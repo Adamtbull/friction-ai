@@ -1,304 +1,1018 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Friction AI</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Friction AI - Slow down your AI, on purpose</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
-<style>
-/* ================= BASE ================= */
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;height:100%}
-body{
-  font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;
-  background:linear-gradient(180deg,#d4e8e6,#e8ecef);
-  color:#1f2937;
-  overscroll-behavior:none;
-}
+  <style>
+    /* =================== */
+    /* SAFARI-FRIENDLY BASE */
+    /* =================== */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
 
-/* Lock page when in chat */
-body.chat-mode{
-  position:fixed;
-  width:100%;
-  overflow:hidden;
-}
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overscroll-behavior: none;
+    }
 
-/* ================= VARIABLES ================= */
-:root{
-  --teal:#5a9a94;
-  --teal-dark:#4a8a84;
-  --white:#fff;
-  --border:#d1d5db;
-  --grey:#6b7280;
-  --safe-top:env(safe-area-inset-top);
-  --safe-bottom:env(safe-area-inset-bottom);
-  --vv-bottom:0px;
-}
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(180deg, #d4e8e6 0%, #e8ecef 100%);
+      color: #1f2937;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
 
-/* ================= HOMEPAGE ================= */
-.homepage{
-  max-width:600px;
-  margin:0 auto;
-  padding:60px 24px;
-  text-align:center;
-}
-.homepage.hidden{display:none}
+    button, input, textarea, select {
+      font: inherit;
+      color: inherit;
+      letter-spacing: inherit;
+    }
 
-.brand{letter-spacing:3px;color:var(--teal);font-size:0.8rem;margin-bottom:24px}
-.headline{font-size:2rem;margin-bottom:12px}
-.sub{color:var(--grey);margin-bottom:40px}
+    button,
+    input[type="text"],
+    textarea,
+    select {
+      -webkit-appearance: none;
+      appearance: none;
+    }
 
-.btn{
-  display:block;
-  width:100%;
-  max-width:280px;
-  margin:12px auto;
-  padding:14px;
-  border-radius:8px;
-  border:1px solid var(--border);
-  background:var(--white);
-  cursor:pointer;
-}
-.btn.primary{
-  background:var(--teal);
-  color:white;
-  border:none;
-}
+    button {
+      background: none;
+    }
 
-/* ================= CHAT APP ================= */
-.chat-app{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:linear-gradient(180deg,#d4e8e6,#e8ecef);
-}
-.chat-app.active{display:block}
+    button, a, input, textarea, select {
+      -webkit-tap-highlight-color: transparent;
+    }
 
-/* Header */
-.chat-header{
-  position:fixed;
-  top:0;left:0;right:0;
-  padding:16px 20px;
-  padding-top:calc(16px + var(--safe-top));
-  background:rgba(255,255,255,0.8);
-  backdrop-filter:blur(10px);
-  border-bottom:1px solid var(--border);
-  z-index:10;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-.chat-logo{color:var(--teal);font-size:0.8rem}
+    /* Lock background scroll when overlay is open */
+    body.scroll-locked {
+      position: fixed;
+      width: 100%;
+      overflow: hidden;
+    }
 
-/* Messages */
-.chat-messages{
-  position:fixed;
-  top:72px;
-  bottom:calc(90px + var(--vv-bottom));
-  left:0;right:0;
-  padding:20px;
-  overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
-  display:flex;
-  flex-direction:column;
-  gap:16px;
-}
-.message{
-  max-width:80%;
-  padding:12px 16px;
-  border-radius:16px;
-  font-size:0.95rem;
-}
-.user{align-self:flex-end;background:var(--teal);color:white}
-.ai{align-self:flex-start;background:white;border:1px solid var(--border)}
+    /* NEW: Lock PAGE scroll when chat is active (prevents Safari from shifting page when keyboard opens) */
+    body.chat-mode {
+      position: fixed;
+      width: 100%;
+      overflow: hidden;
+    }
 
-/* Input */
-.chat-input-area{
-  position:fixed;
-  left:0;right:0;
-  bottom:calc(var(--safe-bottom) + var(--vv-bottom));
-  padding:12px 16px calc(16px + var(--safe-bottom));
-  background:rgba(255,255,255,0.9);
-  backdrop-filter:blur(10px);
-  border-top:1px solid var(--border);
-}
-.chat-input-wrap{
-  display:flex;
-  gap:10px;
-  align-items:flex-end;
-}
-textarea{
-  flex:1;
-  min-height:44px;
-  max-height:150px;
-  padding:12px;
-  border-radius:12px;
-  border:1px solid var(--border);
-  font-size:16px;
-  resize:none;
-}
-.send{
-  width:44px;height:44px;
-  border-radius:12px;
-  border:none;
-  background:var(--teal);
-  color:white;
-  cursor:pointer;
-}
+    /* iOS safe areas + dynamic viewport */
+    :root {
+      --teal-light: #d4e8e6;
+      --teal-lighter: #e8f4f3;
+      --teal: #5a9a94;
+      --teal-dark: #4a8a84;
+      --grey-light: #e8ecef;
+      --grey: #6b7280;
+      --grey-dark: #374151;
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --white: #ffffff;
+      --border: #d1d5db;
+      --shadow: rgba(0, 0, 0, 0.05);
 
-/* ================= FRICTION OVERLAY ================= */
-.friction{
-  position:fixed;
-  inset:0;
-  background:rgba(255,255,255,0.95);
-  backdrop-filter:blur(10px);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:100;
-}
-.friction.active{display:flex}
-.friction-box{
-  background:white;
-  padding:24px;
-  border-radius:16px;
-  width:100%;
-  max-width:400px;
-  text-align:center;
-  border:1px solid var(--border);
-}
-code{
-  display:block;
-  background:#eee;
-  padding:10px;
-  border-radius:8px;
-  margin-bottom:8px;
-  user-select:none;
-}
-</style>
+      --app-height: 100vh;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+      /* NEW: iOS keyboard covered space (stable) */
+      --vv-bottom: 0px;
+
+      /* NEW: measured heights so the middle panel fits perfectly */
+      --header-h: 80px;
+      --composer-h: 110px;
+    }
+
+    @supports (height: 100dvh) {
+      :root { --app-height: 100dvh; }
+    }
+
+    /* =================== */
+    /* HOMEPAGE STYLES     */
+    /* =================== */
+    .homepage {
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 24px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .homepage.hidden {
+      display: none;
+    }
+
+    .brand {
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 2px;
+      color: var(--teal);
+      margin-bottom: 24px;
+    }
+
+    .headline {
+      font-size: 2rem;
+      font-weight: 600;
+      text-align: center;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      line-height: 1.3;
+    }
+
+    .subheadline {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-bottom: 40px;
+      max-width: 400px;
+    }
+
+    .section {
+      width: 100%;
+      margin-bottom: 32px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .section-subtitle {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .section-text {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .section-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .section-list li {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      padding-left: 20px;
+      position: relative;
+      margin-bottom: 8px;
+    }
+
+    .section-list li::before {
+      content: "•";
+      color: var(--teal);
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+    }
+
+    .philosophy-line {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0;
+    }
+
+    .cta-section {
+      width: 100%;
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .cta-text {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-oauth {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--white);
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-oauth:hover {
+      border-color: var(--teal);
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .btn-oauth svg {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+    }
+
+    .btn-primary {
+      width: 100%;
+      max-width: 320px;
+      padding: 14px 24px;
+      border: none;
+      border-radius: 8px;
+      background: var(--teal);
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--white);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      background: var(--teal-dark);
+    }
+
+    .footer-note {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 16px;
+    }
+
+    /* =================== */
+    /* CHAT APP STYLES     */
+    /* =================== */
+    .chat-app {
+      display: none;
+      flex-direction: column;
+      height: var(--app-height);
+      background: linear-gradient(180deg, var(--teal-light) 0%, var(--grey-light) 100%);
+
+      /* NEW: make chat truly "app-like" */
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .chat-app.active {
+      display: flex;
+    }
+
+    /* YOUR TOP BAR — kept the same structure, only made it fixed */
+    .chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: calc(16px + var(--safe-top)) 20px 16px;
+      background: rgba(255, 255, 255, 0.6);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+
+      /* NEW: fixed header */
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 50;
+    }
+
+    .chat-logo {
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 1px;
+      color: var(--teal);
+    }
+
+    .header-timer {
+      font-size: 0.8rem;
+      color: var(--teal);
+      background: var(--teal-light);
+      padding: 6px 12px;
+      border-radius: 20px;
+      display: none;
+      white-space: nowrap;
+    }
+
+    .header-timer.active {
+      display: block;
+    }
+
+    .chat-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .model-select {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--white);
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      cursor: pointer;
+      outline: none;
+    }
+
+    .model-select:focus {
+      border-color: var(--teal);
+    }
+
+    .btn-icon {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--white);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex: 0 0 auto;
+    }
+
+    .btn-icon:hover {
+      border-color: var(--teal);
+    }
+
+    .btn-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--grey);
+    }
+
+    /* NEW: messages become the middle fixed scroll panel */
+    .chat-messages {
+      position: fixed;
+      left: 0; right: 0;
+      top: var(--header-h);
+      bottom: calc(var(--composer-h) + var(--vv-bottom));
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-width: 0;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 14px 18px;
+      border-radius: 16px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      min-width: 0;
+    }
+
+    .message-user {
+      align-self: flex-end;
+      background: var(--teal);
+      color: var(--white);
+      border-bottom-right-radius: 4px;
+    }
+
+    .message-ai {
+      align-self: flex-start;
+      background: var(--white);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+
+    .message-error {
+      align-self: center;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #dc2626;
+      font-size: 0.85rem;
+    }
+
+    .welcome-message {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-secondary);
+    }
+
+    .welcome-message h2 {
+      font-size: 1.3rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin: 0 0 8px;
+    }
+
+    .welcome-message p {
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    .typing-indicator {
+      display: none;
+      align-self: flex-start;
+      padding: 16px 20px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+    }
+
+    .typing-indicator.active {
+      display: flex;
+      gap: 4px;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--teal);
+      border-radius: 50%;
+      opacity: 0.4;
+      animation: typing 1.4s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typing {
+      0%, 60%, 100% { opacity: 0.4; transform: translateY(0); }
+      30% { opacity: 1; transform: translateY(-4px); }
+    }
+
+    /* YOUR INPUT BAR — kept same content, made it fixed and stable */
+    .chat-input-area {
+      padding: 16px 20px calc(24px + var(--safe-bottom));
+      background: rgba(255, 255, 255, 0.8);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border);
+
+      /* NEW: fixed composer attached to keyboard */
+      position: fixed;
+      left: 0; right: 0;
+      bottom: calc(var(--safe-bottom) + var(--vv-bottom));
+      z-index: 50;
+
+      /* REMOVED: transform translateY(-kb) — that was causing wobble */
+      transform: none;
+      will-change: bottom;
+    }
+
+    .chat-input-wrapper {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      max-width: 800px;
+      margin: 0 auto;
+      min-width: 0;
+    }
+
+    .chat-input {
+      flex: 1;
+      min-width: 0;
+      padding: 14px 18px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--white);
+      font-size: 16px; /* prevents iOS Safari zoom */
+      color: var(--text-primary);
+      resize: none;
+      min-height: 50px;
+      max-height: 150px;
+      outline: none;
+      line-height: 1.5;
+      overflow: hidden;
+    }
+
+    .chat-input:focus {
+      border-color: var(--teal);
+    }
+
+    .chat-input::placeholder {
+      color: var(--grey);
+    }
+
+    .btn-send {
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 12px;
+      background: var(--teal);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex: 0 0 auto;
+    }
+
+    .btn-send:hover {
+      background: var(--teal-dark);
+    }
+
+    .btn-send:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-send svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--white);
+    }
+
+    /* =================== */
+    /* FRICTION OVERLAY    */
+    /* =================== */
+    .friction-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.95);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 24px;
+      overscroll-behavior: contain;
+    }
+
+    .friction-overlay.active {
+      display: flex;
+    }
+
+    .friction-box {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 24px var(--shadow);
+    }
+
+    .friction-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 8px;
+    }
+
+    .friction-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin: 0 0 24px;
+    }
+
+    .friction-row {
+      margin-bottom: 20px;
+    }
+
+    .friction-label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--grey);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .friction-code {
+      display: block;
+      background: var(--grey-light);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+      font-size: 0.95rem;
+      letter-spacing: 1px;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+      word-break: break-all;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .friction-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+      font-size: 16px; /* prevents iOS Safari zoom */
+      text-align: center;
+      letter-spacing: 1px;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s ease;
+      background: var(--white);
+    }
+
+    .friction-input:focus {
+      border-color: var(--teal);
+    }
+
+    .friction-input.success {
+      border-color: #22c55e;
+    }
+
+    .friction-input.error {
+      border-color: #ef4444;
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    .friction-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .friction-buttons button {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-cancel {
+      background: var(--grey-light);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    .btn-unlock {
+      background: var(--teal);
+      border: none;
+      color: var(--white);
+      opacity: 0.5;
+    }
+
+    .btn-unlock:disabled {
+      cursor: not-allowed;
+    }
+
+    .btn-unlock.ready {
+      opacity: 1;
+    }
+
+    .friction-error {
+      color: #ef4444;
+      font-size: 0.85rem;
+      margin-top: 8px;
+      min-height: 20px;
+    }
+
+    .friction-timer {
+      color: var(--teal);
+      font-size: 0.85rem;
+      margin-top: 16px;
+      min-height: 20px;
+    }
+
+    /* =================== */
+    /* MOBILE RESPONSIVE   */
+    /* =================== */
+    @media (max-width: 600px) {
+      .homepage { padding: 40px 20px; }
+      .headline { font-size: 1.7rem; }
+
+      .auth-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .btn-oauth {
+        width: 100%;
+        max-width: 280px;
+        justify-content: center;
+      }
+
+      .friction-code { font-size: 0.8rem; }
+      .message { max-width: 90%; }
+    }
+  </style>
 </head>
 
 <body>
+  <!-- =================== -->
+  <!-- HOMEPAGE            -->
+  <!-- =================== -->
+  <div class="homepage" id="homepage">
+    <div class="brand">FRICTION AI</div>
 
-<!-- HOMEPAGE -->
-<div class="homepage" id="homepage">
-  <div class="brand">FRICTION AI</div>
-  <h1 class="headline">Slow down your AI — on purpose.</h1>
-  <p class="sub">Thoughtful friction creates awareness.</p>
-  <button class="btn" id="start">Continue</button>
-</div>
+    <h1 class="headline">Slow down your AI — on purpose.</h1>
 
-<!-- CHAT -->
-<div class="chat-app" id="chat">
-  <div class="chat-header">
-    <div class="chat-logo">FRICTION AI</div>
-    <button id="exit">✕</button>
-  </div>
+    <p class="subheadline">Friction AI adds intentional pauses before messages are sent, helping reduce impulsive use and increase presence.</p>
 
-  <div class="chat-messages" id="messages">
-    <div class="message ai">Welcome. Take your time.</div>
-  </div>
+    <div class="section">
+      <h2 class="section-title">How it works</h2>
+      <ul class="section-list">
+        <li>You may be asked to type a short code before sending</li>
+        <li>Continued use gradually increases the effort</li>
+        <li>It caps at two lines and resets after 2 hours</li>
+      </ul>
+    </div>
 
-  <div class="chat-input-area" id="composer">
-    <div class="chat-input-wrap">
-      <textarea id="input" placeholder="Type slowly…"></textarea>
-      <button class="send" id="send">➤</button>
+    <div class="section">
+      <h2 class="section-title">Why</h2>
+      <p class="section-subtitle">Tough love, not punishment.</p>
+      <p class="section-text">We slow things down because we care about attention, presence, and real-world goals.</p>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Our philosophy</h2>
+      <p class="philosophy-line">Ease creates dependency.</p>
+      <p class="philosophy-line">Thoughtful friction creates awareness.</p>
+      <p class="philosophy-line">We optimise for presence, not engagement.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="cta-section">
+      <h2 class="section-title">Try it</h2>
+      <p class="cta-text">By continuing, you're choosing a slower AI experience.</p>
+
+      <div class="auth-buttons">
+        <button class="btn-oauth" id="btnApple" type="button">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+          </svg>
+          Continue with Apple
+        </button>
+
+        <button class="btn-oauth" id="btnGoogle" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Continue with Google
+        </button>
+      </div>
+
+      <button class="btn-primary" id="btnEmail" type="button">Sign in with email</button>
+      <p class="footer-note">Works best in your browser. Home-screen optional.</p>
     </div>
   </div>
-</div>
 
-<!-- FRICTION -->
-<div class="friction" id="friction">
-  <div class="friction-box">
-    <h3>Pause</h3>
-    <code id="code"></code>
-    <input id="codeInput" autocomplete="off">
-    <button class="btn primary" id="unlock">Send</button>
+  <!-- =================== -->
+  <!-- CHAT APPLICATION    -->
+  <!-- =================== -->
+  <div class="chat-app" id="chatApp">
+    <header class="chat-header" id="chatHeader">
+      <div class="chat-logo">FRICTION AI</div>
+      <div class="header-timer" id="headerTimer"></div>
+      <div class="chat-controls">
+        <select class="model-select" id="modelSelect">
+          <option value="claude">Claude</option>
+          <option value="gpt">GPT-4o</option>
+          <option value="gemini">Gemini</option>
+          <option value="perplexity">Perplexity</option>
+          <option value="bing">Bing Search</option>
+        </select>
+
+        <button class="btn-icon" id="btnLogout" title="Sign out" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="chat-messages" id="chatMessages">
+      <div class="welcome-message">
+        <h2>Welcome to Friction AI</h2>
+        <p>Choose a model and start chatting. Remember: slow is intentional.</p>
+      </div>
+    </div>
+
+    <div class="typing-indicator" id="typingIndicator">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    </div>
+
+    <div class="chat-input-area" id="chatComposer">
+      <div class="chat-input-wrapper">
+        <textarea class="chat-input" id="messageInput" placeholder="Type your message..." rows="1"></textarea>
+        <button class="btn-send" id="btnSend" type="button" aria-label="Send message">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+    </div>
   </div>
-</div>
 
-<script>
-/* ================= STATE ================= */
-const homepage=document.getElementById('homepage');
-const chat=document.getElementById('chat');
-const messages=document.getElementById('messages');
-const input=document.getElementById('input');
-const composer=document.getElementById('composer');
-const friction=document.getElementById('friction');
-const codeEl=document.getElementById('code');
-const codeInput=document.getElementById('codeInput');
+  <!-- =================== -->
+  <!-- FRICTION OVERLAY    -->
+  <!-- =================== -->
+  <div class="friction-overlay" id="frictionOverlay">
+    <div class="friction-box">
+      <h2 class="friction-title">Pause & reflect</h2>
+      <p class="friction-subtitle">Type both codes exactly to send your message.</p>
 
-let pending=null;
+      <div class="friction-row">
+        <span class="friction-label">Code 1</span>
+        <code class="friction-code" id="frictionCode1"></code>
+        <input type="text" class="friction-input" id="frictionInput1"
+               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+      </div>
 
-/* ================= CHAT MODE LOCK ================= */
-let scrollY=0;
-function enterChat(){
-  scrollY=window.scrollY;
-  document.body.classList.add('chat-mode');
-  document.body.style.top=`-${scrollY}px`;
-  homepage.classList.add('hidden');
-  chat.classList.add('active');
-  window.scrollTo(0,0);
-  updateKeyboard();
-}
-function exitChat(){
-  document.body.classList.remove('chat-mode');
-  document.body.style.top='';
-  window.scrollTo(0,scrollY);
-  chat.classList.remove('active');
-  homepage.classList.remove('hidden');
-}
+      <div class="friction-row" id="frictionRow2">
+        <span class="friction-label">Code 2</span>
+        <code class="friction-code" id="frictionCode2"></code>
+        <input type="text" class="friction-input" id="frictionInput2"
+               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+      </div>
 
-/* ================= KEYBOARD FIX ================= */
-function updateKeyboard(){
-  if(!window.visualViewport) return;
-  const vv=window.visualViewport;
-  const covered=Math.max(0,window.innerHeight-vv.height);
-  document.documentElement.style.setProperty('--vv-bottom',covered+'px');
-  window.scrollTo(0,0);
-}
-window.visualViewport?.addEventListener('resize',updateKeyboard);
-window.visualViewport?.addEventListener('scroll',updateKeyboard);
+      <div class="friction-buttons">
+        <button class="btn-cancel" id="frictionCancel" type="button">Cancel</button>
+        <button class="btn-unlock" id="frictionUnlock" type="button" disabled>Send message</button>
+      </div>
 
-/* ================= INPUT AUTOGROW ================= */
-input.addEventListener('input',()=>{
-  input.style.height='auto';
-  input.style.height=Math.min(input.scrollHeight,150)+'px';
-});
+      <p class="friction-timer" id="frictionTimer"></p>
+      <p class="friction-error" id="frictionError"></p>
+    </div>
+  </div>
 
-/* ================= FRICTION ================= */
-function genCode(){
-  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$';
-  let r='';
-  for(let i=0;i<8;i++) r+=chars[Math.floor(Math.random()*chars.length)];
-  return r;
-}
+  <script>
+    // ===================
+    // STATE
+    // ===================
+    let state = {
+      messages: [],
+      pendingMessage: null,
+      isProcessing: false
+    };
 
-document.getElementById('send').onclick=()=>{
-  if(!input.value.trim()) return;
-  pending=input.value;
-  codeEl.textContent=genCode();
-  codeInput.value='';
-  friction.classList.add('active');
-};
+    // ===================
+    // DOM ELEMENTS
+    // ===================
+    const homepage = document.getElementById('homepage');
+    const chatApp = document.getElementById('chatApp');
+    const btnApple = document.getElementById('btnApple');
+    const btnGoogle = document.getElementById('btnGoogle');
+    const btnEmail = document.getElementById('btnEmail');
 
-document.getElementById('unlock').onclick=()=>{
-  if(codeInput.value!==codeEl.textContent) return;
-  friction.classList.remove('active');
-  const div=document.createElement('div');
-  div.className='message user';
-  div.textContent=pending;
-  messages.appendChild(div);
-  input.value='';
-  input.style.height='auto';
-};
+    const chatHeader = document.getElementById('chatHeader');
+    const chatComposer = document.getElementById('chatComposer');
 
-/* ================= NAV ================= */
-document.getElementById('start').onclick=enterChat;
-document.getElementById('exit').onclick=exitChat;
-</script>
+    const chatMessages = document.getElementById('chatMessages');
+    const messageInput = document.getElementById('messageInput');
+    const btnSend = document.getElementById('btnSend');
+    const modelSelect = document.getElementById('modelSelect');
+    const btnLogout = document.getElementById('btnLogout');
+    const typingIndicator = document.getElementById('typingIndicator');
 
-</body>
-</html>
+    const frictionOverlay = document.getElementById('frictionOverlay');
+    const frictionCode1 = document.getElementById('frictionCode1');
+    const frictionCode2 = document.getElementById('frictionCode2');
+    const frictionInput1 = document.getElementById('frictionInput1');
+    const frictionInput2 = document.getElementById('frictionInput2');
+    const frictionCancel = document.getElementById('frictionCancel');
+    const frictionUnlock = document.getElementById('frictionUnlock');
+    const frictionError = document.getElementById('frictionError');
+
+    // ===================
+    // CHAT MODE SCROLL LOCK (prevents Safari from scrolling the page when keyboard opens)
+    // ===================
+    let _chatScrollYBeforeLock = 0;
+
+    function enterChatModeLock() {
+      if (document.body.classList.contains('chat-mode')) return;
+      _chatScrollYBeforeLock = window.scrollY || 0;
+      document.body.classList.add('chat-mode');
+      document.body.style.top = '-' + _chatScrollYBeforeLock + 'px';
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+    }
+
+    function exitChatModeLock() {
+      if (!document.body.classList.contains('chat-mode')) return;
+      document.body.classList.remove('chat-mode');
+      const top = document.body.style.top;
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      const y = top ? parseInt(top, 10) * -1 : _chatScrollYBeforeLock;
+      window.scrollTo(0, y || 0);
+    }
+
+    // ===================
+    // OVERLAY SCROLL LOCK (keep yours, but avoid fighting chat-mode)
+    // ===================
+    let _scrollYBeforeLock = 0;
+
+    function lockBodyScroll() {
+      // If chat-mode is already locking the page, don't double-lock
+      if (document.body.classList.contains('chat-mode')) return;
+
+      if (document.body.classList.contains('scroll-locked')) return;
+      _scrollYBeforeLock = window.scrollY || 0;
+      document.body.classList.add('scroll-locked');
+      document.body.style.top = '-' + _scrollYBeforeLock + 'px';
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+    }
+
+    function unlockBodyScroll() {
+      if (document.body.classList.contains('chat-mode')) return;
+
+      if (!document.body.classList.contains('scroll-locked')) return;
+      document.body.classList.remove('scroll-locked');
+      const top = document.body.style.top;
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      const y = top ? parseInt(top, 10) * -1 : _scrollYBeforeLock;
+      window.scrollTo(0, y || 0);
+    }
+
+    function preventTouchMove(e) {
+      const box = document.querySelector('.friction-box');
+      if (box && box.contains(e.target)) return;
+      e.preventDefault();
+    }
+
+    // ===================
+    // MEASURE HEADER/COMPOSER (keeps middle panel perfect even as textarea grows)
+    // ===================
+    function updateFixedHeights() {
+      if (!chatApp.classList.contains('active')) return;
+      const headerH = chatHeader ? chatHeader.offsetHeight : 80;
+      const composerH = chatComposer ? chatComposer.offsetHeight : 110;
+      document.documentElement.style.setProperty('--header-h', headerH + 'px');
+      document.documentElement.style.setProperty('--composer-h', composerH + 'px');
+    }
+
+    // ===================
+    // CODE GENERATION
+    // ===================
+    function generateChallenge(length) {
+      const lower = 'abcdefghjkmnpqrstuvwxyz';
+      const upper = 'ABCDEFGHJKMNPQRSTUVWXYZ';
+      const numbers = '23456789';
+      const symbols = '!@#$%&*^~+-=<>?';
+
+      let result = '';
+      for (let i = 0; i < length; i++) {
+        const pattern = i % 4;
+        let charSet;
+        if (pattern === 0) charSet = lower;
+        else if (pattern === 1) charSet = symbols;
+        else if (pattern === 2
