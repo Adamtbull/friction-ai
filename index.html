@@ -1025,6 +1025,9 @@
 
   <button class="btn-primary" id="btnEmail" type="button">Sign in with email</button>
 
+  <!-- Hidden Google Sign-In button -->
+  <div id="googleButtonHidden" style="position: absolute; opacity: 0; pointer-events: none; height: 0; overflow: hidden;"></div>
+
   <p class="footer-note">Works best in your browser. Home-screen optional.</p>
 </div>
 ```
@@ -1345,8 +1348,14 @@
         google.accounts.id.initialize({
           client_id: GOOGLE_CLIENT_ID,
           callback: handleGoogleSignIn,
-          auto_select: true
+          auto_select: false
         });
+
+        // Render a hidden Google button that we'll click programmatically
+        google.accounts.id.renderButton(
+          document.getElementById('googleButtonHidden'),
+          { theme: 'outline', size: 'large', width: 280 }
+        );
 
         // Check if user already signed in
         if (loadUserFromStorage()) {
@@ -1458,12 +1467,14 @@
     });
     
     btnGoogle.addEventListener('click', function() {
-      google.accounts.id.prompt(function(notification) {
-        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-          // Fallback: show the One Tap UI manually or handle error
-          console.log('Google Sign-In prompt not displayed:', notification.getNotDisplayedReason() || notification.getSkippedReason());
-        }
-      });
+      // Click the hidden Google button to trigger sign-in
+      const hiddenBtn = document.querySelector('#googleButtonHidden div[role="button"]');
+      if (hiddenBtn) {
+        hiddenBtn.click();
+      } else {
+        // Fallback: try One Tap
+        google.accounts.id.prompt();
+      }
     });
     
     btnEmail.addEventListener('click', function() {
