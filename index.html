@@ -1,25 +1,12 @@
-/* CSS updates for Safari mobile compatibility */
-.chat-header {
-    position: fixed;
-    top: env(safe-area-inset-top);
-    width: 100%;
-    z-index: 10;
-}
-
-.chat-input-area {
-    position: fixed;
-    bottom: env(safe-area-inset-bottom);
-    width: 100%;
-    z-index: 10;
-}
-
-// Add JavaScript to handle iOS keyboard events
-window.addEventListener('keyboardDidShow', function(event) {
-    const chatInputArea = document.querySelector('.chat-input-area');
-    chatInputArea.style.bottom = `${event.keyboardHeight}px`;
-});
-
-window.addEventListener('keyboardDidHide', function(event) {
-    const chatInputArea = document.querySelector('.chat-input-area');
-    chatInputArea.style.bottom = 'env(safe-area-inset-bottom)';
-});
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Friction AI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <h1>Welcome to Friction AI</h1>
+    <p>Your content goes here...</p>
+</body>
+</html>
