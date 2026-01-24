@@ -296,6 +296,13 @@
       color: var(--teal);
     }
 
+    .model-display {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
     .header-timer {
       font-size: 0.8rem;
       color: var(--teal);
@@ -703,6 +710,14 @@
 
       .friction-code { font-size: 0.8rem; }
       .message { max-width: 90%; }
+
+      .model-display {
+        font-size: 0.7rem;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
   </style>
 </head>
@@ -776,7 +791,10 @@
   <!-- =================== -->
   <div class="chat-app" id="chatApp">
     <header class="chat-header">
-      <div class="chat-logo">FRICTION AI</div>
+      <div>
+        <div class="chat-logo">FRICTION AI</div>
+        <div class="model-display" id="modelDisplay">Claude Sonnet 4.5</div>
+      </div>
       <div class="header-timer" id="headerTimer"></div>
       <div class="chat-controls">
         <select class="model-select" id="modelSelect">
@@ -878,6 +896,7 @@
     const messageInput = document.getElementById('messageInput');
     const btnSend = document.getElementById('btnSend');
     const modelSelect = document.getElementById('modelSelect');
+    const modelDisplay = document.getElementById('modelDisplay');
     const btnLogout = document.getElementById('btnLogout');
     const typingIndicator = document.getElementById('typingIndicator');
 
@@ -889,6 +908,24 @@
     const frictionCancel = document.getElementById('frictionCancel');
     const frictionUnlock = document.getElementById('frictionUnlock');
     const frictionError = document.getElementById('frictionError');
+
+    // ===================
+    // MODEL DISPLAY
+    // ===================
+    const modelNames = {
+      claude: 'Claude Sonnet 4.5',
+      gpt: 'GPT-4o',
+      gemini: 'Gemini 2.0 Flash',
+      perplexity: 'Perplexity Sonar',
+      bing: 'Bing Search'
+    };
+
+    function updateModelDisplay() {
+      const model = modelSelect.value;
+      modelDisplay.textContent = modelNames[model] || model;
+    }
+
+    modelSelect.addEventListener('change', updateModelDisplay);
 
     // ===================
     // BACKGROUND SCROLL LOCK (for overlay)
