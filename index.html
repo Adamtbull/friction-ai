@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -16,9 +15,7 @@
     /* =================== */
     *,
     *::before,
-    *::after {
-      box-sizing: border-box;
-    }
+    *::after { box-sizing: border-box; }
 
     html, body {
       height: 100%;
@@ -35,6 +32,7 @@
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      overscroll-behavior: none;
     }
 
     button, input, textarea, select {
@@ -43,17 +41,12 @@
       letter-spacing: inherit;
     }
 
-    button,
-    input[type="text"],
-    textarea,
-    select {
+    button, input[type="text"], textarea, select {
       -webkit-appearance: none;
       appearance: none;
     }
 
-    button {
-      background: none;
-    }
+    button { background: none; }
 
     button, a, input, textarea, select {
       -webkit-tap-highlight-color: transparent;
@@ -85,8 +78,12 @@
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
 
-      /* Dynamic keyboard offset for iOS Safari */
-      --kb: 0px;
+      /* iOS keyboard offset (visualViewport covered area) */
+      --vv-bottom: 0px;
+
+      /* measured heights for fixed layout */
+      --header-h: 72px;
+      --composer-h: 110px;
     }
 
     @supports (height: 100dvh) {
@@ -106,9 +103,7 @@
       margin: 0 auto;
     }
 
-    .homepage.hidden {
-      display: none;
-    }
+    .homepage.hidden { display: none; }
 
     .brand {
       font-size: 0.85rem;
@@ -255,9 +250,7 @@
       transition: all 0.2s ease;
     }
 
-    .btn-primary:hover {
-      background: var(--teal-dark);
-    }
+    .btn-primary:hover { background: var(--teal-dark); }
 
     .footer-note {
       font-size: 0.8rem;
@@ -270,20 +263,29 @@
     /* =================== */
     .chat-app {
       display: none;
-      flex-direction: column;
       height: var(--app-height);
       background: linear-gradient(180deg, var(--teal-light) 0%, var(--grey-light) 100%);
     }
 
     .chat-app.active {
-      display: flex;
+      display: block;
     }
 
+    /* Fixed header */
     .chat-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: calc(16px + var(--safe-top)) 20px 16px;
+
+      padding: 16px 20px;
+      padding-top: calc(16px + var(--safe-top));
+
       background: rgba(255, 255, 255, 0.6);
       -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
@@ -307,9 +309,7 @@
       white-space: nowrap;
     }
 
-    .header-timer.active {
-      display: block;
-    }
+    .header-timer.active { display: block; }
 
     .chat-controls {
       display: flex;
@@ -329,9 +329,7 @@
       outline: none;
     }
 
-    .model-select:focus {
-      border-color: var(--teal);
-    }
+    .model-select:focus { border-color: var(--teal); }
 
     .btn-icon {
       width: 36px;
@@ -347,9 +345,7 @@
       flex: 0 0 auto;
     }
 
-    .btn-icon:hover {
-      border-color: var(--teal);
-    }
+    .btn-icon:hover { border-color: var(--teal); }
 
     .btn-icon svg {
       width: 18px;
@@ -357,15 +353,21 @@
       stroke: var(--grey);
     }
 
+    /* Middle scroll area (fixed bounds) */
     .chat-messages {
-      flex: 1;
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: var(--header-h);
+      bottom: calc(var(--composer-h) + var(--vv-bottom));
       overflow-y: auto;
-      padding: 24px 20px calc(24px + 50px + 24px + var(--safe-bottom) + var(--kb));
+      -webkit-overflow-scrolling: touch;
+
+      padding: 24px 20px;
       display: flex;
       flex-direction: column;
       gap: 20px;
       min-width: 0;
-      -webkit-overflow-scrolling: touch;
     }
 
     .message {
@@ -452,16 +454,20 @@
       30% { opacity: 1; transform: translateY(-4px); }
     }
 
+    /* Fixed composer (grows with textarea, sticks to keyboard) */
     .chat-input-area {
+      position: fixed;
+      left: 0;
+      right: 0;
+      z-index: 50;
+
+      bottom: calc(var(--safe-bottom) + var(--vv-bottom));
+
       padding: 16px 20px calc(24px + var(--safe-bottom));
       background: rgba(255, 255, 255, 0.8);
       -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
       border-top: 1px solid var(--border);
-
-      /* Keep input above the iOS keyboard */
-      transform: translateY(calc(-1 * var(--kb)));
-      will-change: transform;
     }
 
     .chat-input-wrapper {
@@ -490,13 +496,9 @@
       overflow: hidden;
     }
 
-    .chat-input:focus {
-      border-color: var(--teal);
-    }
+    .chat-input:focus { border-color: var(--teal); }
 
-    .chat-input::placeholder {
-      color: var(--grey);
-    }
+    .chat-input::placeholder { color: var(--grey); }
 
     .btn-send {
       width: 50px;
@@ -512,9 +514,7 @@
       flex: 0 0 auto;
     }
 
-    .btn-send:hover {
-      background: var(--teal-dark);
-    }
+    .btn-send:hover { background: var(--teal-dark); }
 
     .btn-send:disabled {
       opacity: 0.5;
@@ -544,9 +544,7 @@
       overscroll-behavior: contain;
     }
 
-    .friction-overlay.active {
-      display: flex;
-    }
+    .friction-overlay.active { display: flex; }
 
     .friction-box {
       background: var(--white);
@@ -572,9 +570,7 @@
       margin: 0 0 24px;
     }
 
-    .friction-row {
-      margin-bottom: 20px;
-    }
+    .friction-row { margin-bottom: 20px; }
 
     .friction-label {
       font-size: 0.8rem;
@@ -614,13 +610,9 @@
       background: var(--white);
     }
 
-    .friction-input:focus {
-      border-color: var(--teal);
-    }
+    .friction-input:focus { border-color: var(--teal); }
 
-    .friction-input.success {
-      border-color: #22c55e;
-    }
+    .friction-input.success { border-color: #22c55e; }
 
     .friction-input.error {
       border-color: #ef4444;
@@ -662,13 +654,9 @@
       opacity: 0.5;
     }
 
-    .btn-unlock:disabled {
-      cursor: not-allowed;
-    }
+    .btn-unlock:disabled { cursor: not-allowed; }
 
-    .btn-unlock.ready {
-      opacity: 1;
-    }
+    .btn-unlock.ready { opacity: 1; }
 
     .friction-error {
       color: #ef4444;
@@ -706,7 +694,6 @@
       .message { max-width: 90%; }
     }
   </style>
-
 </head>
 
 <body>
@@ -716,76 +703,69 @@
   <div class="homepage" id="homepage">
     <div class="brand">FRICTION AI</div>
 
-```
-<h1 class="headline">Slow down your AI — on purpose.</h1>
+    <h1 class="headline">Slow down your AI — on purpose.</h1>
+    <p class="subheadline">Friction AI adds intentional pauses before messages are sent, helping reduce impulsive use and increase presence.</p>
 
-<p class="subheadline">Friction AI adds intentional pauses before messages are sent, helping reduce impulsive use and increase presence.</p>
+    <div class="section">
+      <h2 class="section-title">How it works</h2>
+      <ul class="section-list">
+        <li>You may be asked to type a short code before sending</li>
+        <li>Continued use gradually increases the effort</li>
+        <li>It caps at two lines and resets after 2 hours</li>
+      </ul>
+    </div>
 
-<div class="section">
-  <h2 class="section-title">How it works</h2>
-  <ul class="section-list">
-    <li>You may be asked to type a short code before sending</li>
-    <li>Continued use gradually increases the effort</li>
-    <li>It caps at two lines and resets after 2 hours</li>
-  </ul>
-</div>
+    <div class="section">
+      <h2 class="section-title">Why</h2>
+      <p class="section-subtitle">Tough love, not punishment.</p>
+      <p class="section-text">We slow things down because we care about attention, presence, and real-world goals.</p>
+    </div>
 
-<div class="section">
-  <h2 class="section-title">Why</h2>
-  <p class="section-subtitle">Tough love, not punishment.</p>
-  <p class="section-text">We slow things down because we care about attention, presence, and real-world goals.</p>
-</div>
+    <div class="section">
+      <h2 class="section-title">Our philosophy</h2>
+      <p class="philosophy-line">Ease creates dependency.</p>
+      <p class="philosophy-line">Thoughtful friction creates awareness.</p>
+      <p class="philosophy-line">We optimise for presence, not engagement.</p>
+    </div>
 
-<div class="section">
-  <h2 class="section-title">Our philosophy</h2>
-  <p class="philosophy-line">Ease creates dependency.</p>
-  <p class="philosophy-line">Thoughtful friction creates awareness.</p>
-  <p class="philosophy-line">We optimise for presence, not engagement.</p>
-</div>
+    <div class="divider"></div>
 
-<div class="divider"></div>
+    <div class="cta-section">
+      <h2 class="section-title">Try it</h2>
+      <p class="cta-text">By continuing, you're choosing a slower AI experience.</p>
 
-<div class="cta-section">
-  <h2 class="section-title">Try it</h2>
-  <p class="cta-text">By continuing, you're choosing a slower AI experience.</p>
+      <div class="auth-buttons">
+        <button class="btn-oauth" id="btnApple" type="button">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+          </svg>
+          Continue with Apple
+        </button>
 
-  <div class="auth-buttons">
-    <button class="btn-oauth" id="btnApple" type="button">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-      </svg>
-      Continue with Apple
-    </button>
+        <button class="btn-oauth" id="btnGoogle" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Continue with Google
+        </button>
+      </div>
 
-    <button class="btn-oauth" id="btnGoogle" type="button">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-      </svg>
-      Continue with Google
-    </button>
-  </div>
-
-  <button class="btn-primary" id="btnEmail" type="button">Sign in with email</button>
-
-  <p class="footer-note">Works best in your browser. Home-screen optional.</p>
-</div>
-```
-
+      <button class="btn-primary" id="btnEmail" type="button">Sign in with email</button>
+      <p class="footer-note">Works best in your browser. Home-screen optional.</p>
+    </div>
   </div>
 
   <!-- =================== -->
-
   <!-- CHAT APPLICATION    -->
-
   <!-- =================== -->
-
   <div class="chat-app" id="chatApp">
-    <header class="chat-header">
+    <header class="chat-header" id="chatHeader">
       <div class="chat-logo">FRICTION AI</div>
       <div class="header-timer" id="headerTimer"></div>
+
       <div class="chat-controls">
         <select class="model-select" id="modelSelect">
           <option value="claude">Claude</option>
@@ -795,81 +775,74 @@
           <option value="bing">Bing Search</option>
         </select>
 
-```
-    <button class="btn-icon" id="btnLogout" title="Sign out" type="button">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-        <polyline points="16 17 21 12 16 7"></polyline>
-        <line x1="21" y1="12" x2="9" y2="12"></line>
-      </svg>
-    </button>
-  </div>
-</header>
+        <button class="btn-icon" id="btnLogout" title="Sign out" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+    </header>
 
-<div class="chat-messages" id="chatMessages">
-  <div class="welcome-message">
-    <h2>Welcome to Friction AI</h2>
-    <p>Choose a model and start chatting. Remember: slow is intentional.</p>
-  </div>
-</div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="welcome-message">
+        <h2>Welcome to Friction AI</h2>
+        <p>Choose a model and start chatting. Remember: slow is intentional.</p>
+      </div>
+    </div>
 
-<div class="typing-indicator" id="typingIndicator">
-  <div class="typing-dot"></div>
-  <div class="typing-dot"></div>
-  <div class="typing-dot"></div>
-</div>
+    <div class="typing-indicator" id="typingIndicator">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    </div>
 
-<div class="chat-input-area">
-  <div class="chat-input-wrapper">
-    <textarea class="chat-input" id="messageInput" placeholder="Type your message..." rows="1"></textarea>
-    <button class="btn-send" id="btnSend" type="button" aria-label="Send message">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <line x1="22" y1="2" x2="11" y2="13"></line>
-        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-      </svg>
-    </button>
-  </div>
-</div>
-```
-
+    <div class="chat-input-area" id="chatComposer">
+      <div class="chat-input-wrapper">
+        <textarea class="chat-input" id="messageInput" placeholder="Type your message..." rows="1"></textarea>
+        <button class="btn-send" id="btnSend" type="button" aria-label="Send message">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- =================== -->
-
   <!-- FRICTION OVERLAY    -->
-
   <!-- =================== -->
-
   <div class="friction-overlay" id="frictionOverlay">
     <div class="friction-box">
       <h2 class="friction-title">Pause & reflect</h2>
       <p class="friction-subtitle">Type both codes exactly to send your message.</p>
 
-```
-  <div class="friction-row">
-    <span class="friction-label">Code 1</span>
-    <code class="friction-code" id="frictionCode1"></code>
-    <input type="text" class="friction-input" id="frictionInput1"
-           autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
-  </div>
+      <div class="friction-row">
+        <span class="friction-label">Code 1</span>
+        <code class="friction-code" id="frictionCode1"></code>
+        <input type="text" class="friction-input" id="frictionInput1"
+               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+      </div>
 
-  <div class="friction-row" id="frictionRow2">
-    <span class="friction-label">Code 2</span>
-    <code class="friction-code" id="frictionCode2"></code>
-    <input type="text" class="friction-input" id="frictionInput2"
-           autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
-  </div>
+      <div class="friction-row" id="frictionRow2">
+        <span class="friction-label">Code 2</span>
+        <code class="friction-code" id="frictionCode2"></code>
+        <input type="text" class="friction-input" id="frictionInput2"
+               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+      </div>
 
-  <div class="friction-buttons">
-    <button class="btn-cancel" id="frictionCancel" type="button">Cancel</button>
-    <button class="btn-unlock" id="frictionUnlock" type="button" disabled>Send message</button>
-  </div>
+      <div class="friction-buttons">
+        <button class="btn-cancel" id="frictionCancel" type="button">Cancel</button>
+        <button class="btn-unlock" id="frictionUnlock" type="button" disabled>Send message</button>
+      </div>
 
-  <p class="friction-timer" id="frictionTimer"></p>
-  <p class="friction-error" id="frictionError"></p>
-</div>
-```
-
+      <p class="friction-timer" id="frictionTimer"></p>
+      <p class="friction-error" id="frictionError"></p>
+    </div>
   </div>
 
   <script>
@@ -890,6 +863,9 @@
     const btnApple = document.getElementById('btnApple');
     const btnGoogle = document.getElementById('btnGoogle');
     const btnEmail = document.getElementById('btnEmail');
+
+    const chatHeader = document.getElementById('chatHeader');
+    const chatComposer = document.getElementById('chatComposer');
 
     const chatMessages = document.getElementById('chatMessages');
     const messageInput = document.getElementById('messageInput');
@@ -939,6 +915,52 @@
     }
 
     // ===================
+    // LAYOUT MEASUREMENTS
+    // ===================
+    function updateFixedHeights() {
+      if (!chatApp.classList.contains('active')) return;
+
+      // Measure header and composer heights so the middle panel fits perfectly
+      const headerH = chatHeader ? chatHeader.offsetHeight : 72;
+      const composerH = chatComposer ? chatComposer.offsetHeight : 110;
+
+      document.documentElement.style.setProperty('--header-h', headerH + 'px');
+      document.documentElement.style.setProperty('--composer-h', composerH + 'px');
+
+      requestAnimationFrame(scrollChatToBottom);
+    }
+
+    // ===================
+    // iOS KEYBOARD HANDLING (VisualViewport)
+    // ===================
+    function updateKeyboardOffset() {
+      const vv = window.visualViewport;
+      if (!vv) return;
+
+      const covered = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      const overlayOpen = frictionOverlay.classList.contains('active');
+
+      // When overlay is open, don't shift the base chat layout
+      document.documentElement.style.setProperty('--vv-bottom', overlayOpen ? '0px' : (covered + 'px'));
+
+      // After keyboard changes, re-measure composer (it can resize)
+      updateFixedHeights();
+
+      if (!overlayOpen && covered > 0 && document.activeElement === messageInput) {
+        requestAnimationFrame(scrollChatToBottom);
+      }
+    }
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', updateKeyboardOffset);
+      window.visualViewport.addEventListener('scroll', updateKeyboardOffset);
+    }
+    window.addEventListener('resize', () => {
+      updateFixedHeights();
+      updateKeyboardOffset();
+    });
+
+    // ===================
     // CODE GENERATION
     // ===================
     function generateChallenge(length) {
@@ -967,17 +989,23 @@
     function showChat() {
       homepage.classList.add('hidden');
       chatApp.classList.add('active');
-      if (lastMessageTime && frictionLevel > 0) startHeaderTimer();
+
+      updateFixedHeights();
       updateKeyboardOffset();
       scrollChatToBottom();
+
+      if (lastMessageTime && frictionLevel > 0) startHeaderTimer();
     }
 
     function showHomepage() {
       chatApp.classList.remove('active');
       homepage.classList.remove('hidden');
+
       state.messages = [];
-      chatMessages.innerHTML = '<div class="welcome-message"><h2>Welcome to Friction AI</h2><p>Choose a model and start chatting. Remember: slow is intentional.</p></div>';
-      document.documentElement.style.setProperty('--kb', '0px');
+      chatMessages.innerHTML =
+        '<div class="welcome-message"><h2>Welcome to Friction AI</h2><p>Choose a model and start chatting. Remember: slow is intentional.</p></div>';
+
+      document.documentElement.style.setProperty('--vv-bottom', '0px');
     }
 
     btnApple.addEventListener('click', showChat);
@@ -1128,7 +1156,9 @@
       lockBodyScroll();
       document.addEventListener('touchmove', preventTouchMove, { passive: false });
 
-      document.documentElement.style.setProperty('--kb', '0px');
+      // Prevent underlying layout from shifting while overlay is open
+      document.documentElement.style.setProperty('--vv-bottom', '0px');
+
       setTimeout(function() { frictionInput1.focus(); }, 10);
     }
 
@@ -1146,8 +1176,12 @@
 
       startHeaderTimer();
 
-      setTimeout(updateKeyboardOffset, 80);
-      setTimeout(scrollChatToBottom, 100);
+      // Recalculate keyboard + heights after overlay closes
+      setTimeout(() => {
+        updateFixedHeights();
+        updateKeyboardOffset();
+        scrollChatToBottom();
+      }, 80);
     }
 
     function checkFrictionInputs() {
@@ -1215,15 +1249,16 @@
       }
     });
 
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission().catch(function() {});
-    }
-
     loadFrictionState();
 
     // ===================
     // CHAT FUNCTIONS
     // ===================
+    function scrollChatToBottom() {
+      if (!chatApp.classList.contains('active')) return;
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
     function addMessage(content, type) {
       const div = document.createElement('div');
       div.className = 'message message-' + type;
@@ -1266,6 +1301,7 @@
     // BACKEND API CALL
     // ===================
     async function callBackend(model) {
+      // NOTE: GitHub Pages is static hosting; /api/chat won't work until you add a backend (Cloudflare Worker, etc.)
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1292,8 +1328,13 @@
     // INPUT HANDLING
     // ===================
     messageInput.addEventListener('input', function() {
+      // auto-grow textarea
       messageInput.style.height = 'auto';
       messageInput.style.height = Math.min(messageInput.scrollHeight, 150) + 'px';
+
+      // composer height changes -> update fixed heights
+      updateFixedHeights();
+
       requestAnimationFrame(scrollChatToBottom);
     });
 
@@ -1304,6 +1345,7 @@
       messageInput.value = '';
       messageInput.style.height = 'auto';
 
+      updateFixedHeights();
       showFriction(content);
     }
 
@@ -1316,57 +1358,29 @@
       }
     });
 
-    // ===================
-    // iOS KEYBOARD POLISH
-    // ===================
-    function scrollChatToBottom() {
-      if (!chatApp.classList.contains('active')) return;
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function updateKeyboardOffset() {
-      if (!window.visualViewport) return;
-
-      const vv = window.visualViewport;
-      const keyboardHeight = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-
-      const overlayOpen = frictionOverlay.classList.contains('active');
-
-      document.documentElement.style.setProperty('--kb', overlayOpen ? '0px' : (keyboardHeight + 'px'));
-
-      const chatInputFocused = (document.activeElement === messageInput);
-
-      if (!overlayOpen && keyboardHeight > 0 && chatInputFocused) {
-        requestAnimationFrame(function() {
-          scrollChatToBottom();
-          messageInput.scrollIntoView({ block: 'end', behavior: 'auto' });
-        });
-      }
-    }
-
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', updateKeyboardOffset);
-      window.visualViewport.addEventListener('scroll', updateKeyboardOffset);
-    }
-
     document.addEventListener('focusin', function(e) {
       if (e.target === messageInput) {
-        setTimeout(updateKeyboardOffset, 50);
-        setTimeout(scrollChatToBottom, 80);
+        setTimeout(() => {
+          updateFixedHeights();
+          updateKeyboardOffset();
+          scrollChatToBottom();
+        }, 50);
       }
     });
 
     document.addEventListener('focusout', function(e) {
       if (e.target === messageInput) {
         setTimeout(function() {
-          document.documentElement.style.setProperty('--kb', '0px');
+          document.documentElement.style.setProperty('--vv-bottom', '0px');
+          updateFixedHeights();
           scrollChatToBottom();
         }, 80);
       }
     });
 
+    // Initial
+    updateFixedHeights();
     updateKeyboardOffset();
   </script>
-
 </body>
 </html>
