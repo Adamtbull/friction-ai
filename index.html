@@ -27,6 +27,7 @@
       padding: 0;
       -webkit-text-size-adjust: 100%;
       text-size-adjust: 100%;
+      overflow: hidden;
     }
 
     body {
@@ -85,9 +86,6 @@
       --app-height: 100vh;
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
-
-      /* Dynamic keyboard offset for iOS Safari */
-      --kb: 0px;
     }
 
     @supports (height: 100dvh) {
@@ -274,6 +272,7 @@
       flex-direction: column;
       height: var(--app-height);
       background: linear-gradient(180deg, var(--teal-light) 0%, var(--grey-light) 100%);
+      position: relative;
     }
 
     .chat-app.active {
@@ -289,6 +288,10 @@
       -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
       z-index: 10;
     }
 
@@ -360,9 +363,13 @@
     }
 
     .chat-messages {
-      flex: 1;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
       overflow-y: auto;
-      padding: 24px 20px calc(100px + var(--safe-bottom));
+      padding: 24px 20px;
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -455,11 +462,16 @@
     }
 
     .chat-input-area {
-      padding: 16px 20px calc(16px + var(--safe-bottom));
+      padding: 16px 20px;
       background: rgba(255, 255, 255, 0.8);
       -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
       border-top: 1px solid var(--border);
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
     }
 
     .chat-input-wrapper {
@@ -776,7 +788,7 @@
   <!-- CHAT APPLICATION    -->
   <!-- =================== -->
   <div class="chat-app" id="chatApp">
-    <header class="chat-header">
+    <header class="chat-header" id="chatHeader">
       <div class="chat-logo">FRICTION AI</div>
       <div class="header-timer" id="headerTimer"></div>
       <div class="chat-controls">
@@ -811,7 +823,7 @@
       <div class="typing-dot"></div>
     </div>
 
-    <div class="chat-input-area">
+    <div class="chat-input-area" id="chatInputArea">
       <div class="chat-input-wrapper">
         <textarea class="chat-input" id="messageInput" placeholder="Type your message..." rows="1"></textarea>
         <button class="btn-send" id="btnSend" type="button" aria-label="Send message">
@@ -876,12 +888,14 @@
     const btnGoogle = document.getElementById('btnGoogle');
     const btnEmail = document.getElementById('btnEmail');
 
+    const chatHeader = document.getElementById('chatHeader');
     const chatMessages = document.getElementById('chatMessages');
     const messageInput = document.getElementById('messageInput');
     const btnSend = document.getElementById('btnSend');
     const modelSelect = document.getElementById('modelSelect');
     const btnLogout = document.getElementById('btnLogout');
     const typingIndicator = document.getElementById('typingIndicator');
+    const chatInputArea = document.getElementById('chatInputArea');
 
     const frictionOverlay = document.getElementById('frictionOverlay');
     const frictionCode1 = document.getElementById('frictionCode1');
@@ -953,7 +967,7 @@
       homepage.classList.add('hidden');
       chatApp.classList.add('active');
       if (lastMessageTime && frictionLevel > 0) startHeaderTimer();
-      updateAppHeight();
+      updateLayout();
       scrollChatToBottom();
     }
 
@@ -1211,7 +1225,7 @@
       div.className = 'message message-' + type;
       div.textContent = content;
       chatMessages.appendChild(div);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
+      scrollChatToBottom();
     }
 
     async function sendMessage(content) {
@@ -1228,7 +1242,7 @@
 
       typingIndicator.classList.add('active');
       chatMessages.appendChild(typingIndicator);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
+      scrollChatToBottom();
 
       try {
         const response = await callBackend(model);
@@ -1240,7 +1254,7 @@
         state.isProcessing = false;
         btnSend.disabled = false;
         typingIndicator.classList.remove('active');
-        requestAnimationFrame(scrollChatToBottom);
+        scrollChatToBottom();
       }
     }
 
@@ -1276,7 +1290,7 @@
     messageInput.addEventListener('input', function() {
       messageInput.style.height = 'auto';
       messageInput.style.height = Math.min(messageInput.scrollHeight, 150) + 'px';
-      requestAnimationFrame(scrollChatToBottom);
+      scrollChatToBottom();
     });
 
     function handleSend() {
@@ -1306,34 +1320,44 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    function updateAppHeight() {
-      if (!window.visualViewport) return;
-      const vv = window.visualViewport;
-      const appHeight = vv.height + vv.offsetTop;
-      chatApp.style.height = `${appHeight}px`;
+    function updateLayout() {
+      chatMessages.style.top = chatHeader.offsetHeight + 'px';
+      chatMessages.style.bottom = chatInputArea.offsetHeight + 'px';
       scrollChatToBottom();
     }
 
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', updateAppHeight);
-      window.visualViewport.addEventListener('scroll', updateAppHeight);
+    // Scroll-to-bottom hack for keyboard height detection (if needed, but combined with position switch)
+    let initialInnerHeight = window.innerHeight;
+
+    function getKeyboardHeight() {
+      const initialScroll = window.pageYOffset;
+      window.scrollTo(0, document.body.scrollHeight);
+      const keyboardOpenHeight = window.innerHeight;
+      window.scrollTo(0, initialScroll);
+      return initialInnerHeight - keyboardOpenHeight;
     }
 
-    document.addEventListener('focusin', function(e) {
-      if (e.target === messageInput) {
-        setTimeout(updateAppHeight, 50);
-        setTimeout(scrollChatToBottom, 80);
-      }
+    // On focus, switch to absolute position and scroll to bottom
+    messageInput.addEventListener('focus', function() {
+      chatInputArea.style.position = 'absolute';
+      setTimeout(() => {
+        const keyboardHeight = getKeyboardHeight();
+        // Optional: Adjust if needed, but position switch often suffices
+        scrollChatToBottom();
+      }, 300); // Delay for keyboard animation
     });
 
-    document.addEventListener('focusout', function(e) {
-      if (e.target === messageInput) {
-        setTimeout(updateAppHeight, 80);
-        setTimeout(scrollChatToBottom, 100);
-      }
+    messageInput.addEventListener('blur', function() {
+      chatInputArea.style.position = 'fixed';
+      updateLayout();
     });
 
-    updateAppHeight();
+    // Handle resize for orientation changes, etc.
+    window.addEventListener('resize', updateLayout);
+
+    // Initial layout update
+    updateLayout();
+
   </script>
 
 </body>
