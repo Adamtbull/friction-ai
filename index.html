@@ -294,9 +294,10 @@
     }
 
     .chat-header-right {
-      width: 36px;
+      min-width: 70px;
       display: flex;
       justify-content: flex-end;
+      align-items: center;
     }
 
     .model-select {
@@ -317,18 +318,17 @@
     }
 
     .header-timer {
-      font-size: 0.75rem;
+      font-size: 0.65rem;
       color: var(--teal);
       background: var(--teal-light);
-      padding: 4px 10px;
-      border-radius: 20px;
+      padding: 4px 8px;
+      border-radius: 12px;
       display: none;
       white-space: nowrap;
-      margin-left: 8px;
     }
 
     .header-timer.active {
-      display: inline-block;
+      display: block;
     }
 
     .btn-icon {
@@ -789,23 +789,26 @@
   <div class="chat-app" id="chatApp">
     <header class="chat-header">
       <div class="chat-header-left">
-        <button class="btn-icon" id="btnLogout" title="Back" type="button">
+        <button class="btn-icon" id="btnMenu" title="Menu" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M15 18l-6-6 6-6"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
         </button>
       </div>
       <div class="chat-header-center">
         <select class="model-select" id="modelSelect">
-          <option value="claude">Claude ▾</option>
-          <option value="gpt">GPT-4o ▾</option>
-          <option value="gemini">Gemini ▾</option>
-          <option value="perplexity">Perplexity ▾</option>
-          <option value="bing">Bing Search ▾</option>
+          <option value="claude">Claude Sonnet 4.5</option>
+          <option value="gpt">GPT-4o</option>
+          <option value="gemini">Google Gemini 2.5</option>
+          <option value="perplexity">Perplexity Sonar</option>
+          <option value="bing">Bing Search</option>
         </select>
+      </div>
+      <div class="chat-header-right">
         <div class="header-timer" id="headerTimer"></div>
       </div>
-      <div class="chat-header-right"></div>
     </header>
 
 ```
@@ -890,7 +893,7 @@
     const messageInput = document.getElementById('messageInput');
     const btnSend = document.getElementById('btnSend');
     const modelSelect = document.getElementById('modelSelect');
-    const btnLogout = document.getElementById('btnLogout');
+    const btnMenu = document.getElementById('btnMenu');
     const typingIndicator = document.getElementById('typingIndicator');
 
     const frictionOverlay = document.getElementById('frictionOverlay');
@@ -965,7 +968,12 @@
     btnApple.addEventListener('click', showChat);
     btnGoogle.addEventListener('click', showChat);
     btnEmail.addEventListener('click', showChat);
-    btnLogout.addEventListener('click', showHomepage);
+    
+    // Menu button - placeholder for future functionality
+    btnMenu.addEventListener('click', function() {
+      // TODO: Open side menu
+      showHomepage(); // For now, go back to homepage
+    });
 
     // FRICTION SYSTEM
     let challenge1 = '';
