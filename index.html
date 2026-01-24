@@ -481,11 +481,13 @@
       left: 0;
       right: 0;
       z-index: 100;
-      padding: 16px 20px calc(24px + var(--safe-bottom));
-      background: rgba(255, 255, 255, 0.8);
+      padding: 16px 20px calc(16px + var(--safe-bottom));
+      background: rgba(255, 255, 255, 0.95);
       -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
       border-top: 1px solid var(--border);
+      transform: translateY(0);
+      transition: transform 0.1s ease-out;
     }
 
     .chat-input-wrapper {
@@ -1366,9 +1368,41 @@
       });
     }
 
+    // ===================
+    // KEYBOARD TRACKING
+    // ===================
+    function updateInputPosition() {
+      if (!window.visualViewport) return;
+
+      const viewport = window.visualViewport;
+      const keyboardHeight = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
+
+      const inputArea = document.querySelector('.chat-input-area');
+      if (inputArea && keyboardHeight > 0) {
+        // Move input up by keyboard height
+        inputArea.style.transform = `translateY(-${keyboardHeight}px)`;
+      } else if (inputArea) {
+        // Reset to bottom when keyboard closes
+        inputArea.style.transform = 'translateY(0)';
+      }
+
+      requestAnimationFrame(scrollChatToBottom);
+    }
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', updateInputPosition);
+      window.visualViewport.addEventListener('scroll', updateInputPosition);
+    }
+
     document.addEventListener('focusin', (e) => {
       if (e.target === messageInput) {
-        setTimeout(scrollChatToBottom, 100);
+        setTimeout(updateInputPosition, 100);
+      }
+    });
+
+    document.addEventListener('focusout', (e) => {
+      if (e.target === messageInput) {
+        setTimeout(updateInputPosition, 100);
       }
     });
   </script>
