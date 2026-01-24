@@ -584,6 +584,45 @@
       border-bottom: 1px solid var(--border);
     }
 
+    .menu-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .profile-pic {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: var(--grey-light);
+    }
+
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .profile-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .profile-email {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     .menu-title {
       font-size: 0.85rem;
       font-weight: 600;
@@ -1096,7 +1135,13 @@
   <div class="menu-overlay" id="menuOverlay"></div>
   <div class="side-menu" id="sideMenu">
     <div class="menu-header">
-      <span class="menu-title">FRICTION AI</span>
+      <div class="menu-profile" id="menuProfile">
+        <img class="profile-pic" id="profilePic" src="" alt="Profile" />
+        <div class="profile-info">
+          <span class="profile-name" id="profileName"></span>
+          <span class="profile-email" id="profileEmail"></span>
+        </div>
+      </div>
       <button class="btn-close-menu" id="btnCloseMenu" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18"/>
@@ -1312,6 +1357,7 @@
       isAdmin = currentUser.email === ADMIN_EMAIL;
       saveUserToStorage();
       updateModelAccess();
+      updateProfileDisplay();
       showChat();
     }
 
@@ -1360,6 +1406,7 @@
         // Check if user already signed in
         if (loadUserFromStorage()) {
           updateModelAccess();
+          updateProfileDisplay();
         }
       } else {
         // Retry if Google script not loaded yet
@@ -1391,6 +1438,20 @@
     const btnSignOut = document.getElementById('btnSignOut');
     const btnSettings = document.getElementById('btnSettings');
     const btnAbout = document.getElementById('btnAbout');
+    
+    // Profile elements
+    const profilePic = document.getElementById('profilePic');
+    const profileName = document.getElementById('profileName');
+    const profileEmail = document.getElementById('profileEmail');
+
+    function updateProfileDisplay() {
+      if (currentUser) {
+        profilePic.src = currentUser.picture || '';
+        profilePic.style.display = currentUser.picture ? 'block' : 'none';
+        profileName.textContent = currentUser.name || 'User';
+        profileEmail.textContent = currentUser.email || '';
+      }
+    }
 
     const frictionOverlay = document.getElementById('frictionOverlay');
     const frictionCode1 = document.getElementById('frictionCode1');
