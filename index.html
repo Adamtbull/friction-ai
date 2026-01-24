@@ -1,1432 +1,1272 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Friction AI - Focus Dashboard</title>
+    <title>Friction AI - Slow down your AI, on purpose</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:wght@400;500&display=swap');
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
-        :root {
-            --bg-primary: #f8f7f4;
-            --bg-secondary: #ffffff;
-            --bg-tertiary: #f0efec;
-            --bg-overlay: rgba(248, 247, 244, 0.98);
-            --border: #e5e4e0;
-            --border-light: #eeede9;
-            --text-primary: #2d3748;
-            --text-secondary: #5a6578;
-            --text-muted: #8b95a5;
-            --accent: #7c9a8e;
-            --accent-light: #a8c5b8;
-            --accent-dark: #5d7a6e;
-            --danger: #c97a7a;
-            --success: #7c9a7c;
-            --card-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
-            --card-shadow-hover: 0 4px 12px rgba(0,0,0,0.08);
+
+```
+    :root {
+        --teal-light: #e8f4f3;
+        --teal: #5a9a94;
+        --teal-dark: #4a8a84;
+        --grey-light: #f7f9fa;
+        --grey: #6b7280;
+        --grey-dark: #374151;
+        --text-primary: #1f2937;
+        --text-secondary: #6b7280;
+        --white: #ffffff;
+        --border: #e5e7eb;
+        --shadow: rgba(0, 0, 0, 0.05);
+    }
+    
+    html, body {
+        height: 100%;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: linear-gradient(180deg, var(--teal-light) 0%, var(--grey-light) 100%);
+        color: var(--text-primary);
+        line-height: 1.6;
+    }
+    
+    /* =================== */
+    /* HOMEPAGE STYLES     */
+    /* =================== */
+    .homepage {
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 60px 24px;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .homepage.hidden {
+        display: none;
+    }
+    
+    .brand {
+        font-size: 0.85rem;
+        font-weight: 500;
+        letter-spacing: 2px;
+        color: var(--teal);
+        margin-bottom: 24px;
+    }
+    
+    .headline {
+        font-size: 2rem;
+        font-weight: 600;
+        text-align: center;
+        color: var(--text-primary);
+        margin-bottom: 16px;
+        line-height: 1.3;
+    }
+    
+    .subheadline {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        text-align: center;
+        margin-bottom: 40px;
+        max-width: 400px;
+    }
+    
+    .section {
+        width: 100%;
+        margin-bottom: 32px;
+    }
+    
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 12px;
+    }
+    
+    .section-subtitle {
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+    }
+    
+    .section-text {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+    }
+    
+    .section-list {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .section-list li {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        padding-left: 20px;
+        position: relative;
+        margin-bottom: 8px;
+    }
+    
+    .section-list li::before {
+        content: "•";
+        color: var(--teal);
+        position: absolute;
+        left: 0;
+        font-weight: bold;
+    }
+    
+    .philosophy-line {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        margin-bottom: 4px;
+    }
+    
+    .divider {
+        width: 100%;
+        height: 1px;
+        background: var(--border);
+        margin: 24px 0;
+    }
+    
+    .cta-section {
+        width: 100%;
+        text-align: center;
+        margin-top: 16px;
+    }
+    
+    .cta-text {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 16px;
+    }
+    
+    .auth-buttons {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }
+    
+    .btn-oauth {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 20px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--white);
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-oauth:hover {
+        border-color: var(--teal);
+        box-shadow: 0 2px 8px var(--shadow);
+    }
+    
+    .btn-oauth svg {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .btn-primary {
+        width: 100%;
+        max-width: 320px;
+        padding: 14px 24px;
+        border: none;
+        border-radius: 8px;
+        background: var(--teal);
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--white);
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-primary:hover {
+        background: var(--teal-dark);
+    }
+    
+    .footer-note {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-top: 16px;
+    }
+    
+    /* =================== */
+    /* CHAT APP STYLES     */
+    /* =================== */
+    .chat-app {
+        display: none;
+        flex-direction: column;
+        height: 100%;
+        background: linear-gradient(180deg, var(--teal-light) 0%, var(--grey-light) 100%);
+    }
+    
+    .chat-app.active {
+        display: flex;
+    }
+    
+    .chat-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border);
+    }
+    
+    .chat-logo {
+        font-size: 0.85rem;
+        font-weight: 500;
+        letter-spacing: 1px;
+        color: var(--teal);
+    }
+    
+    .header-timer {
+        font-size: 0.8rem;
+        color: var(--teal);
+        background: var(--teal-light);
+        padding: 6px 12px;
+        border-radius: 20px;
+        display: none;
+    }
+    
+    .header-timer.active {
+        display: block;
+    }
+    
+    .chat-controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .model-select {
+        padding: 8px 12px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--white);
+        font-size: 0.85rem;
+        color: var(--text-primary);
+        cursor: pointer;
+        outline: none;
+    }
+    
+    .model-select:focus {
+        border-color: var(--teal);
+    }
+    
+    .btn-icon {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--white);
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-icon:hover {
+        border-color: var(--teal);
+    }
+    
+    .btn-icon svg {
+        width: 18px;
+        height: 18px;
+        stroke: var(--grey);
+    }
+    
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 24px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .message {
+        max-width: 80%;
+        padding: 14px 18px;
+        border-radius: 16px;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+    
+    .message-user {
+        align-self: flex-end;
+        background: var(--teal);
+        color: var(--white);
+        border-bottom-right-radius: 4px;
+    }
+    
+    .message-ai {
+        align-self: flex-start;
+        background: var(--white);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+        border-bottom-left-radius: 4px;
+    }
+    
+    .message-system {
+        align-self: center;
+        background: transparent;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        text-align: center;
+        padding: 8px;
+    }
+    
+    .message-error {
+        align-self: center;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #dc2626;
+        font-size: 0.85rem;
+    }
+    
+    .welcome-message {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-secondary);
+    }
+    
+    .welcome-message h2 {
+        font-size: 1.3rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+    }
+    
+    .welcome-message p {
+        font-size: 0.95rem;
+    }
+    
+    .typing-indicator {
+        display: none;
+        align-self: flex-start;
+        padding: 16px 20px;
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        border-bottom-left-radius: 4px;
+    }
+    
+    .typing-indicator.active {
+        display: flex;
+        gap: 4px;
+    }
+    
+    .typing-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--teal);
+        border-radius: 50%;
+        opacity: 0.4;
+        animation: typing 1.4s infinite ease-in-out;
+    }
+    
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    
+    @keyframes typing {
+        0%, 60%, 100% { opacity: 0.4; transform: translateY(0); }
+        30% { opacity: 1; transform: translateY(-4px); }
+    }
+    
+    .chat-input-area {
+        padding: 16px 20px 24px;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid var(--border);
+    }
+    
+    .chat-input-wrapper {
+        display: flex;
+        gap: 12px;
+        align-items: flex-end;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .chat-input {
+        flex: 1;
+        padding: 14px 18px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: var(--white);
+        font-family: inherit;
+        font-size: 0.95rem;
+        color: var(--text-primary);
+        resize: none;
+        min-height: 50px;
+        max-height: 150px;
+        outline: none;
+        line-height: 1.5;
+    }
+    
+    .chat-input:focus {
+        border-color: var(--teal);
+    }
+    
+    .chat-input::placeholder {
+        color: var(--grey);
+    }
+    
+    .btn-send {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        border-radius: 12px;
+        background: var(--teal);
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-send:hover {
+        background: var(--teal-dark);
+    }
+    
+    .btn-send:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    .btn-send svg {
+        width: 20px;
+        height: 20px;
+        stroke: var(--white);
+    }
+    
+    /* =================== */
+    /* FRICTION OVERLAY    */
+    /* =================== */
+    .friction-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 24px;
+    }
+    
+    .friction-overlay.active {
+        display: flex;
+    }
+    
+    .friction-box {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 420px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 4px 24px var(--shadow);
+    }
+    
+    .friction-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+    }
+    
+    .friction-subtitle {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 24px;
+    }
+    
+    .friction-row {
+        margin-bottom: 20px;
+    }
+    
+    .friction-label {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--grey);
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    .friction-code {
+        display: block;
+        background: var(--grey-light);
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+        font-size: 0.95rem;
+        letter-spacing: 1px;
+        color: var(--text-primary);
+        margin-bottom: 10px;
+        word-break: break-all;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+    
+    .friction-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid var(--border);
+        border-radius: 8px;
+        font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+        font-size: 0.95rem;
+        text-align: center;
+        letter-spacing: 1px;
+        color: var(--text-primary);
+        outline: none;
+        transition: border-color 0.2s ease;
+    }
+    
+    .friction-input:focus {
+        border-color: var(--teal);
+    }
+    
+    .friction-input.success {
+        border-color: #22c55e;
+    }
+    
+    .friction-input.error {
+        border-color: #ef4444;
+        animation: shake 0.4s ease;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-6px); }
+        75% { transform: translateX(6px); }
+    }
+    
+    .friction-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+    }
+    
+    .friction-buttons button {
+        flex: 1;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-cancel {
+        background: var(--grey-light);
+        border: 1px solid var(--border);
+        color: var(--text-secondary);
+    }
+    
+    .btn-cancel:hover {
+        background: var(--border);
+    }
+    
+    .btn-unlock {
+        background: var(--teal);
+        border: none;
+        color: var(--white);
+        opacity: 0.5;
+    }
+    
+    .btn-unlock:disabled {
+        cursor: not-allowed;
+    }
+    
+    .btn-unlock.ready {
+        opacity: 1;
+    }
+    
+    .btn-unlock.ready:hover {
+        background: var(--teal-dark);
+    }
+    
+    .friction-error {
+        color: #ef4444;
+        font-size: 0.85rem;
+        margin-top: 8px;
+        min-height: 20px;
+    }
+    
+    .friction-timer {
+        color: var(--teal);
+        font-size: 0.85rem;
+        margin-top: 16px;
+        min-height: 20px;
+    }
+    
+    .friction-reset-notice {
+        background: var(--teal-light);
+        border: 1px solid var(--teal);
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-top: 16px;
+        font-size: 0.85rem;
+        color: var(--teal-dark);
+    }
+    
+    /* =================== */
+    /* MOBILE RESPONSIVE   */
+    /* =================== */
+    @media (max-width: 600px) {
+        .homepage {
+            padding: 40px 20px;
         }
         
-        html, body {
-            height: 100%;
-            overflow-x: hidden;
+        .headline {
+            font-size: 1.7rem;
         }
         
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-        }
-        
-        /* Header */
-        .header {
-            padding: 20px 24px;
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        
-        .logo {
-            font-family: 'Source Serif 4', Georgia, serif;
-            font-weight: 500;
-            font-size: 1.25rem;
-            color: var(--text-primary);
-            letter-spacing: -0.3px;
-        }
-        
-        .logo span {
-            color: var(--accent);
-        }
-        
-        .header-controls {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-        
-        .btn {
-            font-family: 'Inter', sans-serif;
-            font-size: 0.85rem;
-            font-weight: 500;
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: var(--bg-secondary);
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .btn:hover {
-            border-color: var(--accent);
-            color: var(--accent-dark);
-        }
-        
-        .btn-icon {
-            padding: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .btn-icon svg {
-            width: 18px;
-            height: 18px;
-            stroke: var(--text-muted);
-        }
-        
-        /* Main Layout */
-        .main-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 24px;
-            display: flex;
+        .auth-buttons {
             flex-direction: column;
-            gap: 24px;
-            min-height: calc(100vh - 70px);
-        }
-        
-        /* Cards */
-        .card {
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            padding: 20px;
-            box-shadow: var(--card-shadow);
-        }
-        
-        .card-header {
-            display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
         }
         
-        .card-title {
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-muted);
-        }
-        
-        .card-action {
-            font-size: 0.8rem;
-            color: var(--accent);
-            cursor: pointer;
-            border: none;
-            background: none;
-            font-weight: 500;
-        }
-        
-        .card-action:hover {
-            color: var(--accent-dark);
-        }
-        
-        /* Projects Grid */
-        .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 12px;
-        }
-        
-        .project-item {
-            padding: 16px;
-            background: var(--bg-tertiary);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 1px solid transparent;
-        }
-        
-        .project-item:hover {
-            border-color: var(--accent-light);
-            transform: translateY(-1px);
-        }
-        
-        .project-icon {
-            font-size: 1.5rem;
-            margin-bottom: 8px;
-        }
-        
-        .project-name {
-            font-weight: 500;
-            font-size: 0.95rem;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-        
-        .project-desc {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-        
-        /* Links Section */
-        .links-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-        }
-        
-        @media (max-width: 600px) {
-            .links-section {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .links-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        .link-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            background: var(--bg-tertiary);
-            border-radius: 8px;
-            text-decoration: none;
-            color: var(--text-primary);
-            transition: all 0.2s ease;
-            border: 1px solid transparent;
-        }
-        
-        .link-item:hover {
-            border-color: var(--accent-light);
-            background: var(--bg-secondary);
-        }
-        
-        .link-item.friction-required {
-            position: relative;
-        }
-        
-        .link-item.friction-required::after {
-            content: '🔒';
-            font-size: 0.7rem;
-            position: absolute;
-            right: 12px;
-        }
-        
-        .link-icon {
-            font-size: 1.1rem;
-        }
-        
-        .link-name {
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-        
-        /* AI Chat Section */
-        .chat-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-height: 400px;
-        }
-        
-        .chat-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-        }
-        
-        .model-select {
-            font-family: 'Inter', sans-serif;
-            font-size: 0.85rem;
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            cursor: pointer;
-        }
-        
-        .model-select:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-        
-        .chat-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-            background: var(--bg-tertiary);
-            border-radius: 8px;
-            margin-bottom: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        
-        .message {
-            max-width: 80%;
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-        
-        .message-user {
-            align-self: flex-end;
-            background: var(--accent);
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
-        
-        .message-ai {
-            align-self: flex-start;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-bottom-left-radius: 4px;
-        }
-        
-        .message-system {
-            align-self: center;
-            background: transparent;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            text-align: center;
-        }
-        
-        .message-error {
-            align-self: center;
-            background: rgba(201, 122, 122, 0.1);
-            border: 1px solid var(--danger);
-            color: var(--danger);
-            font-size: 0.85rem;
-        }
-        
-        /* Typing indicator */
-        .typing-indicator {
-            display: none;
-            align-self: flex-start;
-            padding: 16px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-        }
-        
-        .typing-indicator.active {
-            display: flex;
-            gap: 4px;
-        }
-        
-        .typing-dot {
-            width: 6px;
-            height: 6px;
-            background: var(--text-muted);
-            border-radius: 50%;
-            animation: typing 1.4s infinite ease-in-out;
-        }
-        
-        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-        
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-            30% { transform: translateY(-3px); opacity: 1; }
-        }
-        
-        /* Input Area */
-        .input-wrapper {
-            display: flex;
-            gap: 12px;
-            align-items: flex-end;
-        }
-        
-        .input-wrapper textarea {
-            flex: 1;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            padding: 14px 16px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            resize: none;
-            min-height: 50px;
-            max-height: 150px;
-            line-height: 1.5;
-            transition: border-color 0.2s;
-        }
-        
-        .input-wrapper textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-        
-        .input-wrapper textarea::placeholder {
-            color: var(--text-muted);
-        }
-        
-        .btn-send {
-            padding: 14px 24px;
-            background: var(--accent);
-            border-color: var(--accent);
-            color: white;
-            font-weight: 500;
-            border-radius: 12px;
-        }
-        
-        .btn-send:hover {
-            background: var(--accent-dark);
-            border-color: var(--accent-dark);
-            color: white;
-        }
-        
-        .btn-send:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        /* Stats bar */
-        .stats-bar {
-            display: flex;
-            justify-content: center;
-            gap: 24px;
-            padding: 12px;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-        
-        /* Friction Overlay */
-        .friction-overlay {
-            position: fixed;
-            inset: 0;
-            background: var(--bg-overlay);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 20px;
-            backdrop-filter: blur(4px);
-        }
-        
-        .friction-overlay.active {
-            display: flex;
-        }
-        
-        .friction-box {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 32px;
-            max-width: 420px;
+        .btn-oauth {
             width: 100%;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        }
-        
-        .friction-title {
-            font-family: 'Source Serif 4', Georgia, serif;
-            font-size: 1.25rem;
-            font-weight: 500;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-        }
-        
-        .friction-subtitle {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 24px;
-        }
-        
-        .friction-row {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        
-        .friction-label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            font-weight: 500;
+            max-width: 280px;
+            justify-content: center;
         }
         
         .friction-code {
-            display: block;
-            background: var(--bg-tertiary);
-            padding: 14px 16px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            letter-spacing: 1.5px;
-            margin-bottom: 10px;
-            user-select: none;
-            -webkit-user-select: none;
-            font-family: 'SF Mono', Monaco, monospace;
-            color: var(--text-primary);
-            word-break: break-all;
-            border: 1px solid var(--border);
+            font-size: 0.8rem;
         }
         
         .friction-input {
-            font-family: 'SF Mono', Monaco, monospace;
-            font-size: 0.9rem;
-            text-align: center;
-            letter-spacing: 1.5px;
-            width: 100%;
-            padding: 14px;
-            border-radius: 8px;
-            border: 2px solid var(--border);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            transition: border-color 0.2s;
-        }
-        
-        .friction-input:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-        
-        .friction-input.success {
-            border-color: var(--success);
-        }
-        
-        .friction-input.error {
-            border-color: var(--danger);
-            animation: shake 0.4s ease;
-        }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-6px); }
-            75% { transform: translateX(6px); }
-        }
-        
-        .friction-buttons {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-        }
-        
-        .friction-buttons button {
-            flex: 1;
-            padding: 14px;
-            border-radius: 10px;
-            font-weight: 500;
-        }
-        
-        .btn-cancel {
-            background: var(--bg-tertiary);
-            border-color: var(--border);
-            color: var(--text-secondary);
-        }
-        
-        .btn-unlock {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: white;
-            opacity: 0.5;
-        }
-        
-        .btn-unlock:disabled {
-            cursor: not-allowed;
-        }
-        
-        .btn-unlock.ready {
-            opacity: 1;
-        }
-        
-        .btn-unlock.ready:hover {
-            background: var(--accent-dark);
-            border-color: var(--accent-dark);
-        }
-        
-        .friction-error {
-            color: var(--danger);
-            margin-top: 12px;
-            height: 20px;
             font-size: 0.85rem;
         }
         
-        /* Settings Overlay */
-        .settings-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.4);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1001;
-            padding: 20px;
-            backdrop-filter: blur(4px);
+        .message {
+            max-width: 90%;
         }
-        
-        .settings-overlay.active {
-            display: flex;
-        }
-        
-        .settings-box {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 85vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-        }
-        
-        .settings-title {
-            font-family: 'Source Serif 4', Georgia, serif;
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: var(--text-primary);
-            margin-bottom: 20px;
-        }
-        
-        .settings-section {
-            margin-bottom: 18px;
-        }
-        
-        .settings-section label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            margin-bottom: 6px;
-        }
-        
-        .settings-section input[type="text"],
-        .settings-section input[type="password"] {
-            width: 100%;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.85rem;
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            transition: border-color 0.2s;
-        }
-        
-        .settings-section input:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-        
-        .settings-note {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-        
-        .settings-divider {
-            height: 1px;
-            background: var(--border);
-            margin: 20px 0;
-        }
-        
-        .settings-buttons {
-            display: flex;
-            gap: 12px;
-            margin-top: 20px;
-        }
-        
-        .settings-buttons button {
-            flex: 1;
-            padding: 12px;
-            border-radius: 10px;
-        }
-        
-        .btn-save {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: white;
-        }
-        
-        .btn-save:hover {
-            background: var(--accent-dark);
-            border-color: var(--accent-dark);
-        }
-        
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-muted);
-        }
-        
-        .empty-state p {
-            margin-bottom: 12px;
-        }
-        
-        /* Mobile adjustments */
-        @media (max-width: 600px) {
-            .main-container {
-                padding: 16px;
-            }
-            
-            .header {
-                padding: 16px;
-            }
-            
-            .card {
-                padding: 16px;
-            }
-            
-            .projects-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .friction-code {
-                font-size: 0.8rem;
-                letter-spacing: 1px;
-            }
-            
-            .friction-input {
-                font-size: 0.85rem;
-            }
-        }
-    </style>
+    }
+</style>
+```
+
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="logo">Friction<span>.</span></div>
-        <div class="header-controls">
-            <button class="btn btn-icon" id="settingsBtn" title="Settings">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+    <!-- =================== -->
+    <!-- HOMEPAGE            -->
+    <!-- =================== -->
+    <div class="homepage" id="homepage">
+        <div class="brand">FRICTION AI</div>
+
+```
+    <h1 class="headline">Slow down your AI — on purpose.</h1>
+    
+    <p class="subheadline">Friction AI adds intentional pauses before messages are sent, helping reduce impulsive use and increase presence.</p>
+    
+    <div class="section">
+        <h2 class="section-title">How it works</h2>
+        <ul class="section-list">
+            <li>You may be asked to type a short code before sending</li>
+            <li>Continued use gradually increases the effort</li>
+            <li>It caps at two lines and resets after 2 hours</li>
+        </ul>
+    </div>
+    
+    <div class="section">
+        <h2 class="section-title">Why</h2>
+        <p class="section-subtitle">Tough love, not punishment.</p>
+        <p class="section-text">We slow things down because we care about attention, presence, and real-world goals.</p>
+    </div>
+    
+    <div class="section">
+        <h2 class="section-title">Our philosophy</h2>
+        <p class="philosophy-line">Ease creates dependency.</p>
+        <p class="philosophy-line">Thoughtful friction creates awareness.</p>
+        <p class="philosophy-line">We optimise for presence, not engagement.</p>
+    </div>
+    
+    <div class="divider"></div>
+    
+    <div class="cta-section">
+        <h2 class="section-title">Try it</h2>
+        <p class="cta-text">By continuing, you're choosing a slower AI experience.</p>
+        
+        <div class="auth-buttons">
+            <button class="btn-oauth" id="btnApple">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                Continue with Apple
+            </button>
+            <button class="btn-oauth" id="btnGoogle">
+                <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                Continue with Google
+            </button>
+        </div>
+        
+        <button class="btn-primary" id="btnEmail">Sign in with email</button>
+        
+        <p class="footer-note">Works best in your browser. Home-screen optional.</p>
+    </div>
+</div>
+
+<!-- =================== -->
+<!-- CHAT APPLICATION    -->
+<!-- =================== -->
+<div class="chat-app" id="chatApp">
+    <header class="chat-header">
+        <div class="chat-logo">FRICTION AI</div>
+        <div class="header-timer" id="headerTimer"></div>
+        <div class="chat-controls">
+            <select class="model-select" id="modelSelect">
+                <option value="claude">Claude</option>
+                <option value="gpt">GPT-4o</option>
+                <option value="gemini">Gemini</option>
+                <option value="perplexity">Perplexity</option>
+                <option value="bing">Bing Search</option>
+            </select>
+            
+            <button class="btn-icon" id="btnLogout" title="Sign out">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
                 </svg>
             </button>
         </div>
     </header>
-
-    <!-- Main Content -->
-    <main class="main-container">
-        <!-- Projects Section -->
-        <section class="card">
-            <div class="card-header">
-                <h2 class="card-title">📁 My Projects</h2>
-                <button class="card-action" id="editProjectsBtn">Edit</button>
-            </div>
-            <div class="projects-grid" id="projectsGrid">
-                <div class="project-item" data-url="">
-                    <div class="project-icon">🤖</div>
-                    <div class="project-name">Ping Pong Robot</div>
-                    <div class="project-desc">ESP32 + LEGO Technic</div>
-                </div>
-                <div class="project-item" data-url="">
-                    <div class="project-icon">🧩</div>
-                    <div class="project-name">Browser Extension</div>
-                    <div class="project-desc">AI friction tool</div>
-                </div>
-                <div class="project-item" data-url="">
-                    <div class="project-icon">🌐</div>
-                    <div class="project-name">Friction Website</div>
-                    <div class="project-desc">This project</div>
-                </div>
-                <div class="project-item" data-url="">
-                    <div class="project-icon">📋</div>
-                    <div class="project-name">Nursing Competencies</div>
-                    <div class="project-desc">Skills development</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Links Section -->
-        <section class="links-section">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">🔗 Quick Links</h2>
-                    <button class="card-action" id="editLinksBtn">Edit</button>
-                </div>
-                <div class="links-list" id="quickLinks">
-                    <a href="https://notion.so" target="_blank" class="link-item">
-                        <span class="link-icon">📝</span>
-                        <span class="link-name">Notion</span>
-                    </a>
-                    <a href="https://github.com" target="_blank" class="link-item">
-                        <span class="link-icon">💻</span>
-                        <span class="link-name">GitHub</span>
-                    </a>
-                    <a href="https://heystu.com" target="_blank" class="link-item">
-                        <span class="link-icon">🧠</span>
-                        <span class="link-name">Heystu</span>
-                    </a>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">🎯 Focus Goals</h2>
-                    <button class="card-action" id="editGoalsBtn">Edit</button>
-                </div>
-                <div class="links-list" id="focusGoals">
-                    <div class="link-item">
-                        <span class="link-icon">🔄</span>
-                        <span class="link-name">Reduce AI dependency</span>
-                    </div>
-                    <div class="link-item">
-                        <span class="link-icon">🛠️</span>
-                        <span class="link-name">Build more, consume less</span>
-                    </div>
-                    <div class="link-item">
-                        <span class="link-icon">📚</span>
-                        <span class="link-name">Complete nursing skills</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- AI Chat Section -->
-        <section class="card chat-section">
-            <div class="chat-header">
-                <h2 class="card-title">💬 AI Chat <span style="color: var(--danger); font-size: 0.7rem; text-transform: none;">(friction required)</span></h2>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <select class="model-select" id="modelSelect">
-                        <option value="claude">Claude</option>
-                        <option value="gpt">GPT-4o</option>
-                        <option value="gemini">Gemini</option>
-                        <option value="perplexity">Perplexity</option>
-                        <option value="bing">Bing Search</option>
-                    </select>
-                    <button class="btn" id="clearBtn">Clear</button>
-                </div>
-            </div>
-            
-            <div class="chat-container" id="chatContainer">
-                <div class="message message-system">Configure your API keys in settings to begin chatting.</div>
-            </div>
-            
-            <div class="typing-indicator" id="typingIndicator">
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
-            </div>
-            
-            <div class="input-wrapper">
-                <textarea 
-                    id="messageInput" 
-                    placeholder="Type your message..." 
-                    rows="1"
-                ></textarea>
-                <button class="btn btn-send" id="sendBtn">Send</button>
-            </div>
-        </section>
-
-        <!-- Stats -->
-        <div class="stats-bar">
-            <span id="messageCount">Messages today: 0</span>
-            <span>•</span>
-            <span id="frictionCount">Friction codes: 0</span>
-        </div>
-    </main>
-
-    <!-- Friction Overlay -->
-    <div class="friction-overlay" id="frictionOverlay">
-        <div class="friction-box">
-            <div class="friction-title">Pause & Reflect</div>
-            <div class="friction-subtitle">Type both codes to send your message</div>
-            
-            <div class="friction-row">
-                <label class="friction-label">Code 1</label>
-                <code class="friction-code" id="frictionCode1"></code>
-                <input 
-                    type="text" 
-                    class="friction-input" 
-                    id="frictionInput1" 
-                    autocomplete="off"
-                    autocorrect="off"
-                    autocapitalize="off"
-                    spellcheck="false"
-                    placeholder="Type code here"
-                >
-            </div>
-            
-            <div class="friction-row">
-                <label class="friction-label">Code 2</label>
-                <code class="friction-code" id="frictionCode2"></code>
-                <input 
-                    type="text" 
-                    class="friction-input" 
-                    id="frictionInput2" 
-                    autocomplete="off"
-                    autocorrect="off"
-                    autocapitalize="off"
-                    spellcheck="false"
-                    placeholder="Type code here"
-                >
-            </div>
-            
-            <div class="friction-buttons">
-                <button class="btn btn-cancel" id="frictionCancel">Cancel</button>
-                <button class="btn btn-unlock" id="frictionUnlock" disabled>Send</button>
-            </div>
-            <p class="friction-error" id="frictionError"></p>
+    
+    <div class="chat-messages" id="chatMessages">
+        <div class="welcome-message">
+            <h2>Welcome to Friction AI</h2>
+            <p>Choose a model and start chatting. Remember: slow is intentional.</p>
         </div>
     </div>
-
-    <!-- Settings Overlay -->
-    <div class="settings-overlay" id="settingsOverlay">
-        <div class="settings-box">
-            <div class="settings-title">⚙️ Settings</div>
-            
-            <div class="settings-section">
-                <label>Claude API Key</label>
-                <input type="password" id="claudeKey" placeholder="sk-ant-...">
-                <div class="settings-note">console.anthropic.com</div>
-            </div>
-            
-            <div class="settings-section">
-                <label>OpenAI API Key</label>
-                <input type="password" id="openaiKey" placeholder="sk-...">
-                <div class="settings-note">platform.openai.com</div>
-            </div>
-            
-            <div class="settings-section">
-                <label>Gemini API Key</label>
-                <input type="password" id="geminiKey" placeholder="AI...">
-                <div class="settings-note">aistudio.google.com</div>
-            </div>
-            
-            <div class="settings-section">
-                <label>Perplexity API Key</label>
-                <input type="password" id="perplexityKey" placeholder="pplx-...">
-                <div class="settings-note">perplexity.ai/settings/api</div>
-            </div>
-            
-            <div class="settings-section">
-                <label>Bing Search API Key</label>
-                <input type="password" id="bingKey" placeholder="...">
-                <div class="settings-note">azure.microsoft.com</div>
-            </div>
-            
-            <div class="settings-divider"></div>
-            
-            <div class="settings-section">
-                <label>System Prompt (Optional)</label>
-                <textarea id="systemPrompt" style="width:100%; min-height:80px; font-family:inherit; font-size:0.85rem; padding:10px 12px; border-radius:8px; border:1px solid var(--border); background:var(--bg-secondary); color:var(--text-primary); resize:vertical;" placeholder="Custom instructions for the AI..."></textarea>
-            </div>
-            
-            <div class="settings-buttons">
-                <button class="btn btn-cancel" id="settingsCancel">Cancel</button>
-                <button class="btn btn-save" id="settingsSave">Save</button>
-            </div>
+    
+    <div class="typing-indicator" id="typingIndicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+    </div>
+    
+    <div class="chat-input-area">
+        <div class="chat-input-wrapper">
+            <textarea 
+                class="chat-input" 
+                id="messageInput" 
+                placeholder="Type your message..."
+                rows="1"
+            ></textarea>
+            <button class="btn-send" id="btnSend">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
         </div>
     </div>
+</div>
 
-    <script>
-        // ===================
-        // STATE
-        // ===================
-        let state = {
-            messages: [],
-            pendingMessage: null,
-            isProcessing: false,
-            todayMessages: 0,
-            frictionCount: 0,
-            settings: {
-                claudeKey: '',
-                openaiKey: '',
-                geminiKey: '',
-                perplexityKey: '',
-                bingKey: '',
-                systemPrompt: ''
-            }
-        };
+<!-- =================== -->
+<!-- FRICTION OVERLAY    -->
+<!-- =================== -->
+<div class="friction-overlay" id="frictionOverlay">
+    <div class="friction-box">
+        <h2 class="friction-title">Pause & reflect</h2>
+        <p class="friction-subtitle">Type both codes exactly to send your message.</p>
+        
+        <div class="friction-row">
+            <span class="friction-label">Code 1</span>
+            <code class="friction-code" id="frictionCode1"></code>
+            <input 
+                type="text" 
+                class="friction-input" 
+                id="frictionInput1"
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false"
+            >
+        </div>
+        
+        <div class="friction-row" id="frictionRow2">
+            <span class="friction-label">Code 2</span>
+            <code class="friction-code" id="frictionCode2"></code>
+            <input 
+                type="text" 
+                class="friction-input" 
+                id="frictionInput2"
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false"
+            >
+        </div>
+        
+        <div class="friction-buttons">
+            <button class="btn-cancel" id="frictionCancel">Cancel</button>
+            <button class="btn-unlock" id="frictionUnlock" disabled>Send message</button>
+        </div>
+        <p class="friction-timer" id="frictionTimer"></p>
+        <p class="friction-error" id="frictionError"></p>
+    </div>
+</div>
 
-        // ===================
-        // CODE GENERATION
-        // ===================
-        function generateChallenge(length) {
-            const lower = 'abcdefghjkmnpqrstuvwxyz';
-            const upper = 'ABCDEFGHJKMNPQRSTUVWXYZ';
-            const numbers = '23456789';
-            const symbols = '!@#$%&*^~+-=<>?';
+
+
+<script>
+    // ===================
+    // STATE
+    // ===================
+    let state = {
+        messages: [],
+        pendingMessage: null,
+        isProcessing: false
+    };
+
+    // ===================
+    // DOM ELEMENTS
+    // ===================
+    const homepage = document.getElementById('homepage');
+    const chatApp = document.getElementById('chatApp');
+    const btnApple = document.getElementById('btnApple');
+    const btnGoogle = document.getElementById('btnGoogle');
+    const btnEmail = document.getElementById('btnEmail');
+    
+    const chatMessages = document.getElementById('chatMessages');
+    const messageInput = document.getElementById('messageInput');
+    const btnSend = document.getElementById('btnSend');
+    const modelSelect = document.getElementById('modelSelect');
+    const btnLogout = document.getElementById('btnLogout');
+    const typingIndicator = document.getElementById('typingIndicator');
+    
+    const frictionOverlay = document.getElementById('frictionOverlay');
+    const frictionCode1 = document.getElementById('frictionCode1');
+    const frictionCode2 = document.getElementById('frictionCode2');
+    const frictionInput1 = document.getElementById('frictionInput1');
+    const frictionInput2 = document.getElementById('frictionInput2');
+    const frictionCancel = document.getElementById('frictionCancel');
+    const frictionUnlock = document.getElementById('frictionUnlock');
+    const frictionError = document.getElementById('frictionError');
+
+    // ===================
+    // CODE GENERATION
+    // ===================
+    function generateChallenge(length) {
+        const lower = 'abcdefghjkmnpqrstuvwxyz';
+        const upper = 'ABCDEFGHJKMNPQRSTUVWXYZ';
+        const numbers = '23456789';
+        const symbols = '!@#$%&*^~+-=<>?';
+        
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            const pattern = i % 4;
+            let charSet;
+            if (pattern === 0) charSet = lower;
+            else if (pattern === 1) charSet = symbols;
+            else if (pattern === 2) charSet = upper;
+            else charSet = numbers;
             
-            let result = '';
-            for (let i = 0; i < length; i++) {
-                const pattern = i % 4;
-                let charSet;
-                if (pattern === 0) charSet = lower;
-                else if (pattern === 1) charSet = symbols;
-                else if (pattern === 2) charSet = upper;
-                else charSet = numbers;
-                
-                result += charSet.charAt(Math.floor(Math.random() * charSet.length));
-            }
-            return result;
+            result += charSet.charAt(Math.floor(Math.random() * charSet.length));
         }
+        return result;
+    }
 
-        // ===================
-        // DOM ELEMENTS
-        // ===================
-        const chatContainer = document.getElementById('chatContainer');
-        const messageInput = document.getElementById('messageInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const modelSelect = document.getElementById('modelSelect');
-        const clearBtn = document.getElementById('clearBtn');
-        const settingsBtn = document.getElementById('settingsBtn');
-        const typingIndicator = document.getElementById('typingIndicator');
-        const messageCount = document.getElementById('messageCount');
-        const frictionCountEl = document.getElementById('frictionCount');
-        
-        const frictionOverlay = document.getElementById('frictionOverlay');
-        const frictionCode1 = document.getElementById('frictionCode1');
-        const frictionCode2 = document.getElementById('frictionCode2');
-        const frictionInput1 = document.getElementById('frictionInput1');
-        const frictionInput2 = document.getElementById('frictionInput2');
-        const frictionCancel = document.getElementById('frictionCancel');
-        const frictionUnlock = document.getElementById('frictionUnlock');
-        const frictionError = document.getElementById('frictionError');
-        
-        const settingsOverlay = document.getElementById('settingsOverlay');
-        const settingsCancel = document.getElementById('settingsCancel');
-        const settingsSave = document.getElementById('settingsSave');
+    // ===================
+    // NAVIGATION
+    // ===================
+    function showChat() {
+        homepage.classList.add('hidden');
+        chatApp.classList.add('active');
+        // Start header timer if there's an active friction level
+        if (lastMessageTime && frictionLevel > 0) {
+            startHeaderTimer();
+        }
+    }
+    
+    function showHomepage() {
+        chatApp.classList.remove('active');
+        homepage.classList.remove('hidden');
+        state.messages = [];
+        chatMessages.innerHTML = `
+            <div class="welcome-message">
+                <h2>Welcome to Friction AI</h2>
+                <p>Choose a model and start chatting. Remember: slow is intentional.</p>
+            </div>
+        `;
+    }
+    
+    btnApple.addEventListener('click', showChat);
+    btnGoogle.addEventListener('click', showChat);
+    btnEmail.addEventListener('click', showChat);
+    btnLogout.addEventListener('click', showHomepage);
 
-        // ===================
-        // FRICTION SYSTEM
-        // ===================
-        let challenge1 = '';
-        let challenge2 = '';
+    // ===================
+    // FRICTION SYSTEM
+    // ===================
+    let challenge1 = '';
+    let challenge2 = '';
+    let frictionLevel = 0; // 0-4, increases with each message
+    let lastMessageTime = null;
+    let timerInterval = null;
+    const RESET_TIME = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
+    
+    // Load friction state from localStorage
+    function loadFrictionState() {
+        const saved = localStorage.getItem('friction_state');
+        if (saved) {
+            const state = JSON.parse(saved);
+            lastMessageTime = state.lastMessageTime;
+            frictionLevel = state.frictionLevel || 0;
+            
+            // Check if 2 hours have passed - reset if so
+            if (lastMessageTime && (Date.now() - lastMessageTime > RESET_TIME)) {
+                frictionLevel = 0;
+                lastMessageTime = null;
+                saveFrictionState();
+            }
+        }
+    }
+    
+    // Save friction state to localStorage
+    function saveFrictionState() {
+        localStorage.setItem('friction_state', JSON.stringify({
+            frictionLevel: frictionLevel,
+            lastMessageTime: lastMessageTime
+        }));
+    }
+    
+    // Format time remaining as H:MM:SS
+    function formatTimeRemaining(ms) {
+        if (ms <= 0) return '0:00:00';
+        const hours = Math.floor(ms / (1000 * 60 * 60));
+        const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((ms % (1000 * 60)) / 1000);
+        return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    
+    // Update timer display
+    function updateTimer() {
+        const timerEl = document.getElementById('frictionTimer');
+        const headerTimerEl = document.getElementById('headerTimer');
         
-        function showFriction(message) {
-            state.pendingMessage = message;
-            challenge1 = generateChallenge(20);
-            challenge2 = generateChallenge(20);
-            frictionCode1.textContent = challenge1;
+        if (!lastMessageTime || frictionLevel === 0) {
+            timerEl.textContent = '';
+            headerTimerEl.classList.remove('active');
+            headerTimerEl.textContent = '';
+            return;
+        }
+        
+        const elapsed = Date.now() - lastMessageTime;
+        const remaining = RESET_TIME - elapsed;
+        
+        if (remaining <= 0) {
+            // Reset happened!
+            frictionLevel = 0;
+            lastMessageTime = null;
+            saveFrictionState();
+            timerEl.textContent = '🎉 Reset! You\'re back to Level 1.';
+            headerTimerEl.textContent = '🎉 Back to Level 1!';
+            
+            // Send notification if supported
+            if (Notification.permission === 'granted') {
+                new Notification('Friction AI', {
+                    body: 'Your friction level has reset to Level 1!',
+                    icon: '🎉'
+                });
+            }
+            
+            // Clear interval
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            // Hide header timer after 5 seconds
+            setTimeout(() => {
+                headerTimerEl.classList.remove('active');
+            }, 5000);
+        } else {
+            const timeStr = formatTimeRemaining(remaining);
+            timerEl.textContent = `⏱ Resets to Level 1 in ${timeStr}`;
+            headerTimerEl.textContent = `⏱ Level ${Math.min(frictionLevel + 1, 5)} · Resets in ${timeStr}`;
+            headerTimerEl.classList.add('active');
+        }
+    }
+    
+    // Start timer interval
+    function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        updateTimer();
+        timerInterval = setInterval(updateTimer, 1000);
+    }
+    
+    // Start header timer (runs continuously when in chat)
+    let headerTimerInterval = null;
+    function startHeaderTimer() {
+        if (headerTimerInterval) clearInterval(headerTimerInterval);
+        updateTimer();
+        headerTimerInterval = setInterval(updateTimer, 1000);
+    }
+    
+    // Get friction config based on level
+    function getFrictionConfig() {
+        const configs = [
+            { rows: 1, length: 6 },   // Level 0: 6 chars, 1 row
+            { rows: 1, length: 10 },  // Level 1: 10 chars, 1 row
+            { rows: 1, length: 14 },  // Level 2: 14 chars, 1 row
+            { rows: 1, length: 18 },  // Level 3: 18 chars, 1 row
+            { rows: 2, length: 20 }   // Level 4: 20 chars, 2 rows (max)
+        ];
+        return configs[Math.min(frictionLevel, 4)];
+    }
+    
+    function showFriction(message) {
+        // Check for reset before showing friction
+        if (lastMessageTime && (Date.now() - lastMessageTime > RESET_TIME)) {
+            frictionLevel = 0;
+            lastMessageTime = null;
+            saveFrictionState();
+        }
+        
+        state.pendingMessage = message;
+        const config = getFrictionConfig();
+        
+        challenge1 = generateChallenge(config.length);
+        frictionCode1.textContent = challenge1;
+        frictionInput1.value = '';
+        frictionInput1.style.borderColor = '';
+        frictionInput1.classList.remove('success', 'error');
+        
+        // Show/hide second row based on config
+        const row2 = document.getElementById('frictionRow2');
+        if (config.rows === 2) {
+            challenge2 = generateChallenge(config.length);
             frictionCode2.textContent = challenge2;
-            frictionInput1.value = '';
             frictionInput2.value = '';
-            frictionInput1.style.borderColor = 'var(--border)';
-            frictionInput2.style.borderColor = 'var(--border)';
+            frictionInput2.style.borderColor = '';
+            frictionInput2.classList.remove('success', 'error');
+            row2.style.display = 'block';
+        } else {
+            challenge2 = '';
+            row2.style.display = 'none';
+        }
+        
+        frictionUnlock.disabled = true;
+        frictionUnlock.classList.remove('ready');
+        frictionError.textContent = '';
+        
+        // Update subtitle to show current level
+        const subtitle = document.querySelector('.friction-subtitle');
+        if (frictionLevel < 4) {
+            subtitle.textContent = `Level ${frictionLevel + 1} of 5 — Type the code to send.`;
+        } else {
+            subtitle.textContent = `Level 5 of 5 — Maximum friction. Take a 2-hour break to reset.`;
+        }
+        
+        // Start timer display
+        startTimer();
+        
+        frictionOverlay.classList.add('active');
+        frictionInput1.focus();
+    }
+    
+    function hideFriction() {
+        frictionOverlay.classList.remove('active');
+        state.pendingMessage = null;
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+        // Keep header timer running
+        startHeaderTimer();
+    }
+    
+    function checkFrictionInputs() {
+        const config = getFrictionConfig();
+        const match1 = frictionInput1.value === challenge1;
+        const match2 = config.rows === 1 || frictionInput2.value === challenge2;
+        
+        frictionInput1.classList.toggle('success', frictionInput1.value && match1);
+        frictionInput1.classList.toggle('error', frictionInput1.value && !match1);
+        
+        if (config.rows === 2) {
+            frictionInput2.classList.toggle('success', frictionInput2.value && match2);
+            frictionInput2.classList.toggle('error', frictionInput2.value && !match2);
+        }
+        
+        if (match1 && match2) {
+            frictionUnlock.disabled = false;
+            frictionUnlock.classList.add('ready');
+        } else {
             frictionUnlock.disabled = true;
             frictionUnlock.classList.remove('ready');
-            frictionError.textContent = '';
-            frictionOverlay.classList.add('active');
-            frictionInput1.focus();
         }
+        frictionError.textContent = '';
+    }
+    
+    function handlePaste(e) {
+        e.preventDefault();
+        frictionError.textContent = 'No pasting — type it out!';
+    }
+    
+    frictionInput1.addEventListener('input', checkFrictionInputs);
+    frictionInput2.addEventListener('input', checkFrictionInputs);
+    frictionInput1.addEventListener('paste', handlePaste);
+    frictionInput2.addEventListener('paste', handlePaste);
+    frictionInput1.addEventListener('drop', e => e.preventDefault());
+    frictionInput2.addEventListener('drop', e => e.preventDefault());
+    
+    frictionCancel.addEventListener('click', hideFriction);
+    
+    frictionUnlock.addEventListener('click', () => {
+        const wasMaxLevel = frictionLevel >= 4;
         
-        function hideFriction() {
-            frictionOverlay.classList.remove('active');
-            state.pendingMessage = null;
+        // Increase friction level (max 4)
+        if (frictionLevel < 4) {
+            frictionLevel++;
         }
+        lastMessageTime = Date.now();
+        saveFrictionState();
         
-        function checkFrictionInputs() {
-            const match1 = frictionInput1.value === challenge1;
-            const match2 = frictionInput2.value === challenge2;
-            
-            frictionInput1.style.borderColor = frictionInput1.value ? (match1 ? 'var(--success)' : 'var(--danger)') : 'var(--border)';
-            frictionInput2.style.borderColor = frictionInput2.value ? (match2 ? 'var(--success)' : 'var(--danger)') : 'var(--border)';
-            
-            if (match1 && match2) {
-                frictionUnlock.disabled = false;
-                frictionUnlock.classList.add('ready');
-            } else {
-                frictionUnlock.disabled = true;
-                frictionUnlock.classList.remove('ready');
-            }
-            frictionError.textContent = '';
-        }
-        
-        function handleFrictionPaste(e) {
-            e.preventDefault();
-            frictionError.textContent = 'No pasting - type it out!';
-        }
-        
-        frictionInput1.addEventListener('input', checkFrictionInputs);
-        frictionInput2.addEventListener('input', checkFrictionInputs);
-        frictionInput1.addEventListener('paste', handleFrictionPaste);
-        frictionInput2.addEventListener('paste', handleFrictionPaste);
-        frictionInput1.addEventListener('drop', e => e.preventDefault());
-        frictionInput2.addEventListener('drop', e => e.preventDefault());
-        
-        frictionCancel.addEventListener('click', hideFriction);
-        
-        frictionUnlock.addEventListener('click', () => {
-            state.frictionCount++;
-            updateStats();
-            saveStats();
+        // Show timer reset notice at level 5
+        const timerEl = document.getElementById('frictionTimer');
+        if (wasMaxLevel) {
+            timerEl.textContent = '🔄 Level 5 remains. Timer resets to 2 hours with each message.';
+            setTimeout(() => {
+                hideFriction();
+                sendMessage(state.pendingMessage);
+            }, 2000);
+        } else {
             hideFriction();
             sendMessage(state.pendingMessage);
-        });
-
-        // ===================
-        // SETTINGS
-        // ===================
-        function loadSettings() {
-            const saved = localStorage.getItem('friction_settings');
-            if (saved) {
-                state.settings = { ...state.settings, ...JSON.parse(saved) };
-            }
-            
-            const today = new Date().toDateString();
-            const savedStats = localStorage.getItem('friction_stats');
-            if (savedStats) {
-                const stats = JSON.parse(savedStats);
-                if (stats.date === today) {
-                    state.todayMessages = stats.messages || 0;
-                    state.frictionCount = stats.friction || 0;
-                }
-            }
-            
-            updateStats();
-            
-            document.getElementById('claudeKey').value = state.settings.claudeKey;
-            document.getElementById('openaiKey').value = state.settings.openaiKey;
-            document.getElementById('geminiKey').value = state.settings.geminiKey;
-            document.getElementById('perplexityKey').value = state.settings.perplexityKey;
-            document.getElementById('bingKey').value = state.settings.bingKey;
-            document.getElementById('systemPrompt').value = state.settings.systemPrompt;
         }
+    });
+    
+    // Request notification permission on load
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
+    
+    // Load friction state on page load
+    loadFrictionState();
 
-        function saveSettings() {
-            state.settings.claudeKey = document.getElementById('claudeKey').value.trim();
-            state.settings.openaiKey = document.getElementById('openaiKey').value.trim();
-            state.settings.geminiKey = document.getElementById('geminiKey').value.trim();
-            state.settings.perplexityKey = document.getElementById('perplexityKey').value.trim();
-            state.settings.bingKey = document.getElementById('bingKey').value.trim();
-            state.settings.systemPrompt = document.getElementById('systemPrompt').value.trim();
-            
-            localStorage.setItem('friction_settings', JSON.stringify(state.settings));
-            settingsOverlay.classList.remove('active');
-        }
-
-        function saveStats() {
-            localStorage.setItem('friction_stats', JSON.stringify({
-                date: new Date().toDateString(),
-                messages: state.todayMessages,
-                friction: state.frictionCount
-            }));
-        }
-
-        function updateStats() {
-            messageCount.textContent = `Messages today: ${state.todayMessages}`;
-            frictionCountEl.textContent = `Friction codes: ${state.frictionCount}`;
-        }
-
-        settingsBtn.addEventListener('click', () => settingsOverlay.classList.add('active'));
-        settingsCancel.addEventListener('click', () => settingsOverlay.classList.remove('active'));
-        settingsSave.addEventListener('click', saveSettings);
-
-        // ===================
-        // CHAT FUNCTIONALITY
-        // ===================
-        function addMessage(content, type) {
-            const div = document.createElement('div');
-            div.className = `message message-${type}`;
-            div.textContent = content;
-            chatContainer.appendChild(div);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-
-        function getCurrentApiKey() {
-            const model = modelSelect.value;
-            switch (model) {
-                case 'claude': return state.settings.claudeKey;
-                case 'gpt': return state.settings.openaiKey;
-                case 'gemini': return state.settings.geminiKey;
-                case 'perplexity': return state.settings.perplexityKey;
-                case 'bing': return state.settings.bingKey;
-                default: return null;
-            }
-        }
-
-        async function sendMessage(content) {
-            const model = modelSelect.value;
-            const apiKey = getCurrentApiKey();
-            
-            if (!apiKey) {
-                addMessage('No API key configured. Check settings.', 'error');
-                return;
-            }
-            
-            addMessage(content, 'user');
-            state.messages.push({ role: 'user', content });
-            state.todayMessages++;
-            updateStats();
-            saveStats();
-            
-            state.isProcessing = true;
-            sendBtn.disabled = true;
-            typingIndicator.classList.add('active');
-            chatContainer.appendChild(typingIndicator);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-            
-            try {
-                let response;
-                
-                if (model === 'claude') {
-                    response = await callClaude(content, apiKey);
-                } else if (model === 'gpt') {
-                    response = await callOpenAI(content, apiKey);
-                } else if (model === 'gemini') {
-                    response = await callGemini(content, apiKey);
-                } else if (model === 'perplexity') {
-                    response = await callPerplexity(content, apiKey);
-                } else if (model === 'bing') {
-                    response = await callBing(content, apiKey);
-                }
-                
-                state.messages.push({ role: 'assistant', content: response });
-                addMessage(response, 'ai');
-                
-            } catch (error) {
-                addMessage(`Error: ${error.message}`, 'error');
-            } finally {
-                state.isProcessing = false;
-                sendBtn.disabled = false;
-                typingIndicator.classList.remove('active');
-            }
-        }
-
-        // ===================
-        // API CALLS
-        // ===================
-        async function callClaude(content, apiKey) {
-            const messages = state.messages.map(m => ({
-                role: m.role === 'assistant' ? 'assistant' : 'user',
-                content: m.content
-            }));
-            messages.push({ role: 'user', content });
-            
-            const body = {
-                model: 'claude-sonnet-4-20250514',
-                max_tokens: 4096,
-                messages: messages
-            };
-            
-            if (state.settings.systemPrompt) {
-                body.system = state.settings.systemPrompt;
-            }
-            
-            const res = await fetch('https://api.anthropic.com/v1/messages', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': apiKey,
-                    'anthropic-version': '2023-06-01',
-                    'anthropic-dangerous-direct-browser-access': 'true'
-                },
-                body: JSON.stringify(body)
-            });
-            
-            if (!res.ok) {
-                const error = await res.json();
-                throw new Error(error.error?.message || 'Claude API error');
-            }
-            
-            const data = await res.json();
-            return data.content[0].text;
-        }
-
-        async function callOpenAI(content, apiKey) {
-            const messages = [];
-            
-            if (state.settings.systemPrompt) {
-                messages.push({ role: 'system', content: state.settings.systemPrompt });
-            }
-            
-            state.messages.forEach(m => {
-                messages.push({ role: m.role, content: m.content });
-            });
-            messages.push({ role: 'user', content });
-            
-            const res = await fetch('https://api.openai.com/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
-                },
-                body: JSON.stringify({
-                    model: 'gpt-4o',
-                    messages: messages,
-                    max_tokens: 4096
-                })
-            });
-            
-            if (!res.ok) {
-                const error = await res.json();
-                throw new Error(error.error?.message || 'OpenAI API error');
-            }
-            
-            const data = await res.json();
-            return data.choices[0].message.content;
-        }
-
-        async function callGemini(content, apiKey) {
-            const contents = [];
-            
-            state.messages.forEach(m => {
-                contents.push({
-                    role: m.role === 'assistant' ? 'model' : 'user',
-                    parts: [{ text: m.content }]
-                });
-            });
-            contents.push({ role: 'user', parts: [{ text: content }] });
-            
-            const body = { contents };
-            
-            if (state.settings.systemPrompt) {
-                body.systemInstruction = { parts: [{ text: state.settings.systemPrompt }] };
-            }
-            
-            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
-            
-            if (!res.ok) {
-                const error = await res.json();
-                throw new Error(error.error?.message || 'Gemini API error');
-            }
-            
-            const data = await res.json();
-            return data.candidates[0].content.parts[0].text;
-        }
-
-        async function callPerplexity(content, apiKey) {
-            const messages = [];
-            
-            if (state.settings.systemPrompt) {
-                messages.push({ role: 'system', content: state.settings.systemPrompt });
-            }
-            
-            state.messages.forEach(m => {
-                messages.push({ role: m.role, content: m.content });
-            });
-            messages.push({ role: 'user', content });
-            
-            const res = await fetch('https://api.perplexity.ai/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
-                },
-                body: JSON.stringify({
-                    model: 'sonar',
-                    messages: messages
-                })
-            });
-            
-            if (!res.ok) {
-                const error = await res.json();
-                throw new Error(error.error?.message || 'Perplexity API error');
-            }
-            
-            const data = await res.json();
-            let response = data.choices[0].message.content;
-            
-            if (data.citations && data.citations.length > 0) {
-                response += '\n\n**Sources:**\n';
-                data.citations.forEach((url, i) => {
-                    response += `${i + 1}. ${url}\n`;
-                });
-            }
-            
-            return response;
-        }
-
-        async function callBing(query, apiKey) {
-            const res = await fetch(`https://api.bing.microsoft.com/v7.0/search?q=${encodeURIComponent(query)}&count=10`, {
-                method: 'GET',
-                headers: {
-                    'Ocp-Apim-Subscription-Key': apiKey
-                }
-            });
-            
-            if (!res.ok) {
-                const error = await res.json();
-                throw new Error(error.error?.message || 'Bing API error');
-            }
-            
-            const data = await res.json();
-            
-            if (!data.webPages || !data.webPages.value || data.webPages.value.length === 0) {
-                return 'No results found.';
-            }
-            
-            let response = `Search results for "${query}":\n\n`;
-            
-            data.webPages.value.forEach((result, i) => {
-                response += `${i + 1}. ${result.name}\n`;
-                response += `${result.snippet}\n`;
-                response += `${result.url}\n\n`;
-            });
-            
-            return response;
-        }
-
-        // ===================
-        // INPUT HANDLING
-        // ===================
-        messageInput.addEventListener('input', () => {
-            messageInput.style.height = 'auto';
-            messageInput.style.height = Math.min(messageInput.scrollHeight, 150) + 'px';
-        });
-
-        function handleSend() {
-            const content = messageInput.value.trim();
-            if (!content || state.isProcessing) return;
-            
-            messageInput.value = '';
-            messageInput.style.height = 'auto';
-            
-            showFriction(content);
-        }
-
-        sendBtn.addEventListener('click', handleSend);
+    // ===================
+    // CHAT FUNCTIONS
+    // ===================
+    function addMessage(content, type) {
+        const div = document.createElement('div');
+        div.className = `message message-${type}`;
+        div.textContent = content;
+        chatMessages.appendChild(div);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    async function sendMessage(content) {
+        const model = modelSelect.value;
         
-        messageInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSend();
-            }
-        });
+        // Remove welcome message if present
+        const welcome = chatMessages.querySelector('.welcome-message');
+        if (welcome) welcome.remove();
+        
+        addMessage(content, 'user');
+        state.messages.push({ role: 'user', content });
+        
+        state.isProcessing = true;
+        btnSend.disabled = true;
+        typingIndicator.classList.add('active');
+        chatMessages.appendChild(typingIndicator);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        try {
+            // Call our backend API (to be built)
+            const response = await callBackend(model, content);
+            
+            state.messages.push({ role: 'assistant', content: response });
+            addMessage(response, 'ai');
+            
+        } catch (error) {
+            addMessage(`Error: ${error.message}`, 'error');
+        } finally {
+            state.isProcessing = false;
+            btnSend.disabled = false;
+            typingIndicator.classList.remove('active');
+        }
+    }
 
-        clearBtn.addEventListener('click', () => {
-            if (confirm('Clear all messages?')) {
-                state.messages = [];
-                chatContainer.innerHTML = '<div class="message message-system">Configure your API keys in settings to begin chatting.</div>';
-            }
+    // ===================
+    // BACKEND API CALL
+    // ===================
+    async function callBackend(model, content) {
+        const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: model,
+                messages: [...state.messages, { role: 'user', content }]
+            })
         });
+        
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.error || 'Backend API error');
+        }
+        
+        const data = await res.json();
+        return data.response;
+    }
 
-        // ===================
-        // INITIALIZE
-        // ===================
-        loadSettings();
-    </script>
+    // ===================
+    // INPUT HANDLING
+    // ===================
+    messageInput.addEventListener('input', () => {
+        messageInput.style.height = 'auto';
+        messageInput.style.height = Math.min(messageInput.scrollHeight, 150) + 'px';
+    });
+    
+    function handleSend() {
+        const content = messageInput.value.trim();
+        if (!content || state.isProcessing) return;
+        
+        messageInput.value = '';
+        messageInput.style.height = 'auto';
+        
+        showFriction(content);
+    }
+    
+    btnSend.addEventListener('click', handleSend);
+    
+    messageInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSend();
+        }
+    });
+</script>
+```
+
 </body>
 </html>
