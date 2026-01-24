@@ -1403,10 +1403,11 @@
           { theme: 'outline', size: 'large', width: 280 }
         );
 
-        // Check if user already signed in
+        // Check if user already signed in - auto go to chat
         if (loadUserFromStorage()) {
           updateModelAccess();
           updateProfileDisplay();
+          showChat(); // Auto-navigate to chat if already signed in
         }
       } else {
         // Retry if Google script not loaded yet
