@@ -393,15 +393,6 @@
       border-bottom-left-radius: 4px;
     }
 
-    .message-system {
-      align-self: center;
-      background: transparent;
-      color: var(--text-secondary);
-      font-size: 0.85rem;
-      text-align: center;
-      padding: 8px;
-    }
-
     .message-error {
       align-self: center;
       background: #fef2f2;
@@ -549,8 +540,6 @@
       justify-content: center;
       z-index: 1000;
       padding: 24px;
-
-      /* Prevent scroll chaining on iOS */
       overscroll-behavior: contain;
     }
 
@@ -665,10 +654,6 @@
       color: var(--text-secondary);
     }
 
-    .btn-cancel:hover {
-      background: var(--border);
-    }
-
     .btn-unlock {
       background: var(--teal);
       border: none;
@@ -682,10 +667,6 @@
 
     .btn-unlock.ready {
       opacity: 1;
-    }
-
-    .btn-unlock.ready:hover {
-      background: var(--teal-dark);
     }
 
     .friction-error {
@@ -706,13 +687,8 @@
     /* MOBILE RESPONSIVE   */
     /* =================== */
     @media (max-width: 600px) {
-      .homepage {
-        padding: 40px 20px;
-      }
-
-      .headline {
-        font-size: 1.7rem;
-      }
+      .homepage { padding: 40px 20px; }
+      .headline { font-size: 1.7rem; }
 
       .auth-buttons {
         flex-direction: column;
@@ -725,13 +701,8 @@
         justify-content: center;
       }
 
-      .friction-code {
-        font-size: 0.8rem;
-      }
-
-      .message {
-        max-width: 90%;
-      }
+      .friction-code { font-size: 0.8rem; }
+      .message { max-width: 90%; }
     }
   </style>
 </head>
@@ -944,9 +915,7 @@
       window.scrollTo(0, y || 0);
     }
 
-    // Also prevent touchmove on the background when overlay is open (iOS)
     function preventTouchMove(e) {
-      // Allow scrolling inside the friction box if it ever overflows, otherwise block.
       const box = document.querySelector('.friction-box');
       if (box && box.contains(e.target)) return;
       e.preventDefault();
@@ -1104,7 +1073,6 @@
     }
 
     function showFriction(message) {
-      // Reset check
       if (lastMessageTime && (Date.now() - lastMessageTime > RESET_TIME)) {
         frictionLevel = 0;
         lastMessageTime = null;
@@ -1142,15 +1110,14 @@
         subtitle.textContent = `Level 5 of 5 — Maximum friction. Take a 2-hour break to reset.`;
       }
 
-      // Start timer display
       startTimer();
 
-      // Show overlay + lock background scroll
       frictionOverlay.classList.add('active');
       lockBodyScroll();
       document.addEventListener('touchmove', preventTouchMove, { passive: false });
 
-      // Focus input (after a tick helps iOS)
+      // Overlay open: keep kb offset off, then focus
+      document.documentElement.style.setProperty('--kb', '0px');
       setTimeout(() => frictionInput1.focus(), 10);
     }
 
@@ -1163,15 +1130,14 @@
         timerInterval = null;
       }
 
-      // Unlock background scroll
       document.removeEventListener('touchmove', preventTouchMove);
       unlockBodyScroll();
 
-      // Keep header timer running
       startHeaderTimer();
 
-      // Reset keyboard offset if overlay was open while keyboard active
-      setTimeout(updateKeyboardOffset, 50);
+      // Let iOS settle before recalculating viewport/keyboard
+      setTimeout(updateKeyboardOffset, 80);
+      setTimeout(scrollChatToBottom, 100);
     }
 
     function checkFrictionInputs() {
@@ -1220,6 +1186,14 @@
       saveFrictionState();
 
       const timerEl = document.getElementById('frictionTimer');
+
+      // IMPORTANT: kill focus BEFORE closing overlay (prevents iOS zoom/pan glitch)
+      if (document.activeElement && typeof document.activeElement.blur === 'function') {
+        document.activeElement.blur();
+      }
+      frictionInput1.blur();
+      frictionInput2.blur();
+
       if (wasMaxLevel) {
         timerEl.textContent = '🔄 Level 5 remains. Timer resets to 2 hours with each message.';
         setTimeout(() => {
@@ -1275,8 +1249,6 @@
         state.isProcessing = false;
         btnSend.disabled = false;
         typingIndicator.classList.remove('active');
-
-        // Keep bottom aligned after response (esp. iOS keyboard states)
         requestAnimationFrame(scrollChatToBottom);
       }
     }
@@ -1313,7 +1285,6 @@
     messageInput.addEventListener('input', () => {
       messageInput.style.height = 'auto';
       messageInput.style.height = Math.min(messageInput.scrollHeight, 150) + 'px';
-      // Keep bottom visible as the textarea grows
       requestAnimationFrame(scrollChatToBottom);
     });
 
@@ -1338,7 +1309,8 @@
 
     // ===================
     // iOS KEYBOARD POLISH
-    // Keeps input + send visible when keyboard opens
+    // Fix: only scrollIntoView when chat input is focused,
+    // and disable kb offset while overlay is open.
     // ===================
     function scrollChatToBottom() {
       if (!chatApp.classList.contains('active')) return;
@@ -1349,17 +1321,20 @@
       if (!window.visualViewport) return;
 
       const vv = window.visualViewport;
-
-      // Approx keyboard height in px
       const keyboardHeight = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
 
-      document.documentElement.style.setProperty('--kb', keyboardHeight + 'px');
+      const overlayOpen = frictionOverlay.classList.contains('active');
 
-      if (keyboardHeight > 0) {
+      // While overlay is open, don't apply kb offset to chat UI
+      document.documentElement.style.setProperty('--kb', overlayOpen ? '0px' : (keyboardHeight + 'px'));
+
+      const chatInputFocused = (document.activeElement === messageInput);
+
+      // Only nudge/scroll the chat input when it is actually focused
+      if (!overlayOpen && keyboardHeight > 0 && chatInputFocused) {
         requestAnimationFrame(() => {
           scrollChatToBottom();
-          // Ensure input is visible
-          messageInput.scrollIntoView({ block: 'end', behavior: 'smooth' });
+          messageInput.scrollIntoView({ block: 'end', behavior: 'auto' });
         });
       }
     }
@@ -1385,7 +1360,6 @@
       }
     });
 
-    // Run once on load
     updateKeyboardOffset();
   </script>
 </body>
