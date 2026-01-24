@@ -538,6 +538,252 @@
     }
 
     /* =================== */
+    /* SIDE MENU           */
+    /* =================== */
+    .menu-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      z-index: 998;
+    }
+
+    .menu-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 300px;
+      max-width: 85vw;
+      background: var(--white);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      padding-top: var(--safe-top);
+    }
+
+    .side-menu.active {
+      transform: translateX(0);
+    }
+
+    .menu-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .menu-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      color: var(--teal);
+    }
+
+    .btn-close-menu {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .btn-close-menu:hover {
+      background: var(--grey-light);
+    }
+
+    .btn-close-menu svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--grey);
+    }
+
+    .menu-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .menu-btn-new {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      background: transparent;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 20px;
+    }
+
+    .menu-btn-new:hover {
+      border-color: var(--teal);
+      color: var(--teal);
+      background: var(--teal-lighter);
+    }
+
+    .menu-btn-new svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .menu-section {
+      margin-bottom: 16px;
+    }
+
+    .menu-section-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: var(--grey);
+      text-transform: uppercase;
+      padding: 8px 12px;
+    }
+
+    .menu-category {
+      margin-bottom: 4px;
+    }
+
+    .menu-category-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .menu-category-header:hover {
+      background: var(--grey-light);
+    }
+
+    .menu-category-header .chevron {
+      width: 16px;
+      height: 16px;
+      stroke: var(--grey);
+      transition: transform 0.2s ease;
+    }
+
+    .menu-category.expanded .chevron {
+      transform: rotate(180deg);
+    }
+
+    .menu-category-items {
+      display: none;
+      padding-left: 12px;
+    }
+
+    .menu-category.expanded .menu-category-items {
+      display: block;
+    }
+
+    .menu-empty {
+      font-size: 0.8rem;
+      color: var(--grey);
+      padding: 8px 12px;
+      font-style: italic;
+    }
+
+    .menu-chat-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: background 0.2s ease;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .menu-chat-item:hover {
+      background: var(--grey-light);
+      color: var(--text-primary);
+    }
+
+    .menu-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 16px 0;
+    }
+
+    .menu-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .menu-item:hover {
+      background: var(--grey-light);
+      color: var(--text-primary);
+    }
+
+    .menu-item svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .menu-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      padding-bottom: calc(16px + var(--safe-bottom));
+    }
+
+    .menu-item-logout:hover {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+
+    .menu-item-logout:hover svg {
+      stroke: #dc2626;
+    }
+
+    /* =================== */
     /* FRICTION OVERLAY    */
     /* =================== */
     .friction-overlay {
@@ -840,6 +1086,131 @@
 
   </div>
 
+  <!-- SIDE MENU -->
+
+  <div class="menu-overlay" id="menuOverlay"></div>
+  <div class="side-menu" id="sideMenu">
+    <div class="menu-header">
+      <span class="menu-title">FRICTION AI</span>
+      <button class="btn-close-menu" id="btnCloseMenu" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+```
+<div class="menu-content">
+  <button class="menu-btn-new" id="btnNewChat" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19"/>
+      <line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    New Chat
+  </button>
+
+  <div class="menu-section">
+    <div class="menu-section-title">Chat History</div>
+    
+    <div class="menu-category" data-model="claude">
+      <button class="menu-category-header" type="button">
+        <span>Claude</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="menu-category-items">
+        <div class="menu-empty">No chats yet</div>
+      </div>
+    </div>
+
+    <div class="menu-category" data-model="gpt">
+      <button class="menu-category-header" type="button">
+        <span>GPT-4o</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="menu-category-items">
+        <div class="menu-empty">No chats yet</div>
+      </div>
+    </div>
+
+    <div class="menu-category" data-model="gemini">
+      <button class="menu-category-header" type="button">
+        <span>Google Gemini</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="menu-category-items">
+        <div class="menu-empty">No chats yet</div>
+      </div>
+    </div>
+
+    <div class="menu-category" data-model="perplexity">
+      <button class="menu-category-header" type="button">
+        <span>Perplexity</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="menu-category-items">
+        <div class="menu-empty">No chats yet</div>
+      </div>
+    </div>
+
+    <div class="menu-category" data-model="bing">
+      <button class="menu-category-header" type="button">
+        <span>Bing Search</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="menu-category-items">
+        <div class="menu-empty">No chats yet</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu-divider"></div>
+
+  <!-- Placeholder for future menu items -->
+  <div class="menu-section">
+    <div class="menu-section-title">More</div>
+    <button class="menu-item" id="btnSettings" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+      </svg>
+      <span>Settings</span>
+    </button>
+    <button class="menu-item" id="btnAbout" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="16" x2="12" y2="12"/>
+        <line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+      <span>About</span>
+    </button>
+  </div>
+</div>
+
+<div class="menu-footer">
+  <button class="menu-item menu-item-logout" id="btnSignOut" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+      <polyline points="16 17 21 12 16 7"/>
+      <line x1="21" y1="12" x2="9" y2="12"/>
+    </svg>
+    <span>Sign Out</span>
+  </button>
+</div>
+```
+
+  </div>
+
   <!-- FRICTION OVERLAY -->
 
   <div class="friction-overlay" id="frictionOverlay">
@@ -895,6 +1266,15 @@
     const modelSelect = document.getElementById('modelSelect');
     const btnMenu = document.getElementById('btnMenu');
     const typingIndicator = document.getElementById('typingIndicator');
+
+    // Side menu elements
+    const sideMenu = document.getElementById('sideMenu');
+    const menuOverlay = document.getElementById('menuOverlay');
+    const btnCloseMenu = document.getElementById('btnCloseMenu');
+    const btnNewChat = document.getElementById('btnNewChat');
+    const btnSignOut = document.getElementById('btnSignOut');
+    const btnSettings = document.getElementById('btnSettings');
+    const btnAbout = document.getElementById('btnAbout');
 
     const frictionOverlay = document.getElementById('frictionOverlay');
     const frictionCode1 = document.getElementById('frictionCode1');
@@ -969,10 +1349,51 @@
     btnGoogle.addEventListener('click', showChat);
     btnEmail.addEventListener('click', showChat);
     
-    // Menu button - placeholder for future functionality
-    btnMenu.addEventListener('click', function() {
-      // TODO: Open side menu
-      showHomepage(); // For now, go back to homepage
+    // SIDE MENU FUNCTIONS
+    function openMenu() {
+      sideMenu.classList.add('active');
+      menuOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenu() {
+      sideMenu.classList.remove('active');
+      menuOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    btnMenu.addEventListener('click', openMenu);
+    btnCloseMenu.addEventListener('click', closeMenu);
+    menuOverlay.addEventListener('click', closeMenu);
+
+    btnNewChat.addEventListener('click', function() {
+      // Clear current chat and start fresh
+      state.messages = [];
+      chatMessages.innerHTML = '<div class="welcome-message"><div class="welcome-icon">✦</div><h2>How can I help you today?</h2><p>Remember: slow is intentional.</p></div>';
+      closeMenu();
+    });
+
+    btnSignOut.addEventListener('click', function() {
+      closeMenu();
+      showHomepage();
+    });
+
+    btnSettings.addEventListener('click', function() {
+      // TODO: Open settings
+      closeMenu();
+    });
+
+    btnAbout.addEventListener('click', function() {
+      // TODO: Show about page
+      closeMenu();
+    });
+
+    // Category expand/collapse
+    document.querySelectorAll('.menu-category-header').forEach(function(header) {
+      header.addEventListener('click', function() {
+        const category = this.closest('.menu-category');
+        category.classList.toggle('expanded');
+      });
     });
 
     // FRICTION SYSTEM
