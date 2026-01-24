@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <style>
     *,
@@ -1266,6 +1267,99 @@
       isProcessing: false
     };
 
+    // AUTH STATE
+    const GOOGLE_CLIENT_ID = '37442638167-t8m3fql61v05h01qmvall1bki9k88tim.apps.googleusercontent.com';
+    const ADMIN_EMAIL = 'fatboydimsim@gmail.com';
+    
+    let currentUser = null;
+    let isAdmin = false;
+
+    // Free models available to everyone, paid models only for admin
+    const FREE_MODELS = ['gemini', 'bing'];
+    const PAID_MODELS = ['claude', 'gpt', 'grok', 'perplexity'];
+
+    function loadUserFromStorage() {
+      const saved = localStorage.getItem('friction_user');
+      if (saved) {
+        currentUser = JSON.parse(saved);
+        isAdmin = currentUser.email === ADMIN_EMAIL;
+        return true;
+      }
+      return false;
+    }
+
+    function saveUserToStorage() {
+      if (currentUser) {
+        localStorage.setItem('friction_user', JSON.stringify(currentUser));
+      } else {
+        localStorage.removeItem('friction_user');
+      }
+    }
+
+    function handleGoogleSignIn(response) {
+      // Decode the JWT token
+      const payload = JSON.parse(atob(response.credential.split('.')[1]));
+      
+      currentUser = {
+        email: payload.email,
+        name: payload.name,
+        picture: payload.picture
+      };
+      
+      isAdmin = currentUser.email === ADMIN_EMAIL;
+      saveUserToStorage();
+      updateModelAccess();
+      showChat();
+    }
+
+    function signOut() {
+      currentUser = null;
+      isAdmin = false;
+      localStorage.removeItem('friction_user');
+      google.accounts.id.disableAutoSelect();
+      updateModelAccess();
+      showHomepage();
+    }
+
+    function updateModelAccess() {
+      const options = modelSelect.querySelectorAll('option');
+      options.forEach(function(option) {
+        const model = option.value;
+        if (PAID_MODELS.includes(model) && !isAdmin) {
+          option.disabled = true;
+          option.textContent = option.textContent.replace(' 🔒', '') + ' 🔒';
+        } else {
+          option.disabled = false;
+          option.textContent = option.textContent.replace(' 🔒', '');
+        }
+      });
+
+      // If current selection is a paid model and user is not admin, switch to Gemini
+      if (PAID_MODELS.includes(modelSelect.value) && !isAdmin) {
+        modelSelect.value = 'gemini';
+      }
+    }
+
+    function initGoogleSignIn() {
+      if (typeof google !== 'undefined' && google.accounts) {
+        google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: handleGoogleSignIn,
+          auto_select: true
+        });
+
+        // Check if user already signed in
+        if (loadUserFromStorage()) {
+          updateModelAccess();
+        }
+      } else {
+        // Retry if Google script not loaded yet
+        setTimeout(initGoogleSignIn, 100);
+      }
+    }
+
+    initGoogleSignIn();
+
     // DOM ELEMENTS
     const homepage = document.getElementById('homepage');
     const chatApp = document.getElementById('chatApp');
@@ -1358,9 +1452,24 @@
       document.documentElement.style.setProperty('--kb', '0px');
     }
 
-    btnApple.addEventListener('click', showChat);
-    btnGoogle.addEventListener('click', showChat);
-    btnEmail.addEventListener('click', showChat);
+    btnApple.addEventListener('click', function() {
+      // TODO: Apple Sign-In
+      alert('Apple Sign-In coming soon!');
+    });
+    
+    btnGoogle.addEventListener('click', function() {
+      google.accounts.id.prompt(function(notification) {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          // Fallback: show the One Tap UI manually or handle error
+          console.log('Google Sign-In prompt not displayed:', notification.getNotDisplayedReason() || notification.getSkippedReason());
+        }
+      });
+    });
+    
+    btnEmail.addEventListener('click', function() {
+      // TODO: Email Sign-In
+      alert('Email Sign-In coming soon!');
+    });
     
     // SIDE MENU FUNCTIONS
     function openMenu() {
@@ -1388,7 +1497,7 @@
 
     btnSignOut.addEventListener('click', function() {
       closeMenu();
-      showHomepage();
+      signOut();
     });
 
     btnSettings.addEventListener('click', function() {
