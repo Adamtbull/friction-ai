@@ -383,7 +383,7 @@
     .chat-messages {
       flex: 1;
       overflow-y: auto;
-      padding: calc(80px + var(--safe-top)) 20px calc(24px + 50px + 24px + var(--safe-bottom) + var(--kb));
+      padding: calc(80px + var(--safe-top)) 20px calc(100px + var(--safe-bottom));
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -476,15 +476,16 @@
     }
 
     .chat-input-area {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
       padding: 16px 20px calc(24px + var(--safe-bottom));
       background: rgba(255, 255, 255, 0.8);
       -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
       border-top: 1px solid var(--border);
-
-      /* Keep input above the iOS keyboard */
-      transform: translateY(calc(-1 * var(--kb)));
-      will-change: transform;
     }
 
     .chat-input-wrapper {
@@ -1005,7 +1006,6 @@
       homepage.classList.add('hidden');
       chatApp.classList.add('active');
       if (lastMessageTime && frictionLevel > 0) startHeaderTimer();
-      updateKeyboardOffset();
       scrollChatToBottom();
     }
 
@@ -1019,7 +1019,6 @@
           <p>Choose a model and start chatting. Remember: slow is intentional.</p>
         </div>
       `;
-      document.documentElement.style.setProperty('--kb', '0px');
     }
 
     btnApple.addEventListener('click', showChat);
@@ -1170,8 +1169,6 @@
       lockBodyScroll();
       document.addEventListener('touchmove', preventTouchMove, { passive: false });
 
-      // Overlay open: keep kb offset off, then focus
-      document.documentElement.style.setProperty('--kb', '0px');
       setTimeout(() => frictionInput1.focus(), 10);
     }
 
@@ -1189,8 +1186,6 @@
 
       startHeaderTimer();
 
-      // Let iOS settle before recalculating viewport/keyboard
-      setTimeout(updateKeyboardOffset, 80);
       setTimeout(scrollChatToBottom, 100);
     }
 
@@ -1362,59 +1357,20 @@
     });
 
     // ===================
-    // iOS KEYBOARD POLISH
-    // Fix: only scrollIntoView when chat input is focused,
-    // and disable kb offset while overlay is open.
+    // SCROLL HANDLING
     // ===================
     function scrollChatToBottom() {
       if (!chatApp.classList.contains('active')) return;
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function updateKeyboardOffset() {
-      if (!window.visualViewport) return;
-
-      const vv = window.visualViewport;
-      const keyboardHeight = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-
-      const overlayOpen = frictionOverlay.classList.contains('active');
-
-      // While overlay is open, don't apply kb offset to chat UI
-      document.documentElement.style.setProperty('--kb', overlayOpen ? '0px' : (keyboardHeight + 'px'));
-
-      const chatInputFocused = (document.activeElement === messageInput);
-
-      // Only nudge/scroll the chat input when it is actually focused
-      if (!overlayOpen && keyboardHeight > 0 && chatInputFocused) {
-        requestAnimationFrame(() => {
-          scrollChatToBottom();
-          messageInput.scrollIntoView({ block: 'end', behavior: 'auto' });
-        });
-      }
-    }
-
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', updateKeyboardOffset);
-      window.visualViewport.addEventListener('scroll', updateKeyboardOffset);
+      requestAnimationFrame(() => {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      });
     }
 
     document.addEventListener('focusin', (e) => {
       if (e.target === messageInput) {
-        setTimeout(updateKeyboardOffset, 50);
-        setTimeout(scrollChatToBottom, 80);
+        setTimeout(scrollChatToBottom, 100);
       }
     });
-
-    document.addEventListener('focusout', (e) => {
-      if (e.target === messageInput) {
-        setTimeout(() => {
-          document.documentElement.style.setProperty('--kb', '0px');
-          scrollChatToBottom();
-        }, 80);
-      }
-    });
-
-    updateKeyboardOffset();
   </script>
 </body>
 </html>
