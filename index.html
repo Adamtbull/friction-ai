@@ -487,7 +487,7 @@
       backdrop-filter: blur(10px);
       border-top: 1px solid var(--border);
       transform: translateY(0);
-      transition: transform 0.1s ease-out;
+      will-change: transform;
     }
 
     .chat-input-wrapper {
@@ -1370,29 +1370,34 @@
 
     // ===================
     // KEYBOARD TRACKING
+    // Stick input to keyboard, accounting for scroll position
     // ===================
     function updateInputPosition() {
       if (!window.visualViewport) return;
 
       const viewport = window.visualViewport;
-      const keyboardHeight = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
-
       const inputArea = document.querySelector('.chat-input-area');
-      if (inputArea && keyboardHeight > 0) {
-        // Move input up by keyboard height
-        inputArea.style.transform = `translateY(-${keyboardHeight}px)`;
-      } else if (inputArea) {
-        // Reset to bottom when keyboard closes
-        inputArea.style.transform = 'translateY(0)';
-      }
+      if (!inputArea) return;
 
-      requestAnimationFrame(scrollChatToBottom);
+      // Calculate where the input should be positioned
+      // viewport.offsetTop changes when you scroll with keyboard open
+      const bottomPosition = viewport.offsetTop + viewport.height;
+      const documentHeight = window.innerHeight;
+
+      // Position input at the bottom of the visual viewport
+      // This makes it stick to the keyboard even when scrolling
+      const offset = documentHeight - bottomPosition;
+
+      inputArea.style.transform = `translateY(-${offset}px)`;
     }
 
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', updateInputPosition);
       window.visualViewport.addEventListener('scroll', updateInputPosition);
     }
+
+    // Also update on regular scroll
+    window.addEventListener('scroll', updateInputPosition, { passive: true });
 
     document.addEventListener('focusin', (e) => {
       if (e.target === messageInput) {
