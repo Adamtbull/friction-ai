@@ -289,10 +289,6 @@
       -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
       z-index: 10;
     }
 
@@ -366,7 +362,7 @@
     .chat-messages {
       flex: 1;
       overflow-y: auto;
-      padding: calc(60px + var(--safe-top)) 20px calc(24px + 50px + 24px + var(--safe-bottom) + var(--kb));
+      padding: 24px 20px calc(100px + var(--safe-bottom));
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -459,15 +455,11 @@
     }
 
     .chat-input-area {
-      padding: 16px 20px calc(24px + var(--safe-bottom));
+      padding: 16px 20px calc(16px + var(--safe-bottom));
       background: rgba(255, 255, 255, 0.8);
       -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
       border-top: 1px solid var(--border);
-
-      /* Keep input above the iOS keyboard */
-      transform: translateY(calc(-1 * var(--kb)));
-      will-change: transform;
     }
 
     .chat-input-wrapper {
@@ -961,7 +953,7 @@
       homepage.classList.add('hidden');
       chatApp.classList.add('active');
       if (lastMessageTime && frictionLevel > 0) startHeaderTimer();
-      updateKeyboardOffset();
+      updateAppHeight();
       scrollChatToBottom();
     }
 
@@ -970,7 +962,6 @@
       homepage.classList.remove('hidden');
       state.messages = [];
       chatMessages.innerHTML = '<div class="welcome-message"><h2>Welcome to Friction AI</h2><p>Choose a model and start chatting. Remember: slow is intentional.</p></div>';
-      document.documentElement.style.setProperty('--kb', '0px');
     }
 
     btnApple.addEventListener('click', showChat);
@@ -1121,7 +1112,6 @@
       lockBodyScroll();
       document.addEventListener('touchmove', preventTouchMove, { passive: false });
 
-      document.documentElement.style.setProperty('--kb', '0px');
       setTimeout(function() { frictionInput1.focus(); }, 10);
     }
 
@@ -1139,7 +1129,6 @@
 
       startHeaderTimer();
 
-      setTimeout(updateKeyboardOffset, 80);
       setTimeout(scrollChatToBottom, 100);
     }
 
@@ -1317,41 +1306,34 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    function updateKeyboardOffset() {
+    function updateAppHeight() {
       if (!window.visualViewport) return;
       const vv = window.visualViewport;
-      const keyboardHeight = window.innerHeight - vv.height;
-      document.documentElement.style.setProperty('--kb', keyboardHeight > 0 ? keyboardHeight + 'px' : '0px');
-      if (keyboardHeight > 0 && document.activeElement === messageInput) {
-        setTimeout(() => {
-          messageInput.scrollIntoView({ behavior: 'smooth', block: 'end' });
-          chatMessages.scrollTop = chatMessages.scrollHeight;
-        }, 300); // Delay for iOS animation
-      }
+      const appHeight = vv.height + vv.offsetTop;
+      chatApp.style.height = `${appHeight}px`;
+      scrollChatToBottom();
     }
 
     if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', updateKeyboardOffset);
-      window.visualViewport.addEventListener('scroll', updateKeyboardOffset);
+      window.visualViewport.addEventListener('resize', updateAppHeight);
+      window.visualViewport.addEventListener('scroll', updateAppHeight);
     }
 
     document.addEventListener('focusin', function(e) {
       if (e.target === messageInput) {
-        setTimeout(updateKeyboardOffset, 50);
+        setTimeout(updateAppHeight, 50);
         setTimeout(scrollChatToBottom, 80);
       }
     });
 
     document.addEventListener('focusout', function(e) {
       if (e.target === messageInput) {
-        setTimeout(function() {
-          document.documentElement.style.setProperty('--kb', '0px');
-          scrollChatToBottom();
-        }, 80);
+        setTimeout(updateAppHeight, 80);
+        setTimeout(scrollChatToBottom, 100);
       }
     });
 
-    updateKeyboardOffset();
+    updateAppHeight();
   </script>
 
 </body>
