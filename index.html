@@ -11,9 +11,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
   <style>
-    /* =================== */
-    /* SAFARI-FRIENDLY BASE */
-    /* =================== */
     *,
     *::before,
     *::after {
@@ -59,14 +56,12 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Lock background scroll when overlay is open */
     body.scroll-locked {
       position: fixed;
       width: 100%;
       overflow: hidden;
     }
 
-    /* iOS safe areas + dynamic viewport */
     :root {
       --teal-light: #d4e8e6;
       --teal-lighter: #e8f4f3;
@@ -84,8 +79,6 @@
       --app-height: 100vh;
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
-
-      /* Dynamic keyboard offset for iOS Safari */
       --kb: 0px;
     }
 
@@ -290,47 +283,52 @@
       border-bottom: 1px solid var(--border);
     }
 
-    .chat-logo {
-      font-size: 0.85rem;
-      font-weight: 500;
-      letter-spacing: 1px;
-      color: var(--teal);
+    .chat-header-left {
+      width: 36px;
     }
 
-    .header-timer {
-      font-size: 0.8rem;
-      color: var(--teal);
-      background: var(--teal-light);
-      padding: 6px 12px;
-      border-radius: 20px;
-      display: none;
-      white-space: nowrap;
-    }
-
-    .header-timer.active {
-      display: block;
-    }
-
-    .chat-controls {
+    .chat-header-center {
+      flex: 1;
       display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
+      justify-content: center;
+    }
+
+    .chat-header-right {
+      width: 36px;
+      display: flex;
+      justify-content: flex-end;
     }
 
     .model-select {
-      padding: 8px 12px;
-      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border: none;
       border-radius: 6px;
-      background: var(--white);
-      font-size: 0.85rem;
+      background: transparent;
+      font-size: 0.95rem;
+      font-weight: 500;
       color: var(--text-primary);
       cursor: pointer;
       outline: none;
+      text-align: center;
     }
 
     .model-select:focus {
-      border-color: var(--teal);
+      background: rgba(0,0,0,0.05);
+    }
+
+    .header-timer {
+      font-size: 0.75rem;
+      color: var(--teal);
+      background: var(--teal-light);
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: none;
+      white-space: nowrap;
+      margin-left: 8px;
+    }
+
+    .header-timer.active {
+      display: inline-block;
     }
 
     .btn-icon {
@@ -340,7 +338,7 @@
       align-items: center;
       justify-content: center;
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 50%;
       background: var(--white);
       cursor: pointer;
       transition: all 0.2s ease;
@@ -360,7 +358,7 @@
     .chat-messages {
       flex: 1;
       overflow-y: auto;
-      padding: 24px 20px;
+      padding: 24px 20px calc(24px + 50px + 24px + var(--safe-bottom) + var(--kb));
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -405,7 +403,7 @@
 
     .welcome-message {
       position: absolute;
-      top: 50%;
+      top: 40%;
       left: 50%;
       transform: translate(-50%, -50%);
       text-align: center;
@@ -413,6 +411,12 @@
       color: var(--text-secondary);
       width: 100%;
       max-width: 400px;
+      pointer-events: none;
+    }
+
+    .welcome-icon {
+      font-size: 2.5rem;
+      margin-bottom: 16px;
     }
 
     .welcome-message h2 {
@@ -423,8 +427,9 @@
     }
 
     .welcome-message p {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       margin: 0;
+      color: var(--text-secondary);
     }
 
     .typing-indicator {
@@ -465,6 +470,8 @@
       -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
       border-top: 1px solid var(--border);
+      transform: translateY(calc(-1 * var(--kb)));
+      will-change: transform;
     }
 
     .chat-input-wrapper {
@@ -474,27 +481,26 @@
       max-width: 800px;
       margin: 0 auto;
       min-width: 0;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 8px 8px 8px 18px;
     }
 
     .chat-input {
       flex: 1;
       min-width: 0;
-      padding: 14px 18px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: var(--white);
-      font-size: 16px; /* prevents iOS Safari zoom */
+      padding: 8px 0;
+      border: none;
+      background: transparent;
+      font-size: 16px;
       color: var(--text-primary);
       resize: none;
-      min-height: 50px;
-      max-height: 150px;
+      min-height: 24px;
+      max-height: 120px;
       outline: none;
       line-height: 1.5;
       overflow: hidden;
-    }
-
-    .chat-input:focus {
-      border-color: var(--teal);
     }
 
     .chat-input::placeholder {
@@ -502,13 +508,13 @@
     }
 
     .btn-send {
-      width: 50px;
-      height: 50px;
+      width: 36px;
+      height: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
       border: none;
-      border-radius: 12px;
+      border-radius: 50%;
       background: var(--teal);
       cursor: pointer;
       transition: all 0.2s ease;
@@ -525,9 +531,10 @@
     }
 
     .btn-send svg {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       stroke: var(--white);
+      margin-left: 2px;
     }
 
     /* =================== */
@@ -608,7 +615,7 @@
       border: 2px solid var(--border);
       border-radius: 8px;
       font-family: 'SF Mono', Monaco, 'Courier New', monospace;
-      font-size: 16px; /* prevents iOS Safari zoom */
+      font-size: 16px;
       text-align: center;
       letter-spacing: 1px;
       color: var(--text-primary);
@@ -713,9 +720,7 @@
 </head>
 
 <body>
-  <!-- =================== -->
-  <!-- HOMEPAGE            -->
-  <!-- =================== -->
+  <!-- HOMEPAGE -->
   <div class="homepage" id="homepage">
     <div class="brand">FRICTION AI</div>
 
@@ -779,40 +784,36 @@
 
   </div>
 
-  <!-- =================== -->
-
-  <!-- CHAT APPLICATION    -->
-
-  <!-- =================== -->
+  <!-- CHAT APPLICATION -->
 
   <div class="chat-app" id="chatApp">
     <header class="chat-header">
-      <div class="chat-logo">FRICTION AI</div>
-      <div class="header-timer" id="headerTimer"></div>
-      <div class="chat-controls">
+      <div class="chat-header-left">
+        <button class="btn-icon" id="btnLogout" title="Back" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
+      </div>
+      <div class="chat-header-center">
         <select class="model-select" id="modelSelect">
-          <option value="claude">Claude</option>
-          <option value="gpt">GPT-4o</option>
-          <option value="gemini">Gemini</option>
-          <option value="perplexity">Perplexity</option>
-          <option value="bing">Bing Search</option>
+          <option value="claude">Claude ▾</option>
+          <option value="gpt">GPT-4o ▾</option>
+          <option value="gemini">Gemini ▾</option>
+          <option value="perplexity">Perplexity ▾</option>
+          <option value="bing">Bing Search ▾</option>
         </select>
+        <div class="header-timer" id="headerTimer"></div>
+      </div>
+      <div class="chat-header-right"></div>
+    </header>
 
 ```
-    <button class="btn-icon" id="btnLogout" title="Sign out" type="button">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-        <polyline points="16 17 21 12 16 7"></polyline>
-        <line x1="21" y1="12" x2="9" y2="12"></line>
-      </svg>
-    </button>
-  </div>
-</header>
-
 <div class="chat-messages" id="chatMessages">
   <div class="welcome-message">
+    <div class="welcome-icon">✦</div>
     <h2>How can I help you today?</h2>
-    <p>Choose a model above and start chatting.<br>Remember: slow is intentional.</p>
+    <p>Remember: slow is intentional.</p>
   </div>
 </div>
 
@@ -824,11 +825,10 @@
 
 <div class="chat-input-area">
   <div class="chat-input-wrapper">
-    <textarea class="chat-input" id="messageInput" placeholder="Type your message..." rows="1"></textarea>
+    <textarea class="chat-input" id="messageInput" placeholder="Message..." rows="1"></textarea>
     <button class="btn-send" id="btnSend" type="button" aria-label="Send message">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <line x1="22" y1="2" x2="11" y2="13"></line>
-        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        <path d="M5 12h14M12 5l7 7-7 7"/>
       </svg>
     </button>
   </div>
@@ -837,16 +837,12 @@
 
   </div>
 
-  <!-- =================== -->
-
-  <!-- FRICTION OVERLAY    -->
-
-  <!-- =================== -->
+  <!-- FRICTION OVERLAY -->
 
   <div class="friction-overlay" id="frictionOverlay">
     <div class="friction-box">
       <h2 class="friction-title">Pause & reflect</h2>
-      <p class="friction-subtitle">Type both codes exactly to send your message.</p>
+      <p class="friction-subtitle">Type the code to send.</p>
 
 ```
   <div class="friction-row">
@@ -876,18 +872,14 @@
   </div>
 
   <script>
-    // ===================
     // STATE
-    // ===================
     let state = {
       messages: [],
       pendingMessage: null,
       isProcessing: false
     };
 
-    // ===================
     // DOM ELEMENTS
-    // ===================
     const homepage = document.getElementById('homepage');
     const chatApp = document.getElementById('chatApp');
     const btnApple = document.getElementById('btnApple');
@@ -910,9 +902,7 @@
     const frictionUnlock = document.getElementById('frictionUnlock');
     const frictionError = document.getElementById('frictionError');
 
-    // ===================
-    // BACKGROUND SCROLL LOCK (for overlay)
-    // ===================
+    // SCROLL LOCK
     let _scrollYBeforeLock = 0;
 
     function lockBodyScroll() {
@@ -920,19 +910,13 @@
       _scrollYBeforeLock = window.scrollY || 0;
       document.body.classList.add('scroll-locked');
       document.body.style.top = '-' + _scrollYBeforeLock + 'px';
-      document.body.style.left = '0';
-      document.body.style.right = '0';
     }
 
     function unlockBodyScroll() {
       if (!document.body.classList.contains('scroll-locked')) return;
       document.body.classList.remove('scroll-locked');
-      const top = document.body.style.top;
       document.body.style.top = '';
-      document.body.style.left = '';
-      document.body.style.right = '';
-      const y = top ? parseInt(top, 10) * -1 : _scrollYBeforeLock;
-      window.scrollTo(0, y || 0);
+      window.scrollTo(0, _scrollYBeforeLock || 0);
     }
 
     function preventTouchMove(e) {
@@ -941,9 +925,7 @@
       e.preventDefault();
     }
 
-    // ===================
     // CODE GENERATION
-    // ===================
     function generateChallenge(length) {
       const lower = 'abcdefghjkmnpqrstuvwxyz';
       const upper = 'ABCDEFGHJKMNPQRSTUVWXYZ';
@@ -958,15 +940,12 @@
         else if (pattern === 1) charSet = symbols;
         else if (pattern === 2) charSet = upper;
         else charSet = numbers;
-
         result += charSet.charAt(Math.floor(Math.random() * charSet.length));
       }
       return result;
     }
 
-    // ===================
     // NAVIGATION
-    // ===================
     function showChat() {
       homepage.classList.add('hidden');
       chatApp.classList.add('active');
@@ -979,7 +958,7 @@
       chatApp.classList.remove('active');
       homepage.classList.remove('hidden');
       state.messages = [];
-      chatMessages.innerHTML = '<div class="welcome-message"><h2>How can I help you today?</h2><p>Choose a model above and start chatting.<br>Remember: slow is intentional.</p></div>';
+      chatMessages.innerHTML = '<div class="welcome-message"><div class="welcome-icon">✦</div><h2>How can I help you today?</h2><p>Remember: slow is intentional.</p></div>';
       document.documentElement.style.setProperty('--kb', '0px');
     }
 
@@ -988,9 +967,7 @@
     btnEmail.addEventListener('click', showChat);
     btnLogout.addEventListener('click', showHomepage);
 
-    // ===================
     // FRICTION SYSTEM
-    // ===================
     let challenge1 = '';
     let challenge2 = '';
     let frictionLevel = 0;
@@ -1004,7 +981,6 @@
         const s = JSON.parse(saved);
         lastMessageTime = s.lastMessageTime;
         frictionLevel = s.frictionLevel || 0;
-
         if (lastMessageTime && (Date.now() - lastMessageTime > RESET_TIME)) {
           frictionLevel = 0;
           lastMessageTime = null;
@@ -1014,10 +990,7 @@
     }
 
     function saveFrictionState() {
-      localStorage.setItem('friction_state', JSON.stringify({
-        frictionLevel,
-        lastMessageTime
-      }));
+      localStorage.setItem('friction_state', JSON.stringify({ frictionLevel, lastMessageTime }));
     }
 
     function formatTimeRemaining(ms) {
@@ -1046,19 +1019,14 @@
         frictionLevel = 0;
         lastMessageTime = null;
         saveFrictionState();
-        timerEl.textContent = '🎉 Reset! You\'re back to Level 1.';
-        headerTimerEl.textContent = '🎉 Back to Level 1!';
-
-        if (timerInterval) {
-          clearInterval(timerInterval);
-          timerInterval = null;
-        }
-
+        timerEl.textContent = '🎉 Reset! Back to Level 1.';
+        headerTimerEl.textContent = '🎉 Level 1';
+        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
         setTimeout(function() { headerTimerEl.classList.remove('active'); }, 5000);
       } else {
         const timeStr = formatTimeRemaining(remaining);
-        timerEl.textContent = '⏱ Resets to Level 1 in ' + timeStr;
-        headerTimerEl.textContent = '⏱ Level ' + Math.min(frictionLevel + 1, 5) + ' · Resets in ' + timeStr;
+        timerEl.textContent = '⏱ Resets in ' + timeStr;
+        headerTimerEl.textContent = 'L' + Math.min(frictionLevel + 1, 5) + ' · ' + timeStr;
         headerTimerEl.classList.add('active');
       }
     }
@@ -1126,11 +1094,9 @@
       }
 
       startTimer();
-
       frictionOverlay.classList.add('active');
       lockBodyScroll();
       document.addEventListener('touchmove', preventTouchMove, { passive: false });
-
       document.documentElement.style.setProperty('--kb', '0px');
       setTimeout(function() { frictionInput1.focus(); }, 10);
     }
@@ -1138,17 +1104,10 @@
     function hideFriction() {
       frictionOverlay.classList.remove('active');
       state.pendingMessage = null;
-
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
-
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       document.removeEventListener('touchmove', preventTouchMove);
       unlockBodyScroll();
-
       startHeaderTimer();
-
       setTimeout(updateKeyboardOffset, 80);
       setTimeout(scrollChatToBottom, 100);
     }
@@ -1173,7 +1132,6 @@
         frictionUnlock.disabled = true;
         frictionUnlock.classList.remove('ready');
       }
-
       frictionError.textContent = '';
     }
 
@@ -1193,7 +1151,6 @@
 
     frictionUnlock.addEventListener('click', function() {
       const wasMaxLevel = frictionLevel >= 4;
-
       if (frictionLevel < 4) frictionLevel++;
       lastMessageTime = Date.now();
       saveFrictionState();
@@ -1224,9 +1181,7 @@
 
     loadFrictionState();
 
-    // ===================
     // CHAT FUNCTIONS
-    // ===================
     function addMessage(content, type) {
       const div = document.createElement('div');
       div.className = 'message message-' + type;
@@ -1237,7 +1192,6 @@
 
     async function sendMessage(content) {
       const model = modelSelect.value;
-
       const welcome = chatMessages.querySelector('.welcome-message');
       if (welcome) welcome.remove();
 
@@ -1265,25 +1219,16 @@
       }
     }
 
-    // ===================
-    // BACKEND API CALL
-    // ===================
     async function callBackend(model) {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: model,
-          messages: state.messages
-        })
+        body: JSON.stringify({ model: model, messages: state.messages })
       });
 
       if (!res.ok) {
         let errorMsg = 'Backend API error';
-        try {
-          const error = await res.json();
-          errorMsg = error.error || errorMsg;
-        } catch (e) {}
+        try { const error = await res.json(); errorMsg = error.error || errorMsg; } catch (e) {}
         throw new Error(errorMsg);
       }
 
@@ -1291,22 +1236,18 @@
       return data.response;
     }
 
-    // ===================
     // INPUT HANDLING
-    // ===================
     messageInput.addEventListener('input', function() {
       messageInput.style.height = 'auto';
-      messageInput.style.height = Math.min(messageInput.scrollHeight, 150) + 'px';
+      messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
       requestAnimationFrame(scrollChatToBottom);
     });
 
     function handleSend() {
       const content = messageInput.value.trim();
       if (!content || state.isProcessing) return;
-
       messageInput.value = '';
       messageInput.style.height = 'auto';
-
       showFriction(content);
     }
 
@@ -1319,29 +1260,45 @@
       }
     });
 
-    // ===================
-    // iOS KEYBOARD POLISH
-    // ===================
+    // iOS KEYBOARD
     function scrollChatToBottom() {
       if (!chatApp.classList.contains('active')) return;
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
     function updateKeyboardOffset() {
-      // Simply scroll to bottom when keyboard appears
-      const chatInputFocused = (document.activeElement === messageInput);
-      if (chatInputFocused) {
-        requestAnimationFrame(scrollChatToBottom);
+      if (!window.visualViewport) return;
+      const vv = window.visualViewport;
+      const keyboardHeight = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      const overlayOpen = frictionOverlay.classList.contains('active');
+      document.documentElement.style.setProperty('--kb', overlayOpen ? '0px' : (keyboardHeight + 'px'));
+
+      if (!overlayOpen && keyboardHeight > 0 && document.activeElement === messageInput) {
+        requestAnimationFrame(function() {
+          scrollChatToBottom();
+          messageInput.scrollIntoView({ block: 'end', behavior: 'auto' });
+        });
       }
     }
 
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', updateKeyboardOffset);
+      window.visualViewport.addEventListener('scroll', updateKeyboardOffset);
     }
 
     document.addEventListener('focusin', function(e) {
       if (e.target === messageInput) {
-        setTimeout(scrollChatToBottom, 100);
+        setTimeout(updateKeyboardOffset, 50);
+        setTimeout(scrollChatToBottom, 80);
+      }
+    });
+
+    document.addEventListener('focusout', function(e) {
+      if (e.target === messageInput) {
+        setTimeout(function() {
+          document.documentElement.style.setProperty('--kb', '0px');
+          scrollChatToBottom();
+        }, 80);
       }
     });
 
