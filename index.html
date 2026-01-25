@@ -1,115 +1,31 @@
 <script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  // =========================
   // STATE
+  // =========================
   let state = {
     messages: [],
     pendingMessage: null,
     isProcessing: false,
-    isSending: false  // New: Prevent duplicate sends during friction/unlock
+    isSending: false
   };
 
+  // =========================
   // AUTH STATE
+  // =========================
   const GOOGLE_CLIENT_ID = '37442638167-t8m3fql61v05h01qmvall1bki9k88tim.apps.googleusercontent.com';
   const ADMIN_EMAIL = 'fatboydimsim@gmail.com';
-  
+
   let currentUser = null;
   let isAdmin = false;
 
-  // Free models available to everyone, paid models only for admin
   const FREE_MODELS = ['gemini', 'bing'];
   const PAID_MODELS = ['claude', 'gpt', 'grok', 'perplexity'];
 
-  function loadUserFromStorage() {
-    const saved = localStorage.getItem('friction_user');
-    if (saved) {
-      currentUser = JSON.parse(saved);
-      isAdmin = currentUser.email === ADMIN_EMAIL;
-      return true;
-    }
-    return false;
-  }
-
-  function saveUserToStorage() {
-    if (currentUser) {
-      localStorage.setItem('friction_user', JSON.stringify(currentUser));
-    } else {
-      localStorage.removeItem('friction_user');
-    }
-  }
-
-  function handleGoogleSignIn(response) {
-    // Decode the JWT token
-    const payload = JSON.parse(atob(response.credential.split('.')[1]));
-    
-    currentUser = {
-      email: payload.email,
-      name: payload.name,
-      picture: payload.picture
-    };
-    
-    isAdmin = currentUser.email === ADMIN_EMAIL;
-    saveUserToStorage();
-    updateModelAccess();
-    updateProfileDisplay();
-    showChat();
-  }
-
-  function signOut() {
-    currentUser = null;
-    isAdmin = false;
-    localStorage.removeItem('friction_user');
-    google.accounts.id.disableAutoSelect();
-    updateModelAccess();
-    showHomepage();
-  }
-
-  function updateModelAccess() {
-    const options = modelSelect.querySelectorAll('option');
-    options.forEach(function(option) {
-      const model = option.value;
-      if (PAID_MODELS.includes(model) && !isAdmin) {
-        option.disabled = true;
-        option.textContent = option.textContent.replace(' 🔒', '') + ' 🔒';
-      } else {
-        option.disabled = false;
-        option.textContent = option.textContent.replace(' 🔒', '');
-      }
-    });
-
-    // If current selection is a paid model and user is not admin, switch to Gemini
-    if (PAID_MODELS.includes(modelSelect.value) && !isAdmin) {
-      modelSelect.value = 'gemini';
-    }
-  }
-
-  function initGoogleSignIn() {
-    if (typeof google !== 'undefined' && google.accounts) {
-      google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: handleGoogleSignIn,
-        auto_select: false
-      });
-
-      // Render a hidden Google button that we'll click programmatically
-      google.accounts.id.renderButton(
-        document.getElementById('googleButtonHidden'),
-        { theme: 'outline', size: 'large', width: 280 }
-      );
-
-      // Check if user already signed in - auto go to chat
-      if (loadUserFromStorage()) {
-        updateModelAccess();
-        updateProfileDisplay();
-        showChat(); // Auto-navigate to chat if already signed in
-      }
-    } else {
-      // Retry if Google script not loaded yet
-      setTimeout(initGoogleSignIn, 100);
-    }
-  }
-
-  initGoogleSignIn();
-
-  // DOM ELEMENTS
+  // =========================
+  // DOM ELEMENTS (MUST COME FIRST)
+  // =========================
   const homepage = document.getElementById('homepage');
   const chatApp = document.getElementById('chatApp');
   const btnApple = document.getElementById('btnApple');
@@ -123,7 +39,6 @@
   const btnMenu = document.getElementById('btnMenu');
   const typingIndicator = document.getElementById('typingIndicator');
 
-  // Side menu elements
   const sideMenu = document.getElementById('sideMenu');
   const menuOverlay = document.getElementById('menuOverlay');
   const btnCloseMenu = document.getElementById('btnCloseMenu');
@@ -131,20 +46,10 @@
   const btnSignOut = document.getElementById('btnSignOut');
   const btnSettings = document.getElementById('btnSettings');
   const btnAbout = document.getElementById('btnAbout');
-  
-  // Profile elements
+
   const profilePic = document.getElementById('profilePic');
   const profileName = document.getElementById('profileName');
   const profileEmail = document.getElementById('profileEmail');
-
-  function updateProfileDisplay() {
-    if (currentUser) {
-      profilePic.src = currentUser.picture || '';
-      profilePic.style.display = currentUser.picture ? 'block' : 'none';
-      profileName.textContent = currentUser.name || 'User';
-      profileEmail.textContent = currentUser.email || '';
-    }
-  }
 
   const frictionOverlay = document.getElementById('frictionOverlay');
   const frictionCode1 = document.getElementById('frictionCode1');
@@ -155,7 +60,203 @@
   const frictionUnlock = document.getElementById('frictionUnlock');
   const frictionError = document.getElementById('frictionError');
 
+  // If any critical elements are missing, stop BEFORE crashing
+  if (!homepage || !chatApp || !chatMessages || !messageInput || !btnSend || !modelSelect) {
+    console.error('Missing required DOM elements. Check your HTML IDs match the JS.');
+    return;
+  }
+
+  // =========================
+  // STORAGE / PROFILE
+  // =========================
+  function loadUserFromStorage() {
+    const saved = localStorage.getItem('friction_user');
+    if (saved) {
+      try {
+        currentUser = JSON.parse(saved);
+        isAdmin = currentUser.email === ADMIN_EMAIL;
+        return true;
+      } catch (e) {
+        localStorage.removeItem('friction_user');
+      }
+    }
+    return false;
+  }
+
+  function saveUserToStorage() {
+    if (currentUser) localStorage.setItem('friction_user', JSON.stringify(currentUser));
+    else localStorage.removeItem('friction_user');
+  }
+
+  function updateProfileDisplay() {
+    if (!currentUser) return;
+    if (profilePic) {
+      profilePic.src = currentUser.picture || '';
+      profilePic.style.display = currentUser.picture ? 'block' : 'none';
+    }
+    if (profileName) profileName.textContent = currentUser.name || 'User';
+    if (profileEmail) profileEmail.textContent = currentUser.email || '';
+  }
+
+  function updateModelAccess() {
+    if (!modelSelect) return;
+
+    const options = modelSelect.querySelectorAll('option');
+    options.forEach(function(option) {
+      const model = option.value;
+      if (PAID_MODELS.includes(model) && !isAdmin) {
+        option.disabled = true;
+        option.textContent = option.textContent.replace(' 🔒', '') + ' 🔒';
+      } else {
+        option.disabled = false;
+        option.textContent = option.textContent.replace(' 🔒', '');
+      }
+    });
+
+    if (PAID_MODELS.includes(modelSelect.value) && !isAdmin) {
+      modelSelect.value = 'gemini';
+    }
+  }
+
+  // =========================
+  // GOOGLE SIGN-IN (JWT decode fix)
+  // =========================
+  function base64UrlDecode(str) {
+    // Google uses base64url in JWT
+    str = str.replace(/-/g, '+').replace(/_/g, '/');
+    const pad = str.length % 4;
+    if (pad) str += '='.repeat(4 - pad);
+    return atob(str);
+  }
+
+  function handleGoogleSignIn(response) {
+    try {
+      const payload = JSON.parse(base64UrlDecode(response.credential.split('.')[1]));
+      currentUser = {
+        email: payload.email,
+        name: payload.name,
+        picture: payload.picture
+      };
+      isAdmin = currentUser.email === ADMIN_EMAIL;
+      saveUserToStorage();
+      updateModelAccess();
+      updateProfileDisplay();
+      showChat();
+    } catch (e) {
+      console.error('Google sign-in decode failed:', e);
+    }
+  }
+
+  function signOut() {
+    currentUser = null;
+    isAdmin = false;
+    localStorage.removeItem('friction_user');
+    if (window.google?.accounts?.id) google.accounts.id.disableAutoSelect();
+    updateModelAccess();
+    showHomepage();
+  }
+
+  function initGoogleSignIn() {
+    if (window.google?.accounts?.id) {
+      google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleGoogleSignIn,
+        auto_select: false
+      });
+
+      const hiddenMount = document.getElementById('googleButtonHidden');
+      if (hiddenMount) {
+        google.accounts.id.renderButton(hiddenMount, { theme: 'outline', size: 'large', width: 280 });
+      }
+
+      if (loadUserFromStorage()) {
+        updateModelAccess();
+        updateProfileDisplay();
+        showChat();
+      }
+    } else {
+      setTimeout(initGoogleSignIn, 100);
+    }
+  }
+
+  // =========================
+  // NAVIGATION
+  // =========================
+  function showChat() {
+    homepage.classList.add('hidden');
+    chatApp.classList.add('active');
+    if (lastMessageTime && frictionLevel > 0) startHeaderTimer();
+    updateKeyboardOffset();
+    scrollChatToBottom();
+  }
+
+  function showHomepage() {
+    chatApp.classList.remove('active');
+    homepage.classList.remove('hidden');
+    state.messages = [];
+    chatMessages.innerHTML = '<div class="welcome-message"><div class="welcome-icon">✦</div><h2>How can I help you today?</h2><p>Remember: slow is intentional.</p></div>';
+    document.documentElement.style.setProperty('--kb', '0px');
+  }
+
+  // =========================
+  // SIDE MENU
+  // =========================
+  function openMenu() {
+    if (!sideMenu || !menuOverlay) return;
+    sideMenu.classList.add('active');
+    menuOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMenu() {
+    if (!sideMenu || !menuOverlay) return;
+    sideMenu.classList.remove('active');
+    menuOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  btnMenu && btnMenu.addEventListener('click', openMenu);
+  btnCloseMenu && btnCloseMenu.addEventListener('click', closeMenu);
+  menuOverlay && menuOverlay.addEventListener('click', closeMenu);
+
+  btnNewChat && btnNewChat.addEventListener('click', function() {
+    state.messages = [];
+    chatMessages.innerHTML = '<div class="welcome-message"><div class="welcome-icon">✦</div><h2>How can I help you today?</h2><p>Remember: slow is intentional.</p></div>';
+    closeMenu();
+  });
+
+  btnSignOut && btnSignOut.addEventListener('click', function() {
+    closeMenu();
+    signOut();
+  });
+
+  btnSettings && btnSettings.addEventListener('click', closeMenu);
+  btnAbout && btnAbout.addEventListener('click', closeMenu);
+
+  document.querySelectorAll('.menu-category-header').forEach(function(header) {
+    header.addEventListener('click', function() {
+      const category = this.closest('.menu-category');
+      if (category) category.classList.toggle('expanded');
+    });
+  });
+
+  btnApple && btnApple.addEventListener('click', function() {
+    alert('Apple Sign-In coming soon!');
+  });
+
+  btnGoogle && btnGoogle.addEventListener('click', function() {
+    const hiddenBtn = document.querySelector('#googleButtonHidden div[role="button"]');
+    if (hiddenBtn) hiddenBtn.click();
+    else if (window.google?.accounts?.id) google.accounts.id.prompt();
+  });
+
+  btnEmail && btnEmail.addEventListener('click', function() {
+    alert('Email Sign-In coming soon!');
+  });
+
+  // =========================
   // SCROLL LOCK
+  // =========================
   let _scrollYBeforeLock = 0;
 
   function lockBodyScroll() {
@@ -178,7 +279,9 @@
     e.preventDefault();
   }
 
+  // =========================
   // CODE GENERATION
+  // =========================
   function generateChallenge(length) {
     const lower = 'abcdefghjkmnpqrstuvwxyz';
     const upper = 'ABCDEFGHJKMNPQRSTUVWXYZ';
@@ -198,92 +301,9 @@
     return result;
   }
 
-  // NAVIGATION
-  function showChat() {
-    homepage.classList.add('hidden');
-    chatApp.classList.add('active');
-    if (lastMessageTime && frictionLevel > 0) startHeaderTimer();
-    updateKeyboardOffset();
-    scrollChatToBottom();
-  }
-
-  function showHomepage() {
-    chatApp.classList.remove('active');
-    homepage.classList.remove('hidden');
-    state.messages = [];
-    chatMessages.innerHTML = '<div class="welcome-message"><div class="welcome-icon">✦</div><h2>How can I help you today?</h2><p>Remember: slow is intentional.</p></div>';
-    document.documentElement.style.setProperty('--kb', '0px');
-  }
-
-  btnApple.addEventListener('click', function() {
-    // TODO: Apple Sign-In
-    alert('Apple Sign-In coming soon!');
-  });
-  
-  btnGoogle.addEventListener('click', function() {
-    // Click the hidden Google button to trigger sign-in
-    const hiddenBtn = document.querySelector('#googleButtonHidden div[role="button"]');
-    if (hiddenBtn) {
-      hiddenBtn.click();
-    } else {
-      // Fallback: try One Tap
-      google.accounts.id.prompt();
-    }
-  });
-  
-  btnEmail.addEventListener('click', function() {
-    // TODO: Email Sign-In
-    alert('Email Sign-In coming soon!');
-  });
-  
-  // SIDE MENU FUNCTIONS
-  function openMenu() {
-    sideMenu.classList.add('active');
-    menuOverlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeMenu() {
-    sideMenu.classList.remove('active');
-    menuOverlay.classList.remove('active');
-    document.body.style.overflow = '';
-  }
-
-  btnMenu.addEventListener('click', openMenu);
-  btnCloseMenu.addEventListener('click', closeMenu);
-  menuOverlay.addEventListener('click', closeMenu);
-
-  btnNewChat.addEventListener('click', function() {
-    // Clear current chat and start fresh
-    state.messages = [];
-    chatMessages.innerHTML = '<div class="welcome-message"><div class="welcome-icon">✦</div><h2>How can I help you today?</h2><p>Remember: slow is intentional.</p></div>';
-    closeMenu();
-  });
-
-  btnSignOut.addEventListener('click', function() {
-    closeMenu();
-    signOut();
-  });
-
-  btnSettings.addEventListener('click', function() {
-    // TODO: Open settings
-    closeMenu();
-  });
-
-  btnAbout.addEventListener('click', function() {
-    // TODO: Show about page
-    closeMenu();
-  });
-
-  // Category expand/collapse
-  document.querySelectorAll('.menu-category-header').forEach(function(header) {
-    header.addEventListener('click', function() {
-      const category = this.closest('.menu-category');
-      category.classList.toggle('expanded');
-    });
-  });
-
+  // =========================
   // FRICTION SYSTEM
+  // =========================
   let challenge1 = '';
   let challenge2 = '';
   let frictionLevel = 0;
@@ -320,6 +340,7 @@
   function updateTimer() {
     const timerEl = document.getElementById('frictionTimer');
     const headerTimerEl = document.getElementById('headerTimer');
+    if (!timerEl || !headerTimerEl) return;
 
     if (!lastMessageTime || frictionLevel === 0) {
       timerEl.textContent = '';
@@ -372,6 +393,8 @@
   }
 
   function showFriction(message) {
+    if (!frictionOverlay) return;
+
     if (lastMessageTime && (Date.now() - lastMessageTime > RESET_TIME)) {
       frictionLevel = 0;
       lastMessageTime = null;
@@ -382,31 +405,38 @@
     const config = getFrictionConfig();
 
     challenge1 = generateChallenge(config.length);
-    frictionCode1.textContent = challenge1;
-    frictionInput1.value = '';
-    frictionInput1.classList.remove('success', 'error');
+    if (frictionCode1) frictionCode1.textContent = challenge1;
+    if (frictionInput1) {
+      frictionInput1.value = '';
+      frictionInput1.classList.remove('success', 'error');
+    }
 
     const row2 = document.getElementById('frictionRow2');
     if (config.rows === 2) {
       challenge2 = generateChallenge(config.length);
-      frictionCode2.textContent = challenge2;
-      frictionInput2.value = '';
-      frictionInput2.classList.remove('success', 'error');
-      row2.style.display = 'block';
+      if (frictionCode2) frictionCode2.textContent = challenge2;
+      if (frictionInput2) {
+        frictionInput2.value = '';
+        frictionInput2.classList.remove('success', 'error');
+      }
+      if (row2) row2.style.display = 'block';
     } else {
       challenge2 = '';
-      row2.style.display = 'none';
+      if (row2) row2.style.display = 'none';
     }
 
-    frictionUnlock.disabled = true;
-    frictionUnlock.classList.remove('ready');
-    frictionError.textContent = '';
+    if (frictionUnlock) {
+      frictionUnlock.disabled = true;
+      frictionUnlock.classList.remove('ready');
+    }
+    if (frictionError) frictionError.textContent = '';
 
     const subtitle = document.querySelector('.friction-subtitle');
-    if (frictionLevel < 4) {
-      subtitle.textContent = 'Level ' + (frictionLevel + 1) + ' of 5 — Type the code to send.';
-    } else {
-      subtitle.textContent = 'Level 5 of 5 — Maximum friction. Take a 2-hour break to reset.';
+    if (subtitle) {
+      subtitle.textContent =
+        frictionLevel < 4
+          ? 'Level ' + (frictionLevel + 1) + ' of 5 — Type the code to send.'
+          : 'Level 5 of 5 — Maximum friction. Take a 2-hour break to reset.';
     }
 
     startTimer();
@@ -414,10 +444,11 @@
     lockBodyScroll();
     document.addEventListener('touchmove', preventTouchMove, { passive: false });
     document.documentElement.style.setProperty('--kb', '0px');
-    setTimeout(function() { frictionInput1.focus(); }, 10);
+    setTimeout(function() { frictionInput1 && frictionInput1.focus(); }, 10);
   }
 
   function hideFriction() {
+    if (!frictionOverlay) return;
     frictionOverlay.classList.remove('active');
     state.pendingMessage = null;
     if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
@@ -430,69 +461,73 @@
 
   function checkFrictionInputs() {
     const config = getFrictionConfig();
-    const match1 = frictionInput1.value === challenge1;
-    const match2 = config.rows === 1 || frictionInput2.value === challenge2;
+    const match1 = frictionInput1 && frictionInput1.value === challenge1;
+    const match2 = config.rows === 1 || (frictionInput2 && frictionInput2.value === challenge2);
 
-    frictionInput1.classList.toggle('success', frictionInput1.value && match1);
-    frictionInput1.classList.toggle('error', frictionInput1.value && !match1);
+    if (frictionInput1) {
+      frictionInput1.classList.toggle('success', frictionInput1.value && match1);
+      frictionInput1.classList.toggle('error', frictionInput1.value && !match1);
+    }
 
-    if (config.rows === 2) {
+    if (config.rows === 2 && frictionInput2) {
       frictionInput2.classList.toggle('success', frictionInput2.value && match2);
       frictionInput2.classList.toggle('error', frictionInput2.value && !match2);
     }
 
-    if (match1 && match2) {
-      frictionUnlock.disabled = false;
-      frictionUnlock.classList.add('ready');
-    } else {
-      frictionUnlock.disabled = true;
-      frictionUnlock.classList.remove('ready');
+    if (frictionUnlock) {
+      if (match1 && match2) {
+        frictionUnlock.disabled = false;
+        frictionUnlock.classList.add('ready');
+      } else {
+        frictionUnlock.disabled = true;
+        frictionUnlock.classList.remove('ready');
+      }
     }
-    frictionError.textContent = '';
+    if (frictionError) frictionError.textContent = '';
   }
 
   function handlePaste(e) {
     e.preventDefault();
-    frictionError.textContent = 'No pasting — type it out!';
+    if (frictionError) frictionError.textContent = 'No pasting — type it out!';
   }
 
-  frictionInput1.addEventListener('input', checkFrictionInputs);
-  frictionInput2.addEventListener('input', checkFrictionInputs);
-  frictionInput1.addEventListener('paste', handlePaste);
-  frictionInput2.addEventListener('paste', handlePaste);
-  frictionInput1.addEventListener('drop', function(e) { e.preventDefault(); });
-  frictionInput2.addEventListener('drop', function(e) { e.preventDefault(); });
+  frictionInput1 && frictionInput1.addEventListener('input', checkFrictionInputs);
+  frictionInput2 && frictionInput2.addEventListener('input', checkFrictionInputs);
+  frictionInput1 && frictionInput1.addEventListener('paste', handlePaste);
+  frictionInput2 && frictionInput2.addEventListener('paste', handlePaste);
+  frictionInput1 && frictionInput1.addEventListener('drop', function(e) { e.preventDefault(); });
+  frictionInput2 && frictionInput2.addEventListener('drop', function(e) { e.preventDefault(); });
 
-  frictionCancel.addEventListener('click', hideFriction);
+  frictionCancel && frictionCancel.addEventListener('click', hideFriction);
 
-  frictionUnlock.addEventListener('click', function() {
-    if (state.isSending) return;  // Extra guard here too
+  frictionUnlock && frictionUnlock.addEventListener('click', function() {
+    if (state.isSending) return;
 
     const wasMaxLevel = frictionLevel >= 4;
     if (frictionLevel < 4) frictionLevel++;
     lastMessageTime = Date.now();
     saveFrictionState();
 
-    const timerEl = document.getElementById('frictionTimer');
-
     if (document.activeElement && typeof document.activeElement.blur === 'function') {
       document.activeElement.blur();
     }
-    frictionInput1.blur();
-    frictionInput2.blur();
+    frictionInput1 && frictionInput1.blur();
+    frictionInput2 && frictionInput2.blur();
 
-    frictionUnlock.disabled = true;  // Disable immediately to prevent re-clicks
+    frictionUnlock.disabled = true;
+
+    const msgToSend = state.pendingMessage;
 
     if (wasMaxLevel) {
-      timerEl.textContent = '🔄 Level 5 remains. Timer resets to 2 hours with each message.';
-      const msgToSend = state.pendingMessage;
+      const timerEl = document.getElementById('frictionTimer');
+      if (timerEl) timerEl.textContent = '🔄 Level 5 remains. Timer resets to 2 hours with each message.';
       setTimeout(function() {
         hideFriction();
         sendMessage(msgToSend);
       }, 2000);
     } else {
       hideFriction();
-      sendMessage(state.pendingMessage);
+      sendMessage(msgToSend);
     }
   });
 
@@ -502,7 +537,9 @@
 
   loadFrictionState();
 
+  // =========================
   // CHAT FUNCTIONS
+  // =========================
   function addMessage(content, type) {
     const div = document.createElement('div');
     div.className = 'message message-' + type;
@@ -512,7 +549,7 @@
   }
 
   async function sendMessage(content) {
-    if (!content?.trim()) return;
+    if (!content || !content.trim()) return;
 
     const model = modelSelect.value;
     const welcome = chatMessages.querySelector('.welcome-message');
@@ -524,26 +561,29 @@
     state.isProcessing = true;
     btnSend.disabled = true;
 
-    typingIndicator.classList.add('active');
-    chatMessages.appendChild(typingIndicator);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    if (typingIndicator) {
+      typingIndicator.classList.add('active');
+      chatMessages.appendChild(typingIndicator);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
 
     try {
       const response = await callBackend(model);
       state.messages.push({ role: 'assistant', content: response });
       addMessage(response, 'ai');
     } catch (error) {
-      addMessage('Error: ' + error.message, 'error');
+      addMessage('Error: ' + (error?.message || 'Unknown error'), 'error');
     } finally {
       state.isProcessing = false;
-      state.isSending = false;  // Reset here
+      state.isSending = false;
       btnSend.disabled = false;
-      typingIndicator.classList.remove('active');
+      if (typingIndicator) typingIndicator.classList.remove('active');
       requestAnimationFrame(scrollChatToBottom);
     }
   }
 
   async function callBackend(model) {
+    // NOTE: If you're hosting on GitHub Pages, "/api/chat" will 404 unless you have a backend (Cloudflare/Netlify/etc).
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -560,7 +600,9 @@
     return data.response;
   }
 
+  // =========================
   // INPUT HANDLING
+  // =========================
   messageInput.addEventListener('input', function() {
     messageInput.style.height = 'auto';
     messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
@@ -570,7 +612,7 @@
   function handleSend() {
     const content = messageInput.value.trim();
     if (!content || state.isProcessing || state.isSending) return;
-    state.isSending = true;  // Lock it
+    state.isSending = true;
     messageInput.value = '';
     messageInput.style.height = 'auto';
     showFriction(content);
@@ -585,7 +627,9 @@
     }
   });
 
+  // =========================
   // iOS KEYBOARD
+  // =========================
   function scrollChatToBottom() {
     if (!chatApp.classList.contains('active')) return;
     chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -595,7 +639,7 @@
     if (!window.visualViewport) return;
     const vv = window.visualViewport;
     const keyboardHeight = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-    const overlayOpen = frictionOverlay.classList.contains('active');
+    const overlayOpen = frictionOverlay && frictionOverlay.classList.contains('active');
     document.documentElement.style.setProperty('--kb', overlayOpen ? '0px' : (keyboardHeight + 'px'));
 
     if (!overlayOpen && keyboardHeight > 0 && document.activeElement === messageInput) {
@@ -628,4 +672,11 @@
   });
 
   updateKeyboardOffset();
+
+  // =========================
+  // START GOOGLE SIGN-IN (NOW SAFE)
+  // =========================
+  initGoogleSignIn();
+
+});
 </script>
