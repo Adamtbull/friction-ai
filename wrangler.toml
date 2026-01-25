@@ -1,10 +1,7 @@
 name = "friction-ai-backend"
-main = "src/index.js"
+main = "functions/api/chat.js"
 compatibility_date = "2026-01-25"
 
-# Route your Worker to your domain's /api/*
-# Pick ONE of these depending on whether you use www or not.
 routes = [
   { pattern = "www.friction-ai.com/api/*", zone_name = "friction-ai.com" }
-  # { pattern = "friction-ai.com/api/*", zone_name = "friction-ai.com" }
 ]
