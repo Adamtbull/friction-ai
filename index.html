@@ -1770,15 +1770,18 @@
       frictionInput1.blur();
       frictionInput2.blur();
 
+      // Save the message BEFORE hiding (hideFriction clears pendingMessage)
+      const messageToSend = state.pendingMessage;
+      
       if (wasMaxLevel) {
         timerEl.textContent = '🔄 Level 5 remains. Timer resets to 2 hours with each message.';
         setTimeout(function() {
           hideFriction();
-          sendMessage(state.pendingMessage);
+          sendMessage(messageToSend);
         }, 2000);
       } else {
         hideFriction();
-        sendMessage(state.pendingMessage);
+        sendMessage(messageToSend);
       }
     });
 
