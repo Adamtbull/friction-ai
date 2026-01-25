@@ -1,7 +1,10 @@
-name = "friction-ai-backend"
-main = "functions/api/chat.js"
+name = "friction-ai"
+main = "src/index.js"
 compatibility_date = "2026-01-25"
 
 routes = [
   { pattern = "www.friction-ai.com/api/*", zone_name = "friction-ai.com" }
 ]
+
+# Optional but recommended (lets you use modern JS APIs reliably)
+compatibility_flags = ["nodejs_compat"]
