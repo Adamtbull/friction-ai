@@ -2,62 +2,69 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // --- CORS preflight ---
+    // Only respond to /api/*
+    if (!url.pathname.startsWith("/api/")) {
+      return new Response("Not Found", { status: 404 });
+    }
+
+    // CORS preflight
     if (request.method === "OPTIONS") {
       return new Response(null, {
         headers: corsHeaders(),
       });
     }
 
-    // --- Only handle POST /api/chat ---
-    if (url.pathname !== "/api/chat" || request.method !== "POST") {
-      return new Response("Not Found", { status: 404 });
+    // Only handle POST /api/chat
+    if (url.pathname === "/api/chat" && request.method === "POST") {
+      try {
+        const body = await request.json().catch(() => ({}));
+        const model = body.model;
+        const messages = Array.isArray(body.messages) ? body.messages : [];
+
+        if (!messages.length) {
+          return jsonResponse({ error: "No messages provided" }, 400);
+        }
+
+        // Clean/normalize messages
+        const cleaned = messages
+          .filter(m => m && typeof m.content === "string" && m.content.trim().length > 0)
+          .map(m => ({
+            role: m.role === "assistant" ? "assistant" : "user",
+            content: m.content.trim(),
+          }));
+
+        if (!cleaned.length) {
+          return jsonResponse(
+            { response: "Hey! 👋 Looks like your message didn't come through. Try sending something again?" },
+            200
+          );
+        }
+
+        // Gemini requires the last turn to be user
+        if (cleaned[cleaned.length - 1].role !== "user") {
+          return jsonResponse(
+            { error: "Last message must be from user (frontend sent assistant last). Try again." },
+            400
+          );
+        }
+
+        let responseText;
+
+        if (model === "gemini") {
+          responseText = await handleGemini(cleaned, env);
+        } else {
+          return jsonResponse({ error: "Model not configured: " + model }, 400);
+        }
+
+        return jsonResponse({ response: responseText }, 200);
+      } catch (err) {
+        return jsonResponse({ error: err?.message || "Server error" }, 500);
+      }
     }
 
-    try {
-      const body = await request.json();
-      const { model, messages } = body;
-
-      if (!model) {
-        return json({ error: "No model specified" }, 400);
-      }
-
-      if (!Array.isArray(messages) || messages.length === 0) {
-        return json({ error: "No messages provided" }, 400);
-      }
-
-      // ✅ Gemini REQUIRES the LAST message to be a USER message
-      const cleanedMessages = messages
-        .filter(m => m && typeof m.content === "string" && m.content.trim())
-        .map(m => ({
-          role: m.role === "assistant" ? "model" : "user",
-          parts: [{ text: m.content.trim() }],
-        }));
-
-      // Force last role to user (Gemini rule)
-      cleanedMessages[cleanedMessages.length - 1].role = "user";
-
-      let responseText = "";
-
-      if (model === "gemini") {
-        responseText = await callGemini(cleanedMessages, env);
-      } else {
-        return json({ error: `Model not supported: ${model}` }, 400);
-      }
-
-      return json({ response: responseText });
-    } catch (err) {
-      return json(
-        {
-          error: err.message || "Worker error",
-        },
-        500
-      );
-    }
+    return new Response("Not Found", { status: 404, headers: corsHeaders() });
   },
 };
-
-/* ---------------- HELPERS ---------------- */
 
 function corsHeaders() {
   return {
@@ -67,7 +74,7 @@ function corsHeaders() {
   };
 }
 
-function json(data, status = 200) {
+function jsonResponse(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
@@ -77,42 +84,42 @@ function json(data, status = 200) {
   });
 }
 
-/* ---------------- GEMINI ---------------- */
+async function handleGemini(messages, env) {
+  const apiKey = env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error("Gemini API key not configured (missing GEMINI_API_KEY in Worker secrets).");
 
-async function callGemini(contents, env) {
-  if (!env.GEMINI_API_KEY) {
-    throw new Error("GEMINI_API_KEY not configured");
-  }
+  // Convert your chat history to Gemini "contents"
+  const contents = messages.map(m => ({
+    role: m.role === "assistant" ? "model" : "user",
+    parts: [{ text: m.content }],
+  }));
 
-  const res = await fetch(
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" +
-      env.GEMINI_API_KEY,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents,
-        generationConfig: {
-          temperature: 0.9,
-          topP: 0.95,
-          maxOutputTokens: 2048,
-        },
-      }),
-    }
-  );
+  const endpoint =
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" +
+    encodeURIComponent(apiKey);
 
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents,
+      generationConfig: {
+        temperature: 0.9,
+        topP: 0.95,
+        maxOutputTokens: 2048,
+      },
+    }),
+  });
+
+  const text = await res.text();
   if (!res.ok) {
-    const text = await res.text();
+    // Keep full Gemini error visible so you can debug quota/billing/permissions
     throw new Error("Gemini API error: " + text);
   }
 
-  const data = await res.json();
-  const candidate = data.candidates?.[0];
-  const part = candidate?.content?.parts?.[0]?.text;
+  const data = JSON.parse(text);
+  const out = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-  if (!part) {
-    throw new Error("No response from Gemini");
-  }
-
-  return part;
+  if (!out) throw new Error("No valid response text from Gemini.");
+  return out;
 }
