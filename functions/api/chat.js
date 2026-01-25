@@ -10,29 +10,50 @@ export async function onRequestPost({ request, env }) {
     let responseText = "";
 
     switch (model) {
-
       // =====================
       // GOOGLE GEMINI 2.5
       // =====================
       case "gemini": {
-        const GEMINI_KEY = env["Gemini friction key"];
+        // Support BOTH naming styles:
+        // 1) Recommended: GEMINI_API_KEY
+        // 2) Your current CF secret name: "Gemini friction key"
+        const GEMINI_KEY = env.GEMINI_API_KEY || env["Gemini friction key"];
 
         if (!GEMINI_KEY) {
-          return json({ error: "Server missing Gemini friction key" }, 500);
+          return json(
+            { error: "Server missing Gemini key (set GEMINI_API_KEY or 'Gemini friction key')" },
+            500
+          );
         }
 
-        const userText = messages[messages.length - 1]?.content || "";
+        // Build proper Gemini "contents" from full history:
+        // - user -> role: "user"
+        // - assistant -> role: "model"
+        const history = (messages || [])
+          .filter(m => m && typeof m.content === "string" && m.content.trim().length > 0)
+          .map(m => ({
+            role: m.role === "assistant" ? "model" : "user",
+            parts: [{ text: m.content }]
+          }));
+
+        // Ensure we have at least one real user message
+        const lastUser = [...history].reverse().find(m => m.role === "user");
+        if (!lastUser) {
+          return json({ error: "No user message found to send to Gemini." }, 400);
+        }
+
+        // Optional: keep history from getting too large
+        const MAX_TURNS = 30; // tweak if you want
+        const clippedHistory = history.slice(-MAX_TURNS);
 
         const url =
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`;
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(GEMINI_KEY)}`;
 
         const r = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            contents: [
-              { role: "user", parts: [{ text: userText }] }
-            ],
+            contents: clippedHistory,
             generationConfig: {
               temperature: 0.7,
               maxOutputTokens: 700
@@ -46,7 +67,10 @@ export async function onRequestPost({ request, env }) {
           return json({ error: "Gemini API error", details: data }, r.status);
         }
 
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        // Gemini may return multiple parts—join them safely
+        const parts = data?.candidates?.[0]?.content?.parts;
+        const text =
+          Array.isArray(parts) ? parts.map(p => p?.text || "").join("").trim() : "";
 
         if (!text) {
           return json({ error: "Gemini returned no text", details: data }, 502);
@@ -60,9 +84,7 @@ export async function onRequestPost({ request, env }) {
       // CLAUDE SONNET
       // =====================
       case "claude": {
-        const CLAUDE_KEY = env.ANTHROPIC_API_KEY;
-
-        if (!CLAUDE_KEY) {
+        if (!env.ANTHROPIC_API_KEY) {
           return json({ error: "Server missing ANTHROPIC_API_KEY" }, 500);
         }
 
@@ -70,7 +92,7 @@ export async function onRequestPost({ request, env }) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": CLAUDE_KEY,
+            "x-api-key": env.ANTHROPIC_API_KEY,
             "anthropic-version": "2023-06-01"
           },
           body: JSON.stringify({
@@ -97,9 +119,7 @@ export async function onRequestPost({ request, env }) {
       // GPT-4o
       // =====================
       case "gpt": {
-        const OPENAI_KEY = env.OPENAI_API_KEY;
-
-        if (!OPENAI_KEY) {
+        if (!env.OPENAI_API_KEY) {
           return json({ error: "Server missing OPENAI_API_KEY" }, 500);
         }
 
@@ -107,7 +127,7 @@ export async function onRequestPost({ request, env }) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${OPENAI_KEY}`
+            "Authorization": `Bearer ${env.OPENAI_API_KEY}`
           },
           body: JSON.stringify({
             model: "gpt-4o",
@@ -130,22 +150,21 @@ export async function onRequestPost({ request, env }) {
       // GROK (xAI)
       // =====================
       case "grok": {
-        const GROK_KEY = env["Grok friction"];
-
-        if (!GROK_KEY) {
-          return json({ error: "Server missing Grok friction" }, 500);
+        if (!env.XAI_API_KEY) {
+          return json({ error: "Server missing XAI_API_KEY" }, 500);
         }
 
         const r = await fetch("https://api.x.ai/v1/chat/completions", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${GROK_KEY}`
+            "Authorization": `Bearer ${env.XAI_API_KEY}`
           },
           body: JSON.stringify({
             model: "grok-4",
             messages,
-            temperature: 0.7
+            temperature: 0.7,
+            stream: false
           })
         });
 
@@ -163,9 +182,7 @@ export async function onRequestPost({ request, env }) {
       // PERPLEXITY SONAR
       // =====================
       case "perplexity": {
-        const PERPLEXITY_KEY = env.PERPLEXITY_API_KEY;
-
-        if (!PERPLEXITY_KEY) {
+        if (!env.PERPLEXITY_API_KEY) {
           return json({ error: "Server missing PERPLEXITY_API_KEY" }, 500);
         }
 
@@ -173,7 +190,7 @@ export async function onRequestPost({ request, env }) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${PERPLEXITY_KEY}`
+            "Authorization": `Bearer ${env.PERPLEXITY_API_KEY}`
           },
           body: JSON.stringify({
             model: "sonar",
@@ -204,7 +221,6 @@ export async function onRequestPost({ request, env }) {
     }
 
     return json({ response: responseText });
-
   } catch (err) {
     return json({ error: err?.message || "Server error" }, 500);
   }
