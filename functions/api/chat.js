@@ -14,11 +14,7 @@ export async function onRequestPost({ request, env }) {
       // GOOGLE GEMINI 2.5
       // =====================
       case "gemini": {
-        // Support BOTH naming styles:
-        // 1) Recommended: GEMINI_API_KEY
-        // 2) Your current CF secret name: "Gemini friction key"
         const GEMINI_KEY = env.GEMINI_API_KEY || env["Gemini friction key"];
-
         if (!GEMINI_KEY) {
           return json(
             { error: "Server missing Gemini key (set GEMINI_API_KEY or 'Gemini friction key')" },
@@ -26,25 +22,34 @@ export async function onRequestPost({ request, env }) {
           );
         }
 
-        // Build proper Gemini "contents" from full history:
-        // - user -> role: "user"
-        // - assistant -> role: "model"
-        const history = (messages || [])
-          .filter(m => m && typeof m.content === "string" && m.content.trim().length > 0)
-          .map(m => ({
-            role: m.role === "assistant" ? "model" : "user",
-            parts: [{ text: m.content }]
-          }));
+        // Normalize incoming messages into plain text turns
+        const normalized = (messages || [])
+          .map(normalizeMessage)
+          .filter(m => m.text.length > 0);
 
-        // Ensure we have at least one real user message
-        const lastUser = [...history].reverse().find(m => m.role === "user");
+        // Find the most recent USER message (robust role handling)
+        const lastUser = [...normalized].reverse().find(m => m.kind === "user");
         if (!lastUser) {
-          return json({ error: "No user message found to send to Gemini." }, 400);
+          return json(
+            {
+              error: "No user message found to send to Gemini.",
+              hint: "Your frontend must send messages like { role:'user', content:'hi' } at least once.",
+              received_sample: messages.slice(-3)
+            },
+            400
+          );
         }
 
-        // Optional: keep history from getting too large
-        const MAX_TURNS = 30; // tweak if you want
-        const clippedHistory = history.slice(-MAX_TURNS);
+        // Build Gemini contents using full history, with correct roles:
+        // Gemini roles: "user" and "model"
+        const contents = normalized.map(m => ({
+          role: m.kind === "assistant" ? "model" : "user",
+          parts: [{ text: m.text }]
+        }));
+
+        // Optional: cap history size so you don't blow tokens
+        const MAX_TURNS = 30;
+        const clipped = contents.slice(-MAX_TURNS);
 
         const url =
           `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(GEMINI_KEY)}`;
@@ -53,7 +58,7 @@ export async function onRequestPost({ request, env }) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            contents: clippedHistory,
+            contents: clipped,
             generationConfig: {
               temperature: 0.7,
               maxOutputTokens: 700
@@ -62,15 +67,14 @@ export async function onRequestPost({ request, env }) {
         });
 
         const data = await r.json().catch(() => ({}));
-
         if (!r.ok) {
           return json({ error: "Gemini API error", details: data }, r.status);
         }
 
-        // Gemini may return multiple parts—join them safely
         const parts = data?.candidates?.[0]?.content?.parts;
-        const text =
-          Array.isArray(parts) ? parts.map(p => p?.text || "").join("").trim() : "";
+        const text = Array.isArray(parts)
+          ? parts.map(p => p?.text || "").join("").trim()
+          : (parts?.text || "").trim();
 
         if (!text) {
           return json({ error: "Gemini returned no text", details: data }, 502);
@@ -100,13 +104,12 @@ export async function onRequestPost({ request, env }) {
             max_tokens: 800,
             messages: messages.map(m => ({
               role: m.role === "assistant" ? "assistant" : "user",
-              content: m.content
+              content: toText(m?.content)
             }))
           })
         });
 
         const data = await r.json().catch(() => ({}));
-
         if (!r.ok) {
           return json({ error: "Claude API error", details: data }, r.status);
         }
@@ -132,12 +135,14 @@ export async function onRequestPost({ request, env }) {
           body: JSON.stringify({
             model: "gpt-4o",
             temperature: 0.7,
-            messages
+            messages: messages.map(m => ({
+              role: m.role,
+              content: toText(m?.content)
+            }))
           })
         });
 
         const data = await r.json().catch(() => ({}));
-
         if (!r.ok) {
           return json({ error: "OpenAI API error", details: data }, r.status);
         }
@@ -162,14 +167,16 @@ export async function onRequestPost({ request, env }) {
           },
           body: JSON.stringify({
             model: "grok-4",
-            messages,
+            messages: messages.map(m => ({
+              role: m.role,
+              content: toText(m?.content)
+            })),
             temperature: 0.7,
             stream: false
           })
         });
 
         const data = await r.json().catch(() => ({}));
-
         if (!r.ok) {
           return json({ error: "Grok API error", details: data }, r.status);
         }
@@ -194,12 +201,14 @@ export async function onRequestPost({ request, env }) {
           },
           body: JSON.stringify({
             model: "sonar",
-            messages
+            messages: messages.map(m => ({
+              role: m.role,
+              content: toText(m?.content)
+            }))
           })
         });
 
         const data = await r.json().catch(() => ({}));
-
         if (!r.ok) {
           return json({ error: "Perplexity API error", details: data }, r.status);
         }
@@ -224,6 +233,49 @@ export async function onRequestPost({ request, env }) {
   } catch (err) {
     return json({ error: err?.message || "Server error" }, 500);
   }
+}
+
+/** Normalize one message into { kind: 'user'|'assistant', text: string } */
+function normalizeMessage(m) {
+  const roleRaw = String(m?.role || "").toLowerCase();
+
+  // Treat these as assistant
+  const isAssistant =
+    roleRaw === "assistant" || roleRaw === "model" || roleRaw === "ai";
+
+  // Treat these as system/instructions (we still send to Gemini as user by default)
+  // If you later want true system behavior, we can implement that.
+  const text = toText(m?.content);
+
+  return {
+    kind: isAssistant ? "assistant" : "user",
+    text
+  };
+}
+
+/** Convert content to a plain string (handles string/object/array) */
+function toText(content) {
+  if (typeof content === "string") return content.trim();
+
+  // OpenAI-style content arrays: [{type:'text', text:'...'}, ...]
+  if (Array.isArray(content)) {
+    const joined = content
+      .map(part => {
+        if (typeof part === "string") return part;
+        if (part && typeof part === "object") return part.text || part.content || "";
+        return "";
+      })
+      .join("");
+    return String(joined).trim();
+  }
+
+  // Object content: { text: '...' } or { content: '...' }
+  if (content && typeof content === "object") {
+    const maybe = content.text || content.content || content.message || "";
+    return String(maybe).trim();
+  }
+
+  return "";
 }
 
 // helper
