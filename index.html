@@ -1041,8 +1041,8 @@
   <h2 class="section-title">How it works</h2>
   <ul class="section-list">
     <li>You may be asked to type a short code before sending</li>
-    <li>Continued use gradually increases the effort</li>
-    <li>It caps at two lines and resets after 2 hours</li>
+    <li>Continued use gradually increases the effort across 15 levels</li>
+    <li>It caps at two rows of 24 characters and resets after 2 hours</li>
   </ul>
 </div>
 
@@ -1664,7 +1664,7 @@
       } else {
         const timeStr = formatTimeRemaining(remaining);
         timerEl.textContent = '⏱ Resets in ' + timeStr;
-        headerTimerEl.textContent = 'L' + Math.min(frictionLevel + 1, 5) + ' · ' + timeStr;
+        headerTimerEl.textContent = 'L' + Math.min(frictionLevel + 1, 15) + ' · ' + timeStr;
         headerTimerEl.classList.add('active');
       }
     }
@@ -1684,13 +1684,23 @@
 
     function getFrictionConfig() {
       const configs = [
-        { rows: 1, length: 6 },
-        { rows: 1, length: 10 },
-        { rows: 1, length: 14 },
-        { rows: 1, length: 18 },
-        { rows: 2, length: 20 }
+        { rows: 1, length: 4 },   // Level 1
+        { rows: 1, length: 6 },   // Level 2
+        { rows: 1, length: 8 },   // Level 3
+        { rows: 1, length: 10 },  // Level 4
+        { rows: 1, length: 12 },  // Level 5
+        { rows: 1, length: 14 },  // Level 6
+        { rows: 1, length: 16 },  // Level 7
+        { rows: 1, length: 18 },  // Level 8
+        { rows: 1, length: 20 },  // Level 9
+        { rows: 2, length: 12 },  // Level 10
+        { rows: 2, length: 14 },  // Level 11
+        { rows: 2, length: 16 },  // Level 12
+        { rows: 2, length: 18 },  // Level 13
+        { rows: 2, length: 20 },  // Level 14
+        { rows: 2, length: 24 },  // Level 15
       ];
-      return configs[Math.min(frictionLevel, 4)];
+      return configs[Math.min(frictionLevel, 14)];
     }
 
     function handlePaste(e) {
@@ -1836,10 +1846,10 @@
       frictionError.textContent = '';
 
       const subtitle = document.querySelector('.friction-subtitle');
-      if (frictionLevel < 4) {
-        subtitle.textContent = 'Level ' + (frictionLevel + 1) + ' of 5 — Type the code to send.';
+      if (frictionLevel < 14) {
+        subtitle.textContent = 'Level ' + (frictionLevel + 1) + ' of 15 — Type the code to send.';
       } else {
-        subtitle.textContent = 'Level 5 of 5 — Maximum friction. Take a 2-hour break to reset.';
+        subtitle.textContent = 'Level 15 of 15 — Maximum friction. Take a 2-hour break to reset.';
       }
 
       startTimer();
@@ -1869,8 +1879,8 @@
     frictionCancel.addEventListener('click', hideFriction);
 
     frictionUnlock.addEventListener('click', function() {
-      const wasMaxLevel = frictionLevel >= 4;
-      if (frictionLevel < 4) frictionLevel++;
+      const wasMaxLevel = frictionLevel >= 14;
+      if (frictionLevel < 14) frictionLevel++;
       lastMessageTime = Date.now();
       saveFrictionState();
 
