@@ -9,9 +9,7 @@ export default {
 
     // CORS preflight
     if (request.method === "OPTIONS") {
-      return new Response(null, {
-        headers: corsHeaders(),
-      });
+      return new Response(null, { headers: corsHeaders() });
     }
 
     // Only handle POST /api/chat
@@ -40,20 +38,37 @@ export default {
           );
         }
 
-        // Gemini requires the last turn to be user
+        // Most APIs expect the last turn to be from user
         if (cleaned[cleaned.length - 1].role !== "user") {
           return jsonResponse(
-            { error: "Last message must be from user (frontend sent assistant last). Try again." },
+            { error: "Last message must be from user. Try again." },
             400
           );
         }
 
         let responseText;
 
-        if (model === "gemini") {
-          responseText = await handleGemini(cleaned, env);
-        } else {
-          return jsonResponse({ error: "Model not configured: " + model }, 400);
+        switch (model) {
+          case "gemini":
+            responseText = await handleGemini(cleaned, env);
+            break;
+          case "claude":
+            responseText = await handleClaude(cleaned, env);
+            break;
+          case "gpt":
+            responseText = await handleGPT(cleaned, env);
+            break;
+          case "grok":
+            responseText = await handleGrok(cleaned, env);
+            break;
+          case "perplexity":
+            responseText = await handlePerplexity(cleaned, env);
+            break;
+          case "bing":
+            responseText = "Bing Search integration coming soon!";
+            break;
+          default:
+            return jsonResponse({ error: `Unknown model: ${model}` }, 400);
         }
 
         return jsonResponse({ response: responseText }, 200);
@@ -84,11 +99,12 @@ function jsonResponse(data, status = 200) {
   });
 }
 
+// ============ MODEL HANDLERS ============
+
 async function handleGemini(messages, env) {
   const apiKey = env.GEMINI_API_KEY;
-  if (!apiKey) throw new Error("Gemini API key not configured (missing GEMINI_API_KEY in Worker secrets).");
+  if (!apiKey) throw new Error("Gemini API key not configured");
 
-  // Convert your chat history to Gemini "contents"
   const contents = messages.map(m => ({
     role: m.role === "assistant" ? "model" : "user",
     parts: [{ text: m.content }],
@@ -113,13 +129,131 @@ async function handleGemini(messages, env) {
 
   const text = await res.text();
   if (!res.ok) {
-    // Keep full Gemini error visible so you can debug quota/billing/permissions
     throw new Error("Gemini API error: " + text);
   }
 
   const data = JSON.parse(text);
   const out = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
   if (!out) throw new Error("No valid response text from Gemini.");
+  return out;
+}
+
+async function handleClaude(messages, env) {
+  const apiKey = env.ANTHROPIC_API_KEY;
+  if (!apiKey) throw new Error("Claude API key not configured");
+
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 2048,
+      messages: messages.map(m => ({
+        role: m.role,
+        content: m.content,
+      })),
+    }),
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error("Claude API error: " + JSON.stringify(data));
+  }
+
+  const out = data?.content?.[0]?.text;
+  if (!out) throw new Error("No valid response text from Claude.");
+  return out;
+}
+
+async function handleGPT(messages, env) {
+  const apiKey = env.OPENAI_API_KEY;
+  if (!apiKey) throw new Error("OpenAI API key not configured");
+
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: "gpt-4o",
+      temperature: 0.7,
+      messages: messages.map(m => ({
+        role: m.role,
+        content: m.content,
+      })),
+    }),
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error("OpenAI API error: " + JSON.stringify(data));
+  }
+
+  const out = data?.choices?.[0]?.message?.content;
+  if (!out) throw new Error("No valid response text from GPT-4o.");
+  return out;
+}
+
+async function handleGrok(messages, env) {
+  const apiKey = env.XAI_API_KEY;
+  if (!apiKey) throw new Error("Grok API key not configured");
+
+  const res = await fetch("https://api.x.ai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: "grok-3",
+      temperature: 0.7,
+      messages: messages.map(m => ({
+        role: m.role,
+        content: m.content,
+      })),
+    }),
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error("Grok API error: " + JSON.stringify(data));
+  }
+
+  const out = data?.choices?.[0]?.message?.content;
+  if (!out) throw new Error("No valid response text from Grok.");
+  return out;
+}
+
+async function handlePerplexity(messages, env) {
+  const apiKey = env.PERPLEXITY_API_KEY;
+  if (!apiKey) throw new Error("Perplexity API key not configured");
+
+  const res = await fetch("https://api.perplexity.ai/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: "sonar",
+      messages: messages.map(m => ({
+        role: m.role,
+        content: m.content,
+      })),
+    }),
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error("Perplexity API error: " + JSON.stringify(data));
+  }
+
+  const out = data?.choices?.[0]?.message?.content;
+  if (!out) throw new Error("No valid response text from Perplexity.");
   return out;
 }
