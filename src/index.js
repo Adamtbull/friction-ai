@@ -1,6 +1,6 @@
 export default {
 async fetch(request, env) {
-const url = new URL(request.url);
+var url = new URL(request.url);
 
 ```
 // Only respond to /api/*
@@ -16,25 +16,27 @@ if (request.method === "OPTIONS") {
 // Only handle POST /api/chat
 if (url.pathname === "/api/chat" && request.method === "POST") {
   try {
-    const body = await request.json().catch(() => ({}));
-    const model = body.model;
-    const messages = Array.isArray(body.messages) ? body.messages : [];
+    var body = await request.json().catch(function() { return {}; });
+    var model = body.model;
+    var messages = Array.isArray(body.messages) ? body.messages : [];
 
     if (!messages.length) {
       return jsonResponse({ error: "No messages provided" }, 400);
     }
 
     // Clean/normalize messages
-    const cleaned = messages
-      .filter(m => m && typeof m.content === "string" && m.content.trim().length > 0)
-      .map(m => ({
-        role: m.role === "assistant" ? "assistant" : "user",
-        content: m.content.trim(),
-      }));
+    var cleaned = messages
+      .filter(function(m) { return m && typeof m.content === "string" && m.content.trim().length > 0; })
+      .map(function(m) {
+        return {
+          role: m.role === "assistant" ? "assistant" : "user",
+          content: m.content.trim()
+        };
+      });
 
     if (!cleaned.length) {
       return jsonResponse(
-        { response: "Hey! 👋 Looks like your message didn't come through. Try sending something again?" },
+        { response: "Hey! Looks like your message didn't come through. Try sending something again?" },
         200
       );
     }
@@ -47,7 +49,7 @@ if (url.pathname === "/api/chat" && request.method === "POST") {
       );
     }
 
-    let responseText;
+    var responseText;
 
     switch (model) {
       case "gemini":
@@ -66,194 +68,211 @@ if (url.pathname === "/api/chat" && request.method === "POST") {
         responseText = await handlePerplexity(cleaned, env);
         break;
       default:
-        return jsonResponse({ error: `Unknown model: ${model}` }, 400);
+        return jsonResponse({ error: "Unknown model: " + model }, 400);
     }
 
     return jsonResponse({ response: responseText }, 200);
   } catch (err) {
-    return jsonResponse({ error: err?.message || "Server error" }, 500);
+    var errMsg = err && err.message ? err.message : "Server error";
+    return jsonResponse({ error: errMsg }, 500);
   }
 }
 
 return new Response("Not Found", { status: 404, headers: corsHeaders() });
 ```
 
-},
+}
 };
 
 function corsHeaders() {
 return {
 “Access-Control-Allow-Origin”: “*”,
 “Access-Control-Allow-Methods”: “POST, OPTIONS”,
-“Access-Control-Allow-Headers”: “Content-Type”,
+“Access-Control-Allow-Headers”: “Content-Type”
 };
 }
 
-function jsonResponse(data, status = 200) {
-return new Response(JSON.stringify(data), {
-status,
-headers: {
+function jsonResponse(data, status) {
+if (!status) status = 200;
+var headers = {
 “Content-Type”: “application/json”,
-…corsHeaders(),
-},
+“Access-Control-Allow-Origin”: “*”,
+“Access-Control-Allow-Methods”: “POST, OPTIONS”,
+“Access-Control-Allow-Headers”: “Content-Type”
+};
+return new Response(JSON.stringify(data), {
+status: status,
+headers: headers
 });
 }
 
 // ============ MODEL HANDLERS ============
 
 async function handleGemini(messages, env) {
-const apiKey = env.GEMINI_API_KEY;
+var apiKey = env.GEMINI_API_KEY;
 if (!apiKey) throw new Error(“Gemini API key not configured”);
 
-const contents = messages.map(m => ({
+var contents = messages.map(function(m) {
+return {
 role: m.role === “assistant” ? “model” : “user”,
-parts: [{ text: m.content }],
-}));
+parts: [{ text: m.content }]
+};
+});
 
-const endpoint =
-“https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=” +
-encodeURIComponent(apiKey);
+var endpoint = “https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=” + encodeURIComponent(apiKey);
 
-const res = await fetch(endpoint, {
+var res = await fetch(endpoint, {
 method: “POST”,
 headers: { “Content-Type”: “application/json” },
 body: JSON.stringify({
-contents,
+contents: contents,
 generationConfig: {
 temperature: 0.9,
 topP: 0.95,
-maxOutputTokens: 2048,
-},
-}),
+maxOutputTokens: 2048
+}
+})
 });
 
-const text = await res.text();
+var text = await res.text();
 if (!res.ok) {
 throw new Error(“Gemini API error: “ + text);
 }
 
-const data = JSON.parse(text);
-const out = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+var data = JSON.parse(text);
+var out = data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
 if (!out) throw new Error(“No valid response text from Gemini.”);
 return out;
 }
 
 async function handleClaude(messages, env) {
-const apiKey = env.ANTHROPIC_API_KEY;
+var apiKey = env.ANTHROPIC_API_KEY;
 if (!apiKey) throw new Error(“Claude API key not configured”);
 
-const res = await fetch(“https://api.anthropic.com/v1/messages”, {
+var res = await fetch(“https://api.anthropic.com/v1/messages”, {
 method: “POST”,
 headers: {
 “Content-Type”: “application/json”,
 “x-api-key”: apiKey,
-“anthropic-version”: “2023-06-01”,
+“anthropic-version”: “2023-06-01”
 },
 body: JSON.stringify({
 model: “claude-sonnet-4-20250514”,
 max_tokens: 2048,
-messages: messages.map(m => ({
-role: m.role,
-content: m.content,
-})),
-}),
+messages: messages.map(function(m) {
+return { role: m.role, content: m.content };
+})
+})
 });
 
-const data = await res.json().catch(() => ({}));
+var data = await res.json().catch(function() { return {}; });
 if (!res.ok) {
 throw new Error(“Claude API error: “ + JSON.stringify(data));
 }
 
-const out = data?.content?.[0]?.text;
+var out = data && data.content && data.content[0] && data.content[0].text;
 if (!out) throw new Error(“No valid response text from Claude.”);
 return out;
 }
 
 async function handleGPT(messages, env) {
-const apiKey = env.OPENAI_API_KEY;
+var apiKey = env.OPENAI_API_KEY;
 if (!apiKey) throw new Error(“OpenAI API key not configured”);
 
-const res = await fetch(“https://api.openai.com/v1/chat/completions”, {
+var res = await fetch(“https://api.openai.com/v1/chat/completions”, {
 method: “POST”,
 headers: {
 “Content-Type”: “application/json”,
-“Authorization”: `Bearer ${apiKey}`,
+“Authorization”: “Bearer “ + apiKey
 },
 body: JSON.stringify({
 model: “gpt-4o”,
 temperature: 0.7,
-messages: messages.map(m => ({
-role: m.role,
-content: m.content,
-})),
-}),
+messages: messages.map(function(m) {
+return { role: m.role, content: m.content };
+})
+})
 });
 
-const data = await res.json().catch(() => ({}));
+var data = await res.json().catch(function() { return {}; });
 if (!res.ok) {
 throw new Error(“OpenAI API error: “ + JSON.stringify(data));
 }
 
-const out = data?.choices?.[0]?.message?.content;
+var out = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
 if (!out) throw new Error(“No valid response text from GPT-4o.”);
 return out;
 }
 
 async function handleGrok(messages, env) {
-const apiKey = env.XAI_API_KEY;
+var apiKey = env.XAI_API_KEY;
 if (!apiKey) throw new Error(“Grok API key not configured”);
 
-const res = await fetch(“https://api.x.ai/v1/chat/completions”, {
+var res = await fetch(“https://api.x.ai/v1/chat/completions”, {
 method: “POST”,
 headers: {
 “Content-Type”: “application/json”,
-“Authorization”: `Bearer ${apiKey}`,
+“Authorization”: “Bearer “ + apiKey
 },
 body: JSON.stringify({
 model: “grok-3”,
 temperature: 0.7,
-messages: messages.map(m => ({
-role: m.role,
-content: m.content,
-})),
-}),
+messages: messages.map(function(m) {
+return { role: m.role, content: m.content };
+})
+})
 });
 
-const data = await res.json().catch(() => ({}));
+var data = await res.json().catch(function() { return {}; });
 if (!res.ok) {
 throw new Error(“Grok API error: “ + JSON.stringify(data));
 }
 
-const out = data?.choices?.[0]?.message?.content;
+var out = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
 if (!out) throw new Error(“No valid response text from Grok.”);
 return out;
 }
 
 async function handlePerplexity(messages, env) {
-const apiKey = env.PERPLEXITY_API_KEY;
+var apiKey = env.PERPLEXITY_API_KEY;
 if (!apiKey) throw new Error(“Perplexity API key not configured”);
 
-const res = await fetch(“https://api.perplexity.ai/chat/completions”, {
+// Perplexity requires strict alternation: user, assistant, user, assistant
+// Merge consecutive same-role messages
+var alternating = [];
+for (var i = 0; i < messages.length; i++) {
+var msg = messages[i];
+if (alternating.length === 0) {
+alternating.push({ role: msg.role, content: msg.content });
+} else {
+var last = alternating[alternating.length - 1];
+if (last.role === msg.role) {
+// Merge consecutive same-role messages
+last.content += “\n\n” + msg.content;
+} else {
+alternating.push({ role: msg.role, content: msg.content });
+}
+}
+}
+
+var res = await fetch(“https://api.perplexity.ai/chat/completions”, {
 method: “POST”,
 headers: {
 “Content-Type”: “application/json”,
-“Authorization”: `Bearer ${apiKey}`,
+“Authorization”: “Bearer “ + apiKey
 },
 body: JSON.stringify({
 model: “sonar”,
-messages: messages.map(m => ({
-role: m.role,
-content: m.content,
-})),
-}),
+messages: alternating
+})
 });
 
-const data = await res.json().catch(() => ({}));
+var data = await res.json().catch(function() { return {}; });
 if (!res.ok) {
 throw new Error(“Perplexity API error: “ + JSON.stringify(data));
 }
 
-const out = data?.choices?.[0]?.message?.content;
+var out = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
 if (!out) throw new Error(“No valid response text from Perplexity.”);
 return out;
 }
