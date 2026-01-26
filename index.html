@@ -876,52 +876,73 @@
       font-size: 0.8rem;
       font-weight: 500;
       color: var(--grey);
-      margin-bottom: 8px;
+      margin-bottom: 12px;
       display: block;
     }
 
     .friction-code {
-      display: block;
-      background: var(--grey-light);
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-family: 'SF Mono', 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', Monaco, 'Courier New', monospace;
-      font-size: 1rem;
-      letter-spacing: 1.5px;
-      color: var(--text-primary);
+      display: flex;
+      justify-content: center;
+      gap: 6px;
       margin-bottom: 10px;
-      word-break: break-all;
-      font-variant-ligatures: none;
+      flex-wrap: wrap;
+    }
+
+    .friction-char {
+      width: 36px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--grey-light);
+      border-radius: 6px;
+      font-family: 'SF Mono', 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', Monaco, 'Courier New', monospace;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text-primary);
       user-select: none;
       -webkit-user-select: none;
     }
 
-    .friction-input {
-      width: 100%;
-      padding: 12px 16px;
+    .friction-input-row {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .friction-char-input {
+      width: 36px;
+      height: 44px;
+      padding: 0;
       border: 2px solid var(--border);
-      border-radius: 8px;
+      border-radius: 6px;
       font-family: 'SF Mono', 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', Monaco, 'Courier New', monospace;
-      font-size: 16px;
+      font-size: 1.1rem;
+      font-weight: 500;
       text-align: center;
-      letter-spacing: 1.5px;
       color: var(--text-primary);
       outline: none;
       transition: border-color 0.2s ease;
       background: var(--white);
     }
 
-    .friction-input:focus {
+    .friction-char-input:focus {
       border-color: var(--teal);
     }
 
-    .friction-input.success {
+    .friction-char-input.success {
       border-color: #22c55e;
+      background: #f0fdf4;
     }
 
-    .friction-input.error {
+    .friction-char-input.error {
       border-color: #ef4444;
-      animation: shake 0.4s ease;
+      background: #fef2f2;
+    }
+
+    .friction-input {
+      display: none;
     }
 
     @keyframes shake {
@@ -1269,18 +1290,16 @@
       <p class="friction-subtitle">Type the code to send.</p>
 
 ```
-  <div class="friction-row">
+  <div class="friction-row" id="frictionRow1">
     <span class="friction-label">Code 1</span>
-    <code class="friction-code" id="frictionCode1"></code>
-    <input type="text" class="friction-input" id="frictionInput1"
-           autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    <div class="friction-code" id="frictionCode1"></div>
+    <div class="friction-input-row" id="frictionInputRow1"></div>
   </div>
 
   <div class="friction-row" id="frictionRow2">
     <span class="friction-label">Code 2</span>
-    <code class="friction-code" id="frictionCode2"></code>
-    <input type="text" class="friction-input" id="frictionInput2"
-           autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+    <div class="friction-code" id="frictionCode2"></div>
+    <div class="friction-input-row" id="frictionInputRow2"></div>
   </div>
 
   <div class="friction-buttons">
@@ -1448,8 +1467,8 @@
     const frictionOverlay = document.getElementById('frictionOverlay');
     const frictionCode1 = document.getElementById('frictionCode1');
     const frictionCode2 = document.getElementById('frictionCode2');
-    const frictionInput1 = document.getElementById('frictionInput1');
-    const frictionInput2 = document.getElementById('frictionInput2');
+    const frictionInputRow1 = document.getElementById('frictionInputRow1');
+    const frictionInputRow2 = document.getElementById('frictionInputRow2');
     const frictionCancel = document.getElementById('frictionCancel');
     const frictionUnlock = document.getElementById('frictionUnlock');
     const frictionError = document.getElementById('frictionError');
@@ -1674,6 +1693,121 @@
       return configs[Math.min(frictionLevel, 4)];
     }
 
+    function handlePaste(e) {
+      e.preventDefault();
+      frictionError.textContent = 'No pasting — type it out!';
+    }
+
+    function createCharBlocks(code, codeContainer, inputContainer) {
+      codeContainer.innerHTML = '';
+      inputContainer.innerHTML = '';
+      
+      for (let i = 0; i < code.length; i++) {
+        // Create display character block
+        const charBlock = document.createElement('div');
+        charBlock.className = 'friction-char';
+        charBlock.textContent = code[i];
+        codeContainer.appendChild(charBlock);
+        
+        // Create input block
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'friction-char-input';
+        input.maxLength = 1;
+        input.autocomplete = 'off';
+        input.autocorrect = 'off';
+        input.autocapitalize = 'off';
+        input.spellcheck = false;
+        input.dataset.index = i;
+        input.dataset.expected = code[i];
+        
+        input.addEventListener('input', handleCharInput);
+        input.addEventListener('keydown', handleCharKeydown);
+        input.addEventListener('paste', handlePaste);
+        input.addEventListener('drop', function(e) { e.preventDefault(); });
+        
+        inputContainer.appendChild(input);
+      }
+    }
+
+    function handleCharInput(e) {
+      const input = e.target;
+      const value = input.value;
+      const expected = input.dataset.expected;
+      
+      if (value) {
+        if (value === expected) {
+          input.classList.add('success');
+          input.classList.remove('error');
+          // Move to next input
+          const next = input.nextElementSibling;
+          if (next && next.classList.contains('friction-char-input')) {
+            next.focus();
+          }
+        } else {
+          input.classList.add('error');
+          input.classList.remove('success');
+        }
+      } else {
+        input.classList.remove('success', 'error');
+      }
+      
+      checkAllInputs();
+    }
+
+    function handleCharKeydown(e) {
+      const input = e.target;
+      
+      if (e.key === 'Backspace' && !input.value) {
+        // Move to previous input on backspace if empty
+        const prev = input.previousElementSibling;
+        if (prev && prev.classList.contains('friction-char-input')) {
+          prev.focus();
+          prev.select();
+        }
+      } else if (e.key === 'ArrowLeft') {
+        const prev = input.previousElementSibling;
+        if (prev && prev.classList.contains('friction-char-input')) {
+          prev.focus();
+        }
+      } else if (e.key === 'ArrowRight') {
+        const next = input.nextElementSibling;
+        if (next && next.classList.contains('friction-char-input')) {
+          next.focus();
+        }
+      }
+    }
+
+    function checkAllInputs() {
+      const config = getFrictionConfig();
+      
+      // Check row 1
+      const inputs1 = frictionInputRow1.querySelectorAll('.friction-char-input');
+      let match1 = true;
+      inputs1.forEach(function(input) {
+        if (input.value !== input.dataset.expected) match1 = false;
+      });
+      
+      // Check row 2 if needed
+      let match2 = true;
+      if (config.rows === 2) {
+        const inputs2 = frictionInputRow2.querySelectorAll('.friction-char-input');
+        inputs2.forEach(function(input) {
+          if (input.value !== input.dataset.expected) match2 = false;
+        });
+      }
+      
+      if (match1 && match2) {
+        frictionUnlock.disabled = false;
+        frictionUnlock.classList.add('ready');
+      } else {
+        frictionUnlock.disabled = true;
+        frictionUnlock.classList.remove('ready');
+      }
+      
+      frictionError.textContent = '';
+    }
+
     function showFriction(message) {
       if (lastMessageTime && (Date.now() - lastMessageTime > RESET_TIME)) {
         frictionLevel = 0;
@@ -1685,16 +1819,12 @@
       const config = getFrictionConfig();
 
       challenge1 = generateChallenge(config.length);
-      frictionCode1.textContent = challenge1;
-      frictionInput1.value = '';
-      frictionInput1.classList.remove('success', 'error');
+      createCharBlocks(challenge1, frictionCode1, frictionInputRow1);
 
       const row2 = document.getElementById('frictionRow2');
       if (config.rows === 2) {
         challenge2 = generateChallenge(config.length);
-        frictionCode2.textContent = challenge2;
-        frictionInput2.value = '';
-        frictionInput2.classList.remove('success', 'error');
+        createCharBlocks(challenge2, frictionCode2, frictionInputRow2);
         row2.style.display = 'block';
       } else {
         challenge2 = '';
@@ -1717,7 +1847,12 @@
       lockBodyScroll();
       document.addEventListener('touchmove', preventTouchMove, { passive: false });
       document.documentElement.style.setProperty('--kb', '0px');
-      setTimeout(function() { frictionInput1.focus(); }, 10);
+      
+      // Focus first input
+      setTimeout(function() {
+        const firstInput = frictionInputRow1.querySelector('.friction-char-input');
+        if (firstInput) firstInput.focus();
+      }, 10);
     }
 
     function hideFriction() {
@@ -1730,41 +1865,6 @@
       setTimeout(updateKeyboardOffset, 80);
       setTimeout(scrollChatToBottom, 100);
     }
-
-    function checkFrictionInputs() {
-      const config = getFrictionConfig();
-      const match1 = frictionInput1.value === challenge1;
-      const match2 = config.rows === 1 || frictionInput2.value === challenge2;
-
-      frictionInput1.classList.toggle('success', frictionInput1.value && match1);
-      frictionInput1.classList.toggle('error', frictionInput1.value && !match1);
-
-      if (config.rows === 2) {
-        frictionInput2.classList.toggle('success', frictionInput2.value && match2);
-        frictionInput2.classList.toggle('error', frictionInput2.value && !match2);
-      }
-
-      if (match1 && match2) {
-        frictionUnlock.disabled = false;
-        frictionUnlock.classList.add('ready');
-      } else {
-        frictionUnlock.disabled = true;
-        frictionUnlock.classList.remove('ready');
-      }
-      frictionError.textContent = '';
-    }
-
-    function handlePaste(e) {
-      e.preventDefault();
-      frictionError.textContent = 'No pasting — type it out!';
-    }
-
-    frictionInput1.addEventListener('input', checkFrictionInputs);
-    frictionInput2.addEventListener('input', checkFrictionInputs);
-    frictionInput1.addEventListener('paste', handlePaste);
-    frictionInput2.addEventListener('paste', handlePaste);
-    frictionInput1.addEventListener('drop', function(e) { e.preventDefault(); });
-    frictionInput2.addEventListener('drop', function(e) { e.preventDefault(); });
 
     frictionCancel.addEventListener('click', hideFriction);
 
@@ -1779,8 +1879,6 @@
       if (document.activeElement && typeof document.activeElement.blur === 'function') {
         document.activeElement.blur();
       }
-      frictionInput1.blur();
-      frictionInput2.blur();
 
       // Save the message BEFORE hiding (hideFriction clears pendingMessage)
       const messageToSend = state.pendingMessage;
