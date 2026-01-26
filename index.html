@@ -1813,6 +1813,9 @@
     }
 
     async function sendMessage(content) {
+      // Prevent duplicate sends
+      if (state.isProcessing) return;
+      
       const model = modelSelect.value;
       const welcome = chatMessages.querySelector('.welcome-message');
       if (welcome) welcome.remove();
