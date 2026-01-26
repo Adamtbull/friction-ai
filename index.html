@@ -880,45 +880,44 @@
       display: none;
     }
 
-    .friction-code {
+    .friction-pair-container {
       display: flex;
       justify-content: center;
-      gap: 6px;
-      margin-bottom: 8px;
+      gap: 4px;
       flex-wrap: wrap;
     }
 
+    .friction-pair {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
     .friction-char {
-      width: 36px;
-      height: 44px;
+      width: 32px;
+      height: 38px;
       display: flex;
       align-items: center;
       justify-content: center;
       background: var(--grey-light);
       border-radius: 6px;
       font-family: 'SF Mono', 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', Monaco, 'Courier New', monospace;
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 500;
       color: var(--text-primary);
       user-select: none;
       -webkit-user-select: none;
     }
 
-    .friction-input-row {
-      display: flex;
-      justify-content: center;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
     .friction-char-input {
-      width: 36px;
-      height: 44px;
+      width: 32px;
+      height: 38px;
       padding: 0;
       border: 2px solid var(--border);
       border-radius: 6px;
       font-family: 'SF Mono', 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', Monaco, 'Courier New', monospace;
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 500;
       text-align: center;
       color: var(--text-primary);
@@ -941,8 +940,31 @@
       background: #fef2f2;
     }
 
+    .friction-code {
+      display: none;
+    }
+
+    .friction-input-row {
+      display: none;
+    }
+
     .friction-input {
       display: none;
+    }
+
+    @media (max-width: 400px) {
+      .friction-pair {
+        gap: 3px;
+      }
+      .friction-char,
+      .friction-char-input {
+        width: 28px;
+        height: 34px;
+        font-size: 0.9rem;
+      }
+      .friction-pair-container {
+        gap: 3px;
+      }
     }
 
     @keyframes shake {
@@ -1291,15 +1313,11 @@
 
 ```
   <div class="friction-row" id="frictionRow1">
-    <span class="friction-label">Code 1</span>
-    <div class="friction-code" id="frictionCode1"></div>
-    <div class="friction-input-row" id="frictionInputRow1"></div>
+    <div class="friction-pair-container" id="frictionPairs1"></div>
   </div>
 
   <div class="friction-row" id="frictionRow2">
-    <span class="friction-label">Code 2</span>
-    <div class="friction-code" id="frictionCode2"></div>
-    <div class="friction-input-row" id="frictionInputRow2"></div>
+    <div class="friction-pair-container" id="frictionPairs2"></div>
   </div>
 
   <div class="friction-buttons">
@@ -1465,10 +1483,8 @@
     }
 
     const frictionOverlay = document.getElementById('frictionOverlay');
-    const frictionCode1 = document.getElementById('frictionCode1');
-    const frictionCode2 = document.getElementById('frictionCode2');
-    const frictionInputRow1 = document.getElementById('frictionInputRow1');
-    const frictionInputRow2 = document.getElementById('frictionInputRow2');
+    const frictionPairs1 = document.getElementById('frictionPairs1');
+    const frictionPairs2 = document.getElementById('frictionPairs2');
     const frictionCancel = document.getElementById('frictionCancel');
     const frictionUnlock = document.getElementById('frictionUnlock');
     const frictionError = document.getElementById('frictionError');
@@ -1708,16 +1724,19 @@
       frictionError.textContent = 'No pasting — type it out!';
     }
 
-    function createCharBlocks(code, codeContainer, inputContainer) {
-      codeContainer.innerHTML = '';
-      inputContainer.innerHTML = '';
+    function createCharPairs(code, container) {
+      container.innerHTML = '';
       
       for (let i = 0; i < code.length; i++) {
+        // Create pair container (code on top, input below)
+        const pair = document.createElement('div');
+        pair.className = 'friction-pair';
+        
         // Create display character block
         const charBlock = document.createElement('div');
         charBlock.className = 'friction-char';
         charBlock.textContent = code[i];
-        codeContainer.appendChild(charBlock);
+        pair.appendChild(charBlock);
         
         // Create input block
         const input = document.createElement('input');
@@ -1736,7 +1755,8 @@
         input.addEventListener('paste', handlePaste);
         input.addEventListener('drop', function(e) { e.preventDefault(); });
         
-        inputContainer.appendChild(input);
+        pair.appendChild(input);
+        container.appendChild(pair);
       }
     }
 
@@ -1750,9 +1770,11 @@
           input.classList.add('success');
           input.classList.remove('error');
           // Move to next input
-          const next = input.nextElementSibling;
-          if (next && next.classList.contains('friction-char-input')) {
-            next.focus();
+          const pair = input.closest('.friction-pair');
+          const nextPair = pair.nextElementSibling;
+          if (nextPair) {
+            const nextInput = nextPair.querySelector('.friction-char-input');
+            if (nextInput) nextInput.focus();
           }
         } else {
           input.classList.add('error');
@@ -1767,23 +1789,28 @@
 
     function handleCharKeydown(e) {
       const input = e.target;
+      const pair = input.closest('.friction-pair');
       
       if (e.key === 'Backspace' && !input.value) {
-        // Move to previous input on backspace if empty
-        const prev = input.previousElementSibling;
-        if (prev && prev.classList.contains('friction-char-input')) {
-          prev.focus();
-          prev.select();
+        const prevPair = pair.previousElementSibling;
+        if (prevPair) {
+          const prevInput = prevPair.querySelector('.friction-char-input');
+          if (prevInput) {
+            prevInput.focus();
+            prevInput.select();
+          }
         }
       } else if (e.key === 'ArrowLeft') {
-        const prev = input.previousElementSibling;
-        if (prev && prev.classList.contains('friction-char-input')) {
-          prev.focus();
+        const prevPair = pair.previousElementSibling;
+        if (prevPair) {
+          const prevInput = prevPair.querySelector('.friction-char-input');
+          if (prevInput) prevInput.focus();
         }
       } else if (e.key === 'ArrowRight') {
-        const next = input.nextElementSibling;
-        if (next && next.classList.contains('friction-char-input')) {
-          next.focus();
+        const nextPair = pair.nextElementSibling;
+        if (nextPair) {
+          const nextInput = nextPair.querySelector('.friction-char-input');
+          if (nextInput) nextInput.focus();
         }
       }
     }
@@ -1792,7 +1819,7 @@
       const config = getFrictionConfig();
       
       // Check row 1
-      const inputs1 = frictionInputRow1.querySelectorAll('.friction-char-input');
+      const inputs1 = frictionPairs1.querySelectorAll('.friction-char-input');
       let match1 = true;
       inputs1.forEach(function(input) {
         if (input.value !== input.dataset.expected) match1 = false;
@@ -1801,7 +1828,7 @@
       // Check row 2 if needed
       let match2 = true;
       if (config.rows === 2) {
-        const inputs2 = frictionInputRow2.querySelectorAll('.friction-char-input');
+        const inputs2 = frictionPairs2.querySelectorAll('.friction-char-input');
         inputs2.forEach(function(input) {
           if (input.value !== input.dataset.expected) match2 = false;
         });
@@ -1829,12 +1856,12 @@
       const config = getFrictionConfig();
 
       challenge1 = generateChallenge(config.length);
-      createCharBlocks(challenge1, frictionCode1, frictionInputRow1);
+      createCharPairs(challenge1, frictionPairs1);
 
       const row2 = document.getElementById('frictionRow2');
       if (config.rows === 2) {
         challenge2 = generateChallenge(config.length);
-        createCharBlocks(challenge2, frictionCode2, frictionInputRow2);
+        createCharPairs(challenge2, frictionPairs2);
         row2.style.display = 'block';
       } else {
         challenge2 = '';
@@ -1860,7 +1887,7 @@
       
       // Focus first input
       setTimeout(function() {
-        const firstInput = frictionInputRow1.querySelector('.friction-char-input');
+        const firstInput = frictionPairs1.querySelector('.friction-char-input');
         if (firstInput) firstInput.focus();
       }, 10);
     }
