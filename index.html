@@ -1042,7 +1042,7 @@
   <ul class="section-list">
     <li>You may be asked to type a short code before sending</li>
     <li>Continued use gradually increases the effort across 15 levels</li>
-    <li>It caps at two rows of 24 characters and resets after 2 hours</li>
+    <li>It caps at two rows of 16 characters and resets after 2 hours</li>
   </ul>
 </div>
 
@@ -1698,7 +1698,7 @@
         { rows: 2, length: 16 },  // Level 12
         { rows: 2, length: 18 },  // Level 13
         { rows: 2, length: 20 },  // Level 14
-        { rows: 2, length: 24 },  // Level 15
+        { rows: 2, length: 16 },  // Level 15
       ];
       return configs[Math.min(frictionLevel, 14)];
     }
