@@ -1548,6 +1548,93 @@
       background: #b91c1c;
     }
 
+    .settings-section-note {
+      font-size: 0.85rem;
+      color: #f59e0b;
+      background: #fef3c7;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+    }
+
+    #delayOptions.disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .lock-time-picker {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .lock-time-row {
+      flex: 1;
+      text-align: center;
+    }
+
+    .lock-time-label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .lock-time-input {
+      width: 100%;
+      padding: 12px 8px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      text-align: center;
+      background: var(--white);
+      outline: none;
+    }
+
+    .lock-time-input:focus {
+      border-color: var(--teal);
+    }
+
+    .lock-presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .lock-preset-btn {
+      padding: 8px 14px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .lock-preset-btn:hover {
+      background: var(--teal);
+      color: var(--white);
+      border-color: var(--teal);
+    }
+
+    .settings-lock-btn {
+      width: 100%;
+      padding: 14px 20px;
+      background: #dc2626;
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
     /* MESSAGE DELAY OVERLAY */
     .delay-overlay {
       position: fixed;
@@ -2095,39 +2182,44 @@
     </div>
 
     <!-- Message Delay -->
-    <div class="settings-section">
+    <div class="settings-section" id="messageDelaySection">
       <h3 class="settings-section-title">Message Delay</h3>
       <p class="settings-section-desc">Add a waiting period before messages send</p>
+      <p class="settings-section-note" id="delayDisabledNote" style="display: none;">
+        ⚠️ Disabled when using Full or Strict friction mode
+      </p>
       
-      <label class="settings-radio">
-        <input type="radio" name="messageDelay" value="0" checked />
-        <span class="radio-label"><strong>Off</strong></span>
-      </label>
-      
-      <label class="settings-radio">
-        <input type="radio" name="messageDelay" value="5" />
-        <span class="radio-label"><strong>5 seconds</strong></span>
-      </label>
-      
-      <label class="settings-radio">
-        <input type="radio" name="messageDelay" value="15" />
-        <span class="radio-label"><strong>15 seconds</strong></span>
-      </label>
-      
-      <label class="settings-radio">
-        <input type="radio" name="messageDelay" value="30" />
-        <span class="radio-label"><strong>30 seconds</strong></span>
-      </label>
-      
-      <label class="settings-radio">
-        <input type="radio" name="messageDelay" value="45" />
-        <span class="radio-label"><strong>45 seconds</strong></span>
-      </label>
+      <div id="delayOptions">
+        <label class="settings-radio">
+          <input type="radio" name="messageDelay" value="0" checked />
+          <span class="radio-label"><strong>Off</strong></span>
+        </label>
+        
+        <label class="settings-radio">
+          <input type="radio" name="messageDelay" value="5" />
+          <span class="radio-label"><strong>5 seconds</strong></span>
+        </label>
+        
+        <label class="settings-radio">
+          <input type="radio" name="messageDelay" value="15" />
+          <span class="radio-label"><strong>15 seconds</strong></span>
+        </label>
+        
+        <label class="settings-radio">
+          <input type="radio" name="messageDelay" value="30" />
+          <span class="radio-label"><strong>30 seconds</strong></span>
+        </label>
+        
+        <label class="settings-radio">
+          <input type="radio" name="messageDelay" value="45" />
+          <span class="radio-label"><strong>45 seconds</strong></span>
+        </label>
 
-      <label class="settings-checkbox">
-        <input type="checkbox" id="allowCancelDelay" checked />
-        <span class="checkbox-label">Allow cancel during countdown</span>
-      </label>
+        <label class="settings-checkbox">
+          <input type="checkbox" id="allowCancelDelay" checked />
+          <span class="checkbox-label">Allow cancel during countdown</span>
+        </label>
+      </div>
     </div>
 
     <!-- Goal Reminders -->
@@ -2150,16 +2242,30 @@
       <h3 class="settings-section-title">🔒 Lock Settings</h3>
       <p class="settings-section-desc">Prevent changes for a set period. Once locked, you cannot change settings until the timer expires.</p>
       
-      <div class="settings-lock-controls">
-        <select class="settings-select" id="lockDuration">
-          <option value="3600000">1 hour</option>
-          <option value="14400000">4 hours</option>
-          <option value="86400000">24 hours</option>
-          <option value="259200000">3 days</option>
-          <option value="604800000">1 week</option>
-        </select>
-        <button class="settings-lock-btn" id="btnLockSettings" type="button">Lock Settings</button>
+      <div class="lock-time-picker">
+        <div class="lock-time-row">
+          <label class="lock-time-label">Days</label>
+          <input type="number" class="lock-time-input" id="lockDays" min="0" max="30" value="0" />
+        </div>
+        <div class="lock-time-row">
+          <label class="lock-time-label">Hours</label>
+          <input type="number" class="lock-time-input" id="lockHours" min="0" max="23" value="1" />
+        </div>
+        <div class="lock-time-row">
+          <label class="lock-time-label">Minutes</label>
+          <input type="number" class="lock-time-input" id="lockMinutes" min="0" max="59" value="0" />
+        </div>
       </div>
+      
+      <div class="lock-presets">
+        <button type="button" class="lock-preset-btn" data-hours="1">1hr</button>
+        <button type="button" class="lock-preset-btn" data-hours="4">4hr</button>
+        <button type="button" class="lock-preset-btn" data-hours="24">24hr</button>
+        <button type="button" class="lock-preset-btn" data-days="3">3 days</button>
+        <button type="button" class="lock-preset-btn" data-days="7">1 week</button>
+      </div>
+
+      <button class="settings-lock-btn" id="btnLockSettings" type="button">Lock Settings</button>
     </div>
 
   </div>
@@ -2408,6 +2514,9 @@
       document.getElementById('showShortTermGoal').checked = settings.showShortTermGoal;
       document.getElementById('showLongTermGoal').checked = settings.showLongTermGoal;
       
+      // Update delay section based on friction mode
+      updateDelayAvailability();
+      
       // Check if locked
       if (isSettingsLocked()) {
         content.classList.add('locked');
@@ -2419,6 +2528,24 @@
       }
       
       overlay.classList.add('active');
+    }
+
+    function updateDelayAvailability() {
+      var frictionMode = document.querySelector('input[name="frictionMode"]:checked').value;
+      var delayOptions = document.getElementById('delayOptions');
+      var delayNote = document.getElementById('delayDisabledNote');
+      
+      if (frictionMode === 'full' || frictionMode === 'strict') {
+        delayOptions.classList.add('disabled');
+        delayNote.style.display = 'block';
+        // Reset delay to off when using code friction
+        settings.messageDelay = 0;
+        document.querySelector('input[name="messageDelay"][value="0"]').checked = true;
+        saveSettings();
+      } else {
+        delayOptions.classList.remove('disabled');
+        delayNote.style.display = 'none';
+      }
     }
 
     function hideSettings() {
@@ -2451,7 +2578,17 @@
     }
 
     function lockSettings() {
-      var duration = parseInt(document.getElementById('lockDuration').value, 10);
+      var days = parseInt(document.getElementById('lockDays').value, 10) || 0;
+      var hours = parseInt(document.getElementById('lockHours').value, 10) || 0;
+      var minutes = parseInt(document.getElementById('lockMinutes').value, 10) || 0;
+      
+      var duration = (days * 24 * 60 * 60 * 1000) + (hours * 60 * 60 * 1000) + (minutes * 60 * 1000);
+      
+      if (duration < 60000) {
+        alert('Please set a lock duration of at least 1 minute.');
+        return;
+      }
+      
       settings.lockUntil = Date.now() + duration;
       saveSettings();
       
@@ -2989,6 +3126,7 @@
         if (isSettingsLocked()) return;
         settings.frictionMode = this.value;
         saveSettings();
+        updateDelayAvailability();
       });
     });
 
@@ -3028,6 +3166,18 @@
 
     // Delay cancel button
     document.getElementById('delayCancelBtn').addEventListener('click', cancelDelay);
+
+    // Lock preset buttons
+    document.querySelectorAll('.lock-preset-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var hours = this.dataset.hours;
+        var days = this.dataset.days;
+        
+        document.getElementById('lockDays').value = days || 0;
+        document.getElementById('lockHours').value = hours || 0;
+        document.getElementById('lockMinutes').value = 0;
+      });
+    });
 
     // CHAT HISTORY MANAGEMENT
     function generateChatId() {
