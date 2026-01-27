@@ -1,10 +1,20 @@
 name = "friction-ai-api"
 main = "src/index.js"
 compatibility_date = "2026-01-25"
+compatibility_flags = ["nodejs_compat"]
 
+# KV namespace for rate limiting
+kv_namespaces = [
+  { binding = "FRICTION_KV", id = "your-kv-namespace-id-here" }
+]
+
+# Environment variables
+[vars]
+GOOGLE_CLIENT_ID = "37442638167-t8m3fql61v05h01qmvall1bki9k88tim.apps.googleusercontent.com"
+ADMIN_EMAIL = "fatboydimsim@gmail.com"
+AI_ENABLED = "true"
+
+# Routes for your domain
 routes = [
   { pattern = "www.friction-ai.com/api/*", zone_name = "friction-ai.com" }
 ]
-
-# Optional but recommended (lets you use modern JS APIs reliably)
-compatibility_flags = ["nodejs_compat"]
