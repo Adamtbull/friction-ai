@@ -255,6 +255,14 @@ alternating.push({ role: msg.role, content: msg.content });
 }
 }
 
+// Add system message to request full URLs in response
+var messagesWithSystem = [
+{
+role: “system”,
+content: “You are a helpful assistant. Always include a ‘Sources:’ section at the end of your response with the full URLs of the websites you referenced, numbered to match your citations.”
+}
+].concat(alternating);
+
 var res = await fetch(“https://api.perplexity.ai/chat/completions”, {
 method: “POST”,
 headers: {
@@ -263,8 +271,7 @@ headers: {
 },
 body: JSON.stringify({
 model: “sonar”,
-messages: alternating,
-return_citations: true
+messages: messagesWithSystem
 })
 });
 
@@ -276,13 +283,10 @@ throw new Error(“Perplexity API error: “ + JSON.stringify(data));
 var out = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
 if (!out) throw new Error(“No valid response text from Perplexity.”);
 
-// Citations can be in different places depending on API version
-var citations = data.citations ||
-(data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.citations) ||
-(data.choices && data.choices[0] && data.choices[0].citations);
-
-if (citations && citations.length > 0) {
-out += “\n\n—\nSources:”;
+// Also try to append citations from API response if available
+var citations = data.citations;
+if (citations && citations.length > 0 && out.indexOf(“Sources:”) === -1) {
+out += “\n\nSources:”;
 for (var j = 0; j < citations.length; j++) {
 out += “\n[” + (j + 1) + “] “ + citations[j];
 }
