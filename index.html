@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -11,8 +12,1799 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <style>
-    /* ... (ALL YOUR EXISTING CSS STAYS EXACTLY THE SAME) ... */
-    /* Full CSS from your original file goes here unchanged */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    /* Prevent flash of wrong content on load */
+    body {
+      opacity: 0;
+      transition: opacity 0.15s ease-in;
+    }
+
+    body.ready {
+      opacity: 1;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(180deg, #d4e8e6 0%, #e8ecef 100%);
+      color: #1f2937;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    button, input, textarea, select {
+      font: inherit;
+      color: inherit;
+      letter-spacing: inherit;
+    }
+
+    button,
+    input[type="text"],
+    textarea,
+    select {
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    button {
+      background: none;
+    }
+
+    button, a, input, textarea, select {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body.scroll-locked {
+      position: fixed;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    :root {
+      --teal-light: #d4e8e6;
+      --teal-lighter: #e8f4f3;
+      --teal: #5a9a94;
+      --teal-dark: #4a8a84;
+      --grey-light: #e8ecef;
+      --grey: #6b7280;
+      --grey-dark: #374151;
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --white: #ffffff;
+      --border: #d1d5db;
+      --shadow: rgba(0, 0, 0, 0.05);
+
+      --app-height: 100vh;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --kb: 0px;
+    }
+
+    @supports (height: 100dvh) {
+      :root { --app-height: 100dvh; }
+    }
+
+    /* =================== */
+    /* HOMEPAGE STYLES     */
+    /* =================== */
+    .homepage {
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 24px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .homepage.hidden {
+      display: none;
+    }
+
+    .brand {
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 2px;
+      color: var(--teal);
+      margin-bottom: 24px;
+    }
+
+    .headline {
+      font-size: 2rem;
+      font-weight: 600;
+      text-align: center;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      line-height: 1.3;
+    }
+
+    .subheadline {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-bottom: 40px;
+      max-width: 400px;
+    }
+
+    .section {
+      width: 100%;
+      margin-bottom: 32px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .section-subtitle {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .section-text {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .section-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .section-list li {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      padding-left: 20px;
+      position: relative;
+      margin-bottom: 8px;
+    }
+
+    .section-list li::before {
+      content: "•";
+      color: var(--teal);
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+    }
+
+    .philosophy-line {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0;
+    }
+
+    .cta-section {
+      width: 100%;
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .cta-text {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-oauth {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--white);
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-oauth:hover {
+      border-color: var(--teal);
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .btn-oauth svg {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+    }
+
+    .btn-primary {
+      width: 100%;
+      max-width: 320px;
+      padding: 14px 24px;
+      border: none;
+      border-radius: 8px;
+      background: var(--teal);
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--white);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      background: var(--teal-dark);
+    }
+
+    .footer-note {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 16px;
+    }
+
+    /* =================== */
+    /* CHAT APP STYLES     */
+    /* =================== */
+    .chat-app {
+      display: none;
+      flex-direction: column;
+      height: var(--app-height);
+      background: linear-gradient(180deg, var(--teal-light) 0%, var(--grey-light) 100%);
+    }
+
+    .chat-app.active {
+      display: flex;
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: calc(16px + var(--safe-top)) 20px 16px;
+      background: rgba(255, 255, 255, 0.6);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .chat-header-left {
+      width: 36px;
+    }
+
+    .chat-header-center {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+
+    .chat-header-right {
+      min-width: 70px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .model-select {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      cursor: pointer;
+      outline: none;
+      text-align: center;
+    }
+
+    .model-select:focus {
+      background: rgba(0,0,0,0.05);
+    }
+
+    .header-timer {
+      font-size: 0.65rem;
+      color: var(--teal);
+      background: var(--teal-light);
+      padding: 4px 8px;
+      border-radius: 12px;
+      display: none;
+      white-space: nowrap;
+    }
+
+    .header-timer.active {
+      display: block;
+    }
+
+    .btn-icon {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      background: var(--white);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex: 0 0 auto;
+    }
+
+    .btn-icon:hover {
+      border-color: var(--teal);
+    }
+
+    .btn-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--grey);
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 20px calc(24px + 50px + 24px + var(--safe-bottom) + var(--kb));
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-width: 0;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 14px 18px;
+      border-radius: 16px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      min-width: 0;
+    }
+
+    .message-user {
+      align-self: flex-end;
+      background: var(--teal);
+      color: var(--white);
+      border-bottom-right-radius: 4px;
+    }
+
+    .message-ai {
+      align-self: flex-start;
+      background: var(--white);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+
+    .message-ai a {
+      color: var(--teal);
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .message-ai a:hover {
+      text-decoration: underline;
+    }
+
+    .message-ai strong {
+      font-weight: 600;
+    }
+
+    .message-error {
+      align-self: center;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #dc2626;
+      font-size: 0.85rem;
+    }
+
+    .welcome-message {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-secondary);
+      width: 100%;
+      max-width: 400px;
+      pointer-events: none;
+    }
+
+    .welcome-icon {
+      font-size: 2.5rem;
+      margin-bottom: 16px;
+    }
+
+    .welcome-message h2 {
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin: 0 0 8px;
+    }
+
+    .welcome-message p {
+      font-size: 0.9rem;
+      margin: 0;
+      color: var(--text-secondary);
+    }
+
+    .typing-indicator {
+      display: none;
+      align-self: flex-start;
+      padding: 16px 20px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+    }
+
+    .typing-indicator.active {
+      display: flex;
+      gap: 4px;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--teal);
+      border-radius: 50%;
+      opacity: 0.4;
+      animation: typing 1.4s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typing {
+      0%, 60%, 100% { opacity: 0.4; transform: translateY(0); }
+      30% { opacity: 1; transform: translateY(-4px); }
+    }
+
+    .chat-input-area {
+      padding: 16px 20px calc(24px + var(--safe-bottom));
+      background: rgba(255, 255, 255, 0.8);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border);
+      transform: translateY(calc(-1 * var(--kb)));
+      will-change: transform;
+    }
+
+    .chat-input-wrapper {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      max-width: 800px;
+      margin: 0 auto;
+      min-width: 0;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 8px 8px 8px 18px;
+    }
+
+    .chat-input {
+      flex: 1;
+      min-width: 0;
+      padding: 8px 0;
+      border: none;
+      background: transparent;
+      font-size: 16px;
+      color: var(--text-primary);
+      resize: none;
+      min-height: 24px;
+      max-height: 120px;
+      outline: none;
+      line-height: 1.5;
+      overflow: hidden;
+    }
+
+    .chat-input::placeholder {
+      color: var(--grey);
+    }
+
+    .btn-send {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 50%;
+      background: var(--teal);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex: 0 0 auto;
+    }
+
+    .btn-send:hover {
+      background: var(--teal-dark);
+    }
+
+    .btn-send:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-send svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--white);
+      margin-left: 2px;
+    }
+
+    /* =================== */
+    /* SIDE MENU           */
+    /* =================== */
+    .menu-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      z-index: 998;
+    }
+
+    .menu-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 300px;
+      max-width: 85vw;
+      background: var(--white);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      padding-top: var(--safe-top);
+    }
+
+    .side-menu.active {
+      transform: translateX(0);
+    }
+
+    .menu-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .menu-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .profile-pic {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: var(--grey-light);
+    }
+
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .profile-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .profile-email {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .menu-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      color: var(--teal);
+    }
+
+    .btn-close-menu {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .btn-close-menu:hover {
+      background: var(--grey-light);
+    }
+
+    .btn-close-menu svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--grey);
+    }
+
+    .menu-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .menu-btn-new {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      background: transparent;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 20px;
+    }
+
+    .menu-btn-new:hover {
+      border-color: var(--teal);
+      color: var(--teal);
+      background: var(--teal-lighter);
+    }
+
+    .menu-btn-new svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .menu-section {
+      margin-bottom: 16px;
+    }
+
+    .menu-section-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: var(--grey);
+      text-transform: uppercase;
+      padding: 8px 12px;
+    }
+
+    .menu-category {
+      margin-bottom: 4px;
+    }
+
+    .menu-category-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .menu-category-header:hover {
+      background: var(--grey-light);
+    }
+
+    .menu-category-header .chevron {
+      width: 16px;
+      height: 16px;
+      stroke: var(--grey);
+      transition: transform 0.2s ease;
+    }
+
+    .menu-category.expanded .chevron {
+      transform: rotate(180deg);
+    }
+
+    .menu-category-items {
+      display: none;
+      padding-left: 12px;
+    }
+
+    .menu-category.expanded .menu-category-items {
+      display: block;
+    }
+
+    .menu-empty {
+      font-size: 0.8rem;
+      color: var(--grey);
+      padding: 8px 12px;
+      font-style: italic;
+    }
+
+    .menu-history-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px;
+      border-radius: 6px;
+      margin-bottom: 2px;
+    }
+
+    .menu-history-item:hover {
+      background: var(--grey-light);
+    }
+
+    .menu-history-item.active {
+      background: var(--teal-lighter);
+    }
+
+    .menu-history-title {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      background: transparent;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .menu-history-item:hover .menu-history-title,
+    .menu-history-item.active .menu-history-title {
+      color: var(--text-primary);
+    }
+
+    .menu-history-delete {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      border-radius: 4px;
+    }
+
+    .menu-history-item:hover .menu-history-delete {
+      opacity: 0.5;
+    }
+
+    .menu-history-delete:hover {
+      opacity: 1 !important;
+      background: #fef2f2;
+    }
+
+    .menu-history-delete svg {
+      width: 14px;
+      height: 14px;
+      stroke: #dc2626;
+    }
+
+    .menu-chat-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: background 0.2s ease;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .menu-chat-item:hover {
+      background: var(--grey-light);
+      color: var(--text-primary);
+    }
+
+    .menu-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 16px 0;
+    }
+
+    .menu-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .menu-item:hover {
+      background: var(--grey-light);
+      color: var(--text-primary);
+    }
+
+    .menu-item svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .menu-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      padding-bottom: calc(16px + var(--safe-bottom));
+    }
+
+    .menu-item-logout:hover {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+
+    .menu-item-logout:hover svg {
+      stroke: #dc2626;
+    }
+
+    /* =================== */
+    /* FRICTION OVERLAY    */
+    /* =================== */
+    .friction-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.95);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 24px;
+      overscroll-behavior: contain;
+    }
+
+    .friction-overlay.active {
+      display: flex;
+    }
+
+    .friction-box {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 24px var(--shadow);
+    }
+
+    .friction-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 8px;
+    }
+
+    .friction-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin: 0 0 24px;
+    }
+
+    .friction-row {
+      margin-bottom: 24px;
+    }
+
+    .friction-row:last-of-type {
+      margin-bottom: 12px;
+    }
+
+    .friction-label {
+      display: none;
+    }
+
+    .friction-pair-container {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .friction-pair {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .friction-char {
+      width: 32px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--grey-light);
+      border-radius: 6px;
+      font-family: 'SF Mono', 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', Monaco, 'Courier New', monospace;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .friction-char-input {
+      width: 32px;
+      height: 38px;
+      padding: 0;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      font-family: 'SF Mono', 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', Monaco, 'Courier New', monospace;
+      font-size: 1rem;
+      font-weight: 500;
+      text-align: center;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s ease;
+      background: var(--white);
+    }
+
+    .friction-char-input:focus {
+      border-color: var(--teal);
+    }
+
+    .friction-char-input.success {
+      border-color: #22c55e;
+      background: #f0fdf4;
+    }
+
+    .friction-char-input.error {
+      border-color: #ef4444;
+      background: #fef2f2;
+    }
+
+    .friction-code {
+      display: none;
+    }
+
+    .friction-input-row {
+      display: none;
+    }
+
+    .friction-input {
+      display: none;
+    }
+
+    @media (max-width: 400px) {
+      .friction-pair {
+        gap: 3px;
+      }
+      .friction-char,
+      .friction-char-input {
+        width: 28px;
+        height: 34px;
+        font-size: 0.9rem;
+      }
+      .friction-pair-container {
+        gap: 3px;
+      }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    .friction-goal-reminder {
+      background: var(--teal-lighter);
+      border-left: 3px solid var(--teal);
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      border-radius: 0 8px 8px 0;
+      text-align: left;
+    }
+
+    .friction-goal-reminder:empty {
+      display: none;
+    }
+
+    .friction-goal-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--grey);
+      margin-bottom: 4px;
+    }
+
+    .friction-goal-text {
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      font-style: italic;
+    }
+
+    /* ONBOARDING OVERLAY */
+    .onboarding-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+
+    .onboarding-overlay.active {
+      display: flex;
+    }
+
+    .onboarding-box {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 32px 28px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 8px 32px var(--shadow);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .onboarding-step {
+      display: none;
+    }
+
+    .onboarding-step.active {
+      display: block;
+    }
+
+    .onboarding-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+
+    .onboarding-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 16px;
+    }
+
+    .onboarding-text {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin: 0 0 20px;
+    }
+
+    .onboarding-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 14px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: inherit;
+      resize: none;
+      margin-bottom: 20px;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .onboarding-textarea:focus {
+      border-color: var(--teal);
+    }
+
+    .onboarding-textarea::placeholder {
+      color: var(--grey);
+    }
+
+    .shortterm-goals-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .shortterm-goal-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .shortterm-goal-input:focus {
+      border-color: var(--teal);
+    }
+
+    .onboarding-btn-add {
+      background: transparent;
+      border: none;
+      color: var(--teal);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 8px;
+      margin-bottom: 20px;
+    }
+
+    .onboarding-btn-add:hover {
+      text-decoration: underline;
+    }
+
+    .onboarding-nav {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .onboarding-btn {
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+
+    .onboarding-btn.primary {
+      background: var(--teal);
+      color: var(--white);
+    }
+
+    .onboarding-btn.primary:hover {
+      background: var(--teal-dark);
+    }
+
+    .onboarding-btn.secondary {
+      background: var(--grey-light);
+      color: var(--text-secondary);
+    }
+
+    .onboarding-btn.secondary:hover {
+      background: var(--border);
+    }
+
+    .onboarding-summary {
+      background: var(--grey-light);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    .onboarding-summary-item {
+      margin-bottom: 12px;
+    }
+
+    .onboarding-summary-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .onboarding-summary-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--grey);
+      margin-bottom: 4px;
+    }
+
+    .onboarding-summary-text {
+      font-size: 0.95rem;
+      color: var(--text-primary);
+    }
+
+    /* GOAL CHECK-IN */
+    .checkin-goals-list {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    .checkin-goal-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--grey-light);
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .checkin-goal-checkbox {
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+      accent-color: var(--teal);
+    }
+
+    .checkin-goal-text {
+      flex: 1;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+    }
+
+    .checkin-goal-text.completed {
+      text-decoration: line-through;
+      color: var(--grey);
+    }
+
+    /* CHAT BACKGROUND GOAL */
+    .chat-background-goal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.3rem;
+      color: var(--text-primary);
+      opacity: 0;
+      pointer-events: none;
+      text-align: center;
+      padding: 40px;
+      max-width: 80%;
+      font-style: italic;
+      transition: opacity 0.5s ease;
+      z-index: 1;
+    }
+
+    /* SETTINGS OVERLAY */
+    .settings-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .settings-overlay.active {
+      display: flex;
+    }
+
+    .settings-box {
+      background: var(--white);
+      border-radius: 16px;
+      max-width: 480px;
+      width: 100%;
+      margin: 20px 0;
+      box-shadow: 0 8px 32px var(--shadow);
+      overflow: hidden;
+    }
+
+    .settings-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .settings-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .settings-close {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: var(--grey-light);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .settings-close svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--text-secondary);
+    }
+
+    .settings-close:hover {
+      background: var(--border);
+    }
+
+    .settings-lock-banner {
+      background: #fef3c7;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid #fcd34d;
+    }
+
+    .lock-icon {
+      font-size: 1.1rem;
+    }
+
+    .lock-text {
+      font-size: 0.9rem;
+      color: #92400e;
+      font-weight: 500;
+    }
+
+    .settings-content {
+      padding: 8px 0;
+    }
+
+    .settings-content.locked {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .settings-section {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .settings-section:last-child {
+      border-bottom: none;
+    }
+
+    .settings-section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 4px;
+    }
+
+    .settings-section-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin: 0 0 16px;
+      line-height: 1.4;
+    }
+
+    .settings-radio {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      cursor: pointer;
+    }
+
+    .settings-radio input[type="radio"] {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      accent-color: var(--teal);
+      cursor: pointer;
+    }
+
+    .radio-label {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .radio-label strong {
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .radio-desc {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .settings-radio.strict-mode {
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d1f1f 100%);
+      margin: 12px -12px 0;
+      padding: 14px 12px;
+      border-radius: 10px;
+    }
+
+    .settings-radio.strict-mode .radio-label strong {
+      color: #ef4444;
+    }
+
+    .settings-radio.strict-mode .radio-desc {
+      color: #fca5a5;
+    }
+
+    .settings-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      cursor: pointer;
+    }
+
+    .settings-checkbox input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--teal);
+      cursor: pointer;
+    }
+
+    .checkbox-label {
+      font-size: 0.95rem;
+      color: var(--text-primary);
+    }
+
+    .settings-lock-section {
+      background: var(--grey-light);
+    }
+
+    .settings-lock-controls {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .settings-select {
+      flex: 1;
+      padding: 12px 14px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: var(--white);
+      cursor: pointer;
+      outline: none;
+    }
+
+    .settings-select:focus {
+      border-color: var(--teal);
+    }
+
+    .settings-lock-btn {
+      padding: 12px 20px;
+      background: #dc2626;
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .settings-lock-btn:hover {
+      background: #b91c1c;
+    }
+
+    .settings-section-note {
+      font-size: 0.85rem;
+      color: #f59e0b;
+      background: #fef3c7;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+    }
+
+    #delayOptions.disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .lock-time-picker {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .lock-time-row {
+      flex: 1;
+      text-align: center;
+    }
+
+    .lock-time-label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .lock-time-input {
+      width: 100%;
+      padding: 12px 8px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      text-align: center;
+      background: var(--white);
+      outline: none;
+    }
+
+    .lock-time-input:focus {
+      border-color: var(--teal);
+    }
+
+    .lock-presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .lock-preset-btn {
+      padding: 8px 14px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .lock-preset-btn:hover {
+      background: var(--teal);
+      color: var(--white);
+      border-color: var(--teal);
+    }
+
+    .settings-lock-btn {
+      width: 100%;
+      padding: 14px 20px;
+      background: #dc2626;
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* MESSAGE DELAY OVERLAY */
+    .delay-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2500;
+    }
+
+    .delay-overlay.active {
+      display: flex;
+    }
+
+    .delay-box {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      max-width: 320px;
+      width: 90%;
+    }
+
+    .delay-countdown {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 24px;
+    }
+
+    .delay-ring {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .delay-ring-bg {
+      fill: none;
+      stroke: var(--grey-light);
+      stroke-width: 8;
+    }
+
+    .delay-ring-progress {
+      fill: none;
+      stroke: var(--teal);
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 283;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 1s linear;
+    }
+
+    .delay-time {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .delay-text {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin: 0 0 8px;
+    }
+
+    .delay-hint {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin: 0 0 24px;
+      font-style: italic;
+    }
+
+    .delay-cancel {
+      padding: 12px 32px;
+      background: var(--grey-light);
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .delay-cancel:hover {
+      background: var(--border);
+    }
+
+    .delay-cancel.hidden {
+      display: none;
+    }
+
+    .friction-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .friction-buttons button {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-cancel {
+      background: var(--grey-light);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    .btn-unlock {
+      background: var(--teal);
+      border: none;
+      color: var(--white);
+      opacity: 0.5;
+    }
+
+    .btn-unlock:disabled {
+      cursor: not-allowed;
+    }
+
+    .btn-unlock.ready {
+      opacity: 1;
+    }
+
+    .friction-error {
+      color: #ef4444;
+      font-size: 0.85rem;
+      margin-top: 8px;
+      min-height: 20px;
+    }
+
+    .friction-timer {
+      color: var(--teal);
+      font-size: 0.85rem;
+      margin-top: 16px;
+      min-height: 20px;
+    }
+
+    /* =================== */
+    /* MOBILE RESPONSIVE   */
+    /* =================== */
+    @media (max-width: 600px) {
+      .homepage { padding: 40px 20px; }
+      .headline { font-size: 1.7rem; }
+
+      .auth-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .btn-oauth {
+        width: 100%;
+        max-width: 280px;
+        justify-content: center;
+      }
+
+      .friction-code { font-size: 1rem; }
+      .message { max-width: 90%; }
+    }
   </style>
 
 </head>
@@ -22,66 +1814,71 @@
   <div class="homepage" id="homepage">
     <div class="brand">FRICTION AI</div>
 
-    <h1 class="headline">Slow down your AI — on purpose.</h1>
-    <p class="subheadline">Friction AI adds intentional pauses before messages are sent, helping reduce impulsive use and increase presence.</p>
+```
+<h1 class="headline">Slow down your AI — on purpose.</h1>
 
-    <div class="section">
-      <h2 class="section-title">How it works</h2>
-      <ul class="section-list">
-        <li>You may be asked to type a short code before sending</li>
-        <li>Continued use gradually increases the effort across 7 levels</li>
-        <li>It caps at 10 characters and resets after 2 hours</li>
-      </ul>
-    </div>
+<p class="subheadline">Friction AI adds intentional pauses before messages are sent, helping reduce impulsive use and increase presence.</p>
 
-    <div class="section">
-      <h2 class="section-title">Why</h2>
-      <p class="section-subtitle">Tough love, not punishment.</p>
-      <p class="section-text">We slow things down because we care about attention, presence, and real-world goals.</p>
-    </div>
+<div class="section">
+  <h2 class="section-title">How it works</h2>
+  <ul class="section-list">
+    <li>You may be asked to type a short code before sending</li>
+    <li>Continued use gradually increases the effort across 7 levels</li>
+    <li>It caps at 10 characters and resets after 2 hours</li>
+  </ul>
+</div>
 
-    <div class="section">
-      <h2 class="section-title">Our philosophy</h2>
-      <p class="philosophy-line">Ease creates dependency.</p>
-      <p class="philosophy-line">Thoughtful friction creates awareness.</p>
-      <p class="philosophy-line">We optimise for presence, not engagement.</p>
-    </div>
+<div class="section">
+  <h2 class="section-title">Why</h2>
+  <p class="section-subtitle">Tough love, not punishment.</p>
+  <p class="section-text">We slow things down because we care about attention, presence, and real-world goals.</p>
+</div>
 
-    <div class="divider"></div>
+<div class="section">
+  <h2 class="section-title">Our philosophy</h2>
+  <p class="philosophy-line">Ease creates dependency.</p>
+  <p class="philosophy-line">Thoughtful friction creates awareness.</p>
+  <p class="philosophy-line">We optimise for presence, not engagement.</p>
+</div>
 
-    <div class="cta-section">
-      <h2 class="section-title">Try it</h2>
-      <p class="cta-text">By continuing, you're choosing a slower AI experience.</p>
+<div class="divider"></div>
 
-      <div class="auth-buttons">
-        <button class="btn-oauth" id="btnApple" type="button">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-          </svg>
-          Continue with Apple
-        </button>
+<div class="cta-section">
+  <h2 class="section-title">Try it</h2>
+  <p class="cta-text">By continuing, you're choosing a slower AI experience.</p>
 
-        <button class="btn-oauth" id="btnGoogle" type="button">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-          </svg>
-          Continue with Google
-        </button>
-      </div>
+  <div class="auth-buttons">
+    <button class="btn-oauth" id="btnApple" type="button">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+      </svg>
+      Continue with Apple
+    </button>
 
-      <button class="btn-primary" id="btnEmail" type="button">Sign in with email</button>
+    <button class="btn-oauth" id="btnGoogle" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      Continue with Google
+    </button>
+  </div>
 
-      <!-- Hidden Google Sign-In button -->
-      <div id="googleButtonHidden" style="position: absolute; opacity: 0; pointer-events: none; height: 0; overflow: hidden;"></div>
+  <button class="btn-primary" id="btnEmail" type="button">Sign in with email</button>
 
-      <p class="footer-note">Works best in your browser. Home-screen optional.</p>
-    </div>
+  <!-- Hidden Google Sign-In button -->
+  <div id="googleButtonHidden" style="position: absolute; opacity: 0; pointer-events: none; height: 0; overflow: hidden;"></div>
+
+  <p class="footer-note">Works best in your browser. Home-screen optional.</p>
+</div>
+```
+
   </div>
 
   <!-- CHAT APPLICATION -->
+
   <div class="chat-app" id="chatApp">
     <header class="chat-header">
       <div class="chat-header-left">
@@ -95,11 +1892,11 @@
       </div>
       <div class="chat-header-center">
         <select class="model-select" id="modelSelect">
-          <option value="gemini">Google Gemini 2.5 (Free)</option>
-          <option value="claude">Claude Sonnet 4.5 🔒</option>
-          <option value="gpt">GPT-4o 🔒</option>
-          <option value="grok">Grok 3 🔒</option>
-          <option value="perplexity">Perplexity Sonar 🔒</option>
+          <option value="claude">Claude Sonnet 4.5</option>
+          <option value="gpt">GPT-4o</option>
+          <option value="gemini">Google Gemini 2.5</option>
+          <option value="grok">Grok 3</option>
+          <option value="perplexity">Perplexity Sonar</option>
         </select>
       </div>
       <div class="chat-header-right">
@@ -107,34 +1904,38 @@
       </div>
     </header>
 
-    <div class="chat-messages" id="chatMessages">
-      <div class="chat-background-goal" id="chatBackgroundGoal"></div>
-      <div class="welcome-message">
-        <div class="welcome-icon">✦</div>
-        <h2>How can I help you today?</h2>
-        <p>Remember: slow is intentional.</p>
-      </div>
-    </div>
+```
+<div class="chat-messages" id="chatMessages">
+  <div class="chat-background-goal" id="chatBackgroundGoal"></div>
+  <div class="welcome-message">
+    <div class="welcome-icon">✦</div>
+    <h2>How can I help you today?</h2>
+    <p>Remember: slow is intentional.</p>
+  </div>
+</div>
 
-    <div class="typing-indicator" id="typingIndicator">
-      <div class="typing-dot"></div>
-      <div class="typing-dot"></div>
-      <div class="typing-dot"></div>
-    </div>
+<div class="typing-indicator" id="typingIndicator">
+  <div class="typing-dot"></div>
+  <div class="typing-dot"></div>
+  <div class="typing-dot"></div>
+</div>
 
-    <div class="chat-input-area">
-      <div class="chat-input-wrapper">
-        <textarea class="chat-input" id="messageInput" placeholder="Message..." rows="1"></textarea>
-        <button class="btn-send" id="btnSend" type="button" aria-label="Send message">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
-        </button>
-      </div>
-    </div>
+<div class="chat-input-area">
+  <div class="chat-input-wrapper">
+    <textarea class="chat-input" id="messageInput" placeholder="Message..." rows="1"></textarea>
+    <button class="btn-send" id="btnSend" type="button" aria-label="Send message">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </button>
+  </div>
+</div>
+```
+
   </div>
 
   <!-- SIDE MENU -->
+
   <div class="menu-overlay" id="menuOverlay"></div>
   <div class="side-menu" id="sideMenu">
     <div class="menu-header">
@@ -153,151 +1954,159 @@
       </button>
     </div>
 
-    <div class="menu-content">
-      <button class="menu-btn-new" id="btnNewChat" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"/>
-          <line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
-        New Chat
-      </button>
+```
+<div class="menu-content">
+  <button class="menu-btn-new" id="btnNewChat" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19"/>
+      <line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    New Chat
+  </button>
 
-      <div class="menu-section">
-        <div class="menu-section-title">History</div>
-        <div id="chatHistoryList">
-          <div class="menu-empty">No chats yet</div>
-        </div>
-      </div>
-
-      <div class="menu-divider"></div>
-
-      <div class="menu-section">
-        <button class="menu-item" id="btnSettings" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
-          </svg>
-          <span>Settings</span>
-        </button>
-        <button class="menu-item" id="btnAbout" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="16" x2="12" y2="12"/>
-            <line x1="12" y1="8" x2="12.01" y2="8"/>
-          </svg>
-          <span>About</span>
-        </button>
-        <button class="menu-item" id="btnAdmin" type="button" style="display: none;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-          </svg>
-          <span>Admin Dashboard</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="menu-footer">
-      <button class="menu-item menu-item-logout" id="btnSignOut" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-          <polyline points="16 17 21 12 16 7"/>
-          <line x1="21" y1="12" x2="9" y2="12"/>
-        </svg>
-        <span>Sign Out</span>
-      </button>
+  <div class="menu-section">
+    <div class="menu-section-title">History</div>
+    <div id="chatHistoryList">
+      <div class="menu-empty">No chats yet</div>
     </div>
   </div>
 
+  <div class="menu-divider"></div>
+
+  <div class="menu-section">
+    <button class="menu-item" id="btnSettings" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+      </svg>
+      <span>Settings</span>
+    </button>
+    <button class="menu-item" id="btnAbout" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="16" x2="12" y2="12"/>
+        <line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+      <span>About</span>
+    </button>
+  </div>
+</div>
+
+<div class="menu-footer">
+  <button class="menu-item menu-item-logout" id="btnSignOut" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+      <polyline points="16 17 21 12 16 7"/>
+      <line x1="21" y1="12" x2="9" y2="12"/>
+    </svg>
+    <span>Sign Out</span>
+  </button>
+</div>
+```
+
+  </div>
+
   <!-- FRICTION OVERLAY -->
+
   <div class="friction-overlay" id="frictionOverlay">
     <div class="friction-box">
       <h2 class="friction-title">Pause & reflect</h2>
       <p class="friction-subtitle">Type the code to send.</p>
 
-      <div class="friction-goal-reminder" id="frictionGoalReminder"></div>
+```
+  <div class="friction-goal-reminder" id="frictionGoalReminder"></div>
 
-      <div class="friction-row" id="frictionRow1">
-        <div class="friction-pair-container" id="frictionPairs1"></div>
-      </div>
+  <div class="friction-row" id="frictionRow1">
+    <div class="friction-pair-container" id="frictionPairs1"></div>
+  </div>
 
-      <div class="friction-row" id="frictionRow2">
-        <div class="friction-pair-container" id="frictionPairs2"></div>
-      </div>
+  <div class="friction-row" id="frictionRow2">
+    <div class="friction-pair-container" id="frictionPairs2"></div>
+  </div>
 
-      <div class="friction-buttons">
-        <button class="btn-cancel" id="frictionCancel" type="button">Cancel</button>
-        <button class="btn-unlock" id="frictionUnlock" type="button" disabled>Send message</button>
-      </div>
+  <div class="friction-buttons">
+    <button class="btn-cancel" id="frictionCancel" type="button">Cancel</button>
+    <button class="btn-unlock" id="frictionUnlock" type="button" disabled>Send message</button>
+  </div>
 
-      <p class="friction-timer" id="frictionTimer"></p>
-      <p class="friction-error" id="frictionError"></p>
-    </div>
+  <p class="friction-timer" id="frictionTimer"></p>
+  <p class="friction-error" id="frictionError"></p>
+</div>
+```
+
   </div>
 
   <!-- ONBOARDING OVERLAY -->
+
   <div class="onboarding-overlay" id="onboardingOverlay">
     <div class="onboarding-box">
-      <!-- Step 1: Welcome -->
-      <div class="onboarding-step active" id="onboardingStep1">
-        <div class="onboarding-icon">✦</div>
-        <h2 class="onboarding-title">Welcome to Friction AI</h2>
-        <p class="onboarding-text">
-          This app adds small moments of pause to help you use AI more intentionally.
-        </p>
-        <p class="onboarding-text">
-          Before we start, let's set some goals. These will gently remind you of what matters most.
-        </p>
-        <button class="onboarding-btn primary" id="onboardingNext1" type="button">Get Started</button>
-      </div>
 
-      <!-- Step 2: Long-term Goal -->
-      <div class="onboarding-step" id="onboardingStep2">
-        <h2 class="onboarding-title">Your long-term goal</h2>
-        <p class="onboarding-text">
-          What do you want more of in your life? This will appear softly in the background as you chat.
-        </p>
-        <textarea 
-          class="onboarding-textarea" 
-          id="inputLongtermGoal" 
-          placeholder="e.g., Be more present with my family, Focus on my mental health, Grow in my career..."
-          maxlength="100"
-        ></textarea>
-        <div class="onboarding-nav">
-          <button class="onboarding-btn secondary" id="onboardingBack2" type="button">Back</button>
-          <button class="onboarding-btn primary" id="onboardingNext2" type="button">Next</button>
-        </div>
-      </div>
+```
+  <!-- Step 1: Welcome -->
+  <div class="onboarding-step active" id="onboardingStep1">
+    <div class="onboarding-icon">✦</div>
+    <h2 class="onboarding-title">Welcome to Friction AI</h2>
+    <p class="onboarding-text">
+      This app adds small moments of pause to help you use AI more intentionally.
+    </p>
+    <p class="onboarding-text">
+      Before we start, let's set some goals. These will gently remind you of what matters most.
+    </p>
+    <button class="onboarding-btn primary" id="onboardingNext1" type="button">Get Started</button>
+  </div>
 
-      <!-- Step 3: Short-term Goals -->
-      <div class="onboarding-step" id="onboardingStep3">
-        <h2 class="onboarding-title">Your short-term goals</h2>
-        <p class="onboarding-text">
-          What would you like to focus on today or this week? These will appear when you send messages.
-        </p>
-        <div class="shortterm-goals-list" id="shorttermGoalsList">
-          <input type="text" class="shortterm-goal-input" placeholder="e.g., Study for exam" maxlength="60" />
-        </div>
-        <button class="onboarding-btn-add" id="addShorttermGoal" type="button">+ Add another goal</button>
-        <div class="onboarding-nav">
-          <button class="onboarding-btn secondary" id="onboardingBack3" type="button">Back</button>
-          <button class="onboarding-btn primary" id="onboardingNext3" type="button">Finish</button>
-        </div>
-      </div>
-
-      <!-- Step 4: All Set -->
-      <div class="onboarding-step" id="onboardingStep4">
-        <div class="onboarding-icon">🎯</div>
-        <h2 class="onboarding-title">You're all set!</h2>
-        <p class="onboarding-text">
-          Your goals are saved. You can update them anytime from the menu.
-        </p>
-        <div class="onboarding-summary" id="onboardingSummary"></div>
-        <button class="onboarding-btn primary" id="onboardingFinish" type="button">Start Chatting</button>
-      </div>
+  <!-- Step 2: Long-term Goal -->
+  <div class="onboarding-step" id="onboardingStep2">
+    <h2 class="onboarding-title">Your long-term goal</h2>
+    <p class="onboarding-text">
+      What do you want more of in your life? This will appear softly in the background as you chat.
+    </p>
+    <textarea 
+      class="onboarding-textarea" 
+      id="inputLongtermGoal" 
+      placeholder="e.g., Be more present with my family, Focus on my mental health, Grow in my career..."
+      maxlength="100"
+    ></textarea>
+    <div class="onboarding-nav">
+      <button class="onboarding-btn secondary" id="onboardingBack2" type="button">Back</button>
+      <button class="onboarding-btn primary" id="onboardingNext2" type="button">Next</button>
     </div>
   </div>
 
+  <!-- Step 3: Short-term Goals -->
+  <div class="onboarding-step" id="onboardingStep3">
+    <h2 class="onboarding-title">Your short-term goals</h2>
+    <p class="onboarding-text">
+      What would you like to focus on today or this week? These will appear when you send messages.
+    </p>
+    <div class="shortterm-goals-list" id="shorttermGoalsList">
+      <input type="text" class="shortterm-goal-input" placeholder="e.g., Study for exam" maxlength="60" />
+    </div>
+    <button class="onboarding-btn-add" id="addShorttermGoal" type="button">+ Add another goal</button>
+    <div class="onboarding-nav">
+      <button class="onboarding-btn secondary" id="onboardingBack3" type="button">Back</button>
+      <button class="onboarding-btn primary" id="onboardingNext3" type="button">Finish</button>
+    </div>
+  </div>
+
+  <!-- Step 4: All Set -->
+  <div class="onboarding-step" id="onboardingStep4">
+    <div class="onboarding-icon">🎯</div>
+    <h2 class="onboarding-title">You're all set!</h2>
+    <p class="onboarding-text">
+      Your goals are saved. You can update them anytime from the menu.
+    </p>
+    <div class="onboarding-summary" id="onboardingSummary"></div>
+    <button class="onboarding-btn primary" id="onboardingFinish" type="button">Start Chatting</button>
+  </div>
+
+</div>
+```
+
+  </div>
+
   <!-- GOAL CHECK-IN OVERLAY -->
+
   <div class="onboarding-overlay" id="goalCheckinOverlay">
     <div class="onboarding-box">
       <div class="onboarding-icon">👋</div>
@@ -314,6 +2123,7 @@
   </div>
 
   <!-- SETTINGS OVERLAY -->
+
   <div class="settings-overlay" id="settingsOverlay">
     <div class="settings-box">
       <div class="settings-header">
@@ -325,171 +2135,147 @@
         </button>
       </div>
 
-      <div class="settings-lock-banner" id="settingsLockBanner" style="display: none;">
-        <span class="lock-icon">🔒</span>
-        <span class="lock-text">Settings locked for <span id="lockTimeRemaining">--:--:--</span></span>
-      </div>
+```
+  <div class="settings-lock-banner" id="settingsLockBanner" style="display: none;">
+    <span class="lock-icon">🔒</span>
+    <span class="lock-text">Settings locked for <span id="lockTimeRemaining">--:--:--</span></span>
+  </div>
 
-      <div class="settings-content" id="settingsContent">
+  <div class="settings-content" id="settingsContent">
+    
+    <!-- Friction Mode -->
+    <div class="settings-section">
+      <h3 class="settings-section-title">Friction Mode</h3>
+      <p class="settings-section-desc">Choose how much friction to add before sending messages</p>
+      
+      <label class="settings-radio">
+        <input type="radio" name="frictionMode" value="off" />
+        <span class="radio-label">
+          <strong>Off</strong>
+          <span class="radio-desc">No verification needed</span>
+        </span>
+      </label>
+      
+      <label class="settings-radio">
+        <input type="radio" name="frictionMode" value="light" />
+        <span class="radio-label">
+          <strong>Light</strong>
+          <span class="radio-desc">Goal reminder only, no typing</span>
+        </span>
+      </label>
+      
+      <label class="settings-radio">
+        <input type="radio" name="frictionMode" value="full" checked />
+        <span class="radio-label">
+          <strong>Full</strong>
+          <span class="radio-desc">Goal reminder + typing code (4-10 chars)</span>
+        </span>
+      </label>
+
+      <label class="settings-radio strict-mode">
+        <input type="radio" name="frictionMode" value="strict" />
+        <span class="radio-label">
+          <strong>☠️ Strict Mode</strong>
+          <span class="radio-desc">No mercy. 15 levels, up to 2 rows of 20 characters. Take no prisoners.</span>
+        </span>
+      </label>
+    </div>
+
+    <!-- Message Delay -->
+    <div class="settings-section" id="messageDelaySection">
+      <h3 class="settings-section-title">Message Delay</h3>
+      <p class="settings-section-desc">Add a waiting period before messages send</p>
+      <p class="settings-section-note" id="delayDisabledNote" style="display: none;">
+        ⚠️ Disabled when using Full or Strict friction mode
+      </p>
+      
+      <div id="delayOptions">
+        <label class="settings-radio">
+          <input type="radio" name="messageDelay" value="0" checked />
+          <span class="radio-label"><strong>Off</strong></span>
+        </label>
         
-        <!-- Friction Mode -->
-        <div class="settings-section">
-          <h3 class="settings-section-title">Friction Mode</h3>
-          <p class="settings-section-desc">Choose how much friction to add before sending messages</p>
-          
-          <label class="settings-radio">
-            <input type="radio" name="frictionMode" value="off" />
-            <span class="radio-label">
-              <strong>Off</strong>
-              <span class="radio-desc">No verification needed</span>
-            </span>
-          </label>
-          
-          <label class="settings-radio">
-            <input type="radio" name="frictionMode" value="light" />
-            <span class="radio-label">
-              <strong>Light</strong>
-              <span class="radio-desc">Goal reminder only, no typing</span>
-            </span>
-          </label>
-          
-          <label class="settings-radio">
-            <input type="radio" name="frictionMode" value="full" checked />
-            <span class="radio-label">
-              <strong>Full</strong>
-              <span class="radio-desc">Goal reminder + typing code (4-10 chars)</span>
-            </span>
-          </label>
+        <label class="settings-radio">
+          <input type="radio" name="messageDelay" value="5" />
+          <span class="radio-label"><strong>5 seconds</strong></span>
+        </label>
+        
+        <label class="settings-radio">
+          <input type="radio" name="messageDelay" value="15" />
+          <span class="radio-label"><strong>15 seconds</strong></span>
+        </label>
+        
+        <label class="settings-radio">
+          <input type="radio" name="messageDelay" value="30" />
+          <span class="radio-label"><strong>30 seconds</strong></span>
+        </label>
+        
+        <label class="settings-radio">
+          <input type="radio" name="messageDelay" value="45" />
+          <span class="radio-label"><strong>45 seconds</strong></span>
+        </label>
 
-          <label class="settings-radio strict-mode">
-            <input type="radio" name="frictionMode" value="strict" />
-            <span class="radio-label">
-              <strong>☠️ Strict Mode</strong>
-              <span class="radio-desc">No mercy. 15 levels, up to 2 rows of 20 characters. Take no prisoners.</span>
-            </span>
-          </label>
-        </div>
-
-        <!-- Message Delay -->
-        <div class="settings-section" id="messageDelaySection">
-          <h3 class="settings-section-title">Message Delay</h3>
-          <p class="settings-section-desc">Add a waiting period before messages send</p>
-          <p class="settings-section-note" id="delayDisabledNote" style="display: none;">
-            ⚠️ Disabled when using Full or Strict friction mode
-          </p>
-          
-          <div id="delayOptions">
-            <label class="settings-radio">
-              <input type="radio" name="messageDelay" value="0" checked />
-              <span class="radio-label"><strong>Off</strong></span>
-            </label>
-            
-            <label class="settings-radio">
-              <input type="radio" name="messageDelay" value="5" />
-              <span class="radio-label"><strong>5 seconds</strong></span>
-            </label>
-            
-            <label class="settings-radio">
-              <input type="radio" name="messageDelay" value="15" />
-              <span class="radio-label"><strong>15 seconds</strong></span>
-            </label>
-            
-            <label class="settings-radio">
-              <input type="radio" name="messageDelay" value="30" />
-              <span class="radio-label"><strong>30 seconds</strong></span>
-            </label>
-            
-            <label class="settings-radio">
-              <input type="radio" name="messageDelay" value="45" />
-              <span class="radio-label"><strong>45 seconds</strong></span>
-            </label>
-
-            <label class="settings-checkbox">
-              <input type="checkbox" id="allowCancelDelay" checked />
-              <span class="checkbox-label">Allow cancel during countdown</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- Goal Reminders -->
-        <div class="settings-section">
-          <h3 class="settings-section-title">Goal Reminders</h3>
-          
-          <label class="settings-checkbox">
-            <input type="checkbox" id="showShortTermGoal" checked />
-            <span class="checkbox-label">Show short-term goal in friction overlay</span>
-          </label>
-          
-          <label class="settings-checkbox">
-            <input type="checkbox" id="showLongTermGoal" checked />
-            <span class="checkbox-label">Show long-term goal in chat background</span>
-          </label>
-        </div>
-
-        <!-- Data Storage -->
-        <div class="settings-section">
-          <h3 class="settings-section-title">🔐 Data Storage</h3>
-          <p class="settings-section-desc">Choose where your chat history is stored</p>
-          
-          <label class="settings-radio">
-            <input type="radio" name="storageMode" value="local" checked />
-            <span class="radio-label">
-              <strong>Local Only</strong>
-              <span class="radio-desc">Chats stay in this browser (clears if you clear cache)</span>
-            </span>
-          </label>
-          
-          <label class="settings-radio">
-            <input type="radio" name="storageMode" value="encrypted" />
-            <span class="radio-label">
-              <strong>Encrypted Cloud Backup</strong>
-              <span class="radio-desc">Chats encrypted & backed up (accessible from any device)</span>
-            </span>
-          </label>
-          
-          <div id="encryptedStorageNote" style="display: none; margin-top: 15px; padding: 12px; background: #f0f9ff; border-radius: 8px;">
-            <p style="margin: 0; font-size: 0.9rem;">
-              <strong>🔒 Zero-Knowledge Encryption:</strong> Your chats are encrypted with a key only you control. 
-              We cannot read your messages.
-            </p>
-          </div>
-        </div>
-
-        <!-- Lock Settings -->
-        <div class="settings-section settings-lock-section">
-          <h3 class="settings-section-title">🔒 Lock Settings</h3>
-          <p class="settings-section-desc">Prevent changes for a set period. Once locked, you cannot change settings until the timer expires.</p>
-          
-          <div class="lock-time-picker">
-            <div class="lock-time-row">
-              <label class="lock-time-label">Days</label>
-              <input type="number" class="lock-time-input" id="lockDays" min="0" max="30" value="0" />
-            </div>
-            <div class="lock-time-row">
-              <label class="lock-time-label">Hours</label>
-              <input type="number" class="lock-time-input" id="lockHours" min="0" max="23" value="1" />
-            </div>
-            <div class="lock-time-row">
-              <label class="lock-time-label">Minutes</label>
-              <input type="number" class="lock-time-input" id="lockMinutes" min="0" max="59" value="0" />
-            </div>
-          </div>
-          
-          <div class="lock-presets">
-            <button type="button" class="lock-preset-btn" data-hours="1">1hr</button>
-            <button type="button" class="lock-preset-btn" data-hours="4">4hr</button>
-            <button type="button" class="lock-preset-btn" data-hours="24">24hr</button>
-            <button type="button" class="lock-preset-btn" data-days="3">3 days</button>
-            <button type="button" class="lock-preset-btn" data-days="7">1 week</button>
-          </div>
-
-          <button class="settings-lock-btn" id="btnLockSettings" type="button">Lock Settings</button>
-        </div>
+        <label class="settings-checkbox">
+          <input type="checkbox" id="allowCancelDelay" checked />
+          <span class="checkbox-label">Allow cancel during countdown</span>
+        </label>
       </div>
     </div>
+
+    <!-- Goal Reminders -->
+    <div class="settings-section">
+      <h3 class="settings-section-title">Goal Reminders</h3>
+      
+      <label class="settings-checkbox">
+        <input type="checkbox" id="showShortTermGoal" checked />
+        <span class="checkbox-label">Show short-term goal in friction overlay</span>
+      </label>
+      
+      <label class="settings-checkbox">
+        <input type="checkbox" id="showLongTermGoal" checked />
+        <span class="checkbox-label">Show long-term goal in chat background</span>
+      </label>
+    </div>
+
+    <!-- Lock Settings -->
+    <div class="settings-section settings-lock-section">
+      <h3 class="settings-section-title">🔒 Lock Settings</h3>
+      <p class="settings-section-desc">Prevent changes for a set period. Once locked, you cannot change settings until the timer expires.</p>
+      
+      <div class="lock-time-picker">
+        <div class="lock-time-row">
+          <label class="lock-time-label">Days</label>
+          <input type="number" class="lock-time-input" id="lockDays" min="0" max="30" value="0" />
+        </div>
+        <div class="lock-time-row">
+          <label class="lock-time-label">Hours</label>
+          <input type="number" class="lock-time-input" id="lockHours" min="0" max="23" value="1" />
+        </div>
+        <div class="lock-time-row">
+          <label class="lock-time-label">Minutes</label>
+          <input type="number" class="lock-time-input" id="lockMinutes" min="0" max="59" value="0" />
+        </div>
+      </div>
+      
+      <div class="lock-presets">
+        <button type="button" class="lock-preset-btn" data-hours="1">1hr</button>
+        <button type="button" class="lock-preset-btn" data-hours="4">4hr</button>
+        <button type="button" class="lock-preset-btn" data-hours="24">24hr</button>
+        <button type="button" class="lock-preset-btn" data-days="3">3 days</button>
+        <button type="button" class="lock-preset-btn" data-days="7">1 week</button>
+      </div>
+
+      <button class="settings-lock-btn" id="btnLockSettings" type="button">Lock Settings</button>
+    </div>
+
+  </div>
+</div>
+```
+
   </div>
 
   <!-- MESSAGE DELAY OVERLAY -->
+
   <div class="delay-overlay" id="delayOverlay">
     <div class="delay-box">
       <div class="delay-countdown" id="delayCountdown">
@@ -511,193 +2297,38 @@
       messages: [],
       pendingMessage: null,
       isProcessing: false,
-      currentModel: 'gemini',
+      currentModel: 'claude',
       currentChatId: null
     };
 
-    // Constants
-    const ADMIN_EMAIL = 'fatboydimsim@gmail.com';
-    const FREE_MODELS = ['gemini'];
-    const PAID_MODELS = ['claude', 'gpt', 'grok', 'perplexity'];
-
-    // ENCRYPTION CLASS
-    class ChatEncryption {
-      constructor() {
-        this.cryptoKey = null;
-        this.keyStorageName = 'friction_encryption_key';
-      }
-      
-      async init(userId) {
-        // Try to load existing key
-        const storedKey = localStorage.getItem(this.keyStorageName);
-        
-        if (storedKey) {
-          const keyData = JSON.parse(storedKey);
-          this.cryptoKey = await crypto.subtle.importKey(
-            'jwk',
-            keyData,
-            { name: 'AES-GCM' },
-            false,
-            ['encrypt', 'decrypt']
-          );
-        } else {
-          this.cryptoKey = await crypto.subtle.generateKey(
-            { name: 'AES-GCM', length: 256 },
-            true,
-            ['encrypt', 'decrypt']
-          );
-          
-          const exportedKey = await crypto.subtle.exportKey('jwk', this.cryptoKey);
-          localStorage.setItem(this.keyStorageName, JSON.stringify(exportedKey));
-        }
-      }
-      
-      async encrypt(data) {
-        if (!this.cryptoKey) throw new Error('Encryption not initialized');
-        
-        const text = JSON.stringify(data);
-        const encoder = new TextEncoder();
-        const encoded = encoder.encode(text);
-        
-        const iv = crypto.getRandomValues(new Uint8Array(12));
-        const encrypted = await crypto.subtle.encrypt(
-          { name: 'AES-GCM', iv },
-          this.cryptoKey,
-          encoded
-        );
-        
-        const combined = new Uint8Array(iv.length + encrypted.byteLength);
-        combined.set(iv);
-        combined.set(new Uint8Array(encrypted), iv.length);
-        
-        return btoa(String.fromCharCode(...combined));
-      }
-      
-      async decrypt(encryptedBase64) {
-        if (!this.cryptoKey) throw new Error('Encryption not initialized');
-        
-        const combined = Uint8Array.from(atob(encryptedBase64), c => c.charCodeAt(0));
-        const iv = combined.slice(0, 12);
-        const encrypted = combined.slice(12);
-        
-        const decrypted = await crypto.subtle.decrypt(
-          { name: 'AES-GCM', iv },
-          this.cryptoKey,
-          encrypted
-        );
-        
-        const decoder = new TextDecoder();
-        return JSON.parse(decoder.decode(decrypted));
-      }
-      
-      hasKey() {
-        return !!this.cryptoKey;
-      }
-    }
-
-    const chatEncryption = new ChatEncryption();
-
-    // CHAT PERSISTENCE WITH ENCRYPTION OPTION
-    async function saveChatState() {
+    // CHAT PERSISTENCE
+    function saveChatState() {
       const chatState = {
         messages: state.messages,
         currentModel: state.currentModel,
-        currentChatId: state.currentChatId,
-        updatedAt: Date.now()
+        currentChatId: state.currentChatId
       };
-      
-      // Save locally
       localStorage.setItem('friction_chat', JSON.stringify(chatState));
       localStorage.setItem('friction_last_activity', Date.now().toString());
       
-      // Save to history
+      // Also save to history
       saveCurrentChatToHistory();
-      
-      // Backup to cloud if enabled
-      if (settings.storageMode === 'encrypted' && currentUser) {
-        await backupChatToCloud(chatState);
-      }
     }
 
-    async function loadChatState() {
-      // Try local first
+    function loadChatState() {
       const saved = localStorage.getItem('friction_chat');
       if (saved) {
         try {
           const chatState = JSON.parse(saved);
           state.messages = chatState.messages || [];
-          state.currentModel = chatState.currentModel || 'gemini';
+          state.currentModel = chatState.currentModel || 'claude';
           state.currentChatId = chatState.currentChatId || null;
           return true;
         } catch (e) {
-          console.error('Error loading local chat:', e);
+          return false;
         }
       }
-      
-      // Try cloud backup if enabled
-      if (settings.storageMode === 'encrypted' && currentUser) {
-        const cloudChat = await loadChatFromCloud();
-        if (cloudChat) {
-          state.messages = cloudChat.messages || [];
-          state.currentModel = cloudChat.currentModel || 'gemini';
-          state.currentChatId = cloudChat.currentChatId || null;
-          return true;
-        }
-      }
-      
       return false;
-    }
-
-    async function backupChatToCloud(chatState) {
-      try {
-        if (!chatEncryption.hasKey()) {
-          await chatEncryption.init(currentUser.email);
-        }
-        
-        const encrypted = await chatEncryption.encrypt(chatState);
-        const idToken = localStorage.getItem('google_id_token');
-        
-        const response = await fetch('/api/chat/backup', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${idToken}`
-          },
-          body: JSON.stringify({
-            chatId: state.currentChatId || generateChatId(),
-            encryptedData: encrypted,
-            timestamp: Date.now()
-          })
-        });
-        
-        if (!response.ok) {
-          console.warn('Failed to backup chat to cloud');
-        }
-      } catch (error) {
-        console.error('Error backing up chat:', error);
-      }
-    }
-
-    async function loadChatFromCloud() {
-      try {
-        const idToken = localStorage.getItem('google_id_token');
-        const response = await fetch('/api/chat/backup', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${idToken}`
-          }
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          if (data.encryptedData && chatEncryption.hasKey()) {
-            return await chatEncryption.decrypt(data.encryptedData);
-          }
-        }
-      } catch (error) {
-        console.error('Error loading from cloud:', error);
-      }
-      return null;
     }
 
     function clearChatState() {
@@ -716,10 +2347,10 @@
     };
 
     function loadGoals() {
-      const saved = localStorage.getItem('friction_goals');
+      var saved = localStorage.getItem('friction_goals');
       if (saved) {
         try {
-          const parsed = JSON.parse(saved);
+          var parsed = JSON.parse(saved);
           goals = Object.assign(goals, parsed);
           return true;
         } catch (e) {
@@ -734,7 +2365,7 @@
     }
 
     function getActiveShortTermGoal() {
-      const active = goals.shortterm.filter(g => !g.completed);
+      var active = goals.shortterm.filter(function(g) { return !g.completed; });
       return active.length > 0 ? active[0] : null;
     }
 
@@ -746,11 +2377,13 @@
       if (!goals.onboardingComplete) return false;
       if (goals.shortterm.length === 0) return false;
       
-      const allComplete = goals.shortterm.every(g => g.completed);
+      // Check if all goals completed
+      var allComplete = goals.shortterm.every(function(g) { return g.completed; });
       if (allComplete) return true;
       
+      // Check if 72 hours since last tick
       if (goals.lastGoalTick) {
-        const hoursSinceTick = (Date.now() - goals.lastGoalTick) / (1000 * 60 * 60);
+        var hoursSinceTick = (Date.now() - goals.lastGoalTick) / (1000 * 60 * 60);
         if (hoursSinceTick >= 72) return true;
       }
       
@@ -767,15 +2400,15 @@
     }
 
     function showGoalCheckin() {
-      const overlay = document.getElementById('goalCheckinOverlay');
-      const list = document.getElementById('checkinGoalsList');
+      var overlay = document.getElementById('goalCheckinOverlay');
+      var list = document.getElementById('checkinGoalsList');
       list.innerHTML = '';
       
-      goals.shortterm.forEach((goal, index) => {
-        const item = document.createElement('div');
+      goals.shortterm.forEach(function(goal, index) {
+        var item = document.createElement('div');
         item.className = 'checkin-goal-item';
         
-        const checkbox = document.createElement('input');
+        var checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.className = 'checkin-goal-checkbox';
         checkbox.checked = goal.completed;
@@ -785,7 +2418,7 @@
           text.classList.toggle('completed', this.checked);
         });
         
-        const text = document.createElement('span');
+        var text = document.createElement('span');
         text.className = 'checkin-goal-text';
         if (goal.completed) text.classList.add('completed');
         text.textContent = goal.text;
@@ -803,7 +2436,7 @@
     }
 
     function updateBackgroundGoal() {
-      const bgGoal = document.getElementById('chatBackgroundGoal');
+      var bgGoal = document.getElementById('chatBackgroundGoal');
       if (!bgGoal) return;
       
       if (!goals.longterm || !settings.showLongTermGoal) {
@@ -813,27 +2446,27 @@
       
       bgGoal.textContent = '"' + goals.longterm + '"';
       
-      const messageCount = state.messages.filter(m => m.role === 'user').length;
-      const opacity = Math.min(messageCount * 0.03, 0.15);
+      // Calculate opacity based on message count (caps at 0.15)
+      var messageCount = state.messages.filter(function(m) { return m.role === 'user'; }).length;
+      var opacity = Math.min(messageCount * 0.03, 0.15);
       bgGoal.style.opacity = opacity.toString();
     }
 
     // SETTINGS MANAGEMENT
     let settings = {
-      frictionMode: 'full',
-      messageDelay: 0,
+      frictionMode: 'full', // 'off', 'light', 'full'
+      messageDelay: 0, // 0, 5, 15, 30, 45 seconds
       allowCancelDelay: true,
       showShortTermGoal: true,
       showLongTermGoal: true,
-      storageMode: 'local', // 'local' or 'encrypted'
       lockUntil: null
     };
 
     function loadSettings() {
-      const saved = localStorage.getItem('friction_settings');
+      var saved = localStorage.getItem('friction_settings');
       if (saved) {
         try {
-          const parsed = JSON.parse(saved);
+          var parsed = JSON.parse(saved);
           settings = Object.assign(settings, parsed);
           return true;
         } catch (e) {
@@ -845,14 +2478,6 @@
 
     function saveSettings() {
       localStorage.setItem('friction_settings', JSON.stringify(settings));
-      
-      // Update storage mode UI
-      const note = document.getElementById('encryptedStorageNote');
-      if (settings.storageMode === 'encrypted') {
-        note.style.display = 'block';
-      } else {
-        note.style.display = 'none';
-      }
     }
 
     function isSettingsLocked() {
@@ -866,10 +2491,10 @@
     }
 
     function formatLockTime(ms) {
-      const totalSeconds = Math.floor(ms / 1000);
-      const hours = Math.floor(totalSeconds / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
+      var totalSeconds = Math.floor(ms / 1000);
+      var hours = Math.floor(totalSeconds / 3600);
+      var minutes = Math.floor((totalSeconds % 3600) / 60);
+      var seconds = totalSeconds % 60;
       return String(hours).padStart(2, '0') + ':' + 
              String(minutes).padStart(2, '0') + ':' + 
              String(seconds).padStart(2, '0');
@@ -878,26 +2503,21 @@
     function showSettings() {
       loadSettings();
       
-      const overlay = document.getElementById('settingsOverlay');
-      const content = document.getElementById('settingsContent');
-      const lockBanner = document.getElementById('settingsLockBanner');
+      var overlay = document.getElementById('settingsOverlay');
+      var content = document.getElementById('settingsContent');
+      var lockBanner = document.getElementById('settingsLockBanner');
       
+      // Set current values in form
       document.querySelector('input[name="frictionMode"][value="' + settings.frictionMode + '"]').checked = true;
       document.querySelector('input[name="messageDelay"][value="' + settings.messageDelay + '"]').checked = true;
-      document.querySelector('input[name="storageMode"][value="' + settings.storageMode + '"]').checked = true;
       document.getElementById('allowCancelDelay').checked = settings.allowCancelDelay;
       document.getElementById('showShortTermGoal').checked = settings.showShortTermGoal;
       document.getElementById('showLongTermGoal').checked = settings.showLongTermGoal;
       
+      // Update delay section based on friction mode
       updateDelayAvailability();
       
-      const note = document.getElementById('encryptedStorageNote');
-      if (settings.storageMode === 'encrypted') {
-        note.style.display = 'block';
-      } else {
-        note.style.display = 'none';
-      }
-      
+      // Check if locked
       if (isSettingsLocked()) {
         content.classList.add('locked');
         lockBanner.style.display = 'flex';
@@ -911,13 +2531,14 @@
     }
 
     function updateDelayAvailability() {
-      const frictionMode = document.querySelector('input[name="frictionMode"]:checked').value;
-      const delayOptions = document.getElementById('delayOptions');
-      const delayNote = document.getElementById('delayDisabledNote');
+      var frictionMode = document.querySelector('input[name="frictionMode"]:checked').value;
+      var delayOptions = document.getElementById('delayOptions');
+      var delayNote = document.getElementById('delayDisabledNote');
       
       if (frictionMode === 'full' || frictionMode === 'strict') {
         delayOptions.classList.add('disabled');
         delayNote.style.display = 'block';
+        // Reset delay to off when using code friction
         settings.messageDelay = 0;
         document.querySelector('input[name="messageDelay"][value="0"]').checked = true;
         saveSettings();
@@ -931,11 +2552,11 @@
       document.getElementById('settingsOverlay').classList.remove('active');
     }
 
-    let lockTimerInterval = null;
+    var lockTimerInterval = null;
 
     function updateLockTimer() {
-      const remaining = getRemainingLockTime();
-      const timeEl = document.getElementById('lockTimeRemaining');
+      var remaining = getRemainingLockTime();
+      var timeEl = document.getElementById('lockTimeRemaining');
       
       if (remaining <= 0) {
         settings.lockUntil = null;
@@ -957,11 +2578,11 @@
     }
 
     function lockSettings() {
-      const days = parseInt(document.getElementById('lockDays').value, 10) || 0;
-      const hours = parseInt(document.getElementById('lockHours').value, 10) || 0;
-      const minutes = parseInt(document.getElementById('lockMinutes').value, 10) || 0;
+      var days = parseInt(document.getElementById('lockDays').value, 10) || 0;
+      var hours = parseInt(document.getElementById('lockHours').value, 10) || 0;
+      var minutes = parseInt(document.getElementById('lockMinutes').value, 10) || 0;
       
-      const duration = (days * 24 * 60 * 60 * 1000) + (hours * 60 * 60 * 1000) + (minutes * 60 * 1000);
+      var duration = (days * 24 * 60 * 60 * 1000) + (hours * 60 * 60 * 1000) + (minutes * 60 * 1000);
       
       if (duration < 60000) {
         alert('Please set a lock duration of at least 1 minute.');
@@ -977,43 +2598,47 @@
     }
 
     // MESSAGE DELAY OVERLAY
-    let delayInterval = null;
-    let delayMessage = null;
+    var delayInterval = null;
+    var delayMessage = null;
 
     function showDelayOverlay(message) {
       delayMessage = message;
-      const overlay = document.getElementById('delayOverlay');
-      const timeEl = document.getElementById('delayTime');
-      const progressEl = document.getElementById('delayRingProgress');
-      const hintEl = document.getElementById('delayHint');
-      const cancelBtn = document.getElementById('delayCancelBtn');
+      var overlay = document.getElementById('delayOverlay');
+      var timeEl = document.getElementById('delayTime');
+      var progressEl = document.getElementById('delayRingProgress');
+      var hintEl = document.getElementById('delayHint');
+      var cancelBtn = document.getElementById('delayCancelBtn');
       
-      const totalSeconds = settings.messageDelay;
-      let remaining = totalSeconds;
+      var totalSeconds = settings.messageDelay;
+      var remaining = totalSeconds;
       
-      const activeGoal = getActiveShortTermGoal();
+      // Set hint based on goal
+      var activeGoal = getActiveShortTermGoal();
       if (activeGoal) {
         hintEl.textContent = 'While you wait... "' + activeGoal.text + '"';
       } else {
         hintEl.textContent = 'Take a breath. Is this message necessary?';
       }
       
+      // Show/hide cancel button
       if (settings.allowCancelDelay) {
         cancelBtn.classList.remove('hidden');
       } else {
         cancelBtn.classList.add('hidden');
       }
       
+      // Set initial state
       timeEl.textContent = remaining;
       progressEl.style.strokeDashoffset = '0';
       
       overlay.classList.add('active');
       
-      delayInterval = setInterval(() => {
+      delayInterval = setInterval(function() {
         remaining--;
         timeEl.textContent = remaining;
         
-        const progress = ((totalSeconds - remaining) / totalSeconds) * 283;
+        // Update progress ring (283 is circumference of circle with r=45)
+        var progress = ((totalSeconds - remaining) / totalSeconds) * 283;
         progressEl.style.strokeDashoffset = progress;
         
         if (remaining <= 0) {
@@ -1041,17 +2666,20 @@
 
     // AUTH STATE
     const GOOGLE_CLIENT_ID = '37442638167-t8m3fql61v05h01qmvall1bki9k88tim.apps.googleusercontent.com';
+    const ADMIN_EMAIL = 'fatboydimsim@gmail.com';
     
     let currentUser = null;
     let isAdmin = false;
-    let googleIdToken = null;
+
+    // Free models available to everyone, paid models only for admin
+    const FREE_MODELS = ['gemini'];
+    const PAID_MODELS = ['claude', 'gpt', 'grok', 'perplexity'];
 
     function loadUserFromStorage() {
       const saved = localStorage.getItem('friction_user');
       if (saved) {
         currentUser = JSON.parse(saved);
         isAdmin = currentUser.email === ADMIN_EMAIL;
-        googleIdToken = localStorage.getItem('google_id_token');
         return true;
       }
       return false;
@@ -1065,7 +2693,8 @@
       }
     }
 
-    async function handleGoogleSignIn(response) {
+    function handleGoogleSignIn(response) {
+      // Decode the JWT token
       const base64Url = response.credential.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
       const padded = base64 + '==='.slice((base64.length + 3) % 4);
@@ -1077,38 +2706,25 @@
         picture: payload.picture
       };
       
-      googleIdToken = response.credential;
-      localStorage.setItem('google_id_token', googleIdToken);
-      
       isAdmin = currentUser.email === ADMIN_EMAIL;
       saveUserToStorage();
       updateModelAccess();
       updateProfileDisplay();
-      updateMenuForAdmin();
-      
-      if (settings.storageMode === 'encrypted') {
-        await chatEncryption.init(currentUser.email);
-      }
-      
       showChat();
     }
 
     function signOut() {
       currentUser = null;
       isAdmin = false;
-      googleIdToken = null;
       localStorage.removeItem('friction_user');
-      localStorage.removeItem('google_id_token');
-      if (typeof google !== 'undefined' && google.accounts) {
-        google.accounts.id.disableAutoSelect();
-      }
+      google.accounts.id.disableAutoSelect();
       updateModelAccess();
       showHomepage();
     }
 
     function updateModelAccess() {
       const options = modelSelect.querySelectorAll('option');
-      options.forEach(option => {
+      options.forEach(function(option) {
         const model = option.value;
         if (PAID_MODELS.includes(model) && !isAdmin) {
           option.disabled = true;
@@ -1119,9 +2735,9 @@
         }
       });
 
+      // If current selection is a paid model and user is not admin, switch to Gemini
       if (PAID_MODELS.includes(modelSelect.value) && !isAdmin) {
         modelSelect.value = 'gemini';
-        state.currentModel = 'gemini';
       }
     }
 
@@ -1133,25 +2749,29 @@
           auto_select: false
         });
 
+        // Render a hidden Google button that we'll click programmatically
         google.accounts.id.renderButton(
           document.getElementById('googleButtonHidden'),
           { theme: 'outline', size: 'large', width: 280 }
         );
 
+        // Check if user already signed in - auto go to chat
         if (loadUserFromStorage()) {
           updateModelAccess();
           updateProfileDisplay();
-          updateMenuForAdmin();
           showChat();
         }
         
+        // Reveal UI after state is known
         document.body.classList.add('ready');
       } else {
+        // Retry if Google script not loaded yet
         setTimeout(initGoogleSignIn, 100);
       }
     }
 
-    setTimeout(() => {
+    // Fallback: reveal UI after timeout in case Google script fails
+    setTimeout(function() {
       document.body.classList.add('ready');
     }, 1000);
 
@@ -1171,6 +2791,7 @@
     const btnMenu = document.getElementById('btnMenu');
     const typingIndicator = document.getElementById('typingIndicator');
 
+    // Side menu elements
     const sideMenu = document.getElementById('sideMenu');
     const menuOverlay = document.getElementById('menuOverlay');
     const btnCloseMenu = document.getElementById('btnCloseMenu');
@@ -1178,21 +2799,15 @@
     const btnSignOut = document.getElementById('btnSignOut');
     const btnSettings = document.getElementById('btnSettings');
     const btnAbout = document.getElementById('btnAbout');
-    const btnAdmin = document.getElementById('btnAdmin');
     
+    // Profile elements
     const profilePic = document.getElementById('profilePic');
     const profileName = document.getElementById('profileName');
     const profileEmail = document.getElementById('profileEmail');
 
-    function updateMenuForAdmin() {
-      if (btnAdmin) {
-        btnAdmin.style.display = isAdmin ? 'block' : 'none';
-        btnAdmin.addEventListener('click', function() {
-          closeMenu();
-          window.open('/admin.html', '_blank');
-        });
-      }
-    }
+    // Onboarding elements
+    const onboardingOverlay = document.getElementById('onboardingOverlay');
+    const goalCheckinOverlay = document.getElementById('goalCheckinOverlay');
 
     // ONBOARDING EVENT LISTENERS
     document.getElementById('onboardingNext1').addEventListener('click', function() {
@@ -1217,8 +2832,8 @@
     });
 
     document.getElementById('addShorttermGoal').addEventListener('click', function() {
-      const list = document.getElementById('shorttermGoalsList');
-      const input = document.createElement('input');
+      var list = document.getElementById('shorttermGoalsList');
+      var input = document.createElement('input');
       input.type = 'text';
       input.className = 'shortterm-goal-input';
       input.placeholder = 'Another goal...';
@@ -1228,17 +2843,18 @@
     });
 
     document.getElementById('onboardingNext3').addEventListener('click', function() {
-      const inputs = document.querySelectorAll('#shorttermGoalsList .shortterm-goal-input');
+      var inputs = document.querySelectorAll('#shorttermGoalsList .shortterm-goal-input');
       goals.shortterm = [];
-      inputs.forEach(input => {
-        const text = input.value.trim();
+      inputs.forEach(function(input) {
+        var text = input.value.trim();
         if (text) {
           goals.shortterm.push({ text: text, completed: false, createdAt: Date.now() });
         }
       });
       
-      const summary = document.getElementById('onboardingSummary');
-      let html = '';
+      // Show summary
+      var summary = document.getElementById('onboardingSummary');
+      var html = '';
       if (goals.longterm) {
         html += '<div class="onboarding-summary-item">';
         html += '<div class="onboarding-summary-label">Long-term goal</div>';
@@ -1248,7 +2864,7 @@
       if (goals.shortterm.length > 0) {
         html += '<div class="onboarding-summary-item">';
         html += '<div class="onboarding-summary-label">Short-term goals</div>';
-        goals.shortterm.forEach(g => {
+        goals.shortterm.forEach(function(g) {
           html += '<div class="onboarding-summary-text">• ' + g.text + '</div>';
         });
         html += '</div>';
@@ -1268,6 +2884,7 @@
       updateBackgroundGoal();
     });
 
+    // Goal check-in listeners
     document.getElementById('checkinSkip').addEventListener('click', function() {
       goals.lastGoalCheck = Date.now();
       saveGoals();
@@ -1275,7 +2892,8 @@
     });
 
     document.getElementById('checkinSave').addEventListener('click', function() {
-      const hasIncomplete = goals.shortterm.some(g => !g.completed);
+      // Remove completed goals and prompt for new ones if all done
+      var hasIncomplete = goals.shortterm.some(function(g) { return !g.completed; });
       
       goals.lastGoalCheck = Date.now();
       goals.lastGoalTick = Date.now();
@@ -1283,7 +2901,9 @@
       hideGoalCheckin();
       
       if (!hasIncomplete) {
-        goals.shortterm = goals.shortterm.filter(g => !g.completed);
+        // All goals completed - could prompt for new ones
+        // For now just clear completed and let them add via menu
+        goals.shortterm = goals.shortterm.filter(function(g) { return !g.completed; });
         saveGoals();
       }
     });
@@ -1350,56 +2970,68 @@
     // NAVIGATION
     function restoreChatUI() {
       if (state.messages.length > 0) {
+        // Remove welcome message
         const welcome = chatMessages.querySelector('.welcome-message');
         if (welcome) welcome.remove();
         
+        // Clear existing messages (except typing indicator)
         const existingMessages = chatMessages.querySelectorAll('.message');
-        existingMessages.forEach(msg => msg.remove());
+        existingMessages.forEach(function(msg) { msg.remove(); });
         
-        state.messages.forEach(msg => {
+        // Render all saved messages
+        state.messages.forEach(function(msg) {
           const type = msg.role === 'assistant' ? 'ai' : 'user';
           addMessage(msg.content, type);
         });
       }
       
+      // Restore model selection
       if (state.currentModel && modelSelect) {
         modelSelect.value = state.currentModel;
       }
     }
 
-    async function showChat() {
+    function showChat() {
+      // Load saved chat before showing
       loadChatState();
       loadGoals();
       loadSettings();
       
-      const SESSION_TIMEOUT = 2 * 60 * 60 * 1000;
+      // Check if session has expired (2 hours = same as friction reset)
+      const SESSION_TIMEOUT = 2 * 60 * 60 * 1000; // 2 hours
       const lastActivity = localStorage.getItem('friction_last_activity');
       
       if (lastActivity) {
         const elapsed = Date.now() - parseInt(lastActivity, 10);
         if (elapsed > SESSION_TIMEOUT && state.messages.length > 0) {
+          // Save current chat to history before clearing
           saveCurrentChatToHistory();
+          // Start fresh
           state.messages = [];
           state.currentChatId = generateChatId();
           localStorage.removeItem('friction_chat');
         }
       }
       
+      // Update last activity
       localStorage.setItem('friction_last_activity', Date.now().toString());
       
       homepage.classList.add('hidden');
       chatApp.classList.add('active');
       
+      // Restore chat messages (or show welcome if empty)
       if (state.messages.length > 0) {
         restoreChatUI();
       }
       
+      // Check if onboarding needed
       if (shouldShowOnboarding()) {
         showOnboarding();
       } else if (shouldShowGoalCheckin()) {
         showGoalCheckin();
       }
       
+      // Update background goal
       updateBackgroundGoal();
       
       if (lastMessageTime && frictionLevel > 0) startHeaderTimer();
@@ -1416,6 +3048,7 @@
     }
 
     btnApple.addEventListener('click', function() {
+      // TODO: Apple Sign-In
       alert('Apple Sign-In coming soon!');
     });
     
@@ -1424,15 +3057,18 @@
         initGoogleSignIn();
         return;
       }
+      // Click the hidden Google button to trigger sign-in
       const hiddenBtn = document.querySelector('#googleButtonHidden div[role="button"]');
       if (hiddenBtn) {
         hiddenBtn.click();
       } else {
+        // Fallback: try One Tap
         google.accounts.id.prompt();
       }
     });
     
     btnEmail.addEventListener('click', function() {
+      // TODO: Email Sign-In
       alert('Email Sign-In coming soon!');
     });
     
@@ -1455,10 +3091,12 @@
     menuOverlay.addEventListener('click', closeMenu);
 
     btnNewChat.addEventListener('click', function() {
+      // Save current chat first if it has messages
       if (state.messages.length > 0) {
         saveCurrentChatToHistory();
       }
       
+      // Clear current chat and start fresh
       clearChatState();
       state.currentChatId = generateChatId();
       chatMessages.innerHTML = '<div class="welcome-message"><div class="welcome-icon">✦</div><h2>How can I help you today?</h2><p>Remember: slow is intentional.</p></div>';
@@ -1476,13 +3114,14 @@
     });
 
     btnAbout.addEventListener('click', function() {
+      // TODO: Show about page
       closeMenu();
     });
 
     // Settings event listeners
     document.getElementById('settingsClose').addEventListener('click', hideSettings);
 
-    document.querySelectorAll('input[name="frictionMode"]').forEach(radio => {
+    document.querySelectorAll('input[name="frictionMode"]').forEach(function(radio) {
       radio.addEventListener('change', function() {
         if (isSettingsLocked()) return;
         settings.frictionMode = this.value;
@@ -1491,23 +3130,11 @@
       });
     });
 
-    document.querySelectorAll('input[name="messageDelay"]').forEach(radio => {
+    document.querySelectorAll('input[name="messageDelay"]').forEach(function(radio) {
       radio.addEventListener('change', function() {
         if (isSettingsLocked()) return;
         settings.messageDelay = parseInt(this.value, 10);
         saveSettings();
-      });
-    });
-
-    document.querySelectorAll('input[name="storageMode"]').forEach(radio => {
-      radio.addEventListener('change', function() {
-        if (isSettingsLocked()) return;
-        settings.storageMode = this.value;
-        saveSettings();
-        
-        if (this.value === 'encrypted' && currentUser) {
-          chatEncryption.init(currentUser.email);
-        }
       });
     });
 
@@ -1537,12 +3164,14 @@
       }
     });
 
+    // Delay cancel button
     document.getElementById('delayCancelBtn').addEventListener('click', cancelDelay);
 
-    document.querySelectorAll('.lock-preset-btn').forEach(btn => {
+    // Lock preset buttons
+    document.querySelectorAll('.lock-preset-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        const hours = this.dataset.hours;
-        const days = this.dataset.days;
+        var hours = this.dataset.hours;
+        var days = this.dataset.days;
         
         document.getElementById('lockDays').value = days || 0;
         document.getElementById('lockHours').value = hours || 0;
@@ -1557,7 +3186,7 @@
 
     function getChatTitle(messages) {
       if (!messages || messages.length === 0) return 'New Chat';
-      const firstUserMsg = messages.find(m => m.role === 'user');
+      const firstUserMsg = messages.find(function(m) { return m.role === 'user'; });
       if (firstUserMsg) {
         const title = firstUserMsg.content.substring(0, 40);
         return title.length < firstUserMsg.content.length ? title + '...' : title;
@@ -1592,13 +3221,15 @@
         updatedAt: Date.now()
       };
       
-      const existingIndex = history.findIndex(c => c.id === chatData.id);
+      // Update existing or add new
+      const existingIndex = history.findIndex(function(c) { return c.id === chatData.id; });
       if (existingIndex >= 0) {
         history[existingIndex] = chatData;
       } else {
         history.unshift(chatData);
       }
       
+      // Keep only last 50 chats
       history = history.slice(0, 50);
       
       saveChatHistory(history);
@@ -1607,7 +3238,7 @@
 
     function loadChatFromHistory(chatId) {
       const history = loadChatHistory();
-      const chat = history.find(c => c.id === chatId);
+      const chat = history.find(function(c) { return c.id === chatId; });
       if (chat) {
         state.messages = chat.messages;
         state.currentModel = chat.model;
@@ -1621,7 +3252,7 @@
 
     function deleteChatFromHistory(chatId) {
       let history = loadChatHistory();
-      history = history.filter(c => c.id !== chatId);
+      history = history.filter(function(c) { return c.id !== chatId; });
       saveChatHistory(history);
       renderChatHistoryList();
     }
@@ -1636,7 +3267,7 @@
       }
       
       container.innerHTML = '';
-      history.forEach(chat => {
+      history.forEach(function(chat) {
         const item = document.createElement('div');
         item.className = 'menu-history-item';
         if (chat.id === state.currentChatId) {
@@ -1719,11 +3350,11 @@
         timerEl.textContent = '🎉 Reset! Back to Level 1.';
         headerTimerEl.textContent = '🎉 Level 1';
         if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-        setTimeout(() => { headerTimerEl.classList.remove('active'); }, 5000);
+        setTimeout(function() { headerTimerEl.classList.remove('active'); }, 5000);
       } else {
         const timeStr = formatTimeRemaining(remaining);
         timerEl.textContent = '⏱ Resets in ' + timeStr;
-        const maxLevel = settings.frictionMode === 'strict' ? 15 : 7;
+        var maxLevel = settings.frictionMode === 'strict' ? 15 : 7;
         headerTimerEl.textContent = 'L' + Math.min(frictionLevel + 1, maxLevel) + ' · ' + timeStr;
         headerTimerEl.classList.add('active');
       }
@@ -1743,25 +3374,37 @@
     }
 
     function getFrictionConfig() {
+      // Strict mode - original hardcore 15 levels
       if (settings.frictionMode === 'strict') {
         const strictConfigs = [
-          { rows: 1, length: 6 },   { rows: 1, length: 8 },   
-          { rows: 1, length: 10 },  { rows: 1, length: 12 },  
-          { rows: 1, length: 14 },  { rows: 1, length: 16 },  
-          { rows: 1, length: 18 },  { rows: 1, length: 20 },  
-          { rows: 2, length: 12 },  { rows: 2, length: 14 },  
-          { rows: 2, length: 16 },  { rows: 2, length: 18 },  
-          { rows: 2, length: 20 },  { rows: 2, length: 20 },  
-          { rows: 2, length: 20 }
+          { rows: 1, length: 6 },   // Level 1
+          { rows: 1, length: 8 },   // Level 2
+          { rows: 1, length: 10 },  // Level 3
+          { rows: 1, length: 12 },  // Level 4
+          { rows: 1, length: 14 },  // Level 5
+          { rows: 1, length: 16 },  // Level 6
+          { rows: 1, length: 18 },  // Level 7
+          { rows: 1, length: 20 },  // Level 8
+          { rows: 2, length: 12 },  // Level 9
+          { rows: 2, length: 14 },  // Level 10
+          { rows: 2, length: 16 },  // Level 11
+          { rows: 2, length: 18 },  // Level 12
+          { rows: 2, length: 20 },  // Level 13
+          { rows: 2, length: 20 },  // Level 14
+          { rows: 2, length: 20 },  // Level 15
         ];
         return strictConfigs[Math.min(frictionLevel, 14)];
       }
       
+      // Full mode - gentle 7 levels, max 10 chars
       const configs = [
-        { rows: 1, length: 4 },   { rows: 1, length: 5 },   
-        { rows: 1, length: 6 },   { rows: 1, length: 7 },   
-        { rows: 1, length: 8 },   { rows: 1, length: 9 },   
-        { rows: 1, length: 10 }
+        { rows: 1, length: 4 },   // Level 1
+        { rows: 1, length: 5 },   // Level 2
+        { rows: 1, length: 6 },   // Level 3
+        { rows: 1, length: 7 },   // Level 4
+        { rows: 1, length: 8 },   // Level 5
+        { rows: 1, length: 9 },   // Level 6
+        { rows: 1, length: 10 },  // Level 7+
       ];
       return configs[Math.min(frictionLevel, 6)];
     }
@@ -1775,21 +3418,24 @@
       container.innerHTML = '';
       
       for (let i = 0; i < code.length; i++) {
+        // Create pair container (code on top, input below)
         const pair = document.createElement('div');
         pair.className = 'friction-pair';
         
+        // Create display character block
         const charBlock = document.createElement('div');
         charBlock.className = 'friction-char';
         charBlock.textContent = code[i];
         pair.appendChild(charBlock);
         
+        // Create input block
         const input = document.createElement('input');
         input.type = 'text';
         input.className = 'friction-char-input';
         input.maxLength = 1;
         input.autocomplete = 'off';
         input.autocorrect = 'off';
-input.autocapitalize = 'off';
+        input.autocapitalize = 'off';
         input.spellcheck = false;
         input.dataset.index = i;
         input.dataset.expected = code[i];
@@ -1797,7 +3443,7 @@ input.autocapitalize = 'off';
         input.addEventListener('input', handleCharInput);
         input.addEventListener('keydown', handleCharKeydown);
         input.addEventListener('paste', handlePaste);
-        input.addEventListener('drop', e => e.preventDefault());
+        input.addEventListener('drop', function(e) { e.preventDefault(); });
         
         pair.appendChild(input);
         container.appendChild(pair);
@@ -1813,6 +3459,7 @@ input.autocapitalize = 'off';
         if (value === expected) {
           input.classList.add('success');
           input.classList.remove('error');
+          // Move to next input
           const pair = input.closest('.friction-pair');
           const nextPair = pair.nextElementSibling;
           if (nextPair) {
@@ -1861,16 +3508,18 @@ input.autocapitalize = 'off';
     function checkAllInputs() {
       const config = getFrictionConfig();
       
+      // Check row 1
       const inputs1 = frictionPairs1.querySelectorAll('.friction-char-input');
       let match1 = true;
-      inputs1.forEach(input => {
+      inputs1.forEach(function(input) {
         if (input.value !== input.dataset.expected) match1 = false;
       });
       
+      // Check row 2 if needed
       let match2 = true;
       if (config.rows === 2) {
         const inputs2 = frictionPairs2.querySelectorAll('.friction-char-input');
-        inputs2.forEach(input => {
+        inputs2.forEach(function(input) {
           if (input.value !== input.dataset.expected) match2 = false;
         });
       }
@@ -1896,14 +3545,16 @@ input.autocapitalize = 'off';
       state.pendingMessage = message;
       const config = getFrictionConfig();
 
-      const goalReminder = document.getElementById('frictionGoalReminder');
-      const activeGoal = getActiveShortTermGoal();
+      // Show short-term goal reminder
+      var goalReminder = document.getElementById('frictionGoalReminder');
+      var activeGoal = getActiveShortTermGoal();
       if (activeGoal && settings.showShortTermGoal) {
         goalReminder.innerHTML = '<div class="friction-goal-label">Your focus</div><div class="friction-goal-text">"' + activeGoal.text + '"</div>';
       } else {
         goalReminder.innerHTML = '';
       }
 
+      // Show code input row
       document.getElementById('frictionRow1').style.display = 'block';
       
       challenge1 = generateChallenge(config.length);
@@ -1925,12 +3576,14 @@ input.autocapitalize = 'off';
 
       const subtitle = document.querySelector('.friction-subtitle');
       if (settings.frictionMode === 'strict') {
+        // Strict mode - 15 levels
         if (frictionLevel < 14) {
           subtitle.textContent = '☠️ STRICT Level ' + (frictionLevel + 1) + ' of 15 — No mercy.';
         } else {
           subtitle.textContent = '☠️ STRICT Level 15 — Maximum punishment. 2hr reset.';
         }
       } else {
+        // Full mode - 7 levels
         if (frictionLevel < 6) {
           subtitle.textContent = 'Level ' + (frictionLevel + 1) + ' of 7 — Type the code to send.';
         } else {
@@ -1944,7 +3597,8 @@ input.autocapitalize = 'off';
       document.addEventListener('touchmove', preventTouchMove, { passive: false });
       document.documentElement.style.setProperty('--kb', '0px');
       
-      setTimeout(() => {
+      // Focus first input
+      setTimeout(function() {
         const firstInput = frictionPairs1.querySelector('.friction-char-input');
         if (firstInput) firstInput.focus();
       }, 10);
@@ -1964,8 +3618,9 @@ input.autocapitalize = 'off';
     frictionCancel.addEventListener('click', hideFriction);
 
     frictionUnlock.addEventListener('click', function() {
+      // Only increase level for full or strict friction modes
       if (settings.frictionMode === 'full' || settings.frictionMode === 'strict') {
-        const maxLevel = settings.frictionMode === 'strict' ? 14 : 6;
+        var maxLevel = settings.frictionMode === 'strict' ? 14 : 6;
         if (frictionLevel < maxLevel) frictionLevel++;
         lastMessageTime = Date.now();
         saveFrictionState();
@@ -1977,10 +3632,12 @@ input.autocapitalize = 'off';
         document.activeElement.blur();
       }
 
+      // Save the message BEFORE hiding (hideFriction clears pendingMessage)
       const messageToSend = state.pendingMessage;
       
       hideFriction();
       
+      // Check if message delay is enabled
       if (settings.messageDelay > 0) {
         showDelayOverlay(messageToSend);
       } else {
@@ -1988,51 +3645,33 @@ input.autocapitalize = 'off';
       }
     });
 
-    function showLightFriction(message) {
-      state.pendingMessage = message;
-      
-      const goalReminder = document.getElementById('frictionGoalReminder');
-      const activeGoal = getActiveShortTermGoal();
-      if (activeGoal && settings.showShortTermGoal) {
-        goalReminder.innerHTML = '<div class="friction-goal-label">Your focus</div><div class="friction-goal-text">"' + activeGoal.text + '"</div>';
-      } else {
-        goalReminder.innerHTML = '<div class="friction-goal-label">Pause & reflect</div><div class="friction-goal-text">Do you really need this right now?</div>';
-      }
-      
-      document.getElementById('frictionRow1').style.display = 'none';
-      document.getElementById('frictionRow2').style.display = 'none';
-      
-      document.querySelector('.friction-subtitle').textContent = 'Take a moment before sending.';
-      
-      frictionUnlock.disabled = false;
-      frictionUnlock.classList.add('ready');
-      frictionError.textContent = '';
-      
-      frictionOverlay.classList.add('active');
-      lockBodyScroll();
-    }
-
     if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission().catch(() => {});
+      Notification.requestPermission().catch(function() {});
     }
 
     loadFrictionState();
 
     // CHAT FUNCTIONS
     function formatMessageContent(content) {
-      const urlRegex = /(https?:\/\/[^\s\]]+)/g;
-      let escaped = content
+      // Convert URLs to clickable links
+      var urlRegex = /(https?:\/\/[^\s\]]+)/g;
+      var escaped = content
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
       
-      let withLinks = escaped.replace(urlRegex, url => {
-        const cleanUrl = url.replace(/[.,;:!?)]+$/, '');
-        const trailing = url.substring(cleanUrl.length);
+      // Replace URLs with anchor tags
+      var withLinks = escaped.replace(urlRegex, function(url) {
+        // Clean up any trailing punctuation that got caught
+        var cleanUrl = url.replace(/[.,;:!?)]+$/, '');
+        var trailing = url.substring(cleanUrl.length);
         return '<a href="' + cleanUrl + '" target="_blank" rel="noopener noreferrer">' + cleanUrl + '</a>' + trailing;
       });
       
+      // Convert **text** to bold
       withLinks = withLinks.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      
+      // Convert line breaks
       withLinks = withLinks.replace(/\n/g, '<br>');
       
       return withLinks;
@@ -2053,6 +3692,7 @@ input.autocapitalize = 'off';
     }
 
     async function sendMessage(content) {
+      // Prevent duplicate sends
       if (state.isProcessing) return;
       
       const model = modelSelect.value;
@@ -2065,6 +3705,7 @@ input.autocapitalize = 'off';
       state.messages.push({ role: 'user', content: content });
       saveChatState();
       
+      // Update background goal opacity
       updateBackgroundGoal();
 
       state.isProcessing = true;
@@ -2075,7 +3716,7 @@ input.autocapitalize = 'off';
       chatMessages.scrollTop = chatMessages.scrollHeight;
 
       try {
-        const response = await callBackend(model, state.messages);
+        const response = await callBackend(model);
         state.messages.push({ role: 'assistant', content: response });
         saveChatState();
         addMessage(response, 'ai');
@@ -2089,30 +3730,16 @@ input.autocapitalize = 'off';
       }
     }
 
-    async function callBackend(model, messages) {
-      const idToken = localStorage.getItem('google_id_token');
-      if (!idToken) {
-        throw new Error('Not authenticated. Please sign in again.');
-      }
-
+    async function callBackend(model) {
       const res = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`
-        },
-        body: JSON.stringify({ 
-          model: model, 
-          messages: messages 
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: model, messages: state.messages })
       });
 
       if (!res.ok) {
         let errorMsg = 'Backend API error';
-        try { 
-          const error = await res.json(); 
-          errorMsg = error.error || errorMsg; 
-        } catch (e) {}
+        try { const error = await res.json(); errorMsg = error.error || errorMsg; } catch (e) {}
         throw new Error(errorMsg);
       }
 
@@ -2133,22 +3760,49 @@ input.autocapitalize = 'off';
       messageInput.value = '';
       messageInput.style.height = 'auto';
       
-      if (!currentUser) {
-        alert('Please sign in first.');
-        return;
-      }
-      
+      // Check friction mode
       if (settings.frictionMode === 'off') {
+        // No friction - send directly (but check delay)
         if (settings.messageDelay > 0) {
           showDelayOverlay(content);
         } else {
           sendMessage(content);
         }
       } else if (settings.frictionMode === 'light') {
+        // Light mode - show goal only, no typing
         showLightFriction(content);
       } else {
+        // Full or Strict mode - show goal + typing code
         showFriction(content);
       }
+    }
+
+    function showLightFriction(message) {
+      state.pendingMessage = message;
+      
+      // Show a simplified overlay with just the goal
+      var goalReminder = document.getElementById('frictionGoalReminder');
+      var activeGoal = getActiveShortTermGoal();
+      if (activeGoal && settings.showShortTermGoal) {
+        goalReminder.innerHTML = '<div class="friction-goal-label">Your focus</div><div class="friction-goal-text">"' + activeGoal.text + '"</div>';
+      } else {
+        goalReminder.innerHTML = '<div class="friction-goal-label">Pause & reflect</div><div class="friction-goal-text">Do you really need this right now?</div>';
+      }
+      
+      // Hide code input rows
+      document.getElementById('frictionRow1').style.display = 'none';
+      document.getElementById('frictionRow2').style.display = 'none';
+      
+      // Update subtitle
+      document.querySelector('.friction-subtitle').textContent = 'Take a moment before sending.';
+      
+      // Enable send button immediately
+      frictionUnlock.disabled = false;
+      frictionUnlock.classList.add('ready');
+      frictionError.textContent = '';
+      
+      frictionOverlay.classList.add('active');
+      lockBodyScroll();
     }
 
     btnSend.addEventListener('click', handleSend);
@@ -2174,7 +3828,7 @@ input.autocapitalize = 'off';
       document.documentElement.style.setProperty('--kb', overlayOpen ? '0px' : (keyboardHeight + 'px'));
 
       if (!overlayOpen && keyboardHeight > 0 && document.activeElement === messageInput) {
-        requestAnimationFrame(() => {
+        requestAnimationFrame(function() {
           scrollChatToBottom();
           messageInput.scrollIntoView({ block: 'end', behavior: 'auto' });
         });
@@ -2195,7 +3849,7 @@ input.autocapitalize = 'off';
 
     document.addEventListener('focusout', function(e) {
       if (e.target === messageInput) {
-        setTimeout(() => {
+        setTimeout(function() {
           document.documentElement.style.setProperty('--kb', '0px');
           scrollChatToBottom();
         }, 80);
