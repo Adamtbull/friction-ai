@@ -3,10 +3,10 @@ main = "src/index.js"
 compatibility_date = "2026-01-25"
 compatibility_flags = ["nodejs_compat"]
 
-# NO KV NAMESPACE - removed for now
-# kv_namespaces = [
-#   { binding = "FRICTION_KV", id = "your-kv-namespace-id-here" }
-# ]
+# KV namespace for rate limiting
+kv_namespaces = [
+  { binding = "FRICTION_KV", id = "1d183b6e9b0b4f1fa3725d3ba50a6e9c" }
+]
 
 # Environment variables
 [vars]
