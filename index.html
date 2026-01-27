@@ -1472,6 +1472,21 @@
       color: var(--text-secondary);
     }
 
+    .settings-radio.strict-mode {
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d1f1f 100%);
+      margin: 12px -12px 0;
+      padding: 14px 12px;
+      border-radius: 10px;
+    }
+
+    .settings-radio.strict-mode .radio-label strong {
+      color: #ef4444;
+    }
+
+    .settings-radio.strict-mode .radio-desc {
+      color: #fca5a5;
+    }
+
     .settings-checkbox {
       display: flex;
       align-items: center;
@@ -2066,7 +2081,15 @@
         <input type="radio" name="frictionMode" value="full" checked />
         <span class="radio-label">
           <strong>Full</strong>
-          <span class="radio-desc">Goal reminder + typing code</span>
+          <span class="radio-desc">Goal reminder + typing code (4-10 chars)</span>
+        </span>
+      </label>
+
+      <label class="settings-radio strict-mode">
+        <input type="radio" name="frictionMode" value="strict" />
+        <span class="radio-label">
+          <strong>☠️ Strict Mode</strong>
+          <span class="radio-desc">No mercy. 15 levels, up to 2 rows of 20 characters. Take no prisoners.</span>
         </span>
       </label>
     </div>
@@ -3181,7 +3204,8 @@
       } else {
         const timeStr = formatTimeRemaining(remaining);
         timerEl.textContent = '⏱ Resets in ' + timeStr;
-        headerTimerEl.textContent = 'L' + Math.min(frictionLevel + 1, 7) + ' · ' + timeStr;
+        var maxLevel = settings.frictionMode === 'strict' ? 15 : 7;
+        headerTimerEl.textContent = 'L' + Math.min(frictionLevel + 1, maxLevel) + ' · ' + timeStr;
         headerTimerEl.classList.add('active');
       }
     }
@@ -3200,6 +3224,29 @@
     }
 
     function getFrictionConfig() {
+      // Strict mode - original hardcore 15 levels
+      if (settings.frictionMode === 'strict') {
+        const strictConfigs = [
+          { rows: 1, length: 6 },   // Level 1
+          { rows: 1, length: 8 },   // Level 2
+          { rows: 1, length: 10 },  // Level 3
+          { rows: 1, length: 12 },  // Level 4
+          { rows: 1, length: 14 },  // Level 5
+          { rows: 1, length: 16 },  // Level 6
+          { rows: 1, length: 18 },  // Level 7
+          { rows: 1, length: 20 },  // Level 8
+          { rows: 2, length: 12 },  // Level 9
+          { rows: 2, length: 14 },  // Level 10
+          { rows: 2, length: 16 },  // Level 11
+          { rows: 2, length: 18 },  // Level 12
+          { rows: 2, length: 20 },  // Level 13
+          { rows: 2, length: 20 },  // Level 14
+          { rows: 2, length: 20 },  // Level 15
+        ];
+        return strictConfigs[Math.min(frictionLevel, 14)];
+      }
+      
+      // Full mode - gentle 7 levels, max 10 chars
       const configs = [
         { rows: 1, length: 4 },   // Level 1
         { rows: 1, length: 5 },   // Level 2
@@ -3378,10 +3425,20 @@
       frictionError.textContent = '';
 
       const subtitle = document.querySelector('.friction-subtitle');
-      if (frictionLevel < 6) {
-        subtitle.textContent = 'Level ' + (frictionLevel + 1) + ' of 7 — Type the code to send.';
+      if (settings.frictionMode === 'strict') {
+        // Strict mode - 15 levels
+        if (frictionLevel < 14) {
+          subtitle.textContent = '☠️ STRICT Level ' + (frictionLevel + 1) + ' of 15 — No mercy.';
+        } else {
+          subtitle.textContent = '☠️ STRICT Level 15 — Maximum punishment. 2hr reset.';
+        }
       } else {
-        subtitle.textContent = 'Level 7 of 7 — Maximum friction. Take a 2-hour break to reset.';
+        // Full mode - 7 levels
+        if (frictionLevel < 6) {
+          subtitle.textContent = 'Level ' + (frictionLevel + 1) + ' of 7 — Type the code to send.';
+        } else {
+          subtitle.textContent = 'Level 7 of 7 — Maximum friction. Take a 2-hour break to reset.';
+        }
       }
 
       startTimer();
@@ -3411,10 +3468,10 @@
     frictionCancel.addEventListener('click', hideFriction);
 
     frictionUnlock.addEventListener('click', function() {
-      // Only increase level for full friction mode
-      if (settings.frictionMode === 'full') {
-        const wasMaxLevel = frictionLevel >= 6;
-        if (frictionLevel < 6) frictionLevel++;
+      // Only increase level for full or strict friction modes
+      if (settings.frictionMode === 'full' || settings.frictionMode === 'strict') {
+        var maxLevel = settings.frictionMode === 'strict' ? 14 : 6;
+        if (frictionLevel < maxLevel) frictionLevel++;
         lastMessageTime = Date.now();
         saveFrictionState();
       }
@@ -3565,7 +3622,7 @@
         // Light mode - show goal only, no typing
         showLightFriction(content);
       } else {
-        // Full mode - show goal + typing code
+        // Full or Strict mode - show goal + typing code
         showFriction(content);
       }
     }
