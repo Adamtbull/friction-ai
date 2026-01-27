@@ -1062,6 +1062,265 @@
       75% { transform: translateX(6px); }
     }
 
+    .friction-goal-reminder {
+      background: var(--teal-lighter);
+      border-left: 3px solid var(--teal);
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      border-radius: 0 8px 8px 0;
+      text-align: left;
+    }
+
+    .friction-goal-reminder:empty {
+      display: none;
+    }
+
+    .friction-goal-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--grey);
+      margin-bottom: 4px;
+    }
+
+    .friction-goal-text {
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      font-style: italic;
+    }
+
+    /* ONBOARDING OVERLAY */
+    .onboarding-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+
+    .onboarding-overlay.active {
+      display: flex;
+    }
+
+    .onboarding-box {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 32px 28px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 8px 32px var(--shadow);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .onboarding-step {
+      display: none;
+    }
+
+    .onboarding-step.active {
+      display: block;
+    }
+
+    .onboarding-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+
+    .onboarding-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 16px;
+    }
+
+    .onboarding-text {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin: 0 0 20px;
+    }
+
+    .onboarding-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 14px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: inherit;
+      resize: none;
+      margin-bottom: 20px;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .onboarding-textarea:focus {
+      border-color: var(--teal);
+    }
+
+    .onboarding-textarea::placeholder {
+      color: var(--grey);
+    }
+
+    .shortterm-goals-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .shortterm-goal-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .shortterm-goal-input:focus {
+      border-color: var(--teal);
+    }
+
+    .onboarding-btn-add {
+      background: transparent;
+      border: none;
+      color: var(--teal);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 8px;
+      margin-bottom: 20px;
+    }
+
+    .onboarding-btn-add:hover {
+      text-decoration: underline;
+    }
+
+    .onboarding-nav {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .onboarding-btn {
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+
+    .onboarding-btn.primary {
+      background: var(--teal);
+      color: var(--white);
+    }
+
+    .onboarding-btn.primary:hover {
+      background: var(--teal-dark);
+    }
+
+    .onboarding-btn.secondary {
+      background: var(--grey-light);
+      color: var(--text-secondary);
+    }
+
+    .onboarding-btn.secondary:hover {
+      background: var(--border);
+    }
+
+    .onboarding-summary {
+      background: var(--grey-light);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    .onboarding-summary-item {
+      margin-bottom: 12px;
+    }
+
+    .onboarding-summary-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .onboarding-summary-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--grey);
+      margin-bottom: 4px;
+    }
+
+    .onboarding-summary-text {
+      font-size: 0.95rem;
+      color: var(--text-primary);
+    }
+
+    /* GOAL CHECK-IN */
+    .checkin-goals-list {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    .checkin-goal-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--grey-light);
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .checkin-goal-checkbox {
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+      accent-color: var(--teal);
+    }
+
+    .checkin-goal-text {
+      flex: 1;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+    }
+
+    .checkin-goal-text.completed {
+      text-decoration: line-through;
+      color: var(--grey);
+    }
+
+    /* CHAT BACKGROUND GOAL */
+    .chat-background-goal {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.5rem;
+      color: var(--text-primary);
+      opacity: 0;
+      pointer-events: none;
+      text-align: center;
+      padding: 40px;
+      max-width: 80%;
+      font-style: italic;
+      transition: opacity 0.5s ease;
+      z-index: 0;
+    }
+
     .friction-buttons {
       display: flex;
       gap: 12px;
@@ -1235,6 +1494,7 @@
 
 ```
 <div class="chat-messages" id="chatMessages">
+  <div class="chat-background-goal" id="chatBackgroundGoal"></div>
   <div class="welcome-message">
     <div class="welcome-icon">✦</div>
     <h2>How can I help you today?</h2>
@@ -1342,6 +1602,8 @@
       <p class="friction-subtitle">Type the code to send.</p>
 
 ```
+  <div class="friction-goal-reminder" id="frictionGoalReminder"></div>
+
   <div class="friction-row" id="frictionRow1">
     <div class="friction-pair-container" id="frictionPairs1"></div>
   </div>
@@ -1360,6 +1622,92 @@
 </div>
 ```
 
+  </div>
+
+  <!-- ONBOARDING OVERLAY -->
+
+  <div class="onboarding-overlay" id="onboardingOverlay">
+    <div class="onboarding-box">
+
+```
+  <!-- Step 1: Welcome -->
+  <div class="onboarding-step active" id="onboardingStep1">
+    <div class="onboarding-icon">✦</div>
+    <h2 class="onboarding-title">Welcome to Friction AI</h2>
+    <p class="onboarding-text">
+      This app adds small moments of pause to help you use AI more intentionally.
+    </p>
+    <p class="onboarding-text">
+      Before we start, let's set some goals. These will gently remind you of what matters most.
+    </p>
+    <button class="onboarding-btn primary" id="onboardingNext1" type="button">Get Started</button>
+  </div>
+
+  <!-- Step 2: Long-term Goal -->
+  <div class="onboarding-step" id="onboardingStep2">
+    <h2 class="onboarding-title">Your long-term goal</h2>
+    <p class="onboarding-text">
+      What do you want more of in your life? This will appear softly in the background as you chat.
+    </p>
+    <textarea 
+      class="onboarding-textarea" 
+      id="inputLongtermGoal" 
+      placeholder="e.g., Be more present with my family, Focus on my mental health, Grow in my career..."
+      maxlength="100"
+    ></textarea>
+    <div class="onboarding-nav">
+      <button class="onboarding-btn secondary" id="onboardingBack2" type="button">Back</button>
+      <button class="onboarding-btn primary" id="onboardingNext2" type="button">Next</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Short-term Goals -->
+  <div class="onboarding-step" id="onboardingStep3">
+    <h2 class="onboarding-title">Your short-term goals</h2>
+    <p class="onboarding-text">
+      What would you like to focus on today or this week? These will appear when you send messages.
+    </p>
+    <div class="shortterm-goals-list" id="shorttermGoalsList">
+      <input type="text" class="shortterm-goal-input" placeholder="e.g., Study for exam" maxlength="60" />
+    </div>
+    <button class="onboarding-btn-add" id="addShorttermGoal" type="button">+ Add another goal</button>
+    <div class="onboarding-nav">
+      <button class="onboarding-btn secondary" id="onboardingBack3" type="button">Back</button>
+      <button class="onboarding-btn primary" id="onboardingNext3" type="button">Finish</button>
+    </div>
+  </div>
+
+  <!-- Step 4: All Set -->
+  <div class="onboarding-step" id="onboardingStep4">
+    <div class="onboarding-icon">🎯</div>
+    <h2 class="onboarding-title">You're all set!</h2>
+    <p class="onboarding-text">
+      Your goals are saved. You can update them anytime from the menu.
+    </p>
+    <div class="onboarding-summary" id="onboardingSummary"></div>
+    <button class="onboarding-btn primary" id="onboardingFinish" type="button">Start Chatting</button>
+  </div>
+
+</div>
+```
+
+  </div>
+
+  <!-- GOAL CHECK-IN OVERLAY -->
+
+  <div class="onboarding-overlay" id="goalCheckinOverlay">
+    <div class="onboarding-box">
+      <div class="onboarding-icon">👋</div>
+      <h2 class="onboarding-title">Quick check-in</h2>
+      <p class="onboarding-text">
+        It's been a little while. Have you made progress on your goals?
+      </p>
+      <div class="checkin-goals-list" id="checkinGoalsList"></div>
+      <div class="onboarding-nav">
+        <button class="onboarding-btn secondary" id="checkinSkip" type="button">Skip for now</button>
+        <button class="onboarding-btn primary" id="checkinSave" type="button">Save & Continue</button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -1406,6 +1754,121 @@
       state.messages = [];
       state.currentChatId = null;
       localStorage.removeItem('friction_chat');
+    }
+
+    // GOALS MANAGEMENT
+    let goals = {
+      longterm: '',
+      shortterm: [],
+      onboardingComplete: false,
+      lastGoalCheck: null,
+      lastGoalTick: null
+    };
+
+    function loadGoals() {
+      var saved = localStorage.getItem('friction_goals');
+      if (saved) {
+        try {
+          var parsed = JSON.parse(saved);
+          goals = Object.assign(goals, parsed);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+      return false;
+    }
+
+    function saveGoals() {
+      localStorage.setItem('friction_goals', JSON.stringify(goals));
+    }
+
+    function getActiveShortTermGoal() {
+      var active = goals.shortterm.filter(function(g) { return !g.completed; });
+      return active.length > 0 ? active[0] : null;
+    }
+
+    function shouldShowOnboarding() {
+      return !goals.onboardingComplete;
+    }
+
+    function shouldShowGoalCheckin() {
+      if (!goals.onboardingComplete) return false;
+      if (goals.shortterm.length === 0) return false;
+      
+      // Check if all goals completed
+      var allComplete = goals.shortterm.every(function(g) { return g.completed; });
+      if (allComplete) return true;
+      
+      // Check if 72 hours since last tick
+      if (goals.lastGoalTick) {
+        var hoursSinceTick = (Date.now() - goals.lastGoalTick) / (1000 * 60 * 60);
+        if (hoursSinceTick >= 72) return true;
+      }
+      
+      return false;
+    }
+
+    function showOnboarding() {
+      document.getElementById('onboardingOverlay').classList.add('active');
+      document.getElementById('onboardingStep1').classList.add('active');
+    }
+
+    function hideOnboarding() {
+      document.getElementById('onboardingOverlay').classList.remove('active');
+    }
+
+    function showGoalCheckin() {
+      var overlay = document.getElementById('goalCheckinOverlay');
+      var list = document.getElementById('checkinGoalsList');
+      list.innerHTML = '';
+      
+      goals.shortterm.forEach(function(goal, index) {
+        var item = document.createElement('div');
+        item.className = 'checkin-goal-item';
+        
+        var checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'checkin-goal-checkbox';
+        checkbox.checked = goal.completed;
+        checkbox.dataset.index = index;
+        checkbox.addEventListener('change', function() {
+          goals.shortterm[index].completed = this.checked;
+          text.classList.toggle('completed', this.checked);
+        });
+        
+        var text = document.createElement('span');
+        text.className = 'checkin-goal-text';
+        if (goal.completed) text.classList.add('completed');
+        text.textContent = goal.text;
+        
+        item.appendChild(checkbox);
+        item.appendChild(text);
+        list.appendChild(item);
+      });
+      
+      overlay.classList.add('active');
+    }
+
+    function hideGoalCheckin() {
+      document.getElementById('goalCheckinOverlay').classList.remove('active');
+    }
+
+    function updateBackgroundGoal() {
+      var bgGoal = document.getElementById('chatBackgroundGoal');
+      if (!bgGoal) return;
+      
+      if (!goals.longterm) {
+        bgGoal.style.opacity = '0';
+        return;
+      }
+      
+      bgGoal.textContent = '"' + goals.longterm + '"';
+      
+      // Calculate opacity based on message count (caps at 0.15)
+      var messageCount = state.messages.filter(function(m) { return m.role === 'user'; }).length;
+      var opacity = Math.min(messageCount * 0.03, 0.15);
+      bgGoal.style.opacity = opacity.toString();
     }
 
     // AUTH STATE
@@ -1549,6 +2012,109 @@
     const profileName = document.getElementById('profileName');
     const profileEmail = document.getElementById('profileEmail');
 
+    // Onboarding elements
+    const onboardingOverlay = document.getElementById('onboardingOverlay');
+    const goalCheckinOverlay = document.getElementById('goalCheckinOverlay');
+
+    // ONBOARDING EVENT LISTENERS
+    document.getElementById('onboardingNext1').addEventListener('click', function() {
+      document.getElementById('onboardingStep1').classList.remove('active');
+      document.getElementById('onboardingStep2').classList.add('active');
+    });
+
+    document.getElementById('onboardingBack2').addEventListener('click', function() {
+      document.getElementById('onboardingStep2').classList.remove('active');
+      document.getElementById('onboardingStep1').classList.add('active');
+    });
+
+    document.getElementById('onboardingNext2').addEventListener('click', function() {
+      goals.longterm = document.getElementById('inputLongtermGoal').value.trim();
+      document.getElementById('onboardingStep2').classList.remove('active');
+      document.getElementById('onboardingStep3').classList.add('active');
+    });
+
+    document.getElementById('onboardingBack3').addEventListener('click', function() {
+      document.getElementById('onboardingStep3').classList.remove('active');
+      document.getElementById('onboardingStep2').classList.add('active');
+    });
+
+    document.getElementById('addShorttermGoal').addEventListener('click', function() {
+      var list = document.getElementById('shorttermGoalsList');
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'shortterm-goal-input';
+      input.placeholder = 'Another goal...';
+      input.maxLength = 60;
+      list.appendChild(input);
+      input.focus();
+    });
+
+    document.getElementById('onboardingNext3').addEventListener('click', function() {
+      var inputs = document.querySelectorAll('#shorttermGoalsList .shortterm-goal-input');
+      goals.shortterm = [];
+      inputs.forEach(function(input) {
+        var text = input.value.trim();
+        if (text) {
+          goals.shortterm.push({ text: text, completed: false, createdAt: Date.now() });
+        }
+      });
+      
+      // Show summary
+      var summary = document.getElementById('onboardingSummary');
+      var html = '';
+      if (goals.longterm) {
+        html += '<div class="onboarding-summary-item">';
+        html += '<div class="onboarding-summary-label">Long-term goal</div>';
+        html += '<div class="onboarding-summary-text">"' + goals.longterm + '"</div>';
+        html += '</div>';
+      }
+      if (goals.shortterm.length > 0) {
+        html += '<div class="onboarding-summary-item">';
+        html += '<div class="onboarding-summary-label">Short-term goals</div>';
+        goals.shortterm.forEach(function(g) {
+          html += '<div class="onboarding-summary-text">• ' + g.text + '</div>';
+        });
+        html += '</div>';
+      }
+      summary.innerHTML = html || '<p>No goals set - you can add them later from the menu.</p>';
+      
+      document.getElementById('onboardingStep3').classList.remove('active');
+      document.getElementById('onboardingStep4').classList.add('active');
+    });
+
+    document.getElementById('onboardingFinish').addEventListener('click', function() {
+      goals.onboardingComplete = true;
+      goals.lastGoalCheck = Date.now();
+      goals.lastGoalTick = Date.now();
+      saveGoals();
+      hideOnboarding();
+      updateBackgroundGoal();
+    });
+
+    // Goal check-in listeners
+    document.getElementById('checkinSkip').addEventListener('click', function() {
+      goals.lastGoalCheck = Date.now();
+      saveGoals();
+      hideGoalCheckin();
+    });
+
+    document.getElementById('checkinSave').addEventListener('click', function() {
+      // Remove completed goals and prompt for new ones if all done
+      var hasIncomplete = goals.shortterm.some(function(g) { return !g.completed; });
+      
+      goals.lastGoalCheck = Date.now();
+      goals.lastGoalTick = Date.now();
+      saveGoals();
+      hideGoalCheckin();
+      
+      if (!hasIncomplete) {
+        // All goals completed - could prompt for new ones
+        // For now just clear completed and let them add via menu
+        goals.shortterm = goals.shortterm.filter(function(g) { return !g.completed; });
+        saveGoals();
+      }
+    });
+
     function updateProfileDisplay() {
       if (currentUser) {
         profilePic.src = currentUser.picture || '';
@@ -1635,6 +2201,7 @@
     function showChat() {
       // Load saved chat before showing
       loadChatState();
+      loadGoals();
       
       // Check if session has expired (2 hours = same as friction reset)
       const SESSION_TIMEOUT = 2 * 60 * 60 * 1000; // 2 hours
@@ -1663,6 +2230,16 @@
         restoreChatUI();
       }
       
+      // Check if onboarding needed
+      if (shouldShowOnboarding()) {
+        showOnboarding();
+      } else if (shouldShowGoalCheckin()) {
+        showGoalCheckin();
+      }
+      
+      // Update background goal
+      updateBackgroundGoal();
+      
       if (lastMessageTime && frictionLevel > 0) startHeaderTimer();
       updateKeyboardOffset();
       scrollChatToBottom();
@@ -1672,7 +2249,7 @@
       chatApp.classList.remove('active');
       homepage.classList.remove('hidden');
       clearChatState();
-      chatMessages.innerHTML = '<div class="welcome-message"><div class="welcome-icon">✦</div><h2>How can I help you today?</h2><p>Remember: slow is intentional.</p></div>';
+      chatMessages.innerHTML = '<div class="chat-background-goal" id="chatBackgroundGoal"></div><div class="welcome-message"><div class="welcome-icon">✦</div><h2>How can I help you today?</h2><p>Remember: slow is intentional.</p></div>';
       document.documentElement.style.setProperty('--kb', '0px');
     }
 
@@ -2097,6 +2674,15 @@
       state.pendingMessage = message;
       const config = getFrictionConfig();
 
+      // Show short-term goal reminder
+      var goalReminder = document.getElementById('frictionGoalReminder');
+      var activeGoal = getActiveShortTermGoal();
+      if (activeGoal) {
+        goalReminder.innerHTML = '<div class="friction-goal-label">Your focus</div><div class="friction-goal-text">"' + activeGoal.text + '"</div>';
+      } else {
+        goalReminder.innerHTML = '';
+      }
+
       challenge1 = generateChallenge(config.length);
       createCharPairs(challenge1, frictionPairs1);
 
@@ -2233,6 +2819,9 @@
       addMessage(content, 'user');
       state.messages.push({ role: 'user', content: content });
       saveChatState();
+      
+      // Update background goal opacity
+      updateBackgroundGoal();
 
       state.isProcessing = true;
       btnSend.disabled = true;
