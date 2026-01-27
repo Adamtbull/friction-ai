@@ -26,6 +26,16 @@
       text-size-adjust: 100%;
     }
 
+    /* Prevent flash of wrong content on load */
+    body {
+      opacity: 0;
+      transition: opacity 0.15s ease-in;
+    }
+
+    body.ready {
+      opacity: 1;
+    }
+
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background: linear-gradient(180deg, #d4e8e6 0%, #e8ecef 100%);
@@ -1435,13 +1445,21 @@
         if (loadUserFromStorage()) {
           updateModelAccess();
           updateProfileDisplay();
-          showChat(); // Auto-navigate to chat if already signed in
+          showChat();
         }
+        
+        // Reveal UI after state is known
+        document.body.classList.add('ready');
       } else {
         // Retry if Google script not loaded yet
         setTimeout(initGoogleSignIn, 100);
       }
     }
+
+    // Fallback: reveal UI after timeout in case Google script fails
+    setTimeout(function() {
+      document.body.classList.add('ready');
+    }, 1000);
 
     initGoogleSignIn();
 
