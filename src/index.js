@@ -1,3 +1,9 @@
+// src/index.js
+
+// Which models cost you money:
+const FREE_MODELS = ["gemini"];
+const PAID_MODELS = ["claude", "gpt", "grok", "perplexity"];
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -44,6 +50,8 @@ export default {
         return jsonResponse({ error: auth.error }, auth.status);
       }
       const userId = auth.userId;
+      const email = auth.email;
+      const isAdmin = email && email.toLowerCase() === env.ADMIN_EMAIL.toLowerCase();
       const ip = getClientIp(request);
 
       // Enforce limits (per-user + per-ip + daily)
@@ -74,6 +82,16 @@ export default {
 
         if (!messages.length) {
           return jsonResponse({ error: "No messages provided" }, 400);
+        }
+
+        // Enforce model access based on admin status
+        if (PAID_MODELS.includes(model) && !isAdmin) {
+          return jsonResponse(
+            {
+              error: "This model is locked. Only the admin account can use paid models on this site.",
+            },
+            403
+          );
         }
 
         // Clean/normalize messages + cap size per message
@@ -186,7 +204,12 @@ async function getVerifiedGoogleUser(request, env) {
   const cacheKey = "tok:" + hashShort(idToken);
   const cached = await env.FRICTION_KV.get(cacheKey, "json").catch(() => null);
   if (cached && cached.sub && cached.aud === clientId) {
-    return { ok: true, userId: cached.sub };
+    return { 
+      ok: true, 
+      userId: cached.sub,
+      email: cached.email,
+      isAdmin: cached.email && cached.email.toLowerCase() === env.ADMIN_EMAIL.toLowerCase()
+    };
   }
 
   const verifyUrl =
@@ -195,17 +218,29 @@ async function getVerifiedGoogleUser(request, env) {
   const res = await fetch(verifyUrl);
   const data = await res.json().catch(() => ({}));
 
-  if (!res.ok || data.aud !== clientId || !data.sub) {
+  if (!res.ok || data.aud !== clientId || !data.sub || !data.email) {
     return { ok: false, status: 401, error: "Invalid sign-in token." };
   }
 
+  const isAdmin = data.email.toLowerCase() === env.ADMIN_EMAIL.toLowerCase();
+  
   await env.FRICTION_KV.put(
     cacheKey,
-    JSON.stringify({ sub: data.sub, aud: data.aud }),
+    JSON.stringify({ 
+      sub: data.sub, 
+      aud: data.aud,
+      email: data.email,
+      isAdmin: isAdmin 
+    }),
     { expirationTtl: 3600 }
   );
 
-  return { ok: true, userId: data.sub };
+  return { 
+    ok: true, 
+    userId: data.sub,
+    email: data.email,
+    isAdmin: isAdmin
+  };
 }
 
 function hashShort(str) {
