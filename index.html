@@ -1321,6 +1321,316 @@
       z-index: 1;
     }
 
+    /* SETTINGS OVERLAY */
+    .settings-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .settings-overlay.active {
+      display: flex;
+    }
+
+    .settings-box {
+      background: var(--white);
+      border-radius: 16px;
+      max-width: 480px;
+      width: 100%;
+      margin: 20px 0;
+      box-shadow: 0 8px 32px var(--shadow);
+      overflow: hidden;
+    }
+
+    .settings-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .settings-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .settings-close {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: var(--grey-light);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .settings-close svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--text-secondary);
+    }
+
+    .settings-close:hover {
+      background: var(--border);
+    }
+
+    .settings-lock-banner {
+      background: #fef3c7;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid #fcd34d;
+    }
+
+    .lock-icon {
+      font-size: 1.1rem;
+    }
+
+    .lock-text {
+      font-size: 0.9rem;
+      color: #92400e;
+      font-weight: 500;
+    }
+
+    .settings-content {
+      padding: 8px 0;
+    }
+
+    .settings-content.locked {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .settings-section {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .settings-section:last-child {
+      border-bottom: none;
+    }
+
+    .settings-section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 4px;
+    }
+
+    .settings-section-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin: 0 0 16px;
+      line-height: 1.4;
+    }
+
+    .settings-radio {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      cursor: pointer;
+    }
+
+    .settings-radio input[type="radio"] {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      accent-color: var(--teal);
+      cursor: pointer;
+    }
+
+    .radio-label {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .radio-label strong {
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .radio-desc {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .settings-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      cursor: pointer;
+    }
+
+    .settings-checkbox input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--teal);
+      cursor: pointer;
+    }
+
+    .checkbox-label {
+      font-size: 0.95rem;
+      color: var(--text-primary);
+    }
+
+    .settings-lock-section {
+      background: var(--grey-light);
+    }
+
+    .settings-lock-controls {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .settings-select {
+      flex: 1;
+      padding: 12px 14px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: var(--white);
+      cursor: pointer;
+      outline: none;
+    }
+
+    .settings-select:focus {
+      border-color: var(--teal);
+    }
+
+    .settings-lock-btn {
+      padding: 12px 20px;
+      background: #dc2626;
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .settings-lock-btn:hover {
+      background: #b91c1c;
+    }
+
+    /* MESSAGE DELAY OVERLAY */
+    .delay-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2500;
+    }
+
+    .delay-overlay.active {
+      display: flex;
+    }
+
+    .delay-box {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      max-width: 320px;
+      width: 90%;
+    }
+
+    .delay-countdown {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 24px;
+    }
+
+    .delay-ring {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .delay-ring-bg {
+      fill: none;
+      stroke: var(--grey-light);
+      stroke-width: 8;
+    }
+
+    .delay-ring-progress {
+      fill: none;
+      stroke: var(--teal);
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 283;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 1s linear;
+    }
+
+    .delay-time {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .delay-text {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin: 0 0 8px;
+    }
+
+    .delay-hint {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin: 0 0 24px;
+      font-style: italic;
+    }
+
+    .delay-cancel {
+      padding: 12px 32px;
+      background: var(--grey-light);
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .delay-cancel:hover {
+      background: var(--border);
+    }
+
+    .delay-cancel.hidden {
+      display: none;
+    }
+
     .friction-buttons {
       display: flex;
       gap: 12px;
@@ -1710,6 +2020,148 @@
     </div>
   </div>
 
+  <!-- SETTINGS OVERLAY -->
+
+  <div class="settings-overlay" id="settingsOverlay">
+    <div class="settings-box">
+      <div class="settings-header">
+        <h2 class="settings-title">Settings</h2>
+        <button class="settings-close" id="settingsClose" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+```
+  <div class="settings-lock-banner" id="settingsLockBanner" style="display: none;">
+    <span class="lock-icon">🔒</span>
+    <span class="lock-text">Settings locked for <span id="lockTimeRemaining">--:--:--</span></span>
+  </div>
+
+  <div class="settings-content" id="settingsContent">
+    
+    <!-- Friction Mode -->
+    <div class="settings-section">
+      <h3 class="settings-section-title">Friction Mode</h3>
+      <p class="settings-section-desc">Choose how much friction to add before sending messages</p>
+      
+      <label class="settings-radio">
+        <input type="radio" name="frictionMode" value="off" />
+        <span class="radio-label">
+          <strong>Off</strong>
+          <span class="radio-desc">No verification needed</span>
+        </span>
+      </label>
+      
+      <label class="settings-radio">
+        <input type="radio" name="frictionMode" value="light" />
+        <span class="radio-label">
+          <strong>Light</strong>
+          <span class="radio-desc">Goal reminder only, no typing</span>
+        </span>
+      </label>
+      
+      <label class="settings-radio">
+        <input type="radio" name="frictionMode" value="full" checked />
+        <span class="radio-label">
+          <strong>Full</strong>
+          <span class="radio-desc">Goal reminder + typing code</span>
+        </span>
+      </label>
+    </div>
+
+    <!-- Message Delay -->
+    <div class="settings-section">
+      <h3 class="settings-section-title">Message Delay</h3>
+      <p class="settings-section-desc">Add a waiting period before messages send</p>
+      
+      <label class="settings-radio">
+        <input type="radio" name="messageDelay" value="0" checked />
+        <span class="radio-label"><strong>Off</strong></span>
+      </label>
+      
+      <label class="settings-radio">
+        <input type="radio" name="messageDelay" value="5" />
+        <span class="radio-label"><strong>5 seconds</strong></span>
+      </label>
+      
+      <label class="settings-radio">
+        <input type="radio" name="messageDelay" value="15" />
+        <span class="radio-label"><strong>15 seconds</strong></span>
+      </label>
+      
+      <label class="settings-radio">
+        <input type="radio" name="messageDelay" value="30" />
+        <span class="radio-label"><strong>30 seconds</strong></span>
+      </label>
+      
+      <label class="settings-radio">
+        <input type="radio" name="messageDelay" value="45" />
+        <span class="radio-label"><strong>45 seconds</strong></span>
+      </label>
+
+      <label class="settings-checkbox">
+        <input type="checkbox" id="allowCancelDelay" checked />
+        <span class="checkbox-label">Allow cancel during countdown</span>
+      </label>
+    </div>
+
+    <!-- Goal Reminders -->
+    <div class="settings-section">
+      <h3 class="settings-section-title">Goal Reminders</h3>
+      
+      <label class="settings-checkbox">
+        <input type="checkbox" id="showShortTermGoal" checked />
+        <span class="checkbox-label">Show short-term goal in friction overlay</span>
+      </label>
+      
+      <label class="settings-checkbox">
+        <input type="checkbox" id="showLongTermGoal" checked />
+        <span class="checkbox-label">Show long-term goal in chat background</span>
+      </label>
+    </div>
+
+    <!-- Lock Settings -->
+    <div class="settings-section settings-lock-section">
+      <h3 class="settings-section-title">🔒 Lock Settings</h3>
+      <p class="settings-section-desc">Prevent changes for a set period. Once locked, you cannot change settings until the timer expires.</p>
+      
+      <div class="settings-lock-controls">
+        <select class="settings-select" id="lockDuration">
+          <option value="3600000">1 hour</option>
+          <option value="14400000">4 hours</option>
+          <option value="86400000">24 hours</option>
+          <option value="259200000">3 days</option>
+          <option value="604800000">1 week</option>
+        </select>
+        <button class="settings-lock-btn" id="btnLockSettings" type="button">Lock Settings</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+```
+
+  </div>
+
+  <!-- MESSAGE DELAY OVERLAY -->
+
+  <div class="delay-overlay" id="delayOverlay">
+    <div class="delay-box">
+      <div class="delay-countdown" id="delayCountdown">
+        <svg class="delay-ring" viewBox="0 0 100 100">
+          <circle class="delay-ring-bg" cx="50" cy="50" r="45" />
+          <circle class="delay-ring-progress" id="delayRingProgress" cx="50" cy="50" r="45" />
+        </svg>
+        <span class="delay-time" id="delayTime">5</span>
+      </div>
+      <p class="delay-text">Sending...</p>
+      <p class="delay-hint" id="delayHint">While you wait, you could start on your goal</p>
+      <button class="delay-cancel" id="delayCancelBtn" type="button">Cancel</button>
+    </div>
+  </div>
+
   <script>
     // STATE
     let state = {
@@ -1858,7 +2310,7 @@
       var bgGoal = document.getElementById('chatBackgroundGoal');
       if (!bgGoal) return;
       
-      if (!goals.longterm) {
+      if (!goals.longterm || !settings.showLongTermGoal) {
         bgGoal.style.opacity = '0';
         return;
       }
@@ -1869,6 +2321,187 @@
       var messageCount = state.messages.filter(function(m) { return m.role === 'user'; }).length;
       var opacity = Math.min(messageCount * 0.03, 0.15);
       bgGoal.style.opacity = opacity.toString();
+    }
+
+    // SETTINGS MANAGEMENT
+    let settings = {
+      frictionMode: 'full', // 'off', 'light', 'full'
+      messageDelay: 0, // 0, 5, 15, 30, 45 seconds
+      allowCancelDelay: true,
+      showShortTermGoal: true,
+      showLongTermGoal: true,
+      lockUntil: null
+    };
+
+    function loadSettings() {
+      var saved = localStorage.getItem('friction_settings');
+      if (saved) {
+        try {
+          var parsed = JSON.parse(saved);
+          settings = Object.assign(settings, parsed);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+      return false;
+    }
+
+    function saveSettings() {
+      localStorage.setItem('friction_settings', JSON.stringify(settings));
+    }
+
+    function isSettingsLocked() {
+      if (!settings.lockUntil) return false;
+      return Date.now() < settings.lockUntil;
+    }
+
+    function getRemainingLockTime() {
+      if (!settings.lockUntil) return 0;
+      return Math.max(0, settings.lockUntil - Date.now());
+    }
+
+    function formatLockTime(ms) {
+      var totalSeconds = Math.floor(ms / 1000);
+      var hours = Math.floor(totalSeconds / 3600);
+      var minutes = Math.floor((totalSeconds % 3600) / 60);
+      var seconds = totalSeconds % 60;
+      return String(hours).padStart(2, '0') + ':' + 
+             String(minutes).padStart(2, '0') + ':' + 
+             String(seconds).padStart(2, '0');
+    }
+
+    function showSettings() {
+      loadSettings();
+      
+      var overlay = document.getElementById('settingsOverlay');
+      var content = document.getElementById('settingsContent');
+      var lockBanner = document.getElementById('settingsLockBanner');
+      
+      // Set current values in form
+      document.querySelector('input[name="frictionMode"][value="' + settings.frictionMode + '"]').checked = true;
+      document.querySelector('input[name="messageDelay"][value="' + settings.messageDelay + '"]').checked = true;
+      document.getElementById('allowCancelDelay').checked = settings.allowCancelDelay;
+      document.getElementById('showShortTermGoal').checked = settings.showShortTermGoal;
+      document.getElementById('showLongTermGoal').checked = settings.showLongTermGoal;
+      
+      // Check if locked
+      if (isSettingsLocked()) {
+        content.classList.add('locked');
+        lockBanner.style.display = 'flex';
+        updateLockTimer();
+      } else {
+        content.classList.remove('locked');
+        lockBanner.style.display = 'none';
+      }
+      
+      overlay.classList.add('active');
+    }
+
+    function hideSettings() {
+      document.getElementById('settingsOverlay').classList.remove('active');
+    }
+
+    var lockTimerInterval = null;
+
+    function updateLockTimer() {
+      var remaining = getRemainingLockTime();
+      var timeEl = document.getElementById('lockTimeRemaining');
+      
+      if (remaining <= 0) {
+        settings.lockUntil = null;
+        saveSettings();
+        document.getElementById('settingsContent').classList.remove('locked');
+        document.getElementById('settingsLockBanner').style.display = 'none';
+        if (lockTimerInterval) {
+          clearInterval(lockTimerInterval);
+          lockTimerInterval = null;
+        }
+        return;
+      }
+      
+      timeEl.textContent = formatLockTime(remaining);
+      
+      if (!lockTimerInterval) {
+        lockTimerInterval = setInterval(updateLockTimer, 1000);
+      }
+    }
+
+    function lockSettings() {
+      var duration = parseInt(document.getElementById('lockDuration').value, 10);
+      settings.lockUntil = Date.now() + duration;
+      saveSettings();
+      
+      document.getElementById('settingsContent').classList.add('locked');
+      document.getElementById('settingsLockBanner').style.display = 'flex';
+      updateLockTimer();
+    }
+
+    // MESSAGE DELAY OVERLAY
+    var delayInterval = null;
+    var delayMessage = null;
+
+    function showDelayOverlay(message) {
+      delayMessage = message;
+      var overlay = document.getElementById('delayOverlay');
+      var timeEl = document.getElementById('delayTime');
+      var progressEl = document.getElementById('delayRingProgress');
+      var hintEl = document.getElementById('delayHint');
+      var cancelBtn = document.getElementById('delayCancelBtn');
+      
+      var totalSeconds = settings.messageDelay;
+      var remaining = totalSeconds;
+      
+      // Set hint based on goal
+      var activeGoal = getActiveShortTermGoal();
+      if (activeGoal) {
+        hintEl.textContent = 'While you wait... "' + activeGoal.text + '"';
+      } else {
+        hintEl.textContent = 'Take a breath. Is this message necessary?';
+      }
+      
+      // Show/hide cancel button
+      if (settings.allowCancelDelay) {
+        cancelBtn.classList.remove('hidden');
+      } else {
+        cancelBtn.classList.add('hidden');
+      }
+      
+      // Set initial state
+      timeEl.textContent = remaining;
+      progressEl.style.strokeDashoffset = '0';
+      
+      overlay.classList.add('active');
+      
+      delayInterval = setInterval(function() {
+        remaining--;
+        timeEl.textContent = remaining;
+        
+        // Update progress ring (283 is circumference of circle with r=45)
+        var progress = ((totalSeconds - remaining) / totalSeconds) * 283;
+        progressEl.style.strokeDashoffset = progress;
+        
+        if (remaining <= 0) {
+          clearInterval(delayInterval);
+          delayInterval = null;
+          hideDelayOverlay();
+          sendMessage(delayMessage);
+          delayMessage = null;
+        }
+      }, 1000);
+    }
+
+    function hideDelayOverlay() {
+      document.getElementById('delayOverlay').classList.remove('active');
+      if (delayInterval) {
+        clearInterval(delayInterval);
+        delayInterval = null;
+      }
+    }
+
+    function cancelDelay() {
+      hideDelayOverlay();
+      delayMessage = null;
     }
 
     // AUTH STATE
@@ -2202,6 +2835,7 @@
       // Load saved chat before showing
       loadChatState();
       loadGoals();
+      loadSettings();
       
       // Check if session has expired (2 hours = same as friction reset)
       const SESSION_TIMEOUT = 2 * 60 * 60 * 1000; // 2 hours
@@ -2315,14 +2949,62 @@
     });
 
     btnSettings.addEventListener('click', function() {
-      // TODO: Open settings
       closeMenu();
+      showSettings();
     });
 
     btnAbout.addEventListener('click', function() {
       // TODO: Show about page
       closeMenu();
     });
+
+    // Settings event listeners
+    document.getElementById('settingsClose').addEventListener('click', hideSettings);
+
+    document.querySelectorAll('input[name="frictionMode"]').forEach(function(radio) {
+      radio.addEventListener('change', function() {
+        if (isSettingsLocked()) return;
+        settings.frictionMode = this.value;
+        saveSettings();
+      });
+    });
+
+    document.querySelectorAll('input[name="messageDelay"]').forEach(function(radio) {
+      radio.addEventListener('change', function() {
+        if (isSettingsLocked()) return;
+        settings.messageDelay = parseInt(this.value, 10);
+        saveSettings();
+      });
+    });
+
+    document.getElementById('allowCancelDelay').addEventListener('change', function() {
+      if (isSettingsLocked()) return;
+      settings.allowCancelDelay = this.checked;
+      saveSettings();
+    });
+
+    document.getElementById('showShortTermGoal').addEventListener('change', function() {
+      if (isSettingsLocked()) return;
+      settings.showShortTermGoal = this.checked;
+      saveSettings();
+    });
+
+    document.getElementById('showLongTermGoal').addEventListener('change', function() {
+      if (isSettingsLocked()) return;
+      settings.showLongTermGoal = this.checked;
+      saveSettings();
+      updateBackgroundGoal();
+    });
+
+    document.getElementById('btnLockSettings').addEventListener('click', function() {
+      if (isSettingsLocked()) return;
+      if (confirm('Are you sure? Once locked, you cannot change settings until the timer expires.')) {
+        lockSettings();
+      }
+    });
+
+    // Delay cancel button
+    document.getElementById('delayCancelBtn').addEventListener('click', cancelDelay);
 
     // CHAT HISTORY MANAGEMENT
     function generateChatId() {
@@ -2669,12 +3351,15 @@
       // Show short-term goal reminder
       var goalReminder = document.getElementById('frictionGoalReminder');
       var activeGoal = getActiveShortTermGoal();
-      if (activeGoal) {
+      if (activeGoal && settings.showShortTermGoal) {
         goalReminder.innerHTML = '<div class="friction-goal-label">Your focus</div><div class="friction-goal-text">"' + activeGoal.text + '"</div>';
       } else {
         goalReminder.innerHTML = '';
       }
 
+      // Show code input row
+      document.getElementById('frictionRow1').style.display = 'block';
+      
       challenge1 = generateChallenge(config.length);
       createCharPairs(challenge1, frictionPairs1);
 
@@ -2726,10 +3411,13 @@
     frictionCancel.addEventListener('click', hideFriction);
 
     frictionUnlock.addEventListener('click', function() {
-      const wasMaxLevel = frictionLevel >= 6;
-      if (frictionLevel < 6) frictionLevel++;
-      lastMessageTime = Date.now();
-      saveFrictionState();
+      // Only increase level for full friction mode
+      if (settings.frictionMode === 'full') {
+        const wasMaxLevel = frictionLevel >= 6;
+        if (frictionLevel < 6) frictionLevel++;
+        lastMessageTime = Date.now();
+        saveFrictionState();
+      }
 
       const timerEl = document.getElementById('frictionTimer');
 
@@ -2740,14 +3428,12 @@
       // Save the message BEFORE hiding (hideFriction clears pendingMessage)
       const messageToSend = state.pendingMessage;
       
-      if (wasMaxLevel) {
-        timerEl.textContent = '🔄 Level 5 remains. Timer resets to 2 hours with each message.';
-        setTimeout(function() {
-          hideFriction();
-          sendMessage(messageToSend);
-        }, 2000);
+      hideFriction();
+      
+      // Check if message delay is enabled
+      if (settings.messageDelay > 0) {
+        showDelayOverlay(messageToSend);
       } else {
-        hideFriction();
         sendMessage(messageToSend);
       }
     });
@@ -2866,7 +3552,50 @@
       if (!content || state.isProcessing) return;
       messageInput.value = '';
       messageInput.style.height = 'auto';
-      showFriction(content);
+      
+      // Check friction mode
+      if (settings.frictionMode === 'off') {
+        // No friction - send directly (but check delay)
+        if (settings.messageDelay > 0) {
+          showDelayOverlay(content);
+        } else {
+          sendMessage(content);
+        }
+      } else if (settings.frictionMode === 'light') {
+        // Light mode - show goal only, no typing
+        showLightFriction(content);
+      } else {
+        // Full mode - show goal + typing code
+        showFriction(content);
+      }
+    }
+
+    function showLightFriction(message) {
+      state.pendingMessage = message;
+      
+      // Show a simplified overlay with just the goal
+      var goalReminder = document.getElementById('frictionGoalReminder');
+      var activeGoal = getActiveShortTermGoal();
+      if (activeGoal && settings.showShortTermGoal) {
+        goalReminder.innerHTML = '<div class="friction-goal-label">Your focus</div><div class="friction-goal-text">"' + activeGoal.text + '"</div>';
+      } else {
+        goalReminder.innerHTML = '<div class="friction-goal-label">Pause & reflect</div><div class="friction-goal-text">Do you really need this right now?</div>';
+      }
+      
+      // Hide code input rows
+      document.getElementById('frictionRow1').style.display = 'none';
+      document.getElementById('frictionRow2').style.display = 'none';
+      
+      // Update subtitle
+      document.querySelector('.friction-subtitle').textContent = 'Take a moment before sending.';
+      
+      // Enable send button immediately
+      frictionUnlock.disabled = false;
+      frictionUnlock.classList.add('ready');
+      frictionError.textContent = '';
+      
+      frictionOverlay.classList.add('active');
+      lockBodyScroll();
     }
 
     btnSend.addEventListener('click', handleSend);
