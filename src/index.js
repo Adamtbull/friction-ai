@@ -274,5 +274,15 @@ throw new Error(“Perplexity API error: “ + JSON.stringify(data));
 
 var out = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
 if (!out) throw new Error(“No valid response text from Perplexity.”);
+
+// Append citations if available
+var citations = data.citations;
+if (citations && citations.length > 0) {
+out += “\n\n—\n**Sources:**”;
+for (var j = 0; j < citations.length; j++) {
+out += “\n[” + (j + 1) + “] “ + citations[j];
+}
+}
+
 return out;
 }
