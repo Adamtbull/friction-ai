@@ -1347,8 +1347,38 @@
     let state = {
       messages: [],
       pendingMessage: null,
-      isProcessing: false
+      isProcessing: false,
+      currentModel: 'claude'
     };
+
+    // CHAT PERSISTENCE
+    function saveChatState() {
+      const chatState = {
+        messages: state.messages,
+        currentModel: state.currentModel
+      };
+      localStorage.setItem('friction_chat', JSON.stringify(chatState));
+    }
+
+    function loadChatState() {
+      const saved = localStorage.getItem('friction_chat');
+      if (saved) {
+        try {
+          const chatState = JSON.parse(saved);
+          state.messages = chatState.messages || [];
+          state.currentModel = chatState.currentModel || 'claude';
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+      return false;
+    }
+
+    function clearChatState() {
+      state.messages = [];
+      localStorage.removeItem('friction_chat');
+    }
 
     // AUTH STATE
     const GOOGLE_CLIENT_ID = '37442638167-t8m3fql61v05h01qmvall1bki9k88tim.apps.googleusercontent.com';
@@ -1551,9 +1581,39 @@
     }
 
     // NAVIGATION
+    function restoreChatUI() {
+      if (state.messages.length > 0) {
+        // Remove welcome message
+        const welcome = chatMessages.querySelector('.welcome-message');
+        if (welcome) welcome.remove();
+        
+        // Clear existing messages (except typing indicator)
+        const existingMessages = chatMessages.querySelectorAll('.message');
+        existingMessages.forEach(function(msg) { msg.remove(); });
+        
+        // Render all saved messages
+        state.messages.forEach(function(msg) {
+          const type = msg.role === 'assistant' ? 'ai' : 'user';
+          addMessage(msg.content, type);
+        });
+      }
+      
+      // Restore model selection
+      if (state.currentModel && modelSelect) {
+        modelSelect.value = state.currentModel;
+      }
+    }
+
     function showChat() {
+      // Load saved chat before showing
+      loadChatState();
+      
       homepage.classList.add('hidden');
       chatApp.classList.add('active');
+      
+      // Restore chat messages
+      restoreChatUI();
+      
       if (lastMessageTime && frictionLevel > 0) startHeaderTimer();
       updateKeyboardOffset();
       scrollChatToBottom();
@@ -1562,7 +1622,7 @@
     function showHomepage() {
       chatApp.classList.remove('active');
       homepage.classList.remove('hidden');
-      state.messages = [];
+      clearChatState();
       chatMessages.innerHTML = '<div class="welcome-message"><div class="welcome-icon">✦</div><h2>How can I help you today?</h2><p>Remember: slow is intentional.</p></div>';
       document.documentElement.style.setProperty('--kb', '0px');
     }
@@ -1611,7 +1671,7 @@
 
     btnNewChat.addEventListener('click', function() {
       // Clear current chat and start fresh
-      state.messages = [];
+      clearChatState();
       chatMessages.innerHTML = '<div class="welcome-message"><div class="welcome-icon">✦</div><h2>How can I help you today?</h2><p>Remember: slow is intentional.</p></div>';
       closeMenu();
     });
@@ -1970,11 +2030,14 @@
       if (state.isProcessing) return;
       
       const model = modelSelect.value;
+      state.currentModel = model;
+      
       const welcome = chatMessages.querySelector('.welcome-message');
       if (welcome) welcome.remove();
 
       addMessage(content, 'user');
       state.messages.push({ role: 'user', content: content });
+      saveChatState();
 
       state.isProcessing = true;
       btnSend.disabled = true;
@@ -1986,6 +2049,7 @@
       try {
         const response = await callBackend(model);
         state.messages.push({ role: 'assistant', content: response });
+        saveChatState();
         addMessage(response, 'ai');
       } catch (error) {
         addMessage('Error: ' + error.message, 'error');
