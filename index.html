@@ -404,6 +404,20 @@
       border-bottom-left-radius: 4px;
     }
 
+    .message-ai a {
+      color: var(--teal);
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .message-ai a:hover {
+      text-decoration: underline;
+    }
+
+    .message-ai strong {
+      font-weight: 600;
+    }
+
     .message-error {
       align-self: center;
       background: #fef2f2;
@@ -2167,10 +2181,41 @@
     loadFrictionState();
 
     // CHAT FUNCTIONS
+    function formatMessageContent(content) {
+      // Convert URLs to clickable links
+      var urlRegex = /(https?:\/\/[^\s\]]+)/g;
+      var escaped = content
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      
+      // Replace URLs with anchor tags
+      var withLinks = escaped.replace(urlRegex, function(url) {
+        // Clean up any trailing punctuation that got caught
+        var cleanUrl = url.replace(/[.,;:!?)]+$/, '');
+        var trailing = url.substring(cleanUrl.length);
+        return '<a href="' + cleanUrl + '" target="_blank" rel="noopener noreferrer">' + cleanUrl + '</a>' + trailing;
+      });
+      
+      // Convert **text** to bold
+      withLinks = withLinks.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      
+      // Convert line breaks
+      withLinks = withLinks.replace(/\n/g, '<br>');
+      
+      return withLinks;
+    }
+
     function addMessage(content, type) {
       const div = document.createElement('div');
       div.className = 'message message-' + type;
-      div.textContent = content;
+      
+      if (type === 'ai') {
+        div.innerHTML = formatMessageContent(content);
+      } else {
+        div.textContent = content;
+      }
+      
       chatMessages.appendChild(div);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
