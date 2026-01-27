@@ -1989,6 +1989,13 @@
       </svg>
       <span>About</span>
     </button>
+    <button class="menu-item" id="btnAdmin" type="button" style="display: none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      <span>Admin Dashboard</span>
+    </button>
   </div>
 </div>
 
@@ -2706,20 +2713,48 @@
         picture: payload.picture
       };
       
+      // Store the ID token for API authentication
+      localStorage.setItem('google_id_token', response.credential);
+      
       isAdmin = currentUser.email === ADMIN_EMAIL;
       saveUserToStorage();
       updateModelAccess();
       updateProfileDisplay();
+      updateMenuForAdmin();
+      
+      // Register user with backend (for analytics)
+      registerUser(response.credential);
+      
       showChat();
+    }
+
+    function registerUser(idToken) {
+      fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + idToken
+        }
+      }).catch(function(err) {
+        console.log('User registration skipped:', err);
+      });
     }
 
     function signOut() {
       currentUser = null;
       isAdmin = false;
       localStorage.removeItem('friction_user');
+      localStorage.removeItem('google_id_token');
       google.accounts.id.disableAutoSelect();
       updateModelAccess();
       showHomepage();
+    }
+
+    function updateMenuForAdmin() {
+      var adminBtn = document.getElementById('btnAdmin');
+      if (adminBtn) {
+        adminBtn.style.display = isAdmin ? 'flex' : 'none';
+      }
     }
 
     function updateModelAccess() {
@@ -3117,6 +3152,15 @@
       // TODO: Show about page
       closeMenu();
     });
+
+    // Admin button
+    var btnAdmin = document.getElementById('btnAdmin');
+    if (btnAdmin) {
+      btnAdmin.addEventListener('click', function() {
+        closeMenu();
+        window.location.href = '/admin.html';
+      });
+    }
 
     // Settings event listeners
     document.getElementById('settingsClose').addEventListener('click', hideSettings);
@@ -3731,15 +3775,30 @@
     }
 
     async function callBackend(model) {
+      var idToken = localStorage.getItem('google_id_token');
+      if (!idToken) {
+        throw new Error('Please sign in again to continue.');
+      }
+      
       const res = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + idToken
+        },
         body: JSON.stringify({ model: model, messages: state.messages })
       });
 
       if (!res.ok) {
         let errorMsg = 'Backend API error';
         try { const error = await res.json(); errorMsg = error.error || errorMsg; } catch (e) {}
+        
+        // Handle auth errors
+        if (res.status === 401) {
+          signOut();
+          throw new Error('Session expired. Please sign in again.');
+        }
+        
         throw new Error(errorMsg);
       }
 
