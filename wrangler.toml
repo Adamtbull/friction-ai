@@ -3,7 +3,7 @@ main = "src/index.js"
 compatibility_date = "2026-01-25"
 compatibility_flags = ["nodejs_compat"]
 
-# KV namespace for rate limiting
+# KV namespace for rate limiting and encrypted storage
 kv_namespaces = [
   { binding = "FRICTION_KV", id = "your-kv-namespace-id-here" }
 ]
