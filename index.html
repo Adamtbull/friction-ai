@@ -763,6 +763,71 @@
       font-style: italic;
     }
 
+    .menu-history-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px;
+      border-radius: 6px;
+      margin-bottom: 2px;
+    }
+
+    .menu-history-item:hover {
+      background: var(--grey-light);
+    }
+
+    .menu-history-item.active {
+      background: var(--teal-lighter);
+    }
+
+    .menu-history-title {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      background: transparent;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .menu-history-item:hover .menu-history-title,
+    .menu-history-item.active .menu-history-title {
+      color: var(--text-primary);
+    }
+
+    .menu-history-delete {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      border-radius: 4px;
+    }
+
+    .menu-history-item:hover .menu-history-delete {
+      opacity: 0.5;
+    }
+
+    .menu-history-delete:hover {
+      opacity: 1 !important;
+      background: #fef2f2;
+    }
+
+    .menu-history-delete svg {
+      width: 14px;
+      height: 14px;
+      stroke: #dc2626;
+    }
+
     .menu-chat-item {
       width: 100%;
       display: flex;
@@ -1214,74 +1279,15 @@
   </button>
 
   <div class="menu-section">
-    <div class="menu-section-title">Chat History</div>
-    
-    <div class="menu-category" data-model="claude">
-      <button class="menu-category-header" type="button">
-        <span>Claude</span>
-        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="6 9 12 15 18 9"/>
-        </svg>
-      </button>
-      <div class="menu-category-items">
-        <div class="menu-empty">No chats yet</div>
-      </div>
-    </div>
-
-    <div class="menu-category" data-model="gpt">
-      <button class="menu-category-header" type="button">
-        <span>GPT-4o</span>
-        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="6 9 12 15 18 9"/>
-        </svg>
-      </button>
-      <div class="menu-category-items">
-        <div class="menu-empty">No chats yet</div>
-      </div>
-    </div>
-
-    <div class="menu-category" data-model="gemini">
-      <button class="menu-category-header" type="button">
-        <span>Google Gemini</span>
-        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="6 9 12 15 18 9"/>
-        </svg>
-      </button>
-      <div class="menu-category-items">
-        <div class="menu-empty">No chats yet</div>
-      </div>
-    </div>
-
-    <div class="menu-category" data-model="grok">
-      <button class="menu-category-header" type="button">
-        <span>Grok</span>
-        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="6 9 12 15 18 9"/>
-        </svg>
-      </button>
-      <div class="menu-category-items">
-        <div class="menu-empty">No chats yet</div>
-      </div>
-    </div>
-
-    <div class="menu-category" data-model="perplexity">
-      <button class="menu-category-header" type="button">
-        <span>Perplexity</span>
-        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="6 9 12 15 18 9"/>
-        </svg>
-      </button>
-      <div class="menu-category-items">
-        <div class="menu-empty">No chats yet</div>
-      </div>
+    <div class="menu-section-title">History</div>
+    <div id="chatHistoryList">
+      <div class="menu-empty">No chats yet</div>
     </div>
   </div>
 
   <div class="menu-divider"></div>
 
-  <!-- Placeholder for future menu items -->
   <div class="menu-section">
-    <div class="menu-section-title">More</div>
     <button class="menu-item" id="btnSettings" type="button">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="3"/>
@@ -1348,16 +1354,21 @@
       messages: [],
       pendingMessage: null,
       isProcessing: false,
-      currentModel: 'claude'
+      currentModel: 'claude',
+      currentChatId: null
     };
 
     // CHAT PERSISTENCE
     function saveChatState() {
       const chatState = {
         messages: state.messages,
-        currentModel: state.currentModel
+        currentModel: state.currentModel,
+        currentChatId: state.currentChatId
       };
       localStorage.setItem('friction_chat', JSON.stringify(chatState));
+      
+      // Also save to history
+      saveCurrentChatToHistory();
     }
 
     function loadChatState() {
@@ -1367,6 +1378,7 @@
           const chatState = JSON.parse(saved);
           state.messages = chatState.messages || [];
           state.currentModel = chatState.currentModel || 'claude';
+          state.currentChatId = chatState.currentChatId || null;
           return true;
         } catch (e) {
           return false;
@@ -1377,6 +1389,7 @@
 
     function clearChatState() {
       state.messages = [];
+      state.currentChatId = null;
       localStorage.removeItem('friction_chat');
     }
 
@@ -1654,6 +1667,7 @@
     
     // SIDE MENU FUNCTIONS
     function openMenu() {
+      renderChatHistoryList();
       sideMenu.classList.add('active');
       menuOverlay.classList.add('active');
       document.body.style.overflow = 'hidden';
@@ -1670,8 +1684,14 @@
     menuOverlay.addEventListener('click', closeMenu);
 
     btnNewChat.addEventListener('click', function() {
+      // Save current chat first if it has messages
+      if (state.messages.length > 0) {
+        saveCurrentChatToHistory();
+      }
+      
       // Clear current chat and start fresh
       clearChatState();
+      state.currentChatId = generateChatId();
       chatMessages.innerHTML = '<div class="welcome-message"><div class="welcome-icon">✦</div><h2>How can I help you today?</h2><p>Remember: slow is intentional.</p></div>';
       closeMenu();
     });
@@ -1691,13 +1711,121 @@
       closeMenu();
     });
 
-    // Category expand/collapse
-    document.querySelectorAll('.menu-category-header').forEach(function(header) {
-      header.addEventListener('click', function() {
-        const category = this.closest('.menu-category');
-        category.classList.toggle('expanded');
+    // CHAT HISTORY MANAGEMENT
+    function generateChatId() {
+      return 'chat_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    function getChatTitle(messages) {
+      if (!messages || messages.length === 0) return 'New Chat';
+      const firstUserMsg = messages.find(function(m) { return m.role === 'user'; });
+      if (firstUserMsg) {
+        const title = firstUserMsg.content.substring(0, 40);
+        return title.length < firstUserMsg.content.length ? title + '...' : title;
+      }
+      return 'New Chat';
+    }
+
+    function loadChatHistory() {
+      const saved = localStorage.getItem('friction_history');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          return [];
+        }
+      }
+      return [];
+    }
+
+    function saveChatHistory(history) {
+      localStorage.setItem('friction_history', JSON.stringify(history));
+    }
+
+    function saveCurrentChatToHistory() {
+      if (state.messages.length === 0) return;
+      
+      let history = loadChatHistory();
+      const chatData = {
+        id: state.currentChatId || generateChatId(),
+        messages: state.messages,
+        model: state.currentModel,
+        updatedAt: Date.now()
+      };
+      
+      // Update existing or add new
+      const existingIndex = history.findIndex(function(c) { return c.id === chatData.id; });
+      if (existingIndex >= 0) {
+        history[existingIndex] = chatData;
+      } else {
+        history.unshift(chatData);
+      }
+      
+      // Keep only last 50 chats
+      history = history.slice(0, 50);
+      
+      saveChatHistory(history);
+      state.currentChatId = chatData.id;
+    }
+
+    function loadChatFromHistory(chatId) {
+      const history = loadChatHistory();
+      const chat = history.find(function(c) { return c.id === chatId; });
+      if (chat) {
+        state.messages = chat.messages;
+        state.currentModel = chat.model;
+        state.currentChatId = chat.id;
+        modelSelect.value = chat.model;
+        saveChatState();
+        restoreChatUI();
+        closeMenu();
+      }
+    }
+
+    function deleteChatFromHistory(chatId) {
+      let history = loadChatHistory();
+      history = history.filter(function(c) { return c.id !== chatId; });
+      saveChatHistory(history);
+      renderChatHistoryList();
+    }
+
+    function renderChatHistoryList() {
+      const container = document.getElementById('chatHistoryList');
+      const history = loadChatHistory();
+      
+      if (history.length === 0) {
+        container.innerHTML = '<div class="menu-empty">No chats yet</div>';
+        return;
+      }
+      
+      container.innerHTML = '';
+      history.forEach(function(chat) {
+        const item = document.createElement('div');
+        item.className = 'menu-history-item';
+        if (chat.id === state.currentChatId) {
+          item.classList.add('active');
+        }
+        
+        const title = document.createElement('button');
+        title.className = 'menu-history-title';
+        title.textContent = getChatTitle(chat.messages);
+        title.addEventListener('click', function() {
+          loadChatFromHistory(chat.id);
+        });
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'menu-history-delete';
+        deleteBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+        deleteBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          deleteChatFromHistory(chat.id);
+        });
+        
+        item.appendChild(title);
+        item.appendChild(deleteBtn);
+        container.appendChild(item);
       });
-    });
+    }
 
     // FRICTION SYSTEM
     let challenge1 = '';
