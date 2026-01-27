@@ -1366,6 +1366,7 @@
         currentChatId: state.currentChatId
       };
       localStorage.setItem('friction_chat', JSON.stringify(chatState));
+      localStorage.setItem('friction_last_activity', Date.now().toString());
       
       // Also save to history
       saveCurrentChatToHistory();
@@ -1621,11 +1622,32 @@
       // Load saved chat before showing
       loadChatState();
       
+      // Check if session has expired (2 hours = same as friction reset)
+      const SESSION_TIMEOUT = 2 * 60 * 60 * 1000; // 2 hours
+      const lastActivity = localStorage.getItem('friction_last_activity');
+      
+      if (lastActivity) {
+        const elapsed = Date.now() - parseInt(lastActivity, 10);
+        if (elapsed > SESSION_TIMEOUT && state.messages.length > 0) {
+          // Save current chat to history before clearing
+          saveCurrentChatToHistory();
+          // Start fresh
+          state.messages = [];
+          state.currentChatId = generateChatId();
+          localStorage.removeItem('friction_chat');
+        }
+      }
+      
+      // Update last activity
+      localStorage.setItem('friction_last_activity', Date.now().toString());
+      
       homepage.classList.add('hidden');
       chatApp.classList.add('active');
       
-      // Restore chat messages
-      restoreChatUI();
+      // Restore chat messages (or show welcome if empty)
+      if (state.messages.length > 0) {
+        restoreChatUI();
+      }
       
       if (lastMessageTime && frictionLevel > 0) startHeaderTimer();
       updateKeyboardOffset();
