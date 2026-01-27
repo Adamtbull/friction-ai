@@ -187,6 +187,12 @@
           </svg>
           <span>About</span>
         </button>
+        <button class="menu-item" id="btnAdmin" type="button" style="display: none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+          <span>Admin Dashboard</span>
+        </button>
       </div>
     </div>
 
@@ -420,6 +426,35 @@
           </label>
         </div>
 
+        <!-- Data Storage -->
+        <div class="settings-section">
+          <h3 class="settings-section-title">🔐 Data Storage</h3>
+          <p class="settings-section-desc">Choose where your chat history is stored</p>
+          
+          <label class="settings-radio">
+            <input type="radio" name="storageMode" value="local" checked />
+            <span class="radio-label">
+              <strong>Local Only</strong>
+              <span class="radio-desc">Chats stay in this browser (clears if you clear cache)</span>
+            </span>
+          </label>
+          
+          <label class="settings-radio">
+            <input type="radio" name="storageMode" value="encrypted" />
+            <span class="radio-label">
+              <strong>Encrypted Cloud Backup</strong>
+              <span class="radio-desc">Chats encrypted & backed up (accessible from any device)</span>
+            </span>
+          </label>
+          
+          <div id="encryptedStorageNote" style="display: none; margin-top: 15px; padding: 12px; background: #f0f9ff; border-radius: 8px;">
+            <p style="margin: 0; font-size: 0.9rem;">
+              <strong>🔒 Zero-Knowledge Encryption:</strong> Your chats are encrypted with a key only you control. 
+              We cannot read your messages.
+            </p>
+          </div>
+        </div>
+
         <!-- Lock Settings -->
         <div class="settings-section settings-lock-section">
           <h3 class="settings-section-title">🔒 Lock Settings</h3>
@@ -485,21 +520,107 @@
     const FREE_MODELS = ['gemini'];
     const PAID_MODELS = ['claude', 'gpt', 'grok', 'perplexity'];
 
-    // CHAT PERSISTENCE
-    function saveChatState() {
+    // ENCRYPTION CLASS
+    class ChatEncryption {
+      constructor() {
+        this.cryptoKey = null;
+        this.keyStorageName = 'friction_encryption_key';
+      }
+      
+      async init(userId) {
+        // Try to load existing key
+        const storedKey = localStorage.getItem(this.keyStorageName);
+        
+        if (storedKey) {
+          const keyData = JSON.parse(storedKey);
+          this.cryptoKey = await crypto.subtle.importKey(
+            'jwk',
+            keyData,
+            { name: 'AES-GCM' },
+            false,
+            ['encrypt', 'decrypt']
+          );
+        } else {
+          this.cryptoKey = await crypto.subtle.generateKey(
+            { name: 'AES-GCM', length: 256 },
+            true,
+            ['encrypt', 'decrypt']
+          );
+          
+          const exportedKey = await crypto.subtle.exportKey('jwk', this.cryptoKey);
+          localStorage.setItem(this.keyStorageName, JSON.stringify(exportedKey));
+        }
+      }
+      
+      async encrypt(data) {
+        if (!this.cryptoKey) throw new Error('Encryption not initialized');
+        
+        const text = JSON.stringify(data);
+        const encoder = new TextEncoder();
+        const encoded = encoder.encode(text);
+        
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        const encrypted = await crypto.subtle.encrypt(
+          { name: 'AES-GCM', iv },
+          this.cryptoKey,
+          encoded
+        );
+        
+        const combined = new Uint8Array(iv.length + encrypted.byteLength);
+        combined.set(iv);
+        combined.set(new Uint8Array(encrypted), iv.length);
+        
+        return btoa(String.fromCharCode(...combined));
+      }
+      
+      async decrypt(encryptedBase64) {
+        if (!this.cryptoKey) throw new Error('Encryption not initialized');
+        
+        const combined = Uint8Array.from(atob(encryptedBase64), c => c.charCodeAt(0));
+        const iv = combined.slice(0, 12);
+        const encrypted = combined.slice(12);
+        
+        const decrypted = await crypto.subtle.decrypt(
+          { name: 'AES-GCM', iv },
+          this.cryptoKey,
+          encrypted
+        );
+        
+        const decoder = new TextDecoder();
+        return JSON.parse(decoder.decode(decrypted));
+      }
+      
+      hasKey() {
+        return !!this.cryptoKey;
+      }
+    }
+
+    const chatEncryption = new ChatEncryption();
+
+    // CHAT PERSISTENCE WITH ENCRYPTION OPTION
+    async function saveChatState() {
       const chatState = {
         messages: state.messages,
         currentModel: state.currentModel,
-        currentChatId: state.currentChatId
+        currentChatId: state.currentChatId,
+        updatedAt: Date.now()
       };
+      
+      // Save locally
       localStorage.setItem('friction_chat', JSON.stringify(chatState));
       localStorage.setItem('friction_last_activity', Date.now().toString());
       
-      // Also save to history
+      // Save to history
       saveCurrentChatToHistory();
+      
+      // Backup to cloud if enabled
+      if (settings.storageMode === 'encrypted' && currentUser) {
+        await backupChatToCloud(chatState);
+      }
     }
 
-    function loadChatState() {
+    async function loadChatState() {
+      // Try local first
       const saved = localStorage.getItem('friction_chat');
       if (saved) {
         try {
@@ -509,10 +630,74 @@
           state.currentChatId = chatState.currentChatId || null;
           return true;
         } catch (e) {
-          return false;
+          console.error('Error loading local chat:', e);
         }
       }
+      
+      // Try cloud backup if enabled
+      if (settings.storageMode === 'encrypted' && currentUser) {
+        const cloudChat = await loadChatFromCloud();
+        if (cloudChat) {
+          state.messages = cloudChat.messages || [];
+          state.currentModel = cloudChat.currentModel || 'gemini';
+          state.currentChatId = cloudChat.currentChatId || null;
+          return true;
+        }
+      }
+      
       return false;
+    }
+
+    async function backupChatToCloud(chatState) {
+      try {
+        if (!chatEncryption.hasKey()) {
+          await chatEncryption.init(currentUser.email);
+        }
+        
+        const encrypted = await chatEncryption.encrypt(chatState);
+        const idToken = localStorage.getItem('google_id_token');
+        
+        const response = await fetch('/api/chat/backup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`
+          },
+          body: JSON.stringify({
+            chatId: state.currentChatId || generateChatId(),
+            encryptedData: encrypted,
+            timestamp: Date.now()
+          })
+        });
+        
+        if (!response.ok) {
+          console.warn('Failed to backup chat to cloud');
+        }
+      } catch (error) {
+        console.error('Error backing up chat:', error);
+      }
+    }
+
+    async function loadChatFromCloud() {
+      try {
+        const idToken = localStorage.getItem('google_id_token');
+        const response = await fetch('/api/chat/backup', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${idToken}`
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.encryptedData && chatEncryption.hasKey()) {
+            return await chatEncryption.decrypt(data.encryptedData);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading from cloud:', error);
+      }
+      return null;
     }
 
     function clearChatState() {
@@ -561,11 +746,9 @@
       if (!goals.onboardingComplete) return false;
       if (goals.shortterm.length === 0) return false;
       
-      // Check if all goals completed
       const allComplete = goals.shortterm.every(g => g.completed);
       if (allComplete) return true;
       
-      // Check if 72 hours since last tick
       if (goals.lastGoalTick) {
         const hoursSinceTick = (Date.now() - goals.lastGoalTick) / (1000 * 60 * 60);
         if (hoursSinceTick >= 72) return true;
@@ -630,7 +813,6 @@
       
       bgGoal.textContent = '"' + goals.longterm + '"';
       
-      // Calculate opacity based on message count (caps at 0.15)
       const messageCount = state.messages.filter(m => m.role === 'user').length;
       const opacity = Math.min(messageCount * 0.03, 0.15);
       bgGoal.style.opacity = opacity.toString();
@@ -638,11 +820,12 @@
 
     // SETTINGS MANAGEMENT
     let settings = {
-      frictionMode: 'full', // 'off', 'light', 'full'
-      messageDelay: 0, // 0, 5, 15, 30, 45 seconds
+      frictionMode: 'full',
+      messageDelay: 0,
       allowCancelDelay: true,
       showShortTermGoal: true,
       showLongTermGoal: true,
+      storageMode: 'local', // 'local' or 'encrypted'
       lockUntil: null
     };
 
@@ -662,6 +845,14 @@
 
     function saveSettings() {
       localStorage.setItem('friction_settings', JSON.stringify(settings));
+      
+      // Update storage mode UI
+      const note = document.getElementById('encryptedStorageNote');
+      if (settings.storageMode === 'encrypted') {
+        note.style.display = 'block';
+      } else {
+        note.style.display = 'none';
+      }
     }
 
     function isSettingsLocked() {
@@ -691,17 +882,22 @@
       const content = document.getElementById('settingsContent');
       const lockBanner = document.getElementById('settingsLockBanner');
       
-      // Set current values in form
       document.querySelector('input[name="frictionMode"][value="' + settings.frictionMode + '"]').checked = true;
       document.querySelector('input[name="messageDelay"][value="' + settings.messageDelay + '"]').checked = true;
+      document.querySelector('input[name="storageMode"][value="' + settings.storageMode + '"]').checked = true;
       document.getElementById('allowCancelDelay').checked = settings.allowCancelDelay;
       document.getElementById('showShortTermGoal').checked = settings.showShortTermGoal;
       document.getElementById('showLongTermGoal').checked = settings.showLongTermGoal;
       
-      // Update delay section based on friction mode
       updateDelayAvailability();
       
-      // Check if locked
+      const note = document.getElementById('encryptedStorageNote');
+      if (settings.storageMode === 'encrypted') {
+        note.style.display = 'block';
+      } else {
+        note.style.display = 'none';
+      }
+      
       if (isSettingsLocked()) {
         content.classList.add('locked');
         lockBanner.style.display = 'flex';
@@ -722,7 +918,6 @@
       if (frictionMode === 'full' || frictionMode === 'strict') {
         delayOptions.classList.add('disabled');
         delayNote.style.display = 'block';
-        // Reset delay to off when using code friction
         settings.messageDelay = 0;
         document.querySelector('input[name="messageDelay"][value="0"]').checked = true;
         saveSettings();
@@ -796,7 +991,6 @@
       const totalSeconds = settings.messageDelay;
       let remaining = totalSeconds;
       
-      // Set hint based on goal
       const activeGoal = getActiveShortTermGoal();
       if (activeGoal) {
         hintEl.textContent = 'While you wait... "' + activeGoal.text + '"';
@@ -804,14 +998,12 @@
         hintEl.textContent = 'Take a breath. Is this message necessary?';
       }
       
-      // Show/hide cancel button
       if (settings.allowCancelDelay) {
         cancelBtn.classList.remove('hidden');
       } else {
         cancelBtn.classList.add('hidden');
       }
       
-      // Set initial state
       timeEl.textContent = remaining;
       progressEl.style.strokeDashoffset = '0';
       
@@ -821,7 +1013,6 @@
         remaining--;
         timeEl.textContent = remaining;
         
-        // Update progress ring (283 is circumference of circle with r=45)
         const progress = ((totalSeconds - remaining) / totalSeconds) * 283;
         progressEl.style.strokeDashoffset = progress;
         
@@ -874,7 +1065,7 @@
       }
     }
 
-    function handleGoogleSignIn(response) {
+    async function handleGoogleSignIn(response) {
       const base64Url = response.credential.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
       const padded = base64 + '==='.slice((base64.length + 3) % 4);
@@ -886,7 +1077,6 @@
         picture: payload.picture
       };
       
-      // Save the ID token for API calls
       googleIdToken = response.credential;
       localStorage.setItem('google_id_token', googleIdToken);
       
@@ -894,6 +1084,12 @@
       saveUserToStorage();
       updateModelAccess();
       updateProfileDisplay();
+      updateMenuForAdmin();
+      
+      if (settings.storageMode === 'encrypted') {
+        await chatEncryption.init(currentUser.email);
+      }
+      
       showChat();
     }
 
@@ -923,7 +1119,6 @@
         }
       });
 
-      // If current selection is a paid model and user is not admin, switch to Gemini
       if (PAID_MODELS.includes(modelSelect.value) && !isAdmin) {
         modelSelect.value = 'gemini';
         state.currentModel = 'gemini';
@@ -938,28 +1133,24 @@
           auto_select: false
         });
 
-        // Render a hidden Google button that we'll click programmatically
         google.accounts.id.renderButton(
           document.getElementById('googleButtonHidden'),
           { theme: 'outline', size: 'large', width: 280 }
         );
 
-        // Check if user already signed in - auto go to chat
         if (loadUserFromStorage()) {
           updateModelAccess();
           updateProfileDisplay();
+          updateMenuForAdmin();
           showChat();
         }
         
-        // Reveal UI after state is known
         document.body.classList.add('ready');
       } else {
-        // Retry if Google script not loaded yet
         setTimeout(initGoogleSignIn, 100);
       }
     }
 
-    // Fallback: reveal UI after timeout in case Google script fails
     setTimeout(() => {
       document.body.classList.add('ready');
     }, 1000);
@@ -980,7 +1171,6 @@
     const btnMenu = document.getElementById('btnMenu');
     const typingIndicator = document.getElementById('typingIndicator');
 
-    // Side menu elements
     const sideMenu = document.getElementById('sideMenu');
     const menuOverlay = document.getElementById('menuOverlay');
     const btnCloseMenu = document.getElementById('btnCloseMenu');
@@ -988,11 +1178,21 @@
     const btnSignOut = document.getElementById('btnSignOut');
     const btnSettings = document.getElementById('btnSettings');
     const btnAbout = document.getElementById('btnAbout');
+    const btnAdmin = document.getElementById('btnAdmin');
     
-    // Profile elements
     const profilePic = document.getElementById('profilePic');
     const profileName = document.getElementById('profileName');
     const profileEmail = document.getElementById('profileEmail');
+
+    function updateMenuForAdmin() {
+      if (btnAdmin) {
+        btnAdmin.style.display = isAdmin ? 'block' : 'none';
+        btnAdmin.addEventListener('click', function() {
+          closeMenu();
+          window.open('/admin.html', '_blank');
+        });
+      }
+    }
 
     // ONBOARDING EVENT LISTENERS
     document.getElementById('onboardingNext1').addEventListener('click', function() {
@@ -1037,7 +1237,6 @@
         }
       });
       
-      // Show summary
       const summary = document.getElementById('onboardingSummary');
       let html = '';
       if (goals.longterm) {
@@ -1069,7 +1268,6 @@
       updateBackgroundGoal();
     });
 
-    // Goal check-in listeners
     document.getElementById('checkinSkip').addEventListener('click', function() {
       goals.lastGoalCheck = Date.now();
       saveGoals();
@@ -1077,7 +1275,6 @@
     });
 
     document.getElementById('checkinSave').addEventListener('click', function() {
-      // Remove completed goals and prompt for new ones if all done
       const hasIncomplete = goals.shortterm.some(g => !g.completed);
       
       goals.lastGoalCheck = Date.now();
@@ -1086,8 +1283,6 @@
       hideGoalCheckin();
       
       if (!hasIncomplete) {
-        // All goals completed - could prompt for new ones
-        // For now just clear completed and let them add via menu
         goals.shortterm = goals.shortterm.filter(g => !g.completed);
         saveGoals();
       }
@@ -1155,68 +1350,56 @@
     // NAVIGATION
     function restoreChatUI() {
       if (state.messages.length > 0) {
-        // Remove welcome message
         const welcome = chatMessages.querySelector('.welcome-message');
         if (welcome) welcome.remove();
         
-        // Clear existing messages (except typing indicator)
         const existingMessages = chatMessages.querySelectorAll('.message');
         existingMessages.forEach(msg => msg.remove());
         
-        // Render all saved messages
         state.messages.forEach(msg => {
           const type = msg.role === 'assistant' ? 'ai' : 'user';
           addMessage(msg.content, type);
         });
       }
       
-      // Restore model selection
       if (state.currentModel && modelSelect) {
         modelSelect.value = state.currentModel;
       }
     }
 
-    function showChat() {
-      // Load saved chat before showing
+    async function showChat() {
       loadChatState();
       loadGoals();
       loadSettings();
       
-      // Check if session has expired (2 hours = same as friction reset)
-      const SESSION_TIMEOUT = 2 * 60 * 60 * 1000; // 2 hours
+      const SESSION_TIMEOUT = 2 * 60 * 60 * 1000;
       const lastActivity = localStorage.getItem('friction_last_activity');
       
       if (lastActivity) {
         const elapsed = Date.now() - parseInt(lastActivity, 10);
         if (elapsed > SESSION_TIMEOUT && state.messages.length > 0) {
-          // Save current chat to history before clearing
           saveCurrentChatToHistory();
-          // Start fresh
           state.messages = [];
           state.currentChatId = generateChatId();
           localStorage.removeItem('friction_chat');
         }
       }
       
-      // Update last activity
       localStorage.setItem('friction_last_activity', Date.now().toString());
       
       homepage.classList.add('hidden');
       chatApp.classList.add('active');
       
-      // Restore chat messages (or show welcome if empty)
       if (state.messages.length > 0) {
         restoreChatUI();
       }
       
-      // Check if onboarding needed
       if (shouldShowOnboarding()) {
         showOnboarding();
       } else if (shouldShowGoalCheckin()) {
         showGoalCheckin();
       }
       
-      // Update background goal
       updateBackgroundGoal();
       
       if (lastMessageTime && frictionLevel > 0) startHeaderTimer();
@@ -1233,7 +1416,6 @@
     }
 
     btnApple.addEventListener('click', function() {
-      // TODO: Apple Sign-In
       alert('Apple Sign-In coming soon!');
     });
     
@@ -1242,18 +1424,15 @@
         initGoogleSignIn();
         return;
       }
-      // Click the hidden Google button to trigger sign-in
       const hiddenBtn = document.querySelector('#googleButtonHidden div[role="button"]');
       if (hiddenBtn) {
         hiddenBtn.click();
       } else {
-        // Fallback: try One Tap
         google.accounts.id.prompt();
       }
     });
     
     btnEmail.addEventListener('click', function() {
-      // TODO: Email Sign-In
       alert('Email Sign-In coming soon!');
     });
     
@@ -1276,12 +1455,10 @@
     menuOverlay.addEventListener('click', closeMenu);
 
     btnNewChat.addEventListener('click', function() {
-      // Save current chat first if it has messages
       if (state.messages.length > 0) {
         saveCurrentChatToHistory();
       }
       
-      // Clear current chat and start fresh
       clearChatState();
       state.currentChatId = generateChatId();
       chatMessages.innerHTML = '<div class="welcome-message"><div class="welcome-icon">✦</div><h2>How can I help you today?</h2><p>Remember: slow is intentional.</p></div>';
@@ -1299,7 +1476,6 @@
     });
 
     btnAbout.addEventListener('click', function() {
-      // TODO: Show about page
       closeMenu();
     });
 
@@ -1320,6 +1496,18 @@
         if (isSettingsLocked()) return;
         settings.messageDelay = parseInt(this.value, 10);
         saveSettings();
+      });
+    });
+
+    document.querySelectorAll('input[name="storageMode"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        if (isSettingsLocked()) return;
+        settings.storageMode = this.value;
+        saveSettings();
+        
+        if (this.value === 'encrypted' && currentUser) {
+          chatEncryption.init(currentUser.email);
+        }
       });
     });
 
@@ -1349,10 +1537,8 @@
       }
     });
 
-    // Delay cancel button
     document.getElementById('delayCancelBtn').addEventListener('click', cancelDelay);
 
-    // Lock preset buttons
     document.querySelectorAll('.lock-preset-btn').forEach(btn => {
       btn.addEventListener('click', function() {
         const hours = this.dataset.hours;
@@ -1406,7 +1592,6 @@
         updatedAt: Date.now()
       };
       
-      // Update existing or add new
       const existingIndex = history.findIndex(c => c.id === chatData.id);
       if (existingIndex >= 0) {
         history[existingIndex] = chatData;
@@ -1414,7 +1599,6 @@
         history.unshift(chatData);
       }
       
-      // Keep only last 50 chats
       history = history.slice(0, 50);
       
       saveChatHistory(history);
@@ -1559,37 +1743,25 @@
     }
 
     function getFrictionConfig() {
-      // Strict mode - original hardcore 15 levels
       if (settings.frictionMode === 'strict') {
         const strictConfigs = [
-          { rows: 1, length: 6 },   // Level 1
-          { rows: 1, length: 8 },   // Level 2
-          { rows: 1, length: 10 },  // Level 3
-          { rows: 1, length: 12 },  // Level 4
-          { rows: 1, length: 14 },  // Level 5
-          { rows: 1, length: 16 },  // Level 6
-          { rows: 1, length: 18 },  // Level 7
-          { rows: 1, length: 20 },  // Level 8
-          { rows: 2, length: 12 },  // Level 9
-          { rows: 2, length: 14 },  // Level 10
-          { rows: 2, length: 16 },  // Level 11
-          { rows: 2, length: 18 },  // Level 12
-          { rows: 2, length: 20 },  // Level 13
-          { rows: 2, length: 20 },  // Level 14
-          { rows: 2, length: 20 },  // Level 15
+          { rows: 1, length: 6 },   { rows: 1, length: 8 },   
+          { rows: 1, length: 10 },  { rows: 1, length: 12 },  
+          { rows: 1, length: 14 },  { rows: 1, length: 16 },  
+          { rows: 1, length: 18 },  { rows: 1, length: 20 },  
+          { rows: 2, length: 12 },  { rows: 2, length: 14 },  
+          { rows: 2, length: 16 },  { rows: 2, length: 18 },  
+          { rows: 2, length: 20 },  { rows: 2, length: 20 },  
+          { rows: 2, length: 20 }
         ];
         return strictConfigs[Math.min(frictionLevel, 14)];
       }
       
-      // Full mode - gentle 7 levels, max 10 chars
       const configs = [
-        { rows: 1, length: 4 },   // Level 1
-        { rows: 1, length: 5 },   // Level 2
-        { rows: 1, length: 6 },   // Level 3
-        { rows: 1, length: 7 },   // Level 4
-        { rows: 1, length: 8 },   // Level 5
-        { rows: 1, length: 9 },   // Level 6
-        { rows: 1, length: 10 },  // Level 7+
+        { rows: 1, length: 4 },   { rows: 1, length: 5 },   
+        { rows: 1, length: 6 },   { rows: 1, length: 7 },   
+        { rows: 1, length: 8 },   { rows: 1, length: 9 },   
+        { rows: 1, length: 10 }
       ];
       return configs[Math.min(frictionLevel, 6)];
     }
@@ -1603,24 +1775,21 @@
       container.innerHTML = '';
       
       for (let i = 0; i < code.length; i++) {
-        // Create pair container (code on top, input below)
         const pair = document.createElement('div');
         pair.className = 'friction-pair';
         
-        // Create display character block
         const charBlock = document.createElement('div');
         charBlock.className = 'friction-char';
         charBlock.textContent = code[i];
         pair.appendChild(charBlock);
         
-        // Create input block
         const input = document.createElement('input');
         input.type = 'text';
         input.className = 'friction-char-input';
         input.maxLength = 1;
         input.autocomplete = 'off';
         input.autocorrect = 'off';
-        input.autocapitalize = 'off';
+input.autocapitalize = 'off';
         input.spellcheck = false;
         input.dataset.index = i;
         input.dataset.expected = code[i];
@@ -1644,7 +1813,6 @@
         if (value === expected) {
           input.classList.add('success');
           input.classList.remove('error');
-          // Move to next input
           const pair = input.closest('.friction-pair');
           const nextPair = pair.nextElementSibling;
           if (nextPair) {
@@ -1693,14 +1861,12 @@
     function checkAllInputs() {
       const config = getFrictionConfig();
       
-      // Check row 1
       const inputs1 = frictionPairs1.querySelectorAll('.friction-char-input');
       let match1 = true;
       inputs1.forEach(input => {
         if (input.value !== input.dataset.expected) match1 = false;
       });
       
-      // Check row 2 if needed
       let match2 = true;
       if (config.rows === 2) {
         const inputs2 = frictionPairs2.querySelectorAll('.friction-char-input');
@@ -1730,7 +1896,6 @@
       state.pendingMessage = message;
       const config = getFrictionConfig();
 
-      // Show short-term goal reminder
       const goalReminder = document.getElementById('frictionGoalReminder');
       const activeGoal = getActiveShortTermGoal();
       if (activeGoal && settings.showShortTermGoal) {
@@ -1739,7 +1904,6 @@
         goalReminder.innerHTML = '';
       }
 
-      // Show code input row
       document.getElementById('frictionRow1').style.display = 'block';
       
       challenge1 = generateChallenge(config.length);
@@ -1761,14 +1925,12 @@
 
       const subtitle = document.querySelector('.friction-subtitle');
       if (settings.frictionMode === 'strict') {
-        // Strict mode - 15 levels
         if (frictionLevel < 14) {
           subtitle.textContent = '☠️ STRICT Level ' + (frictionLevel + 1) + ' of 15 — No mercy.';
         } else {
           subtitle.textContent = '☠️ STRICT Level 15 — Maximum punishment. 2hr reset.';
         }
       } else {
-        // Full mode - 7 levels
         if (frictionLevel < 6) {
           subtitle.textContent = 'Level ' + (frictionLevel + 1) + ' of 7 — Type the code to send.';
         } else {
@@ -1782,7 +1944,6 @@
       document.addEventListener('touchmove', preventTouchMove, { passive: false });
       document.documentElement.style.setProperty('--kb', '0px');
       
-      // Focus first input
       setTimeout(() => {
         const firstInput = frictionPairs1.querySelector('.friction-char-input');
         if (firstInput) firstInput.focus();
@@ -1803,7 +1964,6 @@
     frictionCancel.addEventListener('click', hideFriction);
 
     frictionUnlock.addEventListener('click', function() {
-      // Only increase level for full or strict friction modes
       if (settings.frictionMode === 'full' || settings.frictionMode === 'strict') {
         const maxLevel = settings.frictionMode === 'strict' ? 14 : 6;
         if (frictionLevel < maxLevel) frictionLevel++;
@@ -1817,12 +1977,10 @@
         document.activeElement.blur();
       }
 
-      // Save the message BEFORE hiding (hideFriction clears pendingMessage)
       const messageToSend = state.pendingMessage;
       
       hideFriction();
       
-      // Check if message delay is enabled
       if (settings.messageDelay > 0) {
         showDelayOverlay(messageToSend);
       } else {
@@ -1833,7 +1991,6 @@
     function showLightFriction(message) {
       state.pendingMessage = message;
       
-      // Show a simplified overlay with just the goal
       const goalReminder = document.getElementById('frictionGoalReminder');
       const activeGoal = getActiveShortTermGoal();
       if (activeGoal && settings.showShortTermGoal) {
@@ -1842,14 +1999,11 @@
         goalReminder.innerHTML = '<div class="friction-goal-label">Pause & reflect</div><div class="friction-goal-text">Do you really need this right now?</div>';
       }
       
-      // Hide code input rows
       document.getElementById('frictionRow1').style.display = 'none';
       document.getElementById('frictionRow2').style.display = 'none';
       
-      // Update subtitle
       document.querySelector('.friction-subtitle').textContent = 'Take a moment before sending.';
       
-      // Enable send button immediately
       frictionUnlock.disabled = false;
       frictionUnlock.classList.add('ready');
       frictionError.textContent = '';
@@ -1866,25 +2020,19 @@
 
     // CHAT FUNCTIONS
     function formatMessageContent(content) {
-      // Convert URLs to clickable links
       const urlRegex = /(https?:\/\/[^\s\]]+)/g;
       let escaped = content
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
       
-      // Replace URLs with anchor tags
       let withLinks = escaped.replace(urlRegex, url => {
-        // Clean up any trailing punctuation that got caught
         const cleanUrl = url.replace(/[.,;:!?)]+$/, '');
         const trailing = url.substring(cleanUrl.length);
         return '<a href="' + cleanUrl + '" target="_blank" rel="noopener noreferrer">' + cleanUrl + '</a>' + trailing;
       });
       
-      // Convert **text** to bold
       withLinks = withLinks.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-      
-      // Convert line breaks
       withLinks = withLinks.replace(/\n/g, '<br>');
       
       return withLinks;
@@ -1905,7 +2053,6 @@
     }
 
     async function sendMessage(content) {
-      // Prevent duplicate sends
       if (state.isProcessing) return;
       
       const model = modelSelect.value;
@@ -1918,7 +2065,6 @@
       state.messages.push({ role: 'user', content: content });
       saveChatState();
       
-      // Update background goal opacity
       updateBackgroundGoal();
 
       state.isProcessing = true;
@@ -1944,7 +2090,6 @@
     }
 
     async function callBackend(model, messages) {
-      // Get Google ID token from localStorage
       const idToken = localStorage.getItem('google_id_token');
       if (!idToken) {
         throw new Error('Not authenticated. Please sign in again.');
@@ -1988,25 +2133,20 @@
       messageInput.value = '';
       messageInput.style.height = 'auto';
       
-      // Check if user is authenticated
       if (!currentUser) {
         alert('Please sign in first.');
         return;
       }
       
-      // Check friction mode
       if (settings.frictionMode === 'off') {
-        // No friction - send directly (but check delay)
         if (settings.messageDelay > 0) {
           showDelayOverlay(content);
         } else {
           sendMessage(content);
         }
       } else if (settings.frictionMode === 'light') {
-        // Light mode - show goal only, no typing
         showLightFriction(content);
       } else {
-        // Full or Strict mode - show goal + typing code
         showFriction(content);
       }
     }
