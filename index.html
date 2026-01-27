@@ -1305,11 +1305,11 @@
 
     /* CHAT BACKGROUND GOAL */
     .chat-background-goal {
-      position: absolute;
+      position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       color: var(--text-primary);
       opacity: 0;
       pointer-events: none;
@@ -1318,7 +1318,7 @@
       max-width: 80%;
       font-style: italic;
       transition: opacity 0.5s ease;
-      z-index: 0;
+      z-index: 1;
     }
 
     .friction-buttons {
@@ -1411,8 +1411,8 @@
   <h2 class="section-title">How it works</h2>
   <ul class="section-list">
     <li>You may be asked to type a short code before sending</li>
-    <li>Continued use gradually increases the effort across 15 levels</li>
-    <li>It caps at two rows of 16 characters and resets after 2 hours</li>
+    <li>Continued use gradually increases the effort across 7 levels</li>
+    <li>It caps at 10 characters and resets after 2 hours</li>
   </ul>
 </div>
 
@@ -2499,7 +2499,7 @@
       } else {
         const timeStr = formatTimeRemaining(remaining);
         timerEl.textContent = '⏱ Resets in ' + timeStr;
-        headerTimerEl.textContent = 'L' + Math.min(frictionLevel + 1, 15) + ' · ' + timeStr;
+        headerTimerEl.textContent = 'L' + Math.min(frictionLevel + 1, 7) + ' · ' + timeStr;
         headerTimerEl.classList.add('active');
       }
     }
@@ -2520,22 +2520,14 @@
     function getFrictionConfig() {
       const configs = [
         { rows: 1, length: 4 },   // Level 1
-        { rows: 1, length: 6 },   // Level 2
-        { rows: 1, length: 8 },   // Level 3
-        { rows: 1, length: 10 },  // Level 4
-        { rows: 1, length: 12 },  // Level 5
-        { rows: 1, length: 14 },  // Level 6
-        { rows: 1, length: 16 },  // Level 7
-        { rows: 1, length: 18 },  // Level 8
-        { rows: 1, length: 20 },  // Level 9
-        { rows: 2, length: 12 },  // Level 10
-        { rows: 2, length: 14 },  // Level 11
-        { rows: 2, length: 16 },  // Level 12
-        { rows: 2, length: 18 },  // Level 13
-        { rows: 2, length: 20 },  // Level 14
-        { rows: 2, length: 16 },  // Level 15
+        { rows: 1, length: 5 },   // Level 2
+        { rows: 1, length: 6 },   // Level 3
+        { rows: 1, length: 7 },   // Level 4
+        { rows: 1, length: 8 },   // Level 5
+        { rows: 1, length: 9 },   // Level 6
+        { rows: 1, length: 10 },  // Level 7+
       ];
-      return configs[Math.min(frictionLevel, 14)];
+      return configs[Math.min(frictionLevel, 6)];
     }
 
     function handlePaste(e) {
@@ -2701,10 +2693,10 @@
       frictionError.textContent = '';
 
       const subtitle = document.querySelector('.friction-subtitle');
-      if (frictionLevel < 14) {
-        subtitle.textContent = 'Level ' + (frictionLevel + 1) + ' of 15 — Type the code to send.';
+      if (frictionLevel < 6) {
+        subtitle.textContent = 'Level ' + (frictionLevel + 1) + ' of 7 — Type the code to send.';
       } else {
-        subtitle.textContent = 'Level 15 of 15 — Maximum friction. Take a 2-hour break to reset.';
+        subtitle.textContent = 'Level 7 of 7 — Maximum friction. Take a 2-hour break to reset.';
       }
 
       startTimer();
@@ -2734,8 +2726,8 @@
     frictionCancel.addEventListener('click', hideFriction);
 
     frictionUnlock.addEventListener('click', function() {
-      const wasMaxLevel = frictionLevel >= 14;
-      if (frictionLevel < 14) frictionLevel++;
+      const wasMaxLevel = frictionLevel >= 6;
+      if (frictionLevel < 6) frictionLevel++;
       lastMessageTime = Date.now();
       saveFrictionState();
 
