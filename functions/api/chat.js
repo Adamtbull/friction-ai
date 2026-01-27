@@ -1,60 +1,58 @@
+// functions/api/chat.js
+
+const ADMIN_EMAIL = "fatboydimsim@gmail.com";
+
+// Which models cost you money:
+const FREE_MODELS = ["gemini"];
+const PAID_MODELS = ["claude", "gpt", "grok", "perplexity"];
+
+// Cache Google JWKS in-memory (per isolate) to avoid fetching every request
+let JWKS_CACHE = { keys: null, fetchedAt: 0 };
+const JWKS_TTL_MS = 60 * 60 * 1000; // 1 hour
+
 export async function onRequestPost({ request, env }) {
-  // Kill switch (flip AI_ENABLED=false to instantly stop costs)
-  if (env.AI_ENABLED !== "true") {
-    return json({ error: "AI is temporarily paused. Please try again later." }, 503);
-  }
-
-  // KV required for limits + token caching
-  if (!env.FRICTION_KV) {
-    return json({ error: "Server missing KV binding (FRICTION_KV)." }, 500);
-  }
-
-  // Hard cap request size (prevents giant prompts = giant bills)
-  const contentLength = request.headers.get("content-length");
-  if (contentLength && Number(contentLength) > 50_000) {
-    return json({ error: "Request too large." }, 413);
-  }
-
-  // Require Google auth (prevents anonymous cost drain)
-  const auth = await getVerifiedGoogleUser(request, env);
-  if (!auth.ok) {
-    return json({ error: auth.error }, auth.status);
-  }
-
-  const userId = auth.userId;
-  const ip = getClientIp(request);
-
-  // Enforce per-user + per-ip + daily caps
-  const rl = await enforceLimits({ env, userId, ip });
-  if (!rl.ok) {
-    return json(
-      { error: rl.error, retry_after_seconds: rl.retryAfterSeconds },
-      429,
-      { "Retry-After": String(rl.retryAfterSeconds) }
-    );
-  }
-
-  // Parse body
-  const body = await request.json().catch(() => ({}));
-  const { model, messages } = body;
-
-  if (!model || !Array.isArray(messages)) {
-    return json({ error: "Invalid request. Expected { model, messages[] }" }, 400);
-  }
-
-  // Clean + cap message size
-  const cleaned = messages
-    .filter(m => m && typeof m.content === "string" && String(m.content).trim().length > 0)
-    .map(m => ({
-      role: m.role === "assistant" ? "assistant" : "user",
-      content: String(m.content || "").trim().slice(0, 8000),
-    }));
-
-  if (!cleaned.length) {
-    return json({ error: "No messages provided" }, 400);
-  }
-
   try {
+    const body = await request.json().catch(() => ({}));
+    const { model, messages } = body;
+
+    if (!model || !Array.isArray(messages)) {
+      return json({ error: "Invalid request. Expected { model, messages[] }" }, 400);
+    }
+
+    // 1) Require Google ID token
+    const auth = request.headers.get("Authorization") || "";
+    const m = auth.match(/^Bearer\s+(.+)$/i);
+    if (!m) return json({ error: "Missing Authorization Bearer token" }, 401);
+
+    const idToken = m[1].trim();
+
+    // 2) Verify token (signature + claims)
+    if (!env.GOOGLE_CLIENT_ID) {
+      return json({ error: "Server missing GOOGLE_CLIENT_ID (env var)" }, 500);
+    }
+
+    const claims = await verifyGoogleIdToken(idToken, env.GOOGLE_CLIENT_ID);
+
+    const userEmail = (claims.email || "").toLowerCase();
+    const isAdmin = userEmail === ADMIN_EMAIL.toLowerCase();
+
+    // 3) Enforce model access
+    if (PAID_MODELS.includes(model) && !isAdmin) {
+      return json(
+        {
+          error:
+            "This model is locked. Only the admin account can use paid models on this site.",
+        },
+        403
+      );
+    }
+
+    // Optional: also restrict unknown model names
+    if (![...FREE_MODELS, ...PAID_MODELS].includes(model)) {
+      return json({ error: `Unknown model: ${model}` }, 400);
+    }
+
+    // 4) Now call the chosen provider
     let responseText = "";
 
     switch (model) {
@@ -62,20 +60,22 @@ export async function onRequestPost({ request, env }) {
         const GEMINI_KEY = env.GEMINI_API_KEY;
         if (!GEMINI_KEY) return json({ error: "Server missing GEMINI_API_KEY" }, 500);
 
-        const contents = cleaned.map(m => ({
+        const contents = messages.map((m) => ({
           role: m.role === "assistant" ? "model" : "user",
-          parts: [{ text: m.content }]
+          parts: [{ text: String(m.content || "") }],
         }));
 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(GEMINI_KEY)}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(
+          GEMINI_KEY
+        )}`;
 
         const r = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             contents,
-            generationConfig: { temperature: 0.7, maxOutputTokens: 2048 }
-          })
+            generationConfig: { temperature: 0.7, maxOutputTokens: 2048 },
+          }),
         });
 
         const data = await r.json().catch(() => ({}));
@@ -96,13 +96,16 @@ export async function onRequestPost({ request, env }) {
           headers: {
             "Content-Type": "application/json",
             "x-api-key": env.ANTHROPIC_API_KEY,
-            "anthropic-version": "2023-06-01"
+            "anthropic-version": "2023-06-01",
           },
           body: JSON.stringify({
             model: "claude-sonnet-4-20250514",
             max_tokens: 2048,
-            messages: cleaned.map(m => ({ role: m.role, content: m.content }))
-          })
+            messages: messages.map((m) => ({
+              role: m.role === "assistant" ? "assistant" : "user",
+              content: String(m.content || ""),
+            })),
+          }),
         });
 
         const data = await r.json().catch(() => ({}));
@@ -119,13 +122,16 @@ export async function onRequestPost({ request, env }) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${env.OPENAI_API_KEY}`
+            Authorization: `Bearer ${env.OPENAI_API_KEY}`,
           },
           body: JSON.stringify({
             model: "gpt-4o",
             temperature: 0.7,
-            messages: cleaned.map(m => ({ role: m.role, content: m.content }))
-          })
+            messages: messages.map((m) => ({
+              role: m.role,
+              content: String(m.content || ""),
+            })),
+          }),
         });
 
         const data = await r.json().catch(() => ({}));
@@ -142,13 +148,16 @@ export async function onRequestPost({ request, env }) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${env.XAI_API_KEY}`
+            Authorization: `Bearer ${env.XAI_API_KEY}`,
           },
           body: JSON.stringify({
             model: "grok-3",
-            messages: cleaned.map(m => ({ role: m.role, content: m.content })),
-            temperature: 0.7
-          })
+            temperature: 0.7,
+            messages: messages.map((m) => ({
+              role: m.role,
+              content: String(m.content || ""),
+            })),
+          }),
         });
 
         const data = await r.json().catch(() => ({}));
@@ -165,12 +174,15 @@ export async function onRequestPost({ request, env }) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${env.PERPLEXITY_API_KEY}`
+            Authorization: `Bearer ${env.PERPLEXITY_API_KEY}`,
           },
           body: JSON.stringify({
             model: "sonar",
-            messages: cleaned.map(m => ({ role: m.role, content: m.content }))
-          })
+            messages: messages.map((m) => ({
+              role: m.role,
+              content: String(m.content || ""),
+            })),
+          }),
         });
 
         const data = await r.json().catch(() => ({}));
@@ -179,178 +191,106 @@ export async function onRequestPost({ request, env }) {
         responseText = data?.choices?.[0]?.message?.content || "No response from Perplexity";
         break;
       }
-
-      case "bing": {
-        responseText = "Bing Search integration coming soon!";
-        break;
-      }
-
-      default:
-        return json({ error: `Unknown model: ${model}` }, 400);
     }
 
-    return json({ response: responseText });
+    return json({ response: responseText }, 200);
   } catch (err) {
     return json({ error: err?.message || "Server error" }, 500);
   }
 }
 
-// ---------- CORS / JSON helpers ----------
-function json(obj, status = 200, extraHeaders = {}) {
+export async function onRequestOptions() {
+  return new Response(null, { headers: corsHeaders() });
+}
+
+function corsHeaders() {
+  return {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  };
+}
+
+function json(obj, status = 200) {
   return new Response(JSON.stringify(obj), {
     status,
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-      ...extraHeaders
-    }
+    headers: { "Content-Type": "application/json", ...corsHeaders() },
   });
 }
 
-export async function onRequestOptions() {
-  return new Response(null, {
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization"
-    }
-  });
-}
+// -------------------------
+// Google ID token verification (RS256)
+// -------------------------
+async function verifyGoogleIdToken(idToken, expectedAud) {
+  const parts = idToken.split(".");
+  if (parts.length !== 3) throw new Error("Invalid ID token format");
 
-// ---------- Rate limiting + Auth helpers ----------
-function getClientIp(request) {
-  return (
-    request.headers.get("CF-Connecting-IP") ||
-    request.headers.get("X-Forwarded-For")?.split(",")[0]?.trim() ||
-    "unknown"
+  const header = JSON.parse(decodeBase64UrlToString(parts[0]));
+  const payload = JSON.parse(decodeBase64UrlToString(parts[1]));
+  const sigBytes = decodeBase64UrlToBytes(parts[2]);
+
+  if (header.alg !== "RS256") throw new Error("Unexpected JWT alg");
+  if (!header.kid) throw new Error("Missing kid in JWT header");
+
+  // Validate claims (before signature is okay, but we do both)
+  const now = Math.floor(Date.now() / 1000);
+
+  // issuer must be accounts.google.com or https://accounts.google.com
+  if (payload.iss !== "accounts.google.com" && payload.iss !== "https://accounts.google.com") {
+    throw new Error("Invalid issuer");
+  }
+
+  if (payload.aud !== expectedAud) throw new Error("Invalid audience (aud)");
+  if (!payload.exp || now >= payload.exp) throw new Error("Token expired");
+
+  // Fetch JWKS and verify signature
+  const jwks = await getGoogleJwks();
+  const jwk = jwks.keys.find((k) => k.kid === header.kid);
+  if (!jwk) throw new Error("No matching Google public key (kid)");
+
+  const key = await crypto.subtle.importKey(
+    "jwk",
+    jwk,
+    { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
+    false,
+    ["verify"]
   );
+
+  const signedData = new TextEncoder().encode(`${parts[0]}.${parts[1]}`);
+  const ok = await crypto.subtle.verify(
+    { name: "RSASSA-PKCS1-v1_5" },
+    key,
+    sigBytes,
+    signedData
+  );
+
+  if (!ok) throw new Error("Invalid token signature");
+
+  return payload;
 }
 
-// Expects: Authorization: Bearer <google_id_token>
-async function getVerifiedGoogleUser(request, env) {
-  const clientId = env.GOOGLE_CLIENT_ID;
-  if (!clientId) return { ok: false, status: 500, error: "Server missing GOOGLE_CLIENT_ID." };
-
-  const authz = request.headers.get("Authorization") || "";
-  const match = authz.match(/^Bearer\s+(.+)$/i);
-  const idToken = match ? match[1].trim() : "";
-  if (!idToken) return { ok: false, status: 401, error: "Missing Authorization Bearer token." };
-
-  // Cache token->sub for 1 hour (reduces Google tokeninfo calls)
-  const cacheKey = "tok:" + hashShort(idToken);
-  const cached = await env.FRICTION_KV.get(cacheKey, "json").catch(() => null);
-  if (cached && cached.sub && cached.aud === clientId) {
-    return { ok: true, userId: cached.sub };
-  }
-
-  const verifyUrl = "https://oauth2.googleapis.com/tokeninfo?id_token=" + encodeURIComponent(idToken);
-  const res = await fetch(verifyUrl);
-  const data = await res.json().catch(() => ({}));
-
-  if (!res.ok || data.aud !== clientId || !data.sub) {
-    return { ok: false, status: 401, error: "Invalid sign-in token." };
-  }
-
-  await env.FRICTION_KV.put(cacheKey, JSON.stringify({ sub: data.sub, aud: data.aud }), {
-    expirationTtl: 3600
-  });
-
-  return { ok: true, userId: data.sub };
-}
-
-function hashShort(str) {
-  let h = 2166136261;
-  for (let i = 0; i < str.length; i++) {
-    h ^= str.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return (h >>> 0).toString(16);
-}
-
-async function enforceLimits({ env, userId, ip }) {
-  const kv = env.FRICTION_KV;
-
-  // Burst per user: 5 / 10s
-  const userBurst = await bumpCounter(kv, `u:${userId}:10s`, 10);
-  if (userBurst.count > 5) {
-    return { ok: false, error: "Slow down a bit (friction time).", retryAfterSeconds: userBurst.retryAfter };
-  }
-
-  // Burst per IP backup: 10 / 10s
-  const ipBurst = await bumpCounter(kv, `ip:${ip}:10s`, 10);
-  if (ipBurst.count > 10) {
-    return { ok: false, error: "Too many requests from this network.", retryAfterSeconds: ipBurst.retryAfter };
-  }
-
-  // Daily cap per user: 200/day (Sydney day)
-  const dayKey = `u:${userId}:day:${dayStampSydney()}`;
-  const ttl = secondsUntilSydneyMidnight();
-  const userDaily = await bumpCounter(kv, dayKey, ttl);
-  if (userDaily.count > 200) {
-    return { ok: false, error: "Daily limit reached. Come back tomorrow.", retryAfterSeconds: userDaily.retryAfter };
-  }
-
-  return { ok: true };
-}
-
-async function bumpCounter(kv, key, ttlSeconds) {
+async function getGoogleJwks() {
   const now = Date.now();
-  const raw = await kv.get(key).catch(() => null);
+  if (JWKS_CACHE.keys && now - JWKS_CACHE.fetchedAt < JWKS_TTL_MS) return JWKS_CACHE.keys;
 
-  let count = 0;
-  let start = now;
+  const r = await fetch("https://www.googleapis.com/oauth2/v3/certs", { method: "GET" });
+  if (!r.ok) throw new Error("Failed to fetch Google certs");
+  const jwks = await r.json();
 
-  if (raw) {
-    const parts = raw.split("|");
-    count = Number(parts[0] || "0");
-    start = Number(parts[1] || String(now));
-  }
-
-  count += 1;
-
-  const windowMs = ttlSeconds * 1000;
-  const elapsed = now - start;
-  const retryAfter = Math.max(1, Math.ceil((windowMs - elapsed) / 1000));
-
-  await kv.put(key, `${count}|${start}`, { expirationTtl: ttlSeconds });
-  return { count, retryAfter };
+  JWKS_CACHE = { keys: jwks, fetchedAt: now };
+  return jwks;
 }
 
-function dayStampSydney() {
-  const d = new Date();
-  const parts = new Intl.DateTimeFormat("en-AU", {
-    timeZone: "Australia/Sydney",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  })
-    .formatToParts(d)
-    .reduce((acc, p) => ((acc[p.type] = p.value), acc), {});
-  return `${parts.year}-${parts.month}-${parts.day}`;
+function decodeBase64UrlToString(b64url) {
+  const b64 = b64url.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((b64url.length + 3) % 4);
+  const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
 }
 
-function secondsUntilSydneyMidnight() {
-  // v1 approximation, good enough for daily caps
-  const tz = "Australia/Sydney";
-  const now = new Date();
-
-  const s = new Intl.DateTimeFormat("en-US", {
-    timeZone: tz,
-    hour12: false,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  }).format(now);
-
-  const [mdy, hms] = s.split(", ");
-  const [mm, dd, yyyy] = mdy.split("/");
-  const localNow = new Date(`${yyyy}-${mm}-${dd}T${hms}Z`);
-  const next = new Date(localNow);
-  next.setUTCHours(24, 0, 0, 0);
-
-  return Math.max(60, Math.ceil((next.getTime() - localNow.getTime()) / 1000));
+function decodeBase64UrlToBytes(b64url) {
+  const b64 = b64url.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((b64url.length + 3) % 4);
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
 }
