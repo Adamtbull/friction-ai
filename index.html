@@ -2567,9 +2567,12 @@
       };
       localStorage.setItem('friction_chat', JSON.stringify(chatState));
       localStorage.setItem('friction_last_activity', Date.now().toString());
-      
+
       // Also save to history
       saveCurrentChatToHistory();
+
+      // Sync to server (debounced)
+      saveUserDataToServer();
     }
 
     function loadChatState() {
@@ -2619,6 +2622,8 @@
 
     function saveGoals() {
       localStorage.setItem('friction_goals', JSON.stringify(goals));
+      // Sync to server (debounced)
+      saveUserDataToServer();
     }
 
     function getActiveShortTermGoal() {
@@ -2735,6 +2740,8 @@
 
     function saveSettings() {
       localStorage.setItem('friction_settings', JSON.stringify(settings));
+      // Sync to server (debounced)
+      saveUserDataToServer();
     }
 
     function isSettingsLocked() {
@@ -2950,31 +2957,36 @@
       }
     }
 
-    function handleGoogleSignIn(response) {
+    async function handleGoogleSignIn(response) {
       // Decode the JWT token
       const base64Url = response.credential.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
       const padded = base64 + '==='.slice((base64.length + 3) % 4);
       const payload = JSON.parse(atob(padded));
-      
+
       currentUser = {
         email: payload.email,
         name: payload.name,
         picture: payload.picture
       };
-      
+
       // Store the ID token for API authentication
       localStorage.setItem('google_id_token', response.credential);
-      
+
       isAdmin = currentUser.email === ADMIN_EMAIL;
       saveUserToStorage();
+
+      // Register user with backend (for analytics)
+      registerUser(response.credential);
+
+      // Load user data from server (restores chat history, settings, etc.)
+      await loadUserDataFromServer();
+
+      // Now update UI with restored data
       updateModelAccess();
       updateProfileDisplay();
       updateMenuForAdmin();
-      
-      // Register user with backend (for analytics)
-      registerUser(response.credential);
-      
+
       showChat();
     }
 
@@ -2988,6 +3000,96 @@
       }).catch(function(err) {
         console.log('User registration skipped:', err);
       });
+    }
+
+    // SERVER DATA SYNC
+    async function loadUserDataFromServer() {
+      var idToken = localStorage.getItem('google_id_token');
+      if (!idToken) return false;
+
+      try {
+        var response = await fetch('/api/user/data', {
+          method: 'GET',
+          headers: {
+            'Authorization': 'Bearer ' + idToken
+          }
+        });
+
+        if (!response.ok) return false;
+
+        var result = await response.json();
+        if (result.data) {
+          // Restore chat history
+          if (result.data.chat) {
+            localStorage.setItem('friction_chat', JSON.stringify(result.data.chat));
+          }
+          // Restore goals
+          if (result.data.goals) {
+            localStorage.setItem('friction_goals', JSON.stringify(result.data.goals));
+          }
+          // Restore settings
+          if (result.data.settings) {
+            localStorage.setItem('friction_settings', JSON.stringify(result.data.settings));
+          }
+          // Restore chat history list
+          if (result.data.history) {
+            localStorage.setItem('friction_history', JSON.stringify(result.data.history));
+          }
+          // Restore friction state
+          if (result.data.frictionState) {
+            localStorage.setItem('friction_state', JSON.stringify(result.data.frictionState));
+          }
+          console.log('User data loaded from server');
+          return true;
+        }
+        return false;
+      } catch (err) {
+        console.log('Failed to load user data from server:', err);
+        return false;
+      }
+    }
+
+    function saveUserDataToServer() {
+      var idToken = localStorage.getItem('google_id_token');
+      if (!idToken) return;
+
+      // Debounce saves to avoid too many requests
+      if (window.saveDataTimeout) {
+        clearTimeout(window.saveDataTimeout);
+      }
+
+      window.saveDataTimeout = setTimeout(function() {
+        var data = {};
+
+        // Collect all data from localStorage
+        var chat = localStorage.getItem('friction_chat');
+        if (chat) data.chat = JSON.parse(chat);
+
+        var goals = localStorage.getItem('friction_goals');
+        if (goals) data.goals = JSON.parse(goals);
+
+        var settings = localStorage.getItem('friction_settings');
+        if (settings) data.settings = JSON.parse(settings);
+
+        var history = localStorage.getItem('friction_history');
+        if (history) data.history = JSON.parse(history);
+
+        var frictionState = localStorage.getItem('friction_state');
+        if (frictionState) data.frictionState = JSON.parse(frictionState);
+
+        fetch('/api/user/data', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + idToken
+          },
+          body: JSON.stringify(data)
+        }).then(function() {
+          console.log('User data saved to server');
+        }).catch(function(err) {
+          console.log('Failed to save user data to server:', err);
+        });
+      }, 2000); // Wait 2 seconds before saving to debounce
     }
 
     function signOut() {
