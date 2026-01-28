@@ -199,7 +199,7 @@ parts: [{ text: m.content }]
 };
 });
 
-var endpoint = “https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=” + encodeURIComponent(apiKey);
+var endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + encodeURIComponent(apiKey);
 
 var res = await fetch(endpoint, {
 method: “POST”,
