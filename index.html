@@ -2028,28 +2028,29 @@
     }
 
     /* CODE CANVAS */
-    .code-canvas-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 2000; }
+    .code-canvas-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.4); z-index: 2000; }
     .code-canvas-overlay.active { display: block; }
-    .code-canvas { position: fixed; top: 0; right: 0; bottom: 0; width: 50%; min-width: 400px; max-width: 800px; background: #0d2831; transform: translateX(100%); transition: transform 0.3s ease; z-index: 2001; display: flex; flex-direction: column; box-shadow: -4px 0 24px rgba(0,0,0,0.3); }
+    .code-canvas { position: fixed; top: 0; right: 0; bottom: 0; width: 50%; min-width: 400px; max-width: 800px; background: var(--white); transform: translateX(100%); transition: transform 0.3s ease; z-index: 2001; display: flex; flex-direction: column; box-shadow: -4px 0 24px rgba(0,0,0,0.15); }
     .code-canvas.active { transform: translateX(0); }
-    .code-canvas-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: #0a1f26; border-bottom: 1px solid #1a4a5c; }
+    .code-canvas-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: var(--teal-lighter); border-bottom: 1px solid var(--border); }
     .code-canvas-title { display: flex; align-items: center; gap: 10px; }
-    .code-canvas-title span { color: #6bb8cc; font-size: 0.9rem; font-weight: 500; }
-    .code-canvas-lang { background: #1a4a5c; color: #6bb8cc; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; text-transform: lowercase; }
+    .code-canvas-title span { color: var(--text-primary); font-size: 0.9rem; font-weight: 500; }
+    .code-canvas-title svg { stroke: var(--teal); }
+    .code-canvas-lang { background: var(--teal); color: var(--white); padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; text-transform: lowercase; }
     .code-canvas-actions { display: flex; gap: 8px; }
-    .btn-canvas-action { display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: transparent; border: 1px solid #1a4a5c; border-radius: 6px; color: #6bb8cc; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
-    .btn-canvas-action:hover { background: #1a4a5c; color: #fff; }
-    .btn-canvas-action.primary { background: var(--teal); border-color: var(--teal); color: #fff; }
+    .btn-canvas-action { display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: var(--white); border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary); font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
+    .btn-canvas-action:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-lighter); }
+    .btn-canvas-action.primary { background: var(--teal); border-color: var(--teal); color: var(--white); }
     .btn-canvas-action.primary:hover { background: var(--teal-dark); }
     .btn-canvas-action svg { width: 16px; height: 16px; }
-    .btn-canvas-close { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: transparent; border: 1px solid #1a4a5c; border-radius: 6px; color: #6bb8cc; cursor: pointer; transition: all 0.2s ease; }
-    .btn-canvas-close:hover { background: #1a4a5c; color: #fff; }
+    .btn-canvas-close { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: var(--white); border: 1px solid var(--border); border-radius: 6px; color: var(--grey); cursor: pointer; transition: all 0.2s ease; }
+    .btn-canvas-close:hover { border-color: var(--teal); color: var(--teal); }
     .btn-canvas-close svg { width: 18px; height: 18px; }
-    .code-canvas-body { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
-    .code-canvas-editor { flex: 1; width: 100%; padding: 20px; font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace; font-size: 0.9rem; line-height: 1.7; border: none; outline: none; resize: none; background: #0d2831; color: #e6f4f1; tab-size: 2; }
-    .code-canvas-editor::placeholder { color: #4a7a8c; }
-    .code-canvas-footer { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: #0a1f26; border-top: 1px solid #1a4a5c; }
-    .code-canvas-info { font-size: 0.75rem; color: #4a7a8c; }
+    .code-canvas-body { flex: 1; overflow: hidden; display: flex; flex-direction: column; background: var(--grey-light); }
+    .code-canvas-editor { flex: 1; width: 100%; padding: 20px; font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace; font-size: 0.9rem; line-height: 1.7; border: none; outline: none; resize: none; background: var(--white); color: var(--text-primary); tab-size: 2; margin: 16px; border-radius: 8px; width: calc(100% - 32px); }
+    .code-canvas-editor::placeholder { color: var(--text-secondary); }
+    .code-canvas-footer { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: var(--teal-lighter); border-top: 1px solid var(--border); }
+    .code-canvas-info { font-size: 0.75rem; color: var(--text-secondary); }
     .btn-open-canvas { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: transparent; border: 1px solid #1a4a5c; border-radius: 4px; color: #6bb8cc; font-size: 0.7rem; cursor: pointer; transition: all 0.2s ease; margin-left: 8px; }
     .btn-open-canvas:hover { background: #1a4a5c; color: #fff; }
     .btn-open-canvas svg { width: 12px; height: 12px; }
@@ -4418,26 +4419,28 @@
       URL.revokeObjectURL(url);
     }
 
-    // Canvas event listeners
-    document.getElementById('btnCanvasClose').addEventListener('click', closeCodeCanvas);
-    document.getElementById('codeCanvasOverlay').addEventListener('click', closeCodeCanvas);
-    document.getElementById('btnCanvasCopy').addEventListener('click', copyCanvasCode);
-    document.getElementById('btnCanvasDownload').addEventListener('click', downloadCanvasCode);
-    document.getElementById('canvasEditor').addEventListener('input', updateCanvasInfo);
+    // Canvas event listeners (wait for DOM to be ready)
+    window.addEventListener('load', function() {
+      document.getElementById('btnCanvasClose').addEventListener('click', closeCodeCanvas);
+      document.getElementById('codeCanvasOverlay').addEventListener('click', closeCodeCanvas);
+      document.getElementById('btnCanvasCopy').addEventListener('click', copyCanvasCode);
+      document.getElementById('btnCanvasDownload').addEventListener('click', downloadCanvasCode);
+      document.getElementById('canvasEditor').addEventListener('input', updateCanvasInfo);
 
-    // Handle tab key in canvas editor
-    document.getElementById('canvasEditor').addEventListener('keydown', function(e) {
-      if (e.key === 'Tab') {
-        e.preventDefault();
-        var start = this.selectionStart;
-        var end = this.selectionEnd;
-        this.value = this.value.substring(0, start) + '  ' + this.value.substring(end);
-        this.selectionStart = this.selectionEnd = start + 2;
-        updateCanvasInfo();
-      }
-      if (e.key === 'Escape') {
-        closeCodeCanvas();
-      }
+      // Handle tab key in canvas editor
+      document.getElementById('canvasEditor').addEventListener('keydown', function(e) {
+        if (e.key === 'Tab') {
+          e.preventDefault();
+          var start = this.selectionStart;
+          var end = this.selectionEnd;
+          this.value = this.value.substring(0, start) + '  ' + this.value.substring(end);
+          this.selectionStart = this.selectionEnd = start + 2;
+          updateCanvasInfo();
+        }
+        if (e.key === 'Escape') {
+          closeCodeCanvas();
+        }
+      });
     });
 
   </script>
