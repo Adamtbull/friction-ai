@@ -426,6 +426,198 @@
       font-size: 0.85rem;
     }
 
+    /* CODE BLOCKS */
+    .code-block-container {
+      position: relative;
+      margin: 12px 0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #1e1e1e;
+    }
+
+    .code-block-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: #2d2d2d;
+      border-bottom: 1px solid #3d3d3d;
+    }
+
+    .code-block-lang {
+      font-size: 0.75rem;
+      color: #a0a0a0;
+      text-transform: lowercase;
+    }
+
+    .code-copy-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: transparent;
+      border: 1px solid #4d4d4d;
+      border-radius: 4px;
+      color: #a0a0a0;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .code-copy-btn:hover {
+      background: #3d3d3d;
+      color: #fff;
+    }
+
+    .code-copy-btn.copied {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: #fff;
+    }
+
+    .code-copy-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .code-block-content {
+      padding: 16px;
+      overflow-x: auto;
+    }
+
+    .code-block-content pre {
+      margin: 0;
+      font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: #d4d4d4;
+      white-space: pre;
+    }
+
+    .code-block-content code {
+      font-family: inherit;
+    }
+
+    /* Inline code */
+    .inline-code {
+      background: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+      font-size: 0.85em;
+      color: #e11d48;
+    }
+
+    /* ATTACHMENT PREVIEW */
+    .attachment-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--grey-light);
+      border-top: 1px solid var(--border);
+    }
+
+    .attachment-item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      max-width: 200px;
+    }
+
+    .attachment-item img {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+
+    .attachment-item .file-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--grey-light);
+      border-radius: 4px;
+    }
+
+    .attachment-item .file-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--text-secondary);
+    }
+
+    .attachment-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .attachment-name {
+      font-size: 0.8rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .attachment-size {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+    }
+
+    .attachment-remove {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 20px;
+      height: 20px;
+      background: #ef4444;
+      border: none;
+      border-radius: 50%;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* MESSAGE IMAGE */
+    .message-image {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 8px;
+      margin-top: 8px;
+      cursor: pointer;
+    }
+
+    .message-file {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--grey-light);
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+
+    .message-file svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--teal);
+    }
+
+    .message-file span {
+      font-size: 0.85rem;
+      color: var(--text-primary);
+    }
+
     .welcome-message {
       position: absolute;
       top: 40%;
@@ -560,6 +752,30 @@
       height: 18px;
       stroke: var(--white);
       margin-left: 2px;
+    }
+
+    .btn-attach {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 50%;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex: 0 0 auto;
+    }
+
+    .btn-attach:hover {
+      background: var(--grey-light);
+    }
+
+    .btn-attach svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--text-secondary);
     }
 
     /* =================== */
@@ -1881,7 +2097,6 @@
   <div class="homepage" id="homepage">
     <div class="brand">FRICTION AI</div>
 
-```
 <h1 class="headline">Slow down your AI — on purpose.</h1>
 
 <p class="subheadline">Friction AI adds intentional pauses before messages are sent, helping reduce impulsive use and increase presence.</p>
@@ -1940,7 +2155,6 @@
 
   <p class="footer-note">Works best in your browser. Home-screen optional.</p>
 </div>
-```
 
   </div>
 
@@ -1971,7 +2185,6 @@
       </div>
     </header>
 
-```
 <div class="chat-messages" id="chatMessages">
   <div class="chat-background-goal" id="chatBackgroundGoal"></div>
   <div class="welcome-message">
@@ -1988,7 +2201,14 @@
 </div>
 
 <div class="chat-input-area">
+  <div class="attachment-preview" id="attachmentPreview" style="display: none;"></div>
   <div class="chat-input-wrapper">
+    <input type="file" id="fileUpload" multiple accept="image/*,.txt,.js,.py,.html,.css,.json,.md,.csv,.xml" style="display: none;">
+    <button class="btn-attach" id="btnAttach" type="button" aria-label="Attach file">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+      </svg>
+    </button>
     <textarea class="chat-input" id="messageInput" placeholder="Message..." rows="1"></textarea>
     <button class="btn-send" id="btnSend" type="button" aria-label="Send message">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -1997,7 +2217,6 @@
     </button>
   </div>
 </div>
-```
 
   </div>
 
@@ -2021,7 +2240,6 @@
       </button>
     </div>
 
-```
 <div class="menu-content">
   <button class="menu-btn-new" id="btnNewChat" type="button">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2076,7 +2294,6 @@
     <span>Sign Out</span>
   </button>
 </div>
-```
 
   </div>
 
@@ -2087,7 +2304,6 @@
       <h2 class="friction-title">Pause & reflect</h2>
       <p class="friction-subtitle">Type the code to send.</p>
 
-```
   <div class="friction-goal-reminder" id="frictionGoalReminder"></div>
 
   <div class="friction-row" id="frictionRow1">
@@ -2106,7 +2322,6 @@
   <p class="friction-timer" id="frictionTimer"></p>
   <p class="friction-error" id="frictionError"></p>
 </div>
-```
 
   </div>
 
@@ -2115,7 +2330,6 @@
   <div class="onboarding-overlay" id="onboardingOverlay">
     <div class="onboarding-box">
 
-```
   <!-- Step 1: Welcome -->
   <div class="onboarding-step active" id="onboardingStep1">
     <div class="onboarding-icon">✦</div>
@@ -2175,7 +2389,6 @@
   </div>
 
 </div>
-```
 
   </div>
 
@@ -2209,7 +2422,6 @@
         </button>
       </div>
 
-```
   <div class="settings-lock-banner" id="settingsLockBanner" style="display: none;">
     <span class="lock-icon">🔒</span>
     <span class="lock-text">Settings locked for <span id="lockTimeRemaining">--:--:--</span></span>
@@ -2347,7 +2559,6 @@
 
   </div>
 </div>
-```
 
   </div>
 
@@ -3767,56 +3978,135 @@
 
     // CHAT FUNCTIONS
     function formatMessageContent(content) {
+      // Handle code blocks first (before escaping)
+      var codeBlockId = 0;
+      var codeBlocks = [];
+
+      // Extract fenced code blocks (```lang\ncode```)
+      content = content.replace(/```(\w*)\n?([\s\S]*?)```/g, function(match, lang, code) {
+        var id = 'code-block-' + (codeBlockId++);
+        codeBlocks.push({ id: id, lang: lang || 'text', code: code.trim() });
+        return '{{CODE_BLOCK_' + id + '}}';
+      });
+
+      // Extract inline code (`code`)
+      content = content.replace(/`([^`]+)`/g, function(match, code) {
+        return '<span class="inline-code">' + code.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span>';
+      });
+
       // Convert URLs to clickable links
       var urlRegex = /(https?:\/\/[^\s\]]+)/g;
       var escaped = content
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
-      
+
+      // Restore inline code (it was escaped)
+      escaped = escaped.replace(/&lt;span class="inline-code"&gt;/g, '<span class="inline-code">');
+      escaped = escaped.replace(/&lt;\/span&gt;/g, '</span>');
+
       // Replace URLs with anchor tags
       var withLinks = escaped.replace(urlRegex, function(url) {
-        // Clean up any trailing punctuation that got caught
         var cleanUrl = url.replace(/[.,;:!?)]+$/, '');
         var trailing = url.substring(cleanUrl.length);
         return '<a href="' + cleanUrl + '" target="_blank" rel="noopener noreferrer">' + cleanUrl + '</a>' + trailing;
       });
-      
+
       // Convert **text** to bold
       withLinks = withLinks.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-      
+
       // Convert line breaks
       withLinks = withLinks.replace(/\n/g, '<br>');
-      
+
+      // Restore code blocks with styled containers
+      codeBlocks.forEach(function(block) {
+        var codeHtml = '<div class="code-block-container">' +
+          '<div class="code-block-header">' +
+            '<span class="code-block-lang">' + block.lang + '</span>' +
+            '<button class="code-copy-btn" onclick="copyCodeBlock(this)" data-code="' + encodeURIComponent(block.code) + '">' +
+              '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
+              '<span>Copy</span>' +
+            '</button>' +
+          '</div>' +
+          '<div class="code-block-content"><pre><code>' + block.code.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</code></pre></div>' +
+        '</div>';
+        withLinks = withLinks.replace('{{CODE_BLOCK_' + block.id + '}}', codeHtml);
+      });
+
       return withLinks;
     }
 
-    function addMessage(content, type) {
+    function copyCodeBlock(button) {
+      var code = decodeURIComponent(button.getAttribute('data-code'));
+      navigator.clipboard.writeText(code).then(function() {
+        button.classList.add('copied');
+        button.querySelector('span').textContent = 'Copied!';
+        setTimeout(function() {
+          button.classList.remove('copied');
+          button.querySelector('span').textContent = 'Copy';
+        }, 2000);
+      });
+    }
+
+    function addMessage(content, type, attachments) {
       const div = document.createElement('div');
       div.className = 'message message-' + type;
-      
+
       if (type === 'ai') {
         div.innerHTML = formatMessageContent(content);
       } else {
         div.textContent = content;
       }
-      
+
+      // Add attachments if any
+      if (attachments && attachments.length > 0) {
+        attachments.forEach(function(att) {
+          if (att.type && att.type.startsWith('image/')) {
+            var img = document.createElement('img');
+            img.src = att.data;
+            img.alt = att.name;
+            img.className = 'message-image';
+            img.onclick = function() { window.open(att.data, '_blank'); };
+            div.appendChild(img);
+          } else {
+            var fileDiv = document.createElement('div');
+            fileDiv.className = 'message-file';
+            fileDiv.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>' + att.name + '</span>';
+            div.appendChild(fileDiv);
+          }
+        });
+      }
+
       chatMessages.appendChild(div);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    async function sendMessage(content) {
+    async function sendMessage(content, attachments) {
       // Prevent duplicate sends
       if (state.isProcessing) return;
-      
+
+      // Get attachments from state if not provided directly
+      attachments = attachments || state.pendingAttachments || [];
+      state.pendingAttachments = [];
+
       const model = modelSelect.value;
       state.currentModel = model;
-      
+
       const welcome = chatMessages.querySelector('.welcome-message');
       if (welcome) welcome.remove();
 
-      addMessage(content, 'user');
-      state.messages.push({ role: 'user', content: content });
+      // Build message content with file contents for AI
+      var fullContent = content;
+      attachments.forEach(function(att) {
+        if (att.type && !att.type.startsWith('image/') && att.data) {
+          fullContent += '\n\n[File: ' + att.name + ']\n' + att.data;
+        } else if (att.type && att.type.startsWith('image/')) {
+          fullContent += '\n\n[Image attached: ' + att.name + ']';
+        }
+      });
+
+      addMessage(content || 'Sent attachment(s)', 'user', attachments);
+      state.messages.push({ role: 'user', content: fullContent });
       saveChatState();
       
       // Update background goal opacity
@@ -3885,17 +4175,21 @@
 
     function handleSend() {
       const content = messageInput.value.trim();
-      if (!content || state.isProcessing) return;
+      const attachments = getAttachmentsForMessage();
+      if ((!content && attachments.length === 0) || state.isProcessing) return;
       messageInput.value = '';
       messageInput.style.height = 'auto';
-      
+
+      // Store attachments for later use
+      state.pendingAttachments = attachments;
+
       // Check friction mode
       if (settings.frictionMode === 'off') {
         // No friction - send directly (but check delay)
         if (settings.messageDelay > 0) {
           showDelayOverlay(content);
         } else {
-          sendMessage(content);
+          sendMessage(content, attachments);
         }
       } else if (settings.frictionMode === 'light') {
         // Light mode - show goal only, no typing
@@ -3942,6 +4236,90 @@
         handleSend();
       }
     });
+
+    // FILE UPLOAD HANDLING
+    var pendingAttachments = [];
+    var fileUploadInput = document.getElementById('fileUpload');
+    var btnAttach = document.getElementById('btnAttach');
+    var attachmentPreview = document.getElementById('attachmentPreview');
+
+    btnAttach.addEventListener('click', function() {
+      fileUploadInput.click();
+    });
+
+    fileUploadInput.addEventListener('change', function(e) {
+      var files = Array.from(e.target.files);
+      files.forEach(function(file) {
+        if (file.size > 10 * 1024 * 1024) {
+          alert('File too large: ' + file.name + ' (max 10MB)');
+          return;
+        }
+
+        var reader = new FileReader();
+        reader.onload = function(event) {
+          var attachment = {
+            id: Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            data: event.target.result
+          };
+          pendingAttachments.push(attachment);
+          renderAttachmentPreview();
+        };
+
+        if (file.type.startsWith('image/')) {
+          reader.readAsDataURL(file);
+        } else {
+          reader.readAsText(file);
+        }
+      });
+      e.target.value = '';
+    });
+
+    function renderAttachmentPreview() {
+      if (pendingAttachments.length === 0) {
+        attachmentPreview.style.display = 'none';
+        attachmentPreview.innerHTML = '';
+        return;
+      }
+
+      attachmentPreview.style.display = 'flex';
+      attachmentPreview.innerHTML = pendingAttachments.map(function(att) {
+        var preview = '';
+        if (att.type.startsWith('image/')) {
+          preview = '<img src="' + att.data + '" alt="' + att.name + '">';
+        } else {
+          preview = '<div class="file-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>';
+        }
+        return '<div class="attachment-item">' +
+          preview +
+          '<div class="attachment-info">' +
+            '<div class="attachment-name">' + att.name + '</div>' +
+            '<div class="attachment-size">' + formatFileSize(att.size) + '</div>' +
+          '</div>' +
+          '<button class="attachment-remove" onclick="removeAttachment(\'' + att.id + '\')">&times;</button>' +
+        '</div>';
+      }).join('');
+    }
+
+    function removeAttachment(id) {
+      pendingAttachments = pendingAttachments.filter(function(a) { return a.id !== id; });
+      renderAttachmentPreview();
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    function getAttachmentsForMessage() {
+      var atts = pendingAttachments.slice();
+      pendingAttachments = [];
+      renderAttachmentPreview();
+      return atts;
+    }
 
     // iOS KEYBOARD
     function scrollChatToBottom() {
