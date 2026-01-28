@@ -2,12 +2,10 @@ export default {
 async fetch(request, env) {
 var url = new URL(request.url);
 
-```
 // Only respond to /api/*
 if (!url.pathname.startsWith("/api/")) {
   return new Response("Not Found", { status: 404 });
 }
-
 // CORS preflight
 if (request.method === "OPTIONS") {
   return new Response(null, { headers: corsHeaders() });
@@ -388,9 +386,7 @@ if (parts.length !== 3) {
 return { valid: false, error: “Invalid token format” };
 }
 
-```
 var payload = JSON.parse(atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")));
-
 // Check expiration
 if (payload.exp && payload.exp * 1000 < Date.now()) {
   return { valid: false, error: "Token expired" };
@@ -407,8 +403,6 @@ if (payload.aud !== env.GOOGLE_CLIENT_ID) {
 }
 
 return { valid: true, email: payload.email, name: payload.name };
-```
-
 } catch (err) {
 return { valid: false, error: “Token verification failed” };
 }
@@ -447,10 +441,8 @@ try {
 var today = new Date().toISOString().split(“T”)[0];
 var key = “analytics:” + today;
 
-```
 var existing = await env.FRICTION_KV.get(key);
 var dayData = existing ? JSON.parse(existing) : { messages: 0, users: {}, models: {}, signups: 0 };
-
 if (data.type === "message") {
   dayData.messages++;
   dayData.users[data.userHash] = (dayData.users[data.userHash] || 0) + 1;
@@ -460,8 +452,6 @@ if (data.type === "message") {
 }
 
 await env.FRICTION_KV.put(key, JSON.stringify(dayData), { expirationTtl: 90 * 24 * 60 * 60 }); // 90 days
-```
-
 } catch (err) {
 console.error(“Analytics error:”, err);
 }
@@ -479,10 +469,8 @@ last7Days: { messages: 0, uniqueUsers: 0, signups: 0, models: {} },
 last30Days: { messages: 0, uniqueUsers: 0, signups: 0, models: {} }
 };
 
-```
 var allUsers7 = {};
 var allUsers30 = {};
-
 for (var i = 0; i < 30; i++) {
   var date = new Date();
   date.setDate(date.getDate() - i);
@@ -527,8 +515,6 @@ var userList = await env.FRICTION_KV.get("users:list");
 stats.totalUsers = userList ? JSON.parse(userList).length : 0;
 
 return stats;
-```
-
 } catch (err) {
 return { error: err.message };
 }
@@ -541,7 +527,6 @@ try {
 var userList = await env.FRICTION_KV.get(“users:list”);
 var users = userList ? JSON.parse(userList) : [];
 
-```
 var existing = users.find(function(u) { return u.email === email; });
 if (!existing) {
   users.push({
@@ -554,8 +539,6 @@ if (!existing) {
   existing.lastActive = new Date().toISOString();
   await env.FRICTION_KV.put("users:list", JSON.stringify(users));
 }
-```
-
 } catch (err) {
 console.error(“Store user error:”, err);
 }
