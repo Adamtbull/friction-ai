@@ -159,10 +159,6 @@ if (url.pathname === "/api/auth/register" && request.method === "POST") {
 }
 
 return new Response("Not Found", { status: 404, headers: corsHeaders() });
-```
-
-}
-};
 
 function corsHeaders() {
 return {
