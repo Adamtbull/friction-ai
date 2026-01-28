@@ -167,8 +167,8 @@ return new Response("Not Found", { status: 404, headers: corsHeaders() });
 function corsHeaders() {
 return {
 "Access-Control-Allow-Origin": "*",
-"Access-Control-Allow-Methods": "POST, OPTIONS",
-"Access-Control-Allow-Headers": "Content-Type"
+"Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+"Access-Control-Allow-Headers": "Content-Type, Authorization"
 };
 }
 
@@ -177,8 +177,8 @@ if (!status) status = 200;
 var headers = {
 "Content-Type": "application/json",
 "Access-Control-Allow-Origin": "*",
-"Access-Control-Allow-Methods": "POST, OPTIONS",
-"Access-Control-Allow-Headers": "Content-Type"
+"Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+"Access-Control-Allow-Headers": "Content-Type, Authorization"
 };
 return new Response(JSON.stringify(data), {
 status: status,
@@ -199,7 +199,7 @@ parts: [{ text: m.content }]
 };
 });
 
-var endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + encodeURIComponent(apiKey);
+var endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + encodeURIComponent(apiKey);
 
 var res = await fetch(endpoint, {
 method: "POST",
