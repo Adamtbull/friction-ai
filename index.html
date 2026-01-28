@@ -1472,19 +1472,24 @@
       color: var(--text-secondary);
     }
 
-    .settings-radio.strict-mode {
-      background: linear-gradient(135deg, #1a1a1a 0%, #2d1f1f 100%);
-      margin: 12px -12px 0;
-      padding: 14px 12px;
-      border-radius: 10px;
-    }
-
     .settings-radio.strict-mode .radio-label strong {
-      color: #ef4444;
+      color: #dc2626;
     }
 
     .settings-radio.strict-mode .radio-desc {
-      color: #fca5a5;
+      color: #dc2626;
+      font-weight: 500;
+    }
+
+    .strict-warning {
+      background: #fef2f2;
+      border-left: 3px solid #dc2626;
+      padding: 10px 12px;
+      margin: 8px 0 0 32px;
+      border-radius: 0 6px 6px 0;
+      font-size: 0.8rem;
+      color: #991b1b;
+      line-height: 1.4;
     }
 
     .settings-checkbox {
@@ -2182,10 +2187,13 @@
       <label class="settings-radio strict-mode">
         <input type="radio" name="frictionMode" value="strict" />
         <span class="radio-label">
-          <strong>☠️ Strict Mode</strong>
+          <strong>⚠️ Strict Mode</strong>
           <span class="radio-desc">No mercy. 15 levels, up to 2 rows of 20 characters. Take no prisoners.</span>
         </span>
       </label>
+      <div class="strict-warning">
+        <strong>⚠️ For Serious Friction Only:</strong> This mode is designed for people who need maximum friction and accountability. Not recommended for casual use.
+      </div>
     </div>
 
     <!-- Message Delay -->
