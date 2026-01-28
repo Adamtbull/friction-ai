@@ -1810,7 +1810,102 @@
       .friction-code { font-size: 1rem; }
       .message { max-width: 90%; }
     }
-  </style>
+  
+    /* =================== */
+    /* CODE BLOCK STYLES   */
+    /* =================== */
+    .code-block-container {
+      margin: 12px 0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #1e1e1e;
+      border: 1px solid var(--border);
+    }
+
+    .code-block-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: #2d2d2d;
+      border-bottom: 1px solid #3d3d3d;
+    }
+
+    .code-block-language {
+      font-size: 0.75rem;
+      color: #858585;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 500;
+    }
+
+    .code-block-filename {
+      font-size: 0.8rem;
+      color: #d4d4d4;
+      font-family: 'SF Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
+      margin-bottom: 2px;
+    }
+
+    .btn-copy-code {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: var(--teal);
+      border: none;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--white);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-copy-code:hover {
+      background: var(--teal-dark);
+    }
+
+    .btn-copy-code.copied {
+      background: #22c55e;
+    }
+
+    .btn-copy-code svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+    }
+
+    .code-block-content {
+      padding: 16px;
+      overflow-x: auto;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .code-block-content pre {
+      margin: 0;
+      font-family: 'SF Mono', 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', Monaco, 'Courier New', monospace;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: #d4d4d4;
+    }
+
+    .code-block-content code {
+      font-family: inherit;
+      color: inherit;
+    }
+
+    /* Syntax highlighting colors */
+    .code-keyword { color: #569cd6; }
+    .code-string { color: #ce9178; }
+    .code-comment { color: #6a9955; font-style: italic; }
+    .code-function { color: #dcdcaa; }
+    .code-number { color: #b5cea8; }
+    .code-property { color: #9cdcfe; }
+    .code-tag { color: #569cd6; }
+    .code-attribute { color: #9cdcfe; }
+    .code-value { color: #ce9178; }
+</style>
 
 </head>
 
@@ -3924,6 +4019,97 @@
     });
 
     updateKeyboardOffset();
+  
+
+    // =================== //
+    // CODE BLOCK HANDLER  //
+    // =================== //
+
+    function formatCodeBlocks(messageElement) {
+      const content = messageElement.innerHTML;
+
+      // Match code blocks with optional language and filename
+      // Supports: ```language, ```language:filename, or just ```
+      const codeBlockRegex = /```([\w+#-]*)?(?::(\S+))?\n([\s\S]*?)```/g;
+
+      let formatted = content.replace(codeBlockRegex, (match, language, filename, code) => {
+        const lang = language || 'plaintext';
+        const file = filename || '';
+        const codeId = 'code-' + Math.random().toString(36).substr(2, 9);
+
+        return `
+          <div class="code-block-container">
+            <div class="code-block-header">
+              <div>
+                ${file ? `<div class="code-block-filename">${escapeHtml(file)}</div>` : ''}
+                <div class="code-block-language">${escapeHtml(lang)}</div>
+              </div>
+              <button class="btn-copy-code" onclick="copyCode('${codeId}')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <div class="code-block-content">
+              <pre id="${codeId}"><code>${escapeHtml(code.trim())}</code></pre>
+            </div>
+          </div>
+        `;
+      });
+
+      messageElement.innerHTML = formatted;
+    }
+
+    function copyCode(codeId) {
+      const codeElement = document.getElementById(codeId);
+      const button = event.currentTarget;
+      const buttonText = button.querySelector('span');
+
+      if (!codeElement) return;
+
+      const code = codeElement.textContent;
+
+      // Copy to clipboard
+      navigator.clipboard.writeText(code).then(() => {
+        // Visual feedback
+        button.classList.add('copied');
+        buttonText.textContent = 'Copied!';
+
+        setTimeout(() => {
+          button.classList.remove('copied');
+          buttonText.textContent = 'Copy';
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy:', err);
+        buttonText.textContent = 'Failed';
+        setTimeout(() => {
+          buttonText.textContent = 'Copy';
+        }, 2000);
+      });
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Enhance the addMessage function to format code blocks
+    const chatMessagesEl = document.getElementById('chatMessages');
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.classList && node.classList.contains('message-ai')) {
+            formatCodeBlocks(node);
+          }
+        });
+      });
+    });
+
+    observer.observe(chatMessagesEl, { childList: true });
+
   </script>
 
 </body>
