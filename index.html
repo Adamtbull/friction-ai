@@ -2026,67 +2026,35 @@
       .friction-code { font-size: 1rem; }
       .message { max-width: 90%; }
     }
-  
-    /* FILE MANAGER */
-    .file-manager-toggle { position: fixed; right: 20px; bottom: calc(100px + var(--safe-bottom)); width: 56px; height: 56px; background: var(--teal); border: none; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 900; transition: all 0.3s ease; }
-    .file-manager-toggle:hover { background: var(--teal-dark); transform: scale(1.05); }
-    .file-manager-toggle svg { width: 24px; height: 24px; stroke: var(--white); }
-    .file-manager-badge { position: absolute; top: -4px; right: -4px; background: #ef4444; color: var(--white); font-size: 0.7rem; font-weight: 600; padding: 2px 6px; border-radius: 10px; min-width: 20px; text-align: center; }
-    .file-manager-panel { position: fixed; top: 0; right: 0; bottom: 0; width: 380px; max-width: 90vw; background: var(--white); transform: translateX(100%); transition: transform 0.3s ease; z-index: 1001; display: flex; flex-direction: column; box-shadow: -4px 0 24px rgba(0,0,0,0.1); }
-    .file-manager-panel.active { transform: translateX(0); }
-    .file-manager-header { display: flex; align-items: center; justify-content: space-between; padding: 20px; border-bottom: 1px solid var(--border); background: var(--grey-light); }
-    .file-manager-title { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
-    .file-manager-title svg { width: 20px; height: 20px; stroke: var(--teal); }
-    .btn-close-fm { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: none; background: transparent; border-radius: 6px; cursor: pointer; transition: background 0.2s ease; }
-    .btn-close-fm:hover { background: var(--border); }
-    .btn-close-fm svg { width: 18px; height: 18px; stroke: var(--grey); }
-    .file-manager-actions { display: flex; gap: 8px; padding: 12px 20px; border-bottom: 1px solid var(--border); background: var(--white); flex-wrap: wrap; }
-    .btn-fm-action { flex: 1; min-width: 100px; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--white); font-size: 0.8rem; font-weight: 500; color: var(--text-primary); cursor: pointer; transition: all 0.2s ease; }
-    .btn-fm-action:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-lighter); }
-    .btn-fm-action svg { width: 16px; height: 16px; }
-    .btn-fm-action.primary { background: var(--teal); color: var(--white); border-color: var(--teal); }
-    .btn-fm-action.primary:hover { background: var(--teal-dark); }
-    .file-manager-content { flex: 1; overflow-y: auto; padding: 16px 20px; }
-    .file-list { list-style: none; padding: 0; margin: 0; }
-    .file-item { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s ease; background: var(--white); }
-    .file-item:hover, .file-item.active { border-color: var(--teal); background: var(--teal-lighter); }
-    .file-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: var(--grey-light); border-radius: 6px; flex-shrink: 0; }
-    .file-icon svg { width: 18px; height: 18px; stroke: var(--grey); }
-    .file-info { flex: 1; min-width: 0; }
-    .file-name { font-size: 0.9rem; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .file-meta { font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px; }
-    .file-actions { display: flex; gap: 4px; }
-    .btn-file-action { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none; background: transparent; border-radius: 4px; cursor: pointer; transition: all 0.2s ease; }
-    .btn-file-action:hover { background: var(--grey-light); }
-    .btn-file-action svg { width: 16px; height: 16px; }
-    .btn-file-delete:hover { background: #fef2f2; }
-    .btn-file-delete:hover svg { stroke: #dc2626; }
-    .file-empty { text-align: center; padding: 40px 20px; color: var(--text-secondary); }
-    .file-empty-icon { font-size: 3rem; margin-bottom: 12px; opacity: 0.3; }
-    .file-empty-text { font-size: 0.9rem; margin-bottom: 16px; }
-    .file-viewer { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 2001; padding: 20px; overflow-y: auto; }
-    .file-viewer.active { display: flex; align-items: center; justify-content: center; }
-    .file-viewer-content { background: var(--white); border-radius: 12px; width: 100%; max-width: 900px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; }
-    .file-viewer-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); background: var(--grey-light); }
-    .file-viewer-title { font-size: 1rem; font-weight: 600; color: var(--text-primary); }
-    .file-viewer-actions { display: flex; gap: 8px; }
-    .btn-viewer-action { padding: 8px 16px; border: 1px solid var(--border); border-radius: 6px; background: var(--white); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
-    .btn-viewer-action:hover { border-color: var(--teal); color: var(--teal); }
-    .btn-viewer-action.primary { background: var(--teal); color: var(--white); border-color: var(--teal); }
-    .btn-viewer-action.primary:hover { background: var(--teal-dark); }
-    .file-viewer-body { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
-    .file-editor { flex: 1; padding: 16px; font-family: 'SF Mono', monospace; font-size: 0.9rem; line-height: 1.6; border: none; outline: none; resize: none; background: #1e1e1e; color: #d4d4d4; }
-    .file-editor:read-only { background: var(--grey-light); color: var(--text-primary); }
-    .github-sync-panel { padding: 16px 20px; background: var(--teal-lighter); border-top: 2px solid var(--teal); }
-    .github-sync-title { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
-    .github-token-input, .github-repo-input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; margin-bottom: 8px; }
-    .github-token-input { font-family: monospace; }
-    .github-status { font-size: 0.75rem; color: var(--text-secondary); margin-top: 8px; padding: 6px 10px; background: var(--white); border-radius: 4px; }
-    .github-status.success { color: #22c55e; background: #f0fdf4; }
-    .github-status.error { color: #dc2626; background: #fef2f2; }
-    @media (max-width: 600px) {
-      .file-manager-panel { width: 100%; max-width: 100%; }
-      .file-viewer-content { max-width: 100%; max-height: 100vh; border-radius: 0; }
+
+    /* CODE CANVAS */
+    .code-canvas-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 2000; }
+    .code-canvas-overlay.active { display: block; }
+    .code-canvas { position: fixed; top: 0; right: 0; bottom: 0; width: 50%; min-width: 400px; max-width: 800px; background: #0d2831; transform: translateX(100%); transition: transform 0.3s ease; z-index: 2001; display: flex; flex-direction: column; box-shadow: -4px 0 24px rgba(0,0,0,0.3); }
+    .code-canvas.active { transform: translateX(0); }
+    .code-canvas-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: #0a1f26; border-bottom: 1px solid #1a4a5c; }
+    .code-canvas-title { display: flex; align-items: center; gap: 10px; }
+    .code-canvas-title span { color: #6bb8cc; font-size: 0.9rem; font-weight: 500; }
+    .code-canvas-lang { background: #1a4a5c; color: #6bb8cc; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; text-transform: lowercase; }
+    .code-canvas-actions { display: flex; gap: 8px; }
+    .btn-canvas-action { display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: transparent; border: 1px solid #1a4a5c; border-radius: 6px; color: #6bb8cc; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
+    .btn-canvas-action:hover { background: #1a4a5c; color: #fff; }
+    .btn-canvas-action.primary { background: var(--teal); border-color: var(--teal); color: #fff; }
+    .btn-canvas-action.primary:hover { background: var(--teal-dark); }
+    .btn-canvas-action svg { width: 16px; height: 16px; }
+    .btn-canvas-close { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: transparent; border: 1px solid #1a4a5c; border-radius: 6px; color: #6bb8cc; cursor: pointer; transition: all 0.2s ease; }
+    .btn-canvas-close:hover { background: #1a4a5c; color: #fff; }
+    .btn-canvas-close svg { width: 18px; height: 18px; }
+    .code-canvas-body { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+    .code-canvas-editor { flex: 1; width: 100%; padding: 20px; font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace; font-size: 0.9rem; line-height: 1.7; border: none; outline: none; resize: none; background: #0d2831; color: #e6f4f1; tab-size: 2; }
+    .code-canvas-editor::placeholder { color: #4a7a8c; }
+    .code-canvas-footer { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: #0a1f26; border-top: 1px solid #1a4a5c; }
+    .code-canvas-info { font-size: 0.75rem; color: #4a7a8c; }
+    .btn-open-canvas { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: transparent; border: 1px solid #1a4a5c; border-radius: 4px; color: #6bb8cc; font-size: 0.7rem; cursor: pointer; transition: all 0.2s ease; margin-left: 8px; }
+    .btn-open-canvas:hover { background: #1a4a5c; color: #fff; }
+    .btn-open-canvas svg { width: 12px; height: 12px; }
+    @media (max-width: 768px) {
+      .code-canvas { width: 100%; min-width: 100%; max-width: 100%; }
     }
 </style>
 
@@ -4023,10 +3991,16 @@
         var codeHtml = '<div class="code-block-container">' +
           '<div class="code-block-header">' +
             '<span class="code-block-lang">' + block.lang + '</span>' +
-            '<button class="code-copy-btn" onclick="copyCodeBlock(this)" data-code="' + encodeURIComponent(block.code) + '">' +
-              '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
-              '<span>Copy</span>' +
-            '</button>' +
+            '<div style="display:flex;gap:6px;">' +
+              '<button class="btn-open-canvas" onclick="openCodeCanvas(this)" data-code="' + encodeURIComponent(block.code) + '" data-lang="' + block.lang + '">' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>' +
+                'Canvas' +
+              '</button>' +
+              '<button class="code-copy-btn" onclick="copyCodeBlock(this)" data-code="' + encodeURIComponent(block.code) + '">' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
+                '<span>Copy</span>' +
+              '</button>' +
+            '</div>' +
           '</div>' +
           '<div class="code-block-content"><pre><code>' + block.code.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</code></pre></div>' +
         '</div>';
@@ -4364,401 +4338,153 @@
     });
 
     updateKeyboardOffset();
-  
 
     // =================== //
-    // FILE MANAGER SYSTEM //
+    // CODE CANVAS SYSTEM  //
     // =================== //
 
-    let fileManager = {
-      files: [],
-      currentFile: null,
-      githubConfig: { repo: '', token: '' }
+    var canvasState = {
+      currentLang: 'code',
+      isOpen: false
     };
 
-    // Load from localStorage
-    function loadFileManager() {
-      const saved = localStorage.getItem('friction-files');
-      if (saved) {
-        try {
-          fileManager.files = JSON.parse(saved);
-        } catch(e) { fileManager.files = []; }
-      }
-      const githubSaved = localStorage.getItem('friction-github');
-      if (githubSaved) {
-        try {
-          fileManager.githubConfig = JSON.parse(githubSaved);
-          document.getElementById('githubRepo').value = fileManager.githubConfig.repo || '';
-          document.getElementById('githubToken').value = fileManager.githubConfig.token || '';
-        } catch(e) {}
-      }
-      renderFileList();
-      updateFileBadge();
-    }
+    function openCodeCanvas(button) {
+      var code = decodeURIComponent(button.getAttribute('data-code'));
+      var lang = button.getAttribute('data-lang') || 'code';
 
-    // Save to localStorage
-    function saveFileManager() {
-      localStorage.setItem('friction-files', JSON.stringify(fileManager.files));
-      renderFileList();
-      updateFileBadge();
-    }
+      canvasState.currentLang = lang;
+      canvasState.isOpen = true;
 
-    // Toggle File Manager Panel
-    document.getElementById('fileManagerToggle').addEventListener('click', () => {
-      document.getElementById('fileManagerPanel').classList.toggle('active');
-    });
-
-    document.getElementById('closeFileManager').addEventListener('click', () => {
-      document.getElementById('fileManagerPanel').classList.remove('active');
-    });
-
-    // Create New File
-    document.getElementById('btnNewFile').addEventListener('click', createNewFile);
-
-    function createNewFile() {
-      const fileName = prompt('Enter file name (e.g., app.js, index.html):');
-      if (!fileName) return;
-
-      const newFile = {
-        id: Date.now().toString(),
-        name: fileName,
-        content: '',
-        created: new Date().toISOString(),
-        modified: new Date().toISOString()
-      };
-
-      fileManager.files.push(newFile);
-      saveFileManager();
-      openFile(newFile.id);
-    }
-
-    // Render File List
-    function renderFileList() {
-      const fileListEl = document.getElementById('fileList');
-
-      if (fileManager.files.length === 0) {
-        fileListEl.innerHTML = `
-          <div class="file-empty">
-            <div class="file-empty-icon">📁</div>
-            <div class="file-empty-text">No files yet</div>
-            <button class="btn-fm-action" onclick="createNewFile()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-              Create your first file
-            </button>
-          </div>
-        `;
-        return;
-      }
-
-      fileListEl.innerHTML = fileManager.files.map(file => {
-        const ext = file.name.split('.').pop().toLowerCase();
-        const icon = getFileIcon(ext);
-        const size = new Blob([file.content]).size;
-        const sizeText = size < 1024 ? size + ' B' : (size / 1024).toFixed(1) + ' KB';
-        const date = new Date(file.modified).toLocaleDateString();
-
-        return `
-          <li class="file-item" onclick="openFile('${file.id}')">
-            <div class="file-icon">${icon}</div>
-            <div class="file-info">
-              <div class="file-name">${escapeHtml(file.name)}</div>
-              <div class="file-meta">${sizeText} • ${date}</div>
-            </div>
-            <div class="file-actions">
-              <button class="btn-file-action" onclick="event.stopPropagation(); downloadSingleFile('${file.id}')" title="Download">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="7 10 12 15 17 10"></polyline>
-                  <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-              </button>
-              <button class="btn-file-action btn-file-delete" onclick="event.stopPropagation(); deleteFile('${file.id}')" title="Delete">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="3 6 5 6 21 6"></polyline>
-                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                </svg>
-              </button>
-            </div>
-          </li>
-        `;
-      }).join('');
-    }
-
-    // Get file icon
-    function getFileIcon(ext) {
-      const icons = {
-        js: '📜', html: '🌐', css: '🎨', json: '📋',
-        txt: '📄', md: '📝', py: '🐍', java: '☕'
-      };
-      return icons[ext] || '📄';
-    }
-
-    // Open File in Viewer/Editor
-    function openFile(fileId) {
-      const file = fileManager.files.find(f => f.id === fileId);
-      if (!file) return;
-
-      fileManager.currentFile = file;
-      document.getElementById('fileViewerTitle').textContent = file.name;
-      document.getElementById('fileEditor').value = file.content;
-      document.getElementById('fileViewer').classList.add('active');
+      document.getElementById('canvasLang').textContent = lang;
+      document.getElementById('canvasEditor').value = code;
+      document.getElementById('codeCanvas').classList.add('active');
+      document.getElementById('codeCanvasOverlay').classList.add('active');
       document.body.classList.add('scroll-locked');
+
+      updateCanvasInfo();
     }
 
-    // Save File
-    function saveFile() {
-      if (!fileManager.currentFile) return;
-
-      const content = document.getElementById('fileEditor').value;
-      const file = fileManager.files.find(f => f.id === fileManager.currentFile.id);
-
-      if (file) {
-        file.content = content;
-        file.modified = new Date().toISOString();
-        saveFileManager();
-
-        // Show feedback
-        const btn = event.target;
-        btn.textContent = 'Saved!';
-        btn.style.background = '#22c55e';
-        setTimeout(() => {
-          btn.textContent = 'Save';
-          btn.style.background = '';
-        }, 2000);
-      }
-    }
-
-    // Close File Viewer
-    function closeFileViewer() {
-      document.getElementById('fileViewer').classList.remove('active');
+    function closeCodeCanvas() {
+      canvasState.isOpen = false;
+      document.getElementById('codeCanvas').classList.remove('active');
+      document.getElementById('codeCanvasOverlay').classList.remove('active');
       document.body.classList.remove('scroll-locked');
-      fileManager.currentFile = null;
     }
 
-    // Download Single File
-    function downloadSingleFile(fileId) {
-      const file = fileManager.files.find(f => f.id === fileId);
-      if (!file) return;
+    function updateCanvasInfo() {
+      var editor = document.getElementById('canvasEditor');
+      var lines = editor.value.split('\n').length;
+      var chars = editor.value.length;
+      document.getElementById('canvasInfo').textContent = lines + ' line' + (lines !== 1 ? 's' : '') + ' | ' + chars + ' characters';
+    }
 
-      const blob = new Blob([file.content], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+    function copyCanvasCode() {
+      var code = document.getElementById('canvasEditor').value;
+      var btn = document.getElementById('btnCanvasCopy');
+
+      navigator.clipboard.writeText(code).then(function() {
+        var originalText = btn.innerHTML;
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied!';
+        btn.classList.add('primary');
+        setTimeout(function() {
+          btn.innerHTML = originalText;
+          btn.classList.remove('primary');
+        }, 2000);
+      });
+    }
+
+    function downloadCanvasCode() {
+      var code = document.getElementById('canvasEditor').value;
+      var lang = canvasState.currentLang;
+
+      var extensions = {
+        javascript: 'js', js: 'js', python: 'py', py: 'py',
+        html: 'html', css: 'css', json: 'json', typescript: 'ts',
+        ts: 'ts', java: 'java', cpp: 'cpp', c: 'c', go: 'go',
+        rust: 'rs', ruby: 'rb', php: 'php', swift: 'swift',
+        kotlin: 'kt', sql: 'sql', bash: 'sh', shell: 'sh',
+        yaml: 'yaml', yml: 'yml', xml: 'xml', markdown: 'md', md: 'md'
+      };
+
+      var ext = extensions[lang.toLowerCase()] || 'txt';
+      var filename = 'code.' + ext;
+
+      var blob = new Blob([code], { type: 'text/plain' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
       a.href = url;
-      a.download = file.name;
+      a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
     }
 
-    // Download Current File
-    function downloadFile() {
-      if (!fileManager.currentFile) return;
-      downloadSingleFile(fileManager.currentFile.id);
-    }
+    // Canvas event listeners
+    document.getElementById('btnCanvasClose').addEventListener('click', closeCodeCanvas);
+    document.getElementById('codeCanvasOverlay').addEventListener('click', closeCodeCanvas);
+    document.getElementById('btnCanvasCopy').addEventListener('click', copyCanvasCode);
+    document.getElementById('btnCanvasDownload').addEventListener('click', downloadCanvasCode);
+    document.getElementById('canvasEditor').addEventListener('input', updateCanvasInfo);
 
-    // Delete File
-    function deleteFile(fileId) {
-      if (!confirm('Delete this file?')) return;
-
-      fileManager.files = fileManager.files.filter(f => f.id !== fileId);
-      saveFileManager();
-    }
-
-    // Update Badge
-    function updateFileBadge() {
-      const badge = document.getElementById('fileCountBadge');
-      const count = fileManager.files.length;
-
-      if (count > 0) {
-        badge.textContent = count;
-        badge.style.display = 'block';
-      } else {
-        badge.style.display = 'none';
+    // Handle tab key in canvas editor
+    document.getElementById('canvasEditor').addEventListener('keydown', function(e) {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        var start = this.selectionStart;
+        var end = this.selectionEnd;
+        this.value = this.value.substring(0, start) + '  ' + this.value.substring(end);
+        this.selectionStart = this.selectionEnd = start + 2;
+        updateCanvasInfo();
       }
-    }
-
-    // GitHub Sync
-    document.getElementById('btnSyncGitHub').addEventListener('click', () => {
-      const panel = document.getElementById('githubSyncPanel');
-      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+      if (e.key === 'Escape') {
+        closeCodeCanvas();
+      }
     });
-
-    function saveGitHubConfig() {
-      fileManager.githubConfig = {
-        repo: document.getElementById('githubRepo').value,
-        token: document.getElementById('githubToken').value
-      };
-      localStorage.setItem('friction-github', JSON.stringify(fileManager.githubConfig));
-
-      const status = document.getElementById('githubStatus');
-      status.textContent = '✓ Configuration saved';
-      status.className = 'github-status success';
-
-      setTimeout(() => { status.textContent = ''; }, 3000);
-    }
-
-    async function syncToGitHub() {
-      const { repo, token } = fileManager.githubConfig;
-      const status = document.getElementById('githubStatus');
-
-      if (!repo || !token) {
-        status.textContent = '⚠ Please configure GitHub first';
-        status.className = 'github-status error';
-        return;
-      }
-
-      status.textContent = '⏳ Syncing to GitHub...';
-      status.className = 'github-status';
-
-      try {
-        // Upload each file to GitHub
-        for (const file of fileManager.files) {
-          const content = btoa(unescape(encodeURIComponent(file.content)));
-
-          await fetch(`https://api.github.com/repos/${repo}/contents/${file.name}`, {
-            method: 'PUT',
-            headers: {
-              'Authorization': `token ${token}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              message: `Update ${file.name} via Friction AI`,
-              content: content,
-              branch: 'main'
-            })
-          });
-        }
-
-        status.textContent = `✓ Successfully synced ${fileManager.files.length} file(s) to GitHub`;
-        status.className = 'github-status success';
-      } catch (error) {
-        status.textContent = '✗ Sync failed: ' + error.message;
-        status.className = 'github-status error';
-      }
-    }
-
-    // Initialize on load
-    window.addEventListener('load', () => {
-      loadFileManager();
-    });
-
-    // AI Integration: Allow AI to reference files
-    function getFileContent(fileName) {
-      const file = fileManager.files.find(f => f.name === fileName);
-      return file ? file.content : null;
-    }
-
-    function updateFileContent(fileName, content) {
-      let file = fileManager.files.find(f => f.name === fileName);
-
-      if (!file) {
-        file = {
-          id: Date.now().toString(),
-          name: fileName,
-          content: content,
-          created: new Date().toISOString(),
-          modified: new Date().toISOString()
-        };
-        fileManager.files.push(file);
-      } else {
-        file.content = content;
-        file.modified = new Date().toISOString();
-      }
-
-      saveFileManager();
-      return file;
-    }
 
   </script>
 
-
-  <!-- FILE MANAGER -->
-  <button class="file-manager-toggle" id="fileManagerToggle" type="button">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-    </svg>
-    <span class="file-manager-badge" id="fileCountBadge" style="display:none">0</span>
-  </button>
-
-  <div class="file-manager-panel" id="fileManagerPanel">
-    <div class="file-manager-header">
-      <div class="file-manager-title">
+  <!-- CODE CANVAS -->
+  <div class="code-canvas-overlay" id="codeCanvasOverlay"></div>
+  <div class="code-canvas" id="codeCanvas">
+    <div class="code-canvas-header">
+      <div class="code-canvas-title">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          <polyline points="16 18 22 12 16 6"></polyline>
+          <polyline points="8 6 2 12 8 18"></polyline>
         </svg>
-        <span>File Manager</span>
+        <span>Code Canvas</span>
+        <span class="code-canvas-lang" id="canvasLang">code</span>
       </div>
-      <button class="btn-close-fm" id="closeFileManager" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
+      <div class="code-canvas-actions">
+        <button class="btn-canvas-action" id="btnCanvasCopy" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          Copy
+        </button>
+        <button class="btn-canvas-action" id="btnCanvasDownload" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Download
+        </button>
+        <button class="btn-canvas-close" id="btnCanvasClose" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
     </div>
-
-    <div class="file-manager-actions">
-      <button class="btn-fm-action" id="btnNewFile" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14 2 14 8 20 8"></polyline>
-          <line x1="12" y1="18" x2="12" y2="12"></line>
-          <line x1="9" y1="15" x2="15" y2="15"></line>
-        </svg>
-        New
-      </button>
-      <button class="btn-fm-action primary" id="btnSyncGitHub" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-        </svg>
-        GitHub
-      </button>
+    <div class="code-canvas-body">
+      <textarea class="code-canvas-editor" id="canvasEditor" placeholder="Code will appear here..." spellcheck="false"></textarea>
     </div>
-
-    <div class="file-manager-content">
-      <ul class="file-list" id="fileList">
-        <div class="file-empty">
-          <div class="file-empty-icon">📁</div>
-          <div class="file-empty-text">No files yet</div>
-          <button class="btn-fm-action" onclick="createNewFile()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            Create your first file
-          </button>
-        </div>
-      </ul>
-    </div>
-
-    <div class="github-sync-panel" style="display:none" id="githubSyncPanel">
-      <div class="github-sync-title">GitHub Configuration</div>
-      <input type="text" class="github-repo-input" id="githubRepo" placeholder="username/repository" />
-      <input type="password" class="github-token-input" id="githubToken" placeholder="GitHub Personal Access Token" />
-      <button class="btn-fm-action primary" onclick="saveGitHubConfig()" style="width:100%">Save Config</button>
-      <button class="btn-fm-action" onclick="syncToGitHub()" style="width:100%; margin-top:8px">Push to GitHub</button>
-      <div class="github-status" id="githubStatus"></div>
+    <div class="code-canvas-footer">
+      <span class="code-canvas-info" id="canvasInfo">0 lines</span>
     </div>
   </div>
-
-  <!-- FILE VIEWER/EDITOR -->
-  <div class="file-viewer" id="fileViewer">
-    <div class="file-viewer-content">
-      <div class="file-viewer-header">
-        <div class="file-viewer-title" id="fileViewerTitle">Untitled</div>
-        <div class="file-viewer-actions">
-          <button class="btn-viewer-action" onclick="downloadFile()" type="button">Download</button>
-          <button class="btn-viewer-action primary" onclick="saveFile()" type="button">Save</button>
-          <button class="btn-viewer-action" onclick="closeFileViewer()" type="button">Close</button>
-        </div>
-      </div>
-      <div class="file-viewer-body">
-        <textarea class="file-editor" id="fileEditor" placeholder="Start typing..."></textarea>
-      </div>
-    </div>
-  </div>
-
 
 </body>
 </html>
