@@ -141,19 +141,52 @@ if (url.pathname === "/api/auth/register" && request.method === "POST") {
     if (!authResult.valid) {
       return jsonResponse({ error: "Invalid token" }, 401);
     }
-    
+
     await logAnalytics(env, {
       type: "signup",
       userHash: hashEmail(authResult.email),
       timestamp: Date.now()
     });
-    
+
     // Store user in KV (just email + signup date, no content)
     await storeUser(env, authResult.email);
-    
+
     return jsonResponse({ success: true }, 200);
   } catch (err) {
     return jsonResponse({ error: err.message || "Registration failed" }, 500);
+  }
+}
+
+// ============ USER DATA PERSISTENCE ============
+
+// GET /api/user/data - Load user's saved data (chat history, settings, goals)
+if (url.pathname === "/api/user/data" && request.method === "GET") {
+  try {
+    var authResult = await verifyUserToken(request, env);
+    if (!authResult.valid) {
+      return jsonResponse({ error: "Authentication required" }, 401);
+    }
+
+    var userData = await getUserData(env, authResult.email);
+    return jsonResponse({ data: userData }, 200);
+  } catch (err) {
+    return jsonResponse({ error: err.message || "Failed to load data" }, 500);
+  }
+}
+
+// POST /api/user/data - Save user's data
+if (url.pathname === "/api/user/data" && request.method === "POST") {
+  try {
+    var authResult = await verifyUserToken(request, env);
+    if (!authResult.valid) {
+      return jsonResponse({ error: "Authentication required" }, 401);
+    }
+
+    var body = await request.json().catch(function() { return {}; });
+    await saveUserData(env, authResult.email, body);
+    return jsonResponse({ success: true }, 200);
+  } catch (err) {
+    return jsonResponse({ error: err.message || "Failed to save data" }, 500);
   }
 }
 
@@ -563,5 +596,48 @@ var userList = await env.FRICTION_KV.get("users:list");
 return userList ? JSON.parse(userList) : [];
 } catch (err) {
 return [];
+}
+}
+
+// ============ USER DATA PERSISTENCE ============
+
+async function getUserData(env, email) {
+if (!env.FRICTION_KV) return null;
+
+try {
+var key = "userdata:" + hashEmail(email);
+var data = await env.FRICTION_KV.get(key);
+return data ? JSON.parse(data) : null;
+} catch (err) {
+console.error("Get user data error:", err);
+return null;
+}
+}
+
+async function saveUserData(env, email, data) {
+if (!env.FRICTION_KV) return;
+
+try {
+var key = "userdata:" + hashEmail(email);
+
+// Merge with existing data to avoid overwriting
+var existing = await env.FRICTION_KV.get(key);
+var merged = existing ? JSON.parse(existing) : {};
+
+// Update only provided fields
+if (data.chat !== undefined) merged.chat = data.chat;
+if (data.goals !== undefined) merged.goals = data.goals;
+if (data.settings !== undefined) merged.settings = data.settings;
+if (data.history !== undefined) merged.history = data.history;
+if (data.frictionState !== undefined) merged.frictionState = data.frictionState;
+
+merged.lastUpdated = new Date().toISOString();
+
+// Store with 1 year expiration
+await env.FRICTION_KV.put(key, JSON.stringify(merged), { expirationTtl: 365 * 24 * 60 * 60 });
+
+} catch (err) {
+console.error("Save user data error:", err);
+throw err;
 }
 }
