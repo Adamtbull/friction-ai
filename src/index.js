@@ -2,7 +2,6 @@ export default {
 async fetch(request, env) {
 var url = new URL(request.url);
 
-```
 // Only respond to /api/*
 if (!url.pathname.startsWith("/api/")) {
   return new Response("Not Found", { status: 404 });
@@ -159,7 +158,6 @@ if (url.pathname === "/api/auth/register" && request.method === "POST") {
 }
 
 return new Response("Not Found", { status: 404, headers: corsHeaders() });
-```
 
 }
 };
@@ -392,7 +390,6 @@ if (parts.length !== 3) {
 return { valid: false, error: "Invalid token format" };
 }
 
-```
 var payload = JSON.parse(atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")));
 
 // Check expiration
@@ -411,7 +408,6 @@ if (payload.aud !== env.GOOGLE_CLIENT_ID) {
 }
 
 return { valid: true, email: payload.email, name: payload.name };
-```
 
 } catch (err) {
 return { valid: false, error: "Token verification failed" };
@@ -451,7 +447,6 @@ try {
 var today = new Date().toISOString().split("T")[0];
 var key = "analytics:" + today;
 
-```
 var existing = await env.FRICTION_KV.get(key);
 var dayData = existing ? JSON.parse(existing) : { messages: 0, users: {}, models: {}, signups: 0 };
 
@@ -464,7 +459,6 @@ if (data.type === "message") {
 }
 
 await env.FRICTION_KV.put(key, JSON.stringify(dayData), { expirationTtl: 90 * 24 * 60 * 60 }); // 90 days
-```
 
 } catch (err) {
 console.error("Analytics error:", err);
@@ -483,7 +477,6 @@ last7Days: { messages: 0, uniqueUsers: 0, signups: 0, models: {} },
 last30Days: { messages: 0, uniqueUsers: 0, signups: 0, models: {} }
 };
 
-```
 var allUsers7 = {};
 var allUsers30 = {};
 
@@ -531,7 +524,6 @@ var userList = await env.FRICTION_KV.get("users:list");
 stats.totalUsers = userList ? JSON.parse(userList).length : 0;
 
 return stats;
-```
 
 } catch (err) {
 return { error: err.message };
@@ -545,7 +537,6 @@ try {
 var userList = await env.FRICTION_KV.get("users:list");
 var users = userList ? JSON.parse(userList) : [];
 
-```
 var existing = users.find(function(u) { return u.email === email; });
 if (!existing) {
   users.push({
@@ -558,7 +549,6 @@ if (!existing) {
   existing.lastActive = new Date().toISOString();
   await env.FRICTION_KV.put("users:list", JSON.stringify(users));
 }
-```
 
 } catch (err) {
 console.error("Store user error:", err);
