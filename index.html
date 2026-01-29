@@ -2085,13 +2085,32 @@
     #friction-social-view .fs-row {
       display: flex;
       gap: 14px;
+      overflow-y: hidden;
       overflow-x: auto;
-      padding-bottom: 6px;
+      padding: 4px 8px 10px;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x mandatory;
+      scroll-padding: 0 8px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+    }
+
+    #friction-social-view .fs-row::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    #friction-social-view .fs-row::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    #friction-social-view .fs-row::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 999px;
     }
 
     #friction-social-view .fs-card {
-      min-width: 180px;
-      max-width: 180px;
+      flex: 0 0 auto;
+      width: clamp(160px, 42vw, 220px);
       background: var(--white);
       border: 1px solid var(--border);
       border-radius: 12px;
@@ -2101,6 +2120,7 @@
       text-align: left;
       cursor: pointer;
       box-shadow: 0 6px 16px var(--shadow);
+      scroll-snap-align: start;
     }
 
     #friction-social-view .fs-card img {
