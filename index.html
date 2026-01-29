@@ -4770,7 +4770,15 @@
       <div class="life-person-tasks-body is-collapsed" id="lifePersonTasksBody">
         <div class="life-person-tasks-actions">
           <input class="life-input" id="lifePersonTaskTitle" type="text" placeholder="Add a task" maxlength="120" />
-          <input class="life-input" id="lifePersonTaskBarrier" type="text" placeholder="Barrier (optional)" maxlength="80" />
+          <select class="life-select" id="lifePersonTaskBarrier">
+            <option value="">Barrier (optional)</option>
+            <option value="Overwhelmed">Overwhelmed</option>
+            <option value="Too many steps">Too many steps</option>
+            <option value="Low energy">Low energy</option>
+            <option value="Waiting on others">Waiting on others</option>
+            <option value="No time">No time</option>
+            <option value="Other">Other</option>
+          </select>
           <button class="life-btn" id="lifePersonTaskAdd" type="button">Add task</button>
         </div>
         <div class="life-person-tasks-list" id="lifePersonTasksList"></div>
@@ -12311,7 +12319,7 @@
         if (!activePersonId) return;
         var title = lifePersonTaskTitle ? lifePersonTaskTitle.value.trim() : '';
         if (!title) return;
-        var barrier = lifePersonTaskBarrier ? lifePersonTaskBarrier.value.trim() : '';
+        var barrier = lifePersonTaskBarrier ? lifePersonTaskBarrier.value : '';
         tasks.unshift({
           id: generateGoalId('task'),
           personId: activePersonId,
