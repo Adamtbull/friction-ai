@@ -2222,6 +2222,20 @@
 
     #life-view .life-header {
       margin-bottom: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    #life-view .life-header-copy {
+      max-width: 600px;
+    }
+
+    #life-view .life-primary-cta {
+      align-self: center;
+      min-width: 140px;
     }
 
     #life-view .life-controls {
@@ -2350,6 +2364,154 @@
       background: var(--teal-lighter);
       font-size: 0.75rem;
       color: var(--text-primary);
+    }
+
+    #life-view .life-people-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    #life-view .life-people-form {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      background: var(--white);
+      box-shadow: 0 8px 18px var(--shadow);
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    #life-view .life-people-form.active {
+      display: flex;
+    }
+
+    #life-view .life-people-form-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    #life-view .life-avatar-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+    }
+
+    #life-view .life-avatar-preview {
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      background: rgba(90, 154, 148, 0.08);
+    }
+
+    #life-view .life-avatar-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    #life-view .life-avatar-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    #life-view .life-people-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    #life-view .life-person-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      background: var(--white);
+      box-shadow: 0 10px 20px var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    #life-view .life-person-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 24px var(--shadow);
+    }
+
+    #life-view .life-person-top {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    #life-view .life-person-name {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    #life-view .life-person-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    #life-view .life-person-role {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      border-radius: 999px;
+      background: rgba(90, 154, 148, 0.12);
+      font-size: 0.75rem;
+      color: var(--text-primary);
+    }
+
+    #life-view .life-person-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    #life-view .life-people-empty {
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      text-align: center;
+      color: var(--text-secondary);
+      background: rgba(255, 255, 255, 0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #life-view.people-active .life-controls {
+      align-items: flex-start;
+    }
+
+    #life-view .life-area-hidden {
+      display: none;
+    }
+
+    @media (max-width: 720px) {
+      #life-view .life-people-grid {
+        grid-template-columns: 1fr;
+      }
+
+      #life-view .life-person-card {
+        width: 100%;
+      }
     }
 
     #life-view .unstuck-panel {
@@ -3116,13 +3278,17 @@
 
 <section id="life-view" class="view" aria-hidden="true">
   <div class="life-header">
-    <h2 class="section-title">Life</h2>
-    <p class="section-text">Track what matters across all areas of life.</p>
+    <div class="life-header-copy">
+      <h2 class="section-title">Life</h2>
+      <p class="section-text">Choose a person to manage goals, tasks, and appointments.</p>
+    </div>
+    <button class="life-btn life-primary-cta" id="lifeAddPersonPrimary" type="button">Add person</button>
   </div>
   <div class="life-controls">
     <select class="life-select" id="lifeAreaFilter"></select>
     <div class="life-tabs" id="lifeTabs">
-      <button class="life-tab active" data-tab="today" type="button">Today</button>
+      <button class="life-tab active" data-tab="people" type="button">People</button>
+      <button class="life-tab" data-tab="today" type="button">Today</button>
       <button class="life-tab" data-tab="goals" type="button">Goals</button>
       <button class="life-tab" data-tab="tasks" type="button">Tasks</button>
       <button class="life-tab" data-tab="calendar" type="button">Calendar</button>
@@ -3130,7 +3296,44 @@
     </div>
   </div>
 
-  <div class="life-section" data-tab-panel="today">
+  <div class="life-section" data-tab-panel="people">
+    <div class="life-people-layout">
+      <div class="life-people-form" id="lifePeopleForm">
+        <div class="life-people-form-header">
+          <h3 class="section-subtitle" id="lifePeopleFormTitle">Add person</h3>
+          <button class="life-btn secondary" id="lifePeopleFormCancel" type="button">Cancel</button>
+        </div>
+        <div class="life-avatar-row">
+          <div class="life-avatar-preview">
+            <img id="lifeAvatarPreview" alt="Avatar preview" />
+          </div>
+          <div class="life-avatar-actions">
+            <label class="life-btn secondary" for="lifeAvatarUpload">Add photo</label>
+            <input type="file" id="lifeAvatarUpload" accept="image/*" hidden>
+            <button class="life-btn secondary" id="lifeAvatarRandom" type="button">Random avatar</button>
+            <span class="life-meta" id="lifeAvatarHint">Photo uploads are stored only on this device.</span>
+          </div>
+        </div>
+        <div class="life-row">
+          <input class="life-input" id="lifePersonName" type="text" placeholder="Full name" maxlength="60" />
+          <input class="life-input" id="lifePersonRole" type="text" placeholder="Role (wife, son, daughter)" maxlength="40" />
+        </div>
+        <div class="life-row">
+          <input class="life-input" id="lifePersonOrg" type="text" placeholder="Job / School (optional)" maxlength="80" />
+          <input class="life-input" id="lifePersonDob" type="date" />
+        </div>
+        <div class="life-row">
+          <textarea class="life-textarea" id="lifePersonNotes" placeholder="Notes (optional)" maxlength="200"></textarea>
+        </div>
+        <div class="life-row">
+          <button class="life-btn" id="lifePeopleSave" type="button">Save person</button>
+        </div>
+      </div>
+      <div class="life-people-grid" id="lifePeopleList"></div>
+    </div>
+  </div>
+
+  <div class="life-section" data-tab-panel="today" style="display: none;">
     <h3 class="section-subtitle">Today</h3>
     <div class="life-list" id="lifeTodayList"></div>
   </div>
@@ -3897,6 +4100,318 @@
       }
     }
 
+    // PEOPLE OVERVIEW
+    var PEOPLE_KEY = 'friction_people_v1';
+    var people = [];
+    var editingPersonId = null;
+    var pendingAvatarType = 'generated';
+    var pendingAvatarDataUrl = '';
+    var pendingAvatarSeed = '';
+
+    function generatePersonId() {
+      return 'person_' + Date.now().toString(36) + '_' + Math.floor(Math.random() * 100000).toString(36);
+    }
+
+    function hashString(value) {
+      var hash = 0;
+      if (!value) return hash;
+      for (var i = 0; i < value.length; i++) {
+        hash = (hash << 5) - hash + value.charCodeAt(i);
+        hash |= 0;
+      }
+      return Math.abs(hash);
+    }
+
+    function getInitials(name) {
+      if (!name) return 'P';
+      var parts = name.trim().split(/\s+/).filter(Boolean);
+      if (!parts.length) return 'P';
+      if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+      return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
+    }
+
+    function buildAvatarSvg(seed, name) {
+      var palette = [
+        ['#5A9A94', '#DDF1EE'],
+        ['#3E6B99', '#D9E7F5'],
+        ['#7C5C8A', '#EFE2F3'],
+        ['#C77D4A', '#F7E6D8'],
+        ['#4C7C5B', '#E1F2E6']
+      ];
+      var hash = hashString(seed || name || 'seed');
+      var colors = palette[hash % palette.length];
+      var initials = getInitials(name);
+      var svg = ''
+        + '<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">'
+        + '<defs>'
+        + '<linearGradient id="g" x1="0" y1="0" x2="1" y2="1">'
+        + '<stop offset="0%" stop-color="' + colors[0] + '"/>'
+        + '<stop offset="100%" stop-color="' + colors[1] + '"/>'
+        + '</linearGradient>'
+        + '</defs>'
+        + '<rect width="160" height="160" rx="32" fill="url(#g)"/>'
+        + '<text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="56" font-family="Arial, sans-serif" fill="#fff" font-weight="600">'
+        + initials
+        + '</text>'
+        + '</svg>';
+      return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+    }
+
+    function getAvatarDataUrl(person) {
+      if (person.avatarType === 'photo' && person.avatarDataUrl) {
+        return person.avatarDataUrl;
+      }
+      var seed = person.avatarSeed || person.name || person.id || 'seed';
+      return buildAvatarSvg(seed, person.name);
+    }
+
+    function normalizePerson(person) {
+      if (!person || typeof person !== 'object') return null;
+      var id = person.id || generatePersonId();
+      var seed = person.avatarSeed || person.name || id;
+      return {
+        id: id,
+        name: person.name || 'Unnamed',
+        role: person.role || 'Family',
+        org: person.org || '',
+        dob: person.dob || '',
+        notes: person.notes || '',
+        avatarType: person.avatarType === 'photo' ? 'photo' : 'generated',
+        avatarDataUrl: person.avatarDataUrl || '',
+        avatarSeed: seed,
+        createdAt: person.createdAt || Date.now()
+      };
+    }
+
+    function loadPeople() {
+      var saved = localStorage.getItem(PEOPLE_KEY);
+      if (!saved) {
+        people = [];
+        return;
+      }
+      try {
+        var parsed = JSON.parse(saved);
+        if (!Array.isArray(parsed)) {
+          people = [];
+          return;
+        }
+        people = parsed.map(normalizePerson).filter(Boolean);
+      } catch (e) {
+        people = [];
+      }
+    }
+
+    function savePeople() {
+      localStorage.setItem(PEOPLE_KEY, JSON.stringify(people));
+    }
+
+    function formatDob(dob) {
+      if (!dob) return '';
+      var date = new Date(dob);
+      if (Number.isNaN(date.getTime())) return dob;
+      return date.toLocaleDateString();
+    }
+
+    function setPeopleFormVisible(isVisible) {
+      if (!lifePeopleForm) return;
+      lifePeopleForm.classList.toggle('active', isVisible);
+    }
+
+    function resetPeopleForm() {
+      editingPersonId = null;
+      pendingAvatarType = 'generated';
+      pendingAvatarDataUrl = '';
+      pendingAvatarSeed = generatePersonId();
+      if (lifePeopleFormTitle) lifePeopleFormTitle.textContent = 'Add person';
+      if (lifePersonName) lifePersonName.value = '';
+      if (lifePersonRole) lifePersonRole.value = '';
+      if (lifePersonOrg) lifePersonOrg.value = '';
+      if (lifePersonDob) lifePersonDob.value = '';
+      if (lifePersonNotes) lifePersonNotes.value = '';
+      if (lifeAvatarUpload) lifeAvatarUpload.value = '';
+      if (lifeAvatarHint) lifeAvatarHint.textContent = 'Photo uploads are stored only on this device.';
+      updateAvatarPreview();
+    }
+
+    function updateAvatarPreview() {
+      if (!lifeAvatarPreview) return;
+      var name = lifePersonName ? lifePersonName.value.trim() : '';
+      var dataUrl = pendingAvatarType === 'photo' && pendingAvatarDataUrl
+        ? pendingAvatarDataUrl
+        : buildAvatarSvg(pendingAvatarSeed || name || 'seed', name);
+      lifeAvatarPreview.src = dataUrl;
+    }
+
+    function openPeopleForm(person) {
+      setPeopleFormVisible(true);
+      if (!person) {
+        resetPeopleForm();
+        if (lifePersonName) lifePersonName.focus();
+        return;
+      }
+      editingPersonId = person.id;
+      pendingAvatarType = person.avatarType || 'generated';
+      pendingAvatarDataUrl = person.avatarDataUrl || '';
+      pendingAvatarSeed = person.avatarSeed || person.name || person.id;
+      if (lifePeopleFormTitle) lifePeopleFormTitle.textContent = 'Edit person';
+      if (lifePersonName) lifePersonName.value = person.name || '';
+      if (lifePersonRole) lifePersonRole.value = person.role || '';
+      if (lifePersonOrg) lifePersonOrg.value = person.org || '';
+      if (lifePersonDob) lifePersonDob.value = person.dob || '';
+      if (lifePersonNotes) lifePersonNotes.value = person.notes || '';
+      updateAvatarPreview();
+      if (lifePersonName) lifePersonName.focus();
+    }
+
+    function renderPeopleOverview() {
+      if (!lifePeopleList) return;
+      lifePeopleList.innerHTML = '';
+      if (!people.length) {
+        var empty = document.createElement('div');
+        empty.className = 'life-people-empty';
+        empty.innerHTML = '<strong>No people yet.</strong><span>Add family members to personalize your life plans.</span>';
+        var cta = document.createElement('button');
+        cta.type = 'button';
+        cta.className = 'life-btn';
+        cta.textContent = 'Add person';
+        cta.addEventListener('click', function() {
+          openPeopleForm();
+        });
+        empty.appendChild(cta);
+        lifePeopleList.appendChild(empty);
+        return;
+      }
+      people.forEach(function(person) {
+        var card = document.createElement('div');
+        card.className = 'life-person-card';
+        card.tabIndex = 0;
+        card.setAttribute('role', 'button');
+
+        var top = document.createElement('div');
+        top.className = 'life-person-top';
+
+        var avatarWrap = document.createElement('div');
+        avatarWrap.className = 'life-avatar-preview';
+        var avatarImg = document.createElement('img');
+        avatarImg.alt = person.name || 'Person';
+        avatarImg.src = getAvatarDataUrl(person);
+        avatarWrap.appendChild(avatarImg);
+
+        var meta = document.createElement('div');
+        meta.className = 'life-person-meta';
+        var name = document.createElement('div');
+        name.className = 'life-person-name';
+        name.textContent = person.name || 'Unnamed';
+        var role = document.createElement('span');
+        role.className = 'life-person-role';
+        role.textContent = person.role || 'Family';
+        meta.appendChild(name);
+        meta.appendChild(role);
+
+        top.appendChild(avatarWrap);
+        top.appendChild(meta);
+
+        var org = document.createElement('div');
+        org.className = 'life-meta';
+        org.textContent = person.org ? person.org : '';
+
+        var dob = document.createElement('div');
+        dob.className = 'life-meta';
+        dob.textContent = person.dob ? 'DOB: ' + formatDob(person.dob) : '';
+
+        var actions = document.createElement('div');
+        actions.className = 'life-person-actions';
+
+        var editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.className = 'life-btn secondary';
+        editBtn.textContent = 'Edit';
+        editBtn.addEventListener('click', function(event) {
+          event.stopPropagation();
+          openPeopleForm(person);
+        });
+
+        var removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'life-btn secondary';
+        removeBtn.textContent = 'Remove';
+        removeBtn.addEventListener('click', function(event) {
+          event.stopPropagation();
+          var confirmRemove = window.confirm('Remove ' + (person.name || 'this person') + '?');
+          if (!confirmRemove) return;
+          people = people.filter(function(item) { return item.id !== person.id; });
+          savePeople();
+          renderPeopleOverview();
+        });
+
+        actions.appendChild(editBtn);
+        actions.appendChild(removeBtn);
+
+        card.appendChild(top);
+        if (person.org) card.appendChild(org);
+        if (person.dob) card.appendChild(dob);
+        card.appendChild(actions);
+
+        card.addEventListener('click', function(event) {
+          if (event.target.closest('button')) return;
+          window.alert('Person detail view coming soon.');
+        });
+
+        card.addEventListener('keydown', function(event) {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            window.alert('Person detail view coming soon.');
+          }
+        });
+
+        lifePeopleList.appendChild(card);
+      });
+    }
+
+    function createImageThumbnail(file) {
+      return new Promise(function(resolve, reject) {
+        if (!file) {
+          reject(new Error('No file'));
+          return;
+        }
+        if (file.size > 4 * 1024 * 1024) {
+          reject(new Error('File too large'));
+          return;
+        }
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var img = new Image();
+          img.onload = function() {
+            var maxSize = 256;
+            var width = img.width;
+            var height = img.height;
+            if (width > height && width > maxSize) {
+              height = Math.round(height * (maxSize / width));
+              width = maxSize;
+            } else if (height > maxSize) {
+              width = Math.round(width * (maxSize / height));
+              height = maxSize;
+            }
+            var canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            var dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            resolve(dataUrl);
+          };
+          img.onerror = function() {
+            reject(new Error('Image load failed'));
+          };
+          img.src = e.target.result;
+        };
+        reader.onerror = function() {
+          reject(new Error('File read failed'));
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
     // GOALS VIEW DATA
     var GOALS_SHORT_KEY = 'friction_goals_short_v1';
     var GOALS_LONG_KEY = 'friction_goals_long_v1';
@@ -4204,7 +4719,7 @@
     var editingTaskId = null;
     var editingApptId = null;
     var lifeAreaFilterValue = 'all';
-    var lifeActiveTab = 'today';
+    var lifeActiveTab = 'people';
 
     function loadTasks() {
       var saved = localStorage.getItem(TASKS_KEY);
@@ -4665,6 +5180,12 @@
       panels.forEach(function(panel) {
         panel.style.display = panel.dataset.tabPanel === nextTab ? '' : 'none';
       });
+      if (lifeView) {
+        lifeView.classList.toggle('people-active', nextTab === 'people');
+      }
+      if (lifeAreaFilter) {
+        lifeAreaFilter.classList.toggle('life-area-hidden', nextTab === 'people');
+      }
     }
 
     async function callUnstuckAssistant(prompt) {
@@ -5417,6 +5938,21 @@
 
     const lifeAreaFilter = document.getElementById('lifeAreaFilter');
     const lifeTabs = document.getElementById('lifeTabs');
+    const lifeAddPersonPrimary = document.getElementById('lifeAddPersonPrimary');
+    const lifePeopleForm = document.getElementById('lifePeopleForm');
+    const lifePeopleFormTitle = document.getElementById('lifePeopleFormTitle');
+    const lifePeopleFormCancel = document.getElementById('lifePeopleFormCancel');
+    const lifePeopleSave = document.getElementById('lifePeopleSave');
+    const lifePeopleList = document.getElementById('lifePeopleList');
+    const lifePersonName = document.getElementById('lifePersonName');
+    const lifePersonRole = document.getElementById('lifePersonRole');
+    const lifePersonOrg = document.getElementById('lifePersonOrg');
+    const lifePersonDob = document.getElementById('lifePersonDob');
+    const lifePersonNotes = document.getElementById('lifePersonNotes');
+    const lifeAvatarUpload = document.getElementById('lifeAvatarUpload');
+    const lifeAvatarRandom = document.getElementById('lifeAvatarRandom');
+    const lifeAvatarPreview = document.getElementById('lifeAvatarPreview');
+    const lifeAvatarHint = document.getElementById('lifeAvatarHint');
     const lifeTodayList = document.getElementById('lifeTodayList');
     const lifeGoalsList = document.getElementById('lifeGoalsList');
     const lifeTaskText = document.getElementById('lifeTaskText');
@@ -6877,7 +7413,9 @@
     });
 
     loadLifeAreas();
+    loadPeople();
     renderAreaSelects();
+    resetPeopleForm();
 
     goalsShort = loadGoalsViewShort();
     goalsLong = loadGoalsViewLong();
@@ -6896,7 +7434,8 @@
     renderLifeTasks();
     renderLifeCalendar();
     renderLifeAreasList();
-    setLifeTab('today');
+    renderPeopleOverview();
+    setLifeTab('people');
 
     if (shortGoalAdd) {
       shortGoalAdd.addEventListener('click', function() {
@@ -7010,6 +7549,112 @@
         var button = event.target.closest('.life-tab');
         if (!button) return;
         setLifeTab(button.dataset.tab || 'today');
+      });
+    }
+
+    if (lifeAddPersonPrimary) {
+      lifeAddPersonPrimary.addEventListener('click', function() {
+        setLifeTab('people');
+        openPeopleForm();
+      });
+    }
+
+    if (lifePeopleFormCancel) {
+      lifePeopleFormCancel.addEventListener('click', function() {
+        setPeopleFormVisible(false);
+        resetPeopleForm();
+      });
+    }
+
+    if (lifePeopleSave) {
+      lifePeopleSave.addEventListener('click', function() {
+        var name = lifePersonName ? lifePersonName.value.trim() : '';
+        if (!name) {
+          alert('Please enter a name.');
+          if (lifePersonName) lifePersonName.focus();
+          return;
+        }
+        var role = lifePersonRole ? lifePersonRole.value.trim() : '';
+        var org = lifePersonOrg ? lifePersonOrg.value.trim() : '';
+        var dob = lifePersonDob ? lifePersonDob.value : '';
+        var notes = lifePersonNotes ? lifePersonNotes.value.trim() : '';
+        var avatarType = pendingAvatarType === 'photo' && pendingAvatarDataUrl ? 'photo' : 'generated';
+        var avatarSeed = pendingAvatarSeed || name || generatePersonId();
+        var existingPerson = editingPersonId
+          ? people.find(function(person) { return person.id === editingPersonId; })
+          : null;
+        var personRecord = {
+          id: editingPersonId || generatePersonId(),
+          name: name,
+          role: role || 'Family',
+          org: org,
+          dob: dob,
+          notes: notes,
+          avatarType: avatarType,
+          avatarDataUrl: avatarType === 'photo' ? pendingAvatarDataUrl : '',
+          avatarSeed: avatarSeed,
+          createdAt: existingPerson && existingPerson.createdAt ? existingPerson.createdAt : Date.now()
+        };
+        if (editingPersonId) {
+          people = people.map(function(person) {
+            if (person.id !== editingPersonId) return person;
+            return personRecord;
+          });
+        } else {
+          people.unshift(personRecord);
+        }
+        savePeople();
+        renderPeopleOverview();
+        setPeopleFormVisible(false);
+        resetPeopleForm();
+      });
+    }
+
+    if (lifePersonName) {
+      lifePersonName.addEventListener('input', function() {
+        if (pendingAvatarType !== 'photo') {
+          updateAvatarPreview();
+        }
+      });
+    }
+
+    if (lifeAvatarRandom) {
+      lifeAvatarRandom.addEventListener('click', function() {
+        pendingAvatarType = 'generated';
+        pendingAvatarDataUrl = '';
+        pendingAvatarSeed = generatePersonId();
+        if (lifeAvatarHint) {
+          lifeAvatarHint.textContent = 'New generated avatar selected.';
+        }
+        updateAvatarPreview();
+      });
+    }
+
+    if (lifeAvatarUpload) {
+      lifeAvatarUpload.addEventListener('change', function(event) {
+        var file = event.target.files && event.target.files[0];
+        if (!file) return;
+        if (lifeAvatarHint) {
+          lifeAvatarHint.textContent = 'Creating thumbnail...';
+        }
+        createImageThumbnail(file)
+          .then(function(dataUrl) {
+            pendingAvatarType = 'photo';
+            pendingAvatarDataUrl = dataUrl;
+            if (lifeAvatarHint) {
+              lifeAvatarHint.textContent = 'Photo ready. Saved on this device.';
+            }
+            updateAvatarPreview();
+          })
+          .catch(function() {
+            pendingAvatarType = 'generated';
+            pendingAvatarDataUrl = '';
+            pendingAvatarSeed = generatePersonId();
+            if (lifeAvatarHint) {
+              lifeAvatarHint.textContent = 'Photo upload failed. Using a generated avatar instead.';
+            }
+            updateAvatarPreview();
+          });
       });
     }
 
