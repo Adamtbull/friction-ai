@@ -86,20 +86,17 @@ export async function onRequestGet({ request, env }) {
 
   const directChannelId = extractChannelId(q);
   if (directChannelId) {
-    const apiUrl = `${YOUTUBE_API_BASE}/channels?part=snippet&id=${encodeURIComponent(
-      directChannelId
-    )}&key=${encodeURIComponent(env.YOUTUBE_API_KEY)}`;
-    const { response, data } = await fetchJson(apiUrl);
-    if (!response.ok) {
-      return json({ error: "YouTube API error.", details: data }, 502);
-    }
-    const items = Array.isArray(data.items) ? data.items : [];
-    if (items.length === 0) {
-      return json({ error: "Channel not found." }, 404);
-    }
-    return json(toChannelResponse(items[0]), 200, {
-      "Cache-Control": "public, max-age=600",
-    });
+    return json(
+      {
+        channelId: directChannelId,
+        channelTitle: "",
+        channelUrl: `https://www.youtube.com/channel/${directChannelId}`,
+      },
+      200,
+      {
+        "Cache-Control": "public, max-age=600",
+      }
+    );
   }
 
   const parsed = parseChannelQuery(q);
