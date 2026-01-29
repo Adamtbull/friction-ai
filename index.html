@@ -3139,6 +3139,122 @@
       background: rgba(248, 250, 252, 0.6);
     }
 
+    #appointments-view .appointments-summary {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px;
+      background: var(--white);
+    }
+
+    #appointments-view .appointments-summary-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    #appointments-view .appointments-summary-header {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+    }
+
+    #appointments-view .appointments-summary-rows {
+      display: grid;
+      gap: 10px;
+    }
+
+    #appointments-view .appointments-summary-row {
+      display: grid;
+      grid-template-columns: minmax(0, 120px) minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 10px;
+      border-radius: 12px;
+      background: rgba(248, 250, 252, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    #appointments-view .appointments-summary-label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    #appointments-view .appointments-summary-value {
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      word-break: break-word;
+    }
+
+    #appointments-view .appointments-summary-value.is-empty {
+      color: var(--text-secondary);
+    }
+
+    #appointments-view .appointments-summary-row-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    #appointments-view .appointments-icon-btn {
+      border: 1px solid var(--border);
+      background: var(--white);
+      border-radius: 999px;
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+    }
+
+    #appointments-view .appointments-summary-edit {
+      grid-column: 2 / span 2;
+    }
+
+    #appointments-view .appointments-summary-edit input,
+    #appointments-view .appointments-summary-edit textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+    }
+
+    #appointments-view .appointments-summary-edit textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    #appointments-view .appointments-summary-notes details {
+      color: var(--text-primary);
+    }
+
+    #appointments-view .appointments-summary-notes summary {
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 6px;
+    }
+
+    #appointments-view .appointments-summary-notes .appointments-summary-notes-text {
+      margin-top: 6px;
+      white-space: pre-wrap;
+      color: var(--text-primary);
+    }
+
+    #appointments-view .appointments-summary-actions {
+      margin-top: 4px;
+    }
+
+    #appointments-view .appointments-form-fields.is-hidden {
+      display: none;
+    }
+
     #appointments-view .appointments-btn.is-loading .appointments-ai-label {
       opacity: 0.6;
     }
@@ -4693,8 +4809,8 @@
           <div class="appointments-scan">
             <div class="appointments-scan-title">Scan appointment</div>
             <div class="appointments-scan-actions">
-              <button class="appointments-btn secondary" id="appointmentsScanTake" type="button">Take photo</button>
-              <button class="appointments-btn secondary" id="appointmentsScanUpload" type="button">Upload screenshot</button>
+              <button class="appointments-btn secondary" id="appointmentsScanTake" type="button">Take photo (paper card)</button>
+              <button class="appointments-btn secondary" id="appointmentsScanUpload" type="button">Choose screenshot (Photos/Files)</button>
               <input type="file" id="appointmentsScanTakeInput" accept="image/*" capture="environment" style="display: none;" />
               <input type="file" id="appointmentsScanUploadInput" accept="image/*" style="display: none;" />
             </div>
@@ -4704,18 +4820,10 @@
             </div>
           </div>
           <div class="appointments-parse">
-            <label for="appointmentsTextInput">Paste appointment text</label>
+            <label for="appointmentsTextInput">Paste text (recommended)</label>
             <textarea class="appointments-textarea" id="appointmentsTextInput" placeholder="Paste SMS or email text here" maxlength="600"></textarea>
             <div class="appointments-parse-actions">
               <button class="appointments-btn secondary" id="appointmentsParseBtn" type="button">Parse</button>
-              <button class="appointments-btn" id="appointmentsAiBtn" type="button">
-                <span class="appointments-ai-label">Use AI to fill</span>
-                <span class="appointments-ai-dots" aria-hidden="true">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </span>
-              </button>
             </div>
             <details class="appointments-text-details" id="appointmentsOriginalDetails" style="display: none;">
               <summary>Original text</summary>
@@ -4726,45 +4834,59 @@
             <label for="appointmentsModalPerson">Person</label>
             <select class="appointments-select" id="appointmentsModalPerson" required></select>
           </div>
-          <div class="appointment-field">
-            <label for="appointmentsModalTitleInput">Title</label>
-            <input class="appointments-input" id="appointmentsModalTitleInput" type="text" placeholder="Appointment title" maxlength="120" required />
-          </div>
-          <div class="appointment-row">
-            <div class="appointment-field">
-              <label for="appointmentsModalDate">Date</label>
-              <input class="appointments-input" id="appointmentsModalDate" type="date" required />
+          <div class="appointments-summary" id="appointmentsSummary" style="display: none;">
+            <div class="appointments-summary-card">
+              <div class="appointments-summary-header">
+                <span>Appointment card</span>
+              </div>
+              <div class="appointments-summary-rows" id="appointmentsSummaryRows"></div>
             </div>
-            <div class="appointment-field">
-              <label for="appointmentsModalTime">Time</label>
-              <input class="appointments-input" id="appointmentsModalTime" type="time" required />
+            <div class="appointment-modal-actions appointments-summary-actions">
+              <button class="appointments-btn" id="appointmentsSummarySave" type="button">Confirm &amp; Save appointment</button>
+              <button class="appointments-btn secondary" id="appointmentsSummaryDiscard" type="button">Discard</button>
             </div>
           </div>
-          <div class="appointment-row">
+          <div class="appointments-form-fields" id="appointmentsFormFields">
             <div class="appointment-field">
-              <label for="appointmentsModalClinic">Clinic name</label>
-              <input class="appointments-input" id="appointmentsModalClinic" type="text" placeholder="Clinic or facility" maxlength="120" />
+              <label for="appointmentsModalTitleInput">Title</label>
+              <input class="appointments-input" id="appointmentsModalTitleInput" type="text" placeholder="Appointment title" maxlength="120" required />
+            </div>
+            <div class="appointment-row">
+              <div class="appointment-field">
+                <label for="appointmentsModalDate">Date</label>
+                <input class="appointments-input" id="appointmentsModalDate" type="date" required />
+              </div>
+              <div class="appointment-field">
+                <label for="appointmentsModalTime">Time</label>
+                <input class="appointments-input" id="appointmentsModalTime" type="time" required />
+              </div>
+            </div>
+            <div class="appointment-row">
+              <div class="appointment-field">
+                <label for="appointmentsModalClinic">Clinic name</label>
+                <input class="appointments-input" id="appointmentsModalClinic" type="text" placeholder="Clinic or facility" maxlength="120" />
+              </div>
+              <div class="appointment-field">
+                <label for="appointmentsModalDoctor">Doctor name</label>
+                <input class="appointments-input" id="appointmentsModalDoctor" type="text" placeholder="Doctor or provider" maxlength="120" />
+              </div>
             </div>
             <div class="appointment-field">
-              <label for="appointmentsModalDoctor">Doctor name</label>
-              <input class="appointments-input" id="appointmentsModalDoctor" type="text" placeholder="Doctor or provider" maxlength="120" />
+              <label for="appointmentsModalAddress">Address</label>
+              <input class="appointments-input" id="appointmentsModalAddress" type="text" placeholder="Street address, Suburb NSW 2000" maxlength="160" />
             </div>
-          </div>
-          <div class="appointment-field">
-            <label for="appointmentsModalAddress">Address</label>
-            <input class="appointments-input" id="appointmentsModalAddress" type="text" placeholder="Street address, Suburb NSW 2000" maxlength="160" />
-          </div>
-          <div class="appointment-field">
-            <label for="appointmentsModalPhone">Phone number</label>
-            <input class="appointments-input" id="appointmentsModalPhone" type="tel" placeholder="04xx xxx xxx or 02 xxxx xxxx" maxlength="40" />
-          </div>
-          <div class="appointment-field">
-            <label for="appointmentsModalNotes">Notes</label>
-            <textarea class="appointments-textarea" id="appointmentsModalNotes" placeholder="Notes (optional)" maxlength="300"></textarea>
-          </div>
-          <div class="appointment-modal-actions">
-            <button class="appointments-btn" id="appointmentsModalSave" type="submit">Save appointment</button>
-            <button class="appointments-btn secondary" id="appointmentsModalDelete" type="button" style="display: none;">Delete</button>
+            <div class="appointment-field">
+              <label for="appointmentsModalPhone">Phone number</label>
+              <input class="appointments-input" id="appointmentsModalPhone" type="tel" placeholder="04xx xxx xxx or 02 xxxx xxxx" maxlength="40" />
+            </div>
+            <div class="appointment-field">
+              <label for="appointmentsModalNotes">Notes</label>
+              <textarea class="appointments-textarea" id="appointmentsModalNotes" placeholder="Notes (optional)" maxlength="300"></textarea>
+            </div>
+            <div class="appointment-modal-actions">
+              <button class="appointments-btn" id="appointmentsModalSave" type="submit">Save appointment</button>
+              <button class="appointments-btn secondary" id="appointmentsModalDelete" type="button" style="display: none;">Delete</button>
+            </div>
           </div>
         </form>
       </div>
@@ -8305,7 +8427,8 @@
       }
       var numericMatch = normalized.match(/\b(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?\b/);
       if (numericMatch) {
-        var year = numericMatch[3] ? Number(numericMatch[3]) : new Date().getFullYear();
+        if (!numericMatch[3]) return '';
+        var year = Number(numericMatch[3]);
         if (year < 100) year += 2000;
         var numericDate = new Date(year, Number(numericMatch[2]) - 1, Number(numericMatch[1]));
         return Number.isNaN(numericDate.getTime()) ? '' : toYmd(numericDate);
@@ -8326,18 +8449,20 @@
       };
       var nameMatch = normalized.match(/\b(\d{1,2})\s*(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\.?,?\s*(\d{2,4})?\b/i);
       if (nameMatch) {
+        if (!nameMatch[3]) return '';
         var monthKey = nameMatch[2].toLowerCase();
         var monthIndex = monthNames[monthKey] !== undefined ? monthNames[monthKey] : monthNames[monthKey.slice(0, 3)];
-        var yearValue = nameMatch[3] ? Number(nameMatch[3]) : new Date().getFullYear();
+        var yearValue = Number(nameMatch[3]);
         if (yearValue < 100) yearValue += 2000;
         var namedDate = new Date(yearValue, monthIndex, Number(nameMatch[1]));
         return Number.isNaN(namedDate.getTime()) ? '' : toYmd(namedDate);
       }
       var reverseMatch = normalized.match(/\b(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\.?\s*(\d{1,2})(?:\D+(\d{2,4}))?\b/i);
       if (reverseMatch) {
+        if (!reverseMatch[3]) return '';
         var monthKeyAlt = reverseMatch[1].toLowerCase();
         var monthIndexAlt = monthNames[monthKeyAlt] !== undefined ? monthNames[monthKeyAlt] : monthNames[monthKeyAlt.slice(0, 3)];
-        var yearAlt = reverseMatch[3] ? Number(reverseMatch[3]) : new Date().getFullYear();
+        var yearAlt = Number(reverseMatch[3]);
         if (yearAlt < 100) yearAlt += 2000;
         var altDate = new Date(yearAlt, monthIndexAlt, Number(reverseMatch[2]));
         return Number.isNaN(altDate.getTime()) ? '' : toYmd(altDate);
@@ -8347,7 +8472,7 @@
 
     function parseTimeFromText(text) {
       if (!text) return '';
-      var match = text.match(/\b(\d{1,2}):(\d{2})\s*(am|pm)?\b/i);
+      var match = text.match(/\b(\d{1,2})[:.](\d{2})\s*(am|pm)?\b/i);
       var hour = match ? Number(match[1]) : null;
       var minutes = match ? Number(match[2]) : null;
       var meridiem = match && match[3] ? match[3].toLowerCase() : '';
@@ -8372,22 +8497,63 @@
       return match ? normalizeAuPhone(match[0]) : '';
     }
 
+    function titleCase(text) {
+      if (!text) return '';
+      return text.replace(/\w\S*/g, function(word) {
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      });
+    }
+
+    function inferAppointmentTitle(text) {
+      if (!text) return 'Appointment';
+      var lower = text.toLowerCase();
+      var activityMatch = lower.match(/\b([a-z]+)\s+training\b/);
+      if (activityMatch && activityMatch[1]) {
+        return titleCase(activityMatch[1] + ' training');
+      }
+      var lessonMatch = lower.match(/\b([a-z]+)\s+lesson\b/);
+      if (lessonMatch && lessonMatch[1]) {
+        return titleCase(lessonMatch[1] + ' lesson');
+      }
+      if (lower.includes('swimming')) {
+        return 'Swimming';
+      }
+      if (lower.includes('training')) {
+        return 'Training';
+      }
+      if (lower.includes('lesson')) {
+        return 'Lesson';
+      }
+      var medicalIndicators = ['dr', 'doctor', 'gp', 'clinic', 'hospital', 'medical', 'specialist', 'paediatric', 'appointment'];
+      var hasMedical = medicalIndicators.some(function(term) {
+        return new RegExp('\\b' + term + '\\b', 'i').test(text);
+      });
+      return hasMedical ? 'Doctor appointment' : 'Appointment';
+    }
+
+    function extractVenueName(lines) {
+      if (!lines || !lines.length) return '';
+      var venueKeywords = /(clinic|hospital|medical centre|medical center|practice|surgery|pool|school|centre|center)/i;
+      var line = lines.find(function(item) { return venueKeywords.test(item); });
+      if (!line) return '';
+      var cleaned = line.replace(/^(at|location|venue|clinic)\s*[:\-]\s*/i, '').trim();
+      cleaned = cleaned.replace(/\s{2,}/g, ' ').trim();
+      if (!cleaned || cleaned.length > 60) return '';
+      if (/[.!?]/.test(cleaned) || cleaned.split(',').length > 2) return '';
+      return cleaned;
+    }
+
     function parseAppointmentText(text) {
       var cleanText = (text || '').trim();
       if (!cleanText) return {};
-      var title = '';
       var lines = cleanText.split(/\n/).map(function(line) { return line.trim(); }).filter(Boolean);
-      if (lines.length) {
-        title = lines[0];
-      }
-      var venueMatch = cleanText.match(/\b(?:at|location|clinic|venue|practice)\s*[:\-]?\s*([^\n,;]+)\b/i);
       var doctorMatch = cleanText.match(/\b(?:dr\.?|doctor|with)\s+([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)*)/);
       var addressMatch = cleanText.match(/\b(\d{1,5}\s+[^\n,]+(?:\s+(?:NSW|VIC|QLD|SA|WA|TAS|ACT|NT)\s*\d{4})?)\b/i);
       return {
-        title: title,
+        title: inferAppointmentTitle(cleanText),
         date: parseDateFromText(cleanText),
         time: parseTimeFromText(cleanText),
-        venueName: venueMatch ? venueMatch[1].trim() : '',
+        venueName: extractVenueName(lines),
         address: addressMatch ? addressMatch[1].trim() : '',
         contactName: doctorMatch ? doctorMatch[1].trim() : '',
         phone: parsePhoneFromText(cleanText),
@@ -8395,16 +8561,186 @@
       };
     }
 
+    function buildAppointmentDraft(appt, personId) {
+      return {
+        personId: appt ? appt.personId : (personId || ''),
+        title: appt ? (appt.title || '') : '',
+        date: appt ? (appt.date || '') : '',
+        time: appt ? (appt.time || '') : '',
+        clinicName: appt ? (appt.clinicName || '') : '',
+        doctorName: appt ? (appt.doctorName || '') : '',
+        address: appt ? (appt.address || '') : '',
+        phone: appt ? (appt.phone || '') : '',
+        notes: appt ? (appt.notes || '') : ''
+      };
+    }
+
+    function syncAppointmentFormInputs(context) {
+      if (!context || !context.draft) return;
+      if (context.personSelect && context.draft.personId) {
+        context.personSelect.value = context.draft.personId;
+      }
+      if (context.titleInput) context.titleInput.value = context.draft.title || '';
+      if (context.dateInput) context.dateInput.value = context.draft.date || '';
+      if (context.timeInput) context.timeInput.value = context.draft.time || '';
+      if (context.clinicInput) context.clinicInput.value = context.draft.clinicName || '';
+      if (context.doctorInput) context.doctorInput.value = context.draft.doctorName || '';
+      if (context.addressInput) context.addressInput.value = context.draft.address || '';
+      if (context.phoneInput) context.phoneInput.value = context.draft.phone || '';
+      if (context.notesInput) context.notesInput.value = context.draft.notes || '';
+    }
+
+    function setAppointmentSummaryVisible(context, isVisible) {
+      if (!context || !context.summary) return;
+      context.summary.style.display = isVisible ? '' : 'none';
+      if (context.formFields) {
+        context.formFields.classList.toggle('is-hidden', isVisible);
+      }
+    }
+
+    function formatSummaryValue(value) {
+      return value && String(value).trim() ? String(value).trim() : '';
+    }
+
+    function renderAppointmentSummary(context) {
+      if (!context || !context.summaryRows || !context.draft) return;
+      context.summaryRows.innerHTML = '';
+      var fields = [
+        { key: 'title', label: 'Title', type: 'text', placeholder: 'Appointment title' },
+        { key: 'date', label: 'Date', type: 'date' },
+        { key: 'time', label: 'Time', type: 'time' },
+        { key: 'clinicName', label: 'Venue name', type: 'text', placeholder: 'Clinic or facility' },
+        { key: 'address', label: 'Address', type: 'text', placeholder: 'Street address, Suburb NSW 2000' },
+        { key: 'doctorName', label: 'Contact name', type: 'text', placeholder: 'Doctor or provider' },
+        { key: 'phone', label: 'Phone', type: 'tel', placeholder: '04xx xxx xxx or 02 xxxx xxxx' },
+        { key: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Notes (optional)' }
+      ];
+      fields.forEach(function(field) {
+        var row = document.createElement('div');
+        row.className = 'appointments-summary-row';
+        row.dataset.field = field.key;
+        var label = document.createElement('div');
+        label.className = 'appointments-summary-label';
+        label.textContent = field.label;
+        var value = document.createElement('div');
+        value.className = 'appointments-summary-value';
+        var rawValue = formatSummaryValue(context.draft[field.key]);
+        if (field.key === 'notes' && rawValue) {
+          value.classList.add('appointments-summary-notes');
+          var details = document.createElement('details');
+          var summary = document.createElement('summary');
+          summary.textContent = 'Show more';
+          var notesText = document.createElement('div');
+          notesText.className = 'appointments-summary-notes-text';
+          notesText.textContent = rawValue;
+          details.appendChild(summary);
+          details.appendChild(notesText);
+          value.appendChild(details);
+        } else if (rawValue) {
+          value.textContent = rawValue;
+        } else {
+          value.textContent = '—';
+          value.classList.add('is-empty');
+        }
+
+        var actions = document.createElement('div');
+        actions.className = 'appointments-summary-row-actions';
+        var editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.className = 'appointments-icon-btn';
+        editBtn.textContent = '✎';
+        editBtn.setAttribute('aria-label', 'Edit ' + field.label);
+        var saveBtn = document.createElement('button');
+        saveBtn.type = 'button';
+        saveBtn.className = 'appointments-icon-btn';
+        saveBtn.textContent = '✓';
+        saveBtn.setAttribute('aria-label', 'Save ' + field.label);
+        saveBtn.style.display = 'none';
+        var cancelBtn = document.createElement('button');
+        cancelBtn.type = 'button';
+        cancelBtn.className = 'appointments-icon-btn';
+        cancelBtn.textContent = '✕';
+        cancelBtn.setAttribute('aria-label', 'Cancel ' + field.label);
+        cancelBtn.style.display = 'none';
+
+        actions.appendChild(editBtn);
+        actions.appendChild(saveBtn);
+        actions.appendChild(cancelBtn);
+
+        var editWrap = document.createElement('div');
+        editWrap.className = 'appointments-summary-edit';
+        editWrap.style.display = 'none';
+        var input;
+        if (field.type === 'textarea') {
+          input = document.createElement('textarea');
+          input.rows = 3;
+        } else {
+          input = document.createElement('input');
+          input.type = field.type;
+        }
+        if (field.placeholder) input.placeholder = field.placeholder;
+        input.value = context.draft[field.key] || '';
+        if (field.key === 'phone') {
+          input.addEventListener('blur', function() {
+            input.value = normalizeAuPhone(input.value);
+          });
+        }
+        editWrap.appendChild(input);
+
+        function closeEdit() {
+          editWrap.style.display = 'none';
+          value.style.display = '';
+          editBtn.style.display = '';
+          saveBtn.style.display = 'none';
+          cancelBtn.style.display = 'none';
+        }
+
+        editBtn.addEventListener('click', function() {
+          input.value = context.draft[field.key] || '';
+          editWrap.style.display = '';
+          value.style.display = 'none';
+          editBtn.style.display = 'none';
+          saveBtn.style.display = '';
+          cancelBtn.style.display = '';
+          input.focus();
+        });
+
+        saveBtn.addEventListener('click', function() {
+          var newValue = input.value.trim();
+          if (field.key === 'phone') {
+            newValue = normalizeAuPhone(newValue);
+          }
+          if (!context.draft) context.draft = {};
+          context.draft[field.key] = newValue;
+          syncAppointmentFormInputs(context);
+          renderAppointmentSummary(context);
+        });
+
+        cancelBtn.addEventListener('click', function() {
+          closeEdit();
+        });
+
+        row.appendChild(label);
+        row.appendChild(value);
+        row.appendChild(actions);
+        row.appendChild(editWrap);
+        context.summaryRows.appendChild(row);
+      });
+    }
+
     function applyAppointmentFields(context, fields) {
       if (!context || !fields) return;
-      if (fields.title) context.titleInput.value = fields.title;
-      if (fields.date) context.dateInput.value = fields.date;
-      if (fields.time) context.timeInput.value = fields.time;
-      if (fields.venueName) context.clinicInput.value = fields.venueName;
-      if (fields.contactName) context.doctorInput.value = fields.contactName;
-      if (fields.address) context.addressInput.value = fields.address;
-      if (fields.phone) context.phoneInput.value = normalizeAuPhone(fields.phone);
-      if (fields.notes) context.notesInput.value = fields.notes;
+      if (!context.draft) context.draft = {};
+      if (fields.title) context.draft.title = fields.title;
+      if (fields.date) context.draft.date = fields.date;
+      if (fields.time) context.draft.time = fields.time;
+      if (fields.venueName) context.draft.clinicName = fields.venueName;
+      if (fields.contactName) context.draft.doctorName = fields.contactName;
+      if (fields.address) context.draft.address = fields.address;
+      if (fields.phone) context.draft.phone = normalizeAuPhone(fields.phone);
+      if (fields.notes) context.draft.notes = fields.notes;
+      syncAppointmentFormInputs(context);
+      renderAppointmentSummary(context);
     }
 
     function setAppointmentOriginalText(context, text) {
@@ -8430,7 +8766,7 @@
       context.scanPreview.style.display = '';
     }
 
-    function resetAppointmentCapture(context) {
+    function resetAppointmentCapture(context, options) {
       if (!context) return;
       if (context.scanTakeInput) context.scanTakeInput.value = '';
       if (context.scanUploadInput) context.scanUploadInput.value = '';
@@ -8445,6 +8781,12 @@
       if (context.aiBtn) {
         context.aiBtn.classList.remove('is-loading');
         context.aiBtn.disabled = false;
+      }
+      if (!options || !options.preserveDraft) {
+        if (context.summaryRows) context.summaryRows.innerHTML = '';
+        if (context.summary) context.summary.style.display = 'none';
+        if (context.formFields) context.formFields.classList.remove('is-hidden');
+        context.draft = null;
       }
     }
 
@@ -8502,7 +8844,13 @@
       context.phoneInput.value = appt ? appt.phone || '' : '';
       context.notesInput.value = appt ? appt.notes || '' : '';
       context.deleteBtn.style.display = appt ? 'inline-flex' : 'none';
-      resetAppointmentCapture(context);
+      resetAppointmentCapture(context, { preserveDraft: true });
+      context.draft = buildAppointmentDraft(appt, personId);
+      syncAppointmentFormInputs(context);
+      if (context.summary) {
+        setAppointmentSummaryVisible(context, true);
+        renderAppointmentSummary(context);
+      }
       context.modal.classList.add('active');
       context.modal.setAttribute('aria-hidden', 'false');
       lockBodyScroll();
@@ -8521,7 +8869,11 @@
     function handleAppointmentSubmit(event, context) {
       event.preventDefault();
       if (!context) return;
-      var personId = context.personSelect ? context.personSelect.value : '';
+      var useDraft = !!context.summary;
+      var draft = useDraft && context.draft ? context.draft : null;
+      var personId = useDraft
+        ? (draft.personId || (context.personSelect ? context.personSelect.value : ''))
+        : (context.personSelect ? context.personSelect.value : '');
       if (appointmentModalLockPersonId) {
         personId = appointmentModalLockPersonId;
       }
@@ -8529,14 +8881,14 @@
         alert('Please select a person.');
         return;
       }
-      var title = context.titleInput.value.trim();
+      var title = useDraft ? (draft.title || '').trim() : context.titleInput.value.trim();
       if (!title) {
         alert('Please enter a title.');
-        context.titleInput.focus();
+        if (context.titleInput) context.titleInput.focus();
         return;
       }
-      var date = context.dateInput.value;
-      var time = context.timeInput.value;
+      var date = useDraft ? (draft.date || '') : context.dateInput.value;
+      var time = useDraft ? (draft.time || '') : context.timeInput.value;
       if (!date || !time) {
         alert('Please select a date and time.');
         return;
@@ -8557,11 +8909,11 @@
         title: title,
         date: date,
         time: time,
-        clinicName: context.clinicInput.value.trim(),
-        doctorName: context.doctorInput.value.trim(),
-        address: context.addressInput.value.trim(),
-        phone: context.phoneInput.value.trim(),
-        notes: context.notesInput.value.trim(),
+        clinicName: useDraft ? (draft.clinicName || '').trim() : context.clinicInput.value.trim(),
+        doctorName: useDraft ? (draft.doctorName || '').trim() : context.doctorInput.value.trim(),
+        address: useDraft ? (draft.address || '').trim() : context.addressInput.value.trim(),
+        phone: useDraft ? normalizeAuPhone(draft.phone || '') : normalizeAuPhone(context.phoneInput.value.trim()),
+        notes: useDraft ? (draft.notes || '').trim() : context.notesInput.value.trim(),
         createdAt: existing && existing.createdAt ? existing.createdAt : Date.now(),
         updatedAt: Date.now()
       };
@@ -8600,6 +8952,13 @@
           this.value = normalizeAuPhone(this.value);
         });
       }
+      if (context.personSelect) {
+        context.personSelect.addEventListener('change', function() {
+          if (!context.draft) context.draft = buildAppointmentDraft(null, '');
+          context.draft.personId = this.value;
+          syncAppointmentFormInputs(context);
+        });
+      }
       if (context.deleteBtn) {
         context.deleteBtn.addEventListener('click', function() {
           if (!appointmentEditingId) return;
@@ -8614,7 +8973,13 @@
         });
         context.scanTakeInput.addEventListener('change', function(event) {
           var file = event.target.files && event.target.files[0];
-          if (file) updateAppointmentScanPreview(context, file);
+          if (file) {
+            updateAppointmentScanPreview(context, file);
+            if (context.summary) {
+              setAppointmentSummaryVisible(context, true);
+              renderAppointmentSummary(context);
+            }
+          }
         });
       }
       if (context.scanUploadBtn && context.scanUploadInput) {
@@ -8623,7 +8988,13 @@
         });
         context.scanUploadInput.addEventListener('change', function(event) {
           var file = event.target.files && event.target.files[0];
-          if (file) updateAppointmentScanPreview(context, file);
+          if (file) {
+            updateAppointmentScanPreview(context, file);
+            if (context.summary) {
+              setAppointmentSummaryVisible(context, true);
+              renderAppointmentSummary(context);
+            }
+          }
         });
       }
       if (context.parseBtn && context.textInput) {
@@ -8637,6 +9008,23 @@
           var parsed = parseAppointmentText(text);
           applyAppointmentFields(context, parsed);
           setAppointmentOriginalText(context, '');
+          if (context.summary) {
+            setAppointmentSummaryVisible(context, true);
+            renderAppointmentSummary(context);
+          }
+        });
+      }
+      if (context.textInput) {
+        context.textInput.addEventListener('blur', function() {
+          var text = context.textInput.value.trim();
+          if (!text) return;
+          if (!context.draft) context.draft = buildAppointmentDraft(null, context.personSelect ? context.personSelect.value : '');
+          context.draft.notes = text;
+          syncAppointmentFormInputs(context);
+          if (context.summary) {
+            setAppointmentSummaryVisible(context, true);
+            renderAppointmentSummary(context);
+          }
         });
       }
       if (context.aiBtn && context.textInput) {
@@ -8659,6 +9047,16 @@
             context.aiBtn.classList.remove('is-loading');
             context.aiBtn.disabled = false;
           }
+        });
+      }
+      if (context.summarySaveBtn) {
+        context.summarySaveBtn.addEventListener('click', function() {
+          handleAppointmentSubmit({ preventDefault: function() {} }, context);
+        });
+      }
+      if (context.summaryDiscardBtn) {
+        context.summaryDiscardBtn.addEventListener('click', function() {
+          closeAppointmentModal(context);
         });
       }
     }
@@ -9616,6 +10014,11 @@
     const appointmentsAiBtn = document.getElementById('appointmentsAiBtn');
     const appointmentsOriginalDetails = document.getElementById('appointmentsOriginalDetails');
     const appointmentsOriginalText = document.getElementById('appointmentsOriginalText');
+    const appointmentsSummary = document.getElementById('appointmentsSummary');
+    const appointmentsSummaryRows = document.getElementById('appointmentsSummaryRows');
+    const appointmentsSummarySave = document.getElementById('appointmentsSummarySave');
+    const appointmentsSummaryDiscard = document.getElementById('appointmentsSummaryDiscard');
+    const appointmentsFormFields = document.getElementById('appointmentsFormFields');
 
     if (lifeAppointmentModal) {
       appointmentModalContexts.life = {
@@ -9668,7 +10071,12 @@
         parseBtn: appointmentsParseBtn,
         aiBtn: appointmentsAiBtn,
         originalDetails: appointmentsOriginalDetails,
-        originalText: appointmentsOriginalText
+        originalText: appointmentsOriginalText,
+        summary: appointmentsSummary,
+        summaryRows: appointmentsSummaryRows,
+        summarySaveBtn: appointmentsSummarySave,
+        summaryDiscardBtn: appointmentsSummaryDiscard,
+        formFields: appointmentsFormFields
       };
     }
 
