@@ -3870,6 +3870,7 @@
       query: ''
     };
     var frictionSocialScrollTop = 0;
+    var frictionSocialMetadataCache = {};
 
     function getFrictionSocialDefaults() {
       return [
@@ -3961,6 +3962,100 @@
       });
       saveFrictionSocialShelves();
       renderFrictionSocialShelves();
+      refreshFrictionSocialMetadata([videoId]);
+    }
+
+    function formatPublishedDate(value) {
+      if (!value) return '';
+      var date = new Date(value);
+      if (isNaN(date.getTime())) return '';
+      return date.toLocaleDateString(undefined, {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
+    }
+
+    function getVideoMetaLine(video) {
+      var channel = video.channel || 'Unknown channel';
+      var published = formatPublishedDate(video.publishedAt);
+      return published ? channel + ' • ' + published : channel;
+    }
+
+    function collectFrictionSocialIds() {
+      var ids = [];
+      frictionSocialState.shelves.forEach(function(shelf) {
+        var videos = Array.isArray(shelf.videos) ? shelf.videos : [];
+        videos.forEach(function(video) {
+          if (video && video.id) ids.push(video.id);
+        });
+      });
+      return ids;
+    }
+
+    function mergeFrictionSocialMetadata(metadata) {
+      if (!metadata) return;
+      var hasUpdates = false;
+      frictionSocialState.shelves.forEach(function(shelf) {
+        var videos = Array.isArray(shelf.videos) ? shelf.videos : [];
+        videos.forEach(function(video) {
+          var info = metadata[video.id];
+          if (!info) return;
+          frictionSocialMetadataCache[video.id] = info;
+          if (info.title) {
+            video.title = info.title;
+            hasUpdates = true;
+          }
+          if (info.channelTitle) {
+            video.channel = info.channelTitle;
+            hasUpdates = true;
+          }
+          if (info.publishedAt) {
+            video.publishedAt = info.publishedAt;
+            hasUpdates = true;
+          }
+          if (info.thumbnail) {
+            video.thumbnail = info.thumbnail;
+            hasUpdates = true;
+          }
+        });
+      });
+      if (hasUpdates) {
+        saveFrictionSocialShelves();
+        renderFrictionSocialShelves();
+      }
+    }
+
+    function fetchFrictionSocialMetadata(ids) {
+      var idList = (ids || []).filter(Boolean);
+      if (idList.length === 0) return Promise.resolve(null);
+      return fetch('/api/youtube/metadata?ids=' + encodeURIComponent(idList.join(',')))
+        .then(function(res) {
+          if (!res.ok) throw new Error('Metadata fetch failed');
+          return res.json();
+        })
+        .catch(function() {
+          return null;
+        });
+    }
+
+    function refreshFrictionSocialMetadata(ids) {
+      var allIds = ids && ids.length ? ids : collectFrictionSocialIds();
+      var uniqueIds = [];
+      var seen = {};
+      allIds.forEach(function(id) {
+        if (!id || seen[id]) return;
+        seen[id] = true;
+        if (!frictionSocialMetadataCache[id]) {
+          uniqueIds.push(id);
+        }
+      });
+      if (uniqueIds.length === 0) return;
+      for (var i = 0; i < uniqueIds.length; i += 50) {
+        fetchFrictionSocialMetadata(uniqueIds.slice(i, i + 50)).then(function(metadata) {
+          mergeFrictionSocialMetadata(metadata);
+        });
+      }
     }
 
     function renderFrictionSocialShelves() {
@@ -4008,9 +4103,10 @@
           card.dataset.videoId = video.id;
           card.dataset.videoTitle = video.title || 'Untitled video';
           card.dataset.videoChannel = video.channel || '';
+          card.dataset.videoPublishedAt = video.publishedAt || '';
 
           var img = document.createElement('img');
-          img.src = 'https://i.ytimg.com/vi/' + video.id + '/hqdefault.jpg';
+          img.src = video.thumbnail || ('https://i.ytimg.com/vi/' + video.id + '/hqdefault.jpg');
           img.alt = video.title || 'YouTube thumbnail';
           img.loading = 'lazy';
 
@@ -4023,7 +4119,7 @@
 
           var cardChannel = document.createElement('div');
           cardChannel.className = 'fs-card-channel';
-          cardChannel.textContent = video.channel || 'Unknown channel';
+          cardChannel.textContent = getVideoMetaLine(video);
 
           body.appendChild(cardTitle);
           body.appendChild(cardChannel);
@@ -4056,7 +4152,7 @@
       frictionSocialModal.setAttribute('aria-hidden', 'false');
       frictionSocialModalFrame.src = 'https://www.youtube.com/embed/' + video.id + '?autoplay=1&rel=0&modestbranding=1';
       frictionSocialModalTitle.textContent = video.title || 'Untitled video';
-      frictionSocialModalChannel.textContent = video.channel || 'Unknown channel';
+      frictionSocialModalChannel.textContent = getVideoMetaLine(video);
       frictionSocialModalLink.href = 'https://www.youtube.com/watch?v=' + video.id;
     }
 
@@ -4073,6 +4169,7 @@
 
     frictionSocialState.shelves = loadFrictionSocialShelves();
     renderFrictionSocialShelves();
+    refreshFrictionSocialMetadata();
 
     frictionSocialSearch.addEventListener('input', function() {
       frictionSocialState.query = this.value || '';
@@ -4087,7 +4184,8 @@
       openFrictionSocialModal({
         id: card.dataset.videoId,
         title: card.dataset.videoTitle,
-        channel: card.dataset.videoChannel
+        channel: card.dataset.videoChannel,
+        publishedAt: card.dataset.videoPublishedAt
       });
     });
 
