@@ -3080,6 +3080,92 @@
       resize: vertical;
     }
 
+    #appointments-view .appointments-scan,
+    #appointments-view .appointments-parse {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: var(--white);
+    }
+
+    #appointments-view .appointments-scan-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+    }
+
+    #appointments-view .appointments-scan-actions,
+    #appointments-view .appointments-parse-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    #appointments-view .appointments-scan-preview {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    #appointments-view .appointments-scan-image {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      object-fit: cover;
+      max-height: 220px;
+    }
+
+    #appointments-view .appointments-scan-note {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    #appointments-view .appointments-text-details {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    #appointments-view .appointments-text-preview {
+      white-space: pre-wrap;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      margin-top: 8px;
+      color: var(--text-primary);
+      background: rgba(248, 250, 252, 0.6);
+    }
+
+    #appointments-view .appointments-btn.is-loading .appointments-ai-label {
+      opacity: 0.6;
+    }
+
+    #appointments-view .appointments-ai-dots {
+      display: none;
+      gap: 4px;
+      align-items: center;
+      margin-left: 8px;
+    }
+
+    #appointments-view .appointments-ai-dots span {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: currentColor;
+      opacity: 0.4;
+      animation: typing 1.4s infinite ease-in-out;
+    }
+
+    #appointments-view .appointments-ai-dots span:nth-child(2) { animation-delay: 0.2s; }
+    #appointments-view .appointments-ai-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    #appointments-view .appointments-btn.is-loading .appointments-ai-dots {
+      display: inline-flex;
+    }
+
     #calendar-view {
       display: none;
       flex: 1;
@@ -4563,11 +4649,11 @@
         </div>
         <div class="appointment-field">
           <label for="lifeAppointmentAddress">Address</label>
-          <input class="life-input" id="lifeAppointmentAddress" type="text" placeholder="Street, city, state" maxlength="160" />
+          <input class="life-input" id="lifeAppointmentAddress" type="text" placeholder="Street address, Suburb NSW 2000" maxlength="160" />
         </div>
         <div class="appointment-field">
           <label for="lifeAppointmentPhone">Phone number</label>
-          <input class="life-input" id="lifeAppointmentPhone" type="tel" placeholder="(555) 555-5555" maxlength="40" />
+          <input class="life-input" id="lifeAppointmentPhone" type="tel" placeholder="04xx xxx xxx or 02 xxxx xxxx" maxlength="40" />
         </div>
         <div class="appointment-field">
           <label for="lifeAppointmentNotes">Notes</label>
@@ -4604,6 +4690,38 @@
           <button class="appointments-btn secondary" id="appointmentsModalClose" type="button">Close</button>
         </div>
         <form class="appointment-form" id="appointmentsModalForm">
+          <div class="appointments-scan">
+            <div class="appointments-scan-title">Scan appointment</div>
+            <div class="appointments-scan-actions">
+              <button class="appointments-btn secondary" id="appointmentsScanTake" type="button">Take photo</button>
+              <button class="appointments-btn secondary" id="appointmentsScanUpload" type="button">Upload screenshot</button>
+              <input type="file" id="appointmentsScanTakeInput" accept="image/*" capture="environment" style="display: none;" />
+              <input type="file" id="appointmentsScanUploadInput" accept="image/*" style="display: none;" />
+            </div>
+            <div class="appointments-scan-preview" id="appointmentsScanPreview" style="display: none;">
+              <img class="appointments-scan-image" id="appointmentsScanImage" alt="Appointment image preview" />
+              <p class="appointments-scan-note">This image stays in the app and isn’t saved unless you choose to save it.</p>
+            </div>
+          </div>
+          <div class="appointments-parse">
+            <label for="appointmentsTextInput">Paste appointment text</label>
+            <textarea class="appointments-textarea" id="appointmentsTextInput" placeholder="Paste SMS or email text here" maxlength="600"></textarea>
+            <div class="appointments-parse-actions">
+              <button class="appointments-btn secondary" id="appointmentsParseBtn" type="button">Parse</button>
+              <button class="appointments-btn" id="appointmentsAiBtn" type="button">
+                <span class="appointments-ai-label">Use AI to fill</span>
+                <span class="appointments-ai-dots" aria-hidden="true">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </span>
+              </button>
+            </div>
+            <details class="appointments-text-details" id="appointmentsOriginalDetails" style="display: none;">
+              <summary>Original text</summary>
+              <div class="appointments-text-preview" id="appointmentsOriginalText"></div>
+            </details>
+          </div>
           <div class="appointment-field">
             <label for="appointmentsModalPerson">Person</label>
             <select class="appointments-select" id="appointmentsModalPerson" required></select>
@@ -4634,11 +4752,11 @@
           </div>
           <div class="appointment-field">
             <label for="appointmentsModalAddress">Address</label>
-            <input class="appointments-input" id="appointmentsModalAddress" type="text" placeholder="Street, city, state" maxlength="160" />
+            <input class="appointments-input" id="appointmentsModalAddress" type="text" placeholder="Street address, Suburb NSW 2000" maxlength="160" />
           </div>
           <div class="appointment-field">
             <label for="appointmentsModalPhone">Phone number</label>
-            <input class="appointments-input" id="appointmentsModalPhone" type="tel" placeholder="(555) 555-5555" maxlength="40" />
+            <input class="appointments-input" id="appointmentsModalPhone" type="tel" placeholder="04xx xxx xxx or 02 xxxx xxxx" maxlength="40" />
           </div>
           <div class="appointment-field">
             <label for="appointmentsModalNotes">Notes</label>
@@ -8155,6 +8273,210 @@
       }
     }
 
+    function normalizeAuPhone(value) {
+      if (!value) return '';
+      var raw = String(value).trim();
+      if (!raw) return '';
+      var hasPlus = raw.startsWith('+');
+      var digits = raw.replace(/[^\d+]/g, '');
+      if (hasPlus) {
+        digits = '+' + digits.replace(/[^\d]/g, '');
+      }
+      var cleaned = digits.replace(/\D/g, '');
+      if (cleaned.startsWith('61')) {
+        cleaned = '0' + cleaned.slice(2);
+      }
+      if (cleaned.length === 10 && cleaned.startsWith('04')) {
+        return cleaned.replace(/(\d{4})(\d{3})(\d{3})/, '$1 $2 $3');
+      }
+      if (cleaned.length === 10 && /^0[2378]/.test(cleaned)) {
+        return cleaned.replace(/(\d{2})(\d{4})(\d{4})/, '$1 $2 $3');
+      }
+      return value.trim();
+    }
+
+    function parseDateFromText(text) {
+      if (!text) return '';
+      var normalized = text.replace(/[\n,]/g, ' ');
+      var isoMatch = normalized.match(/\b(\d{4})-(\d{1,2})-(\d{1,2})\b/);
+      if (isoMatch) {
+        var isoDate = new Date(isoMatch[1], isoMatch[2] - 1, isoMatch[3]);
+        return Number.isNaN(isoDate.getTime()) ? '' : toYmd(isoDate);
+      }
+      var numericMatch = normalized.match(/\b(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?\b/);
+      if (numericMatch) {
+        var year = numericMatch[3] ? Number(numericMatch[3]) : new Date().getFullYear();
+        if (year < 100) year += 2000;
+        var numericDate = new Date(year, Number(numericMatch[2]) - 1, Number(numericMatch[1]));
+        return Number.isNaN(numericDate.getTime()) ? '' : toYmd(numericDate);
+      }
+      var monthNames = {
+        jan: 0, january: 0,
+        feb: 1, february: 1,
+        mar: 2, march: 2,
+        apr: 3, april: 3,
+        may: 4,
+        jun: 5, june: 5,
+        jul: 6, july: 6,
+        aug: 7, august: 7,
+        sep: 8, sept: 8, september: 8,
+        oct: 9, october: 9,
+        nov: 10, november: 10,
+        dec: 11, december: 11
+      };
+      var nameMatch = normalized.match(/\b(\d{1,2})\s*(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\.?,?\s*(\d{2,4})?\b/i);
+      if (nameMatch) {
+        var monthKey = nameMatch[2].toLowerCase();
+        var monthIndex = monthNames[monthKey] !== undefined ? monthNames[monthKey] : monthNames[monthKey.slice(0, 3)];
+        var yearValue = nameMatch[3] ? Number(nameMatch[3]) : new Date().getFullYear();
+        if (yearValue < 100) yearValue += 2000;
+        var namedDate = new Date(yearValue, monthIndex, Number(nameMatch[1]));
+        return Number.isNaN(namedDate.getTime()) ? '' : toYmd(namedDate);
+      }
+      var reverseMatch = normalized.match(/\b(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\.?\s*(\d{1,2})(?:\D+(\d{2,4}))?\b/i);
+      if (reverseMatch) {
+        var monthKeyAlt = reverseMatch[1].toLowerCase();
+        var monthIndexAlt = monthNames[monthKeyAlt] !== undefined ? monthNames[monthKeyAlt] : monthNames[monthKeyAlt.slice(0, 3)];
+        var yearAlt = reverseMatch[3] ? Number(reverseMatch[3]) : new Date().getFullYear();
+        if (yearAlt < 100) yearAlt += 2000;
+        var altDate = new Date(yearAlt, monthIndexAlt, Number(reverseMatch[2]));
+        return Number.isNaN(altDate.getTime()) ? '' : toYmd(altDate);
+      }
+      return '';
+    }
+
+    function parseTimeFromText(text) {
+      if (!text) return '';
+      var match = text.match(/\b(\d{1,2}):(\d{2})\s*(am|pm)?\b/i);
+      var hour = match ? Number(match[1]) : null;
+      var minutes = match ? Number(match[2]) : null;
+      var meridiem = match && match[3] ? match[3].toLowerCase() : '';
+      if (!match) {
+        var shortMatch = text.match(/\b(\d{1,2})\s*(am|pm)\b/i);
+        if (!shortMatch) return '';
+        hour = Number(shortMatch[1]);
+        minutes = 0;
+        meridiem = shortMatch[2].toLowerCase();
+      }
+      if (meridiem) {
+        if (meridiem === 'pm' && hour < 12) hour += 12;
+        if (meridiem === 'am' && hour === 12) hour = 0;
+      }
+      if (hour > 23 || minutes > 59) return '';
+      return padNumber(hour) + ':' + padNumber(minutes);
+    }
+
+    function parsePhoneFromText(text) {
+      if (!text) return '';
+      var match = text.match(/(\+?61\s?\d{1}\s?\d{4}\s?\d{4})|(0[2378]\s?\d{4}\s?\d{4})|(04\d{2}\s?\d{3}\s?\d{3})/);
+      return match ? normalizeAuPhone(match[0]) : '';
+    }
+
+    function parseAppointmentText(text) {
+      var cleanText = (text || '').trim();
+      if (!cleanText) return {};
+      var title = '';
+      var lines = cleanText.split(/\n/).map(function(line) { return line.trim(); }).filter(Boolean);
+      if (lines.length) {
+        title = lines[0];
+      }
+      var venueMatch = cleanText.match(/\b(?:at|location|clinic|venue|practice)\s*[:\-]?\s*([^\n,;]+)\b/i);
+      var doctorMatch = cleanText.match(/\b(?:dr\.?|doctor|with)\s+([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)*)/);
+      var addressMatch = cleanText.match(/\b(\d{1,5}\s+[^\n,]+(?:\s+(?:NSW|VIC|QLD|SA|WA|TAS|ACT|NT)\s*\d{4})?)\b/i);
+      return {
+        title: title,
+        date: parseDateFromText(cleanText),
+        time: parseTimeFromText(cleanText),
+        venueName: venueMatch ? venueMatch[1].trim() : '',
+        address: addressMatch ? addressMatch[1].trim() : '',
+        contactName: doctorMatch ? doctorMatch[1].trim() : '',
+        phone: parsePhoneFromText(cleanText),
+        notes: cleanText
+      };
+    }
+
+    function applyAppointmentFields(context, fields) {
+      if (!context || !fields) return;
+      if (fields.title) context.titleInput.value = fields.title;
+      if (fields.date) context.dateInput.value = fields.date;
+      if (fields.time) context.timeInput.value = fields.time;
+      if (fields.venueName) context.clinicInput.value = fields.venueName;
+      if (fields.contactName) context.doctorInput.value = fields.contactName;
+      if (fields.address) context.addressInput.value = fields.address;
+      if (fields.phone) context.phoneInput.value = normalizeAuPhone(fields.phone);
+      if (fields.notes) context.notesInput.value = fields.notes;
+    }
+
+    function setAppointmentOriginalText(context, text) {
+      if (!context || !context.originalDetails || !context.originalText) return;
+      if (!text) {
+        context.originalDetails.style.display = 'none';
+        context.originalText.textContent = '';
+        return;
+      }
+      context.originalText.textContent = text;
+      context.originalDetails.style.display = '';
+      context.originalDetails.open = false;
+    }
+
+    function updateAppointmentScanPreview(context, file) {
+      if (!context || !context.scanPreview || !context.scanImage) return;
+      if (!file) return;
+      if (context.captureUrl) {
+        URL.revokeObjectURL(context.captureUrl);
+      }
+      context.captureUrl = URL.createObjectURL(file);
+      context.scanImage.src = context.captureUrl;
+      context.scanPreview.style.display = '';
+    }
+
+    function resetAppointmentCapture(context) {
+      if (!context) return;
+      if (context.scanTakeInput) context.scanTakeInput.value = '';
+      if (context.scanUploadInput) context.scanUploadInput.value = '';
+      if (context.scanPreview) context.scanPreview.style.display = 'none';
+      if (context.scanImage) context.scanImage.removeAttribute('src');
+      if (context.captureUrl) {
+        URL.revokeObjectURL(context.captureUrl);
+        context.captureUrl = null;
+      }
+      if (context.textInput) context.textInput.value = '';
+      setAppointmentOriginalText(context, '');
+      if (context.aiBtn) {
+        context.aiBtn.classList.remove('is-loading');
+        context.aiBtn.disabled = false;
+      }
+    }
+
+    async function callAppointmentStructure(text) {
+      var idToken = localStorage.getItem('google_id_token');
+      if (!idToken) {
+        throw new Error('Please sign in again to continue.');
+      }
+      var res = await fetch('/api/appointments/structure', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + idToken
+        },
+        body: JSON.stringify({ text: text })
+      });
+      if (!res.ok) {
+        var errorMsg = 'Backend API error';
+        try {
+          var error = await res.json();
+          errorMsg = error.error || errorMsg;
+        } catch (e) {}
+        if (res.status === 401) {
+          signOut();
+          throw new Error('Session expired. Please sign in again.');
+        }
+        throw new Error(errorMsg);
+      }
+      var data = await res.json();
+      return (data && data.fields) ? data.fields : {};
+    }
+
     function openAppointmentModal(context, appt, options) {
       if (!context || !context.modal) return;
       appointmentEditingId = appt ? appt.id : null;
@@ -8180,6 +8502,7 @@
       context.phoneInput.value = appt ? appt.phone || '' : '';
       context.notesInput.value = appt ? appt.notes || '' : '';
       context.deleteBtn.style.display = appt ? 'inline-flex' : 'none';
+      resetAppointmentCapture(context);
       context.modal.classList.add('active');
       context.modal.setAttribute('aria-hidden', 'false');
       lockBodyScroll();
@@ -8191,6 +8514,7 @@
       context.modal.setAttribute('aria-hidden', 'true');
       appointmentEditingId = null;
       appointmentModalLockPersonId = null;
+      resetAppointmentCapture(context);
       unlockBodyScroll();
     }
 
@@ -8271,12 +8595,70 @@
       context.form.addEventListener('submit', function(event) {
         handleAppointmentSubmit(event, context);
       });
+      if (context.phoneInput) {
+        context.phoneInput.addEventListener('blur', function() {
+          this.value = normalizeAuPhone(this.value);
+        });
+      }
       if (context.deleteBtn) {
         context.deleteBtn.addEventListener('click', function() {
           if (!appointmentEditingId) return;
           var appt = appointments.find(function(item) { return item.id === appointmentEditingId; });
           deleteAppointment(appt);
           closeAppointmentModal(context);
+        });
+      }
+      if (context.scanTakeBtn && context.scanTakeInput) {
+        context.scanTakeBtn.addEventListener('click', function() {
+          context.scanTakeInput.click();
+        });
+        context.scanTakeInput.addEventListener('change', function(event) {
+          var file = event.target.files && event.target.files[0];
+          if (file) updateAppointmentScanPreview(context, file);
+        });
+      }
+      if (context.scanUploadBtn && context.scanUploadInput) {
+        context.scanUploadBtn.addEventListener('click', function() {
+          context.scanUploadInput.click();
+        });
+        context.scanUploadInput.addEventListener('change', function(event) {
+          var file = event.target.files && event.target.files[0];
+          if (file) updateAppointmentScanPreview(context, file);
+        });
+      }
+      if (context.parseBtn && context.textInput) {
+        context.parseBtn.addEventListener('click', function() {
+          var text = context.textInput.value.trim();
+          if (!text) {
+            alert('Paste appointment text to parse.');
+            context.textInput.focus();
+            return;
+          }
+          var parsed = parseAppointmentText(text);
+          applyAppointmentFields(context, parsed);
+          setAppointmentOriginalText(context, '');
+        });
+      }
+      if (context.aiBtn && context.textInput) {
+        context.aiBtn.addEventListener('click', async function() {
+          var text = context.textInput.value.trim();
+          if (!text) {
+            alert('Paste appointment text to use AI.');
+            context.textInput.focus();
+            return;
+          }
+          context.aiBtn.classList.add('is-loading');
+          context.aiBtn.disabled = true;
+          try {
+            var fields = await callAppointmentStructure(text);
+            applyAppointmentFields(context, fields);
+            setAppointmentOriginalText(context, text);
+          } catch (err) {
+            alert(err && err.message ? err.message : 'Unable to structure the appointment text.');
+          } finally {
+            context.aiBtn.classList.remove('is-loading');
+            context.aiBtn.disabled = false;
+          }
         });
       }
     }
@@ -9223,6 +9605,17 @@
     const appointmentsModalSave = document.getElementById('appointmentsModalSave');
     const appointmentsModalDelete = document.getElementById('appointmentsModalDelete');
     const appointmentsModalClose = document.getElementById('appointmentsModalClose');
+    const appointmentsScanTake = document.getElementById('appointmentsScanTake');
+    const appointmentsScanUpload = document.getElementById('appointmentsScanUpload');
+    const appointmentsScanTakeInput = document.getElementById('appointmentsScanTakeInput');
+    const appointmentsScanUploadInput = document.getElementById('appointmentsScanUploadInput');
+    const appointmentsScanPreview = document.getElementById('appointmentsScanPreview');
+    const appointmentsScanImage = document.getElementById('appointmentsScanImage');
+    const appointmentsTextInput = document.getElementById('appointmentsTextInput');
+    const appointmentsParseBtn = document.getElementById('appointmentsParseBtn');
+    const appointmentsAiBtn = document.getElementById('appointmentsAiBtn');
+    const appointmentsOriginalDetails = document.getElementById('appointmentsOriginalDetails');
+    const appointmentsOriginalText = document.getElementById('appointmentsOriginalText');
 
     if (lifeAppointmentModal) {
       appointmentModalContexts.life = {
@@ -9264,7 +9657,18 @@
         notesInput: appointmentsModalNotes,
         saveBtn: appointmentsModalSave,
         deleteBtn: appointmentsModalDelete,
-        closeBtn: appointmentsModalClose
+        closeBtn: appointmentsModalClose,
+        scanTakeBtn: appointmentsScanTake,
+        scanUploadBtn: appointmentsScanUpload,
+        scanTakeInput: appointmentsScanTakeInput,
+        scanUploadInput: appointmentsScanUploadInput,
+        scanPreview: appointmentsScanPreview,
+        scanImage: appointmentsScanImage,
+        textInput: appointmentsTextInput,
+        parseBtn: appointmentsParseBtn,
+        aiBtn: appointmentsAiBtn,
+        originalDetails: appointmentsOriginalDetails,
+        originalText: appointmentsOriginalText
       };
     }
 
