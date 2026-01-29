@@ -2060,6 +2060,16 @@
       background: var(--teal-dark);
     }
 
+    #friction-social-view .fs-secondary-btn {
+      border: 1px solid var(--border);
+      background: var(--white);
+      color: var(--text-primary);
+    }
+
+    #friction-social-view .fs-secondary-btn:hover {
+      background: var(--grey-light);
+    }
+
     #friction-social-view .fs-shelf {
       margin-bottom: 24px;
     }
@@ -2420,6 +2430,8 @@
       <input type="text" id="fsSearchInput" placeholder="Search videos, channels, or IDs" />
     </label>
     <button class="fs-add-btn" id="fsAddVideo" type="button">Add video link</button>
+    <button class="fs-add-btn" id="fsAddChannel" type="button">Add channel</button>
+    <button class="fs-add-btn fs-secondary-btn" id="fsRefreshChannels" type="button">Refresh</button>
   </div>
   <div class="fs-shelves" id="fsShelves"></div>
   <div class="fs-empty" id="fsEmpty" style="display: none;"></div>
@@ -3476,6 +3488,8 @@
     const frictionSocialShelves = document.getElementById('fsShelves');
     const frictionSocialSearch = document.getElementById('fsSearchInput');
     const frictionSocialAdd = document.getElementById('fsAddVideo');
+    const frictionSocialAddChannel = document.getElementById('fsAddChannel');
+    const frictionSocialRefresh = document.getElementById('fsRefreshChannels');
     const frictionSocialEmpty = document.getElementById('fsEmpty');
     const frictionSocialModal = document.getElementById('fsModal');
     const frictionSocialModalClose = document.getElementById('fsModalClose');
@@ -3865,12 +3879,15 @@
     }
 
     // FRICTION SOCIAL
+    var FRICTION_SOCIAL_CHANNELS_KEY = 'friction_social_channels_v1';
+    var FRICTION_SOCIAL_CHANNEL_LIMIT = 12;
     var frictionSocialState = {
       shelves: [],
       query: ''
     };
     var frictionSocialScrollTop = 0;
     var frictionSocialMetadataCache = {};
+    var frictionSocialChannels = [];
 
     function getFrictionSocialDefaults() {
       return [
@@ -3906,8 +3923,27 @@
       return getFrictionSocialDefaults();
     }
 
+    function loadFrictionSocialChannels() {
+      var saved = localStorage.getItem(FRICTION_SOCIAL_CHANNELS_KEY);
+      if (saved) {
+        try {
+          var parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            return parsed;
+          }
+        } catch (e) {
+          return [];
+        }
+      }
+      return [];
+    }
+
     function saveFrictionSocialShelves() {
       localStorage.setItem('friction_social_shelves', JSON.stringify(frictionSocialState.shelves));
+    }
+
+    function saveFrictionSocialChannels() {
+      localStorage.setItem(FRICTION_SOCIAL_CHANNELS_KEY, JSON.stringify(frictionSocialChannels));
     }
 
     function extractYouTubeId(value) {
@@ -3965,6 +4001,102 @@
       refreshFrictionSocialMetadata([videoId]);
     }
 
+    function upsertFrictionSocialChannel(channelData) {
+      var existingIndex = frictionSocialChannels.findIndex(function(channel) {
+        return channel.channelId === channelData.channelId;
+      });
+      if (existingIndex >= 0) {
+        var existing = frictionSocialChannels[existingIndex];
+        frictionSocialChannels[existingIndex] = {
+          channelId: channelData.channelId,
+          channelTitle: channelData.channelTitle || existing.channelTitle,
+          channelUrl: channelData.channelUrl || existing.channelUrl,
+          addedAt: existing.addedAt,
+          videos: channelData.videos || []
+        };
+      } else {
+        frictionSocialChannels.unshift({
+          channelId: channelData.channelId,
+          channelTitle: channelData.channelTitle || 'Unknown channel',
+          channelUrl: channelData.channelUrl || '',
+          addedAt: Date.now(),
+          videos: channelData.videos || []
+        });
+      }
+      saveFrictionSocialChannels();
+    }
+
+    async function fetchFrictionSocialChannelLatest(channelId, limit) {
+      var response = await fetch('/api/youtube/channel-latest?channelId=' + encodeURIComponent(channelId) + '&limit=' + limit);
+      if (!response.ok) {
+        var errorText = await response.text().catch(function() { return ''; });
+        throw new Error(errorText || 'Failed to fetch channel videos.');
+      }
+      return response.json();
+    }
+
+    async function addFrictionSocialChannel() {
+      var input = prompt('Paste a YouTube channel link or @handle:');
+      if (!input) return;
+      try {
+        var resolveResponse = await fetch('/api/youtube/resolve-channel?q=' + encodeURIComponent(input.trim()));
+        if (!resolveResponse.ok) {
+          var resolveText = await resolveResponse.text().catch(function() { return ''; });
+          throw new Error(resolveText || 'Unable to resolve channel.');
+        }
+        var resolved = await resolveResponse.json();
+        if (!resolved || !resolved.channelId) {
+          throw new Error('Channel not found.');
+        }
+        var latest = await fetchFrictionSocialChannelLatest(resolved.channelId, FRICTION_SOCIAL_CHANNEL_LIMIT);
+        var channelInfo = latest.channel || resolved;
+        var videos = Array.isArray(latest.videos) ? latest.videos : [];
+        upsertFrictionSocialChannel({
+          channelId: channelInfo.channelId || resolved.channelId,
+          channelTitle: channelInfo.channelTitle || resolved.channelTitle,
+          channelUrl: channelInfo.channelUrl || resolved.channelUrl,
+          videos: videos
+        });
+        renderFrictionSocialShelves();
+      } catch (err) {
+        alert(err && err.message ? err.message : 'Unable to add channel.');
+      }
+    }
+
+    async function refreshFrictionSocialChannels() {
+      if (!frictionSocialChannels.length) {
+        alert('No channels saved yet.');
+        return;
+      }
+      frictionSocialRefresh.disabled = true;
+      var originalLabel = frictionSocialRefresh.textContent;
+      frictionSocialRefresh.textContent = 'Refreshing...';
+      try {
+        for (var i = 0; i < frictionSocialChannels.length; i++) {
+          var channel = frictionSocialChannels[i];
+          if (!channel || !channel.channelId) continue;
+          try {
+            var latest = await fetchFrictionSocialChannelLatest(channel.channelId, FRICTION_SOCIAL_CHANNEL_LIMIT);
+            var channelInfo = latest.channel || {};
+            frictionSocialChannels[i] = {
+              channelId: channel.channelId,
+              channelTitle: channelInfo.channelTitle || channel.channelTitle,
+              channelUrl: channelInfo.channelUrl || channel.channelUrl,
+              addedAt: channel.addedAt,
+              videos: Array.isArray(latest.videos) ? latest.videos : []
+            };
+          } catch (err) {
+            continue;
+          }
+        }
+        saveFrictionSocialChannels();
+        renderFrictionSocialShelves();
+      } finally {
+        frictionSocialRefresh.disabled = false;
+        frictionSocialRefresh.textContent = originalLabel;
+      }
+    }
+
     function formatPublishedDate(value) {
       if (!value) return '';
       var date = new Date(value);
@@ -3976,8 +4108,8 @@
       });
     }
 
-    function getVideoMetaLine(video) {
-      var channel = video.channel || 'Unknown channel';
+    function getVideoMetaLine(video, fallbackChannel) {
+      var channel = video.channel || fallbackChannel || 'Unknown channel';
       var published = formatPublishedDate(video.publishedAt);
       return published ? channel + ' • ' + published : channel;
     }
@@ -4063,6 +4195,79 @@
       frictionSocialShelves.innerHTML = '';
       var totalMatches = 0;
 
+      frictionSocialChannels.forEach(function(channel) {
+        var videos = Array.isArray(channel.videos) ? channel.videos : [];
+        var channelTitle = channel.channelTitle || 'Unknown channel';
+        var channelMatch = query && channelTitle.toLowerCase().indexOf(query) >= 0;
+        var filtered = videos.filter(function(video) {
+          if (!query) return true;
+          if (channelMatch) return true;
+          var title = (video.title || '').toLowerCase();
+          var id = (video.videoId || '').toLowerCase();
+          return title.indexOf(query) >= 0 || id.indexOf(query) >= 0;
+        });
+
+        if (filtered.length === 0) return;
+        totalMatches += filtered.length;
+
+        var shelfEl = document.createElement('div');
+        shelfEl.className = 'fs-shelf';
+
+        var header = document.createElement('div');
+        header.className = 'fs-shelf-header';
+
+        var titleEl = document.createElement('div');
+        titleEl.className = 'fs-shelf-title';
+        titleEl.textContent = channelTitle;
+
+        var countEl = document.createElement('div');
+        countEl.className = 'fs-shelf-count';
+        countEl.textContent = filtered.length + (filtered.length === 1 ? ' video' : ' videos');
+
+        header.appendChild(titleEl);
+        header.appendChild(countEl);
+
+        var row = document.createElement('div');
+        row.className = 'fs-row';
+
+        filtered.forEach(function(video) {
+          var card = document.createElement('button');
+          card.type = 'button';
+          card.className = 'fs-card';
+          card.dataset.videoId = video.videoId;
+          card.dataset.videoTitle = video.title || 'Untitled video';
+          card.dataset.videoChannel = channelTitle;
+          card.dataset.videoPublishedAt = video.publishedAt || '';
+
+          var img = document.createElement('img');
+          img.src = video.thumbnail || ('https://i.ytimg.com/vi/' + video.videoId + '/hqdefault.jpg');
+          img.alt = video.title || 'YouTube thumbnail';
+          img.loading = 'lazy';
+
+          var body = document.createElement('div');
+          body.className = 'fs-card-body';
+
+          var cardTitle = document.createElement('div');
+          cardTitle.className = 'fs-card-title';
+          cardTitle.textContent = video.title || 'Untitled video';
+
+          var cardChannel = document.createElement('div');
+          cardChannel.className = 'fs-card-channel';
+          cardChannel.textContent = getVideoMetaLine(video, channelTitle);
+
+          body.appendChild(cardTitle);
+          body.appendChild(cardChannel);
+
+          card.appendChild(img);
+          card.appendChild(body);
+          row.appendChild(card);
+        });
+
+        shelfEl.appendChild(header);
+        shelfEl.appendChild(row);
+        frictionSocialShelves.appendChild(shelfEl);
+      });
+
       frictionSocialState.shelves.forEach(function(shelf) {
         var videos = Array.isArray(shelf.videos) ? shelf.videos : [];
         var filtered = videos.filter(function(video) {
@@ -4138,7 +4343,7 @@
         frictionSocialEmpty.style.display = 'block';
         frictionSocialEmpty.textContent = query
           ? 'No videos match your search.'
-          : 'No videos saved yet. Add a YouTube link to start your library.';
+          : 'No videos saved yet. Add a YouTube link or channel to start your library.';
       } else {
         frictionSocialEmpty.style.display = 'none';
       }
@@ -4168,6 +4373,7 @@
     }
 
     frictionSocialState.shelves = loadFrictionSocialShelves();
+    frictionSocialChannels = loadFrictionSocialChannels();
     renderFrictionSocialShelves();
     refreshFrictionSocialMetadata();
 
@@ -4177,6 +4383,12 @@
     });
 
     frictionSocialAdd.addEventListener('click', addFrictionSocialVideo);
+    if (frictionSocialAddChannel) {
+      frictionSocialAddChannel.addEventListener('click', addFrictionSocialChannel);
+    }
+    if (frictionSocialRefresh) {
+      frictionSocialRefresh.addEventListener('click', refreshFrictionSocialChannels);
+    }
 
     frictionSocialShelves.addEventListener('click', function(event) {
       var card = event.target.closest('.fs-card');
