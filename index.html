@@ -3064,6 +3064,7 @@
       font-weight: 500;
     }
 
+    #life-view .appointments-textarea,
     #appointments-view .appointments-input,
     #appointments-view .appointments-select,
     #appointments-view .appointments-textarea {
@@ -3075,11 +3076,14 @@
       color: var(--text-primary);
     }
 
+    #life-view .appointments-textarea,
     #appointments-view .appointments-textarea {
       min-height: 90px;
       resize: vertical;
     }
 
+    #life-view .appointments-scan,
+    #life-view .appointments-parse,
     #appointments-view .appointments-scan,
     #appointments-view .appointments-parse {
       border: 1px solid var(--border);
@@ -3091,12 +3095,15 @@
       background: var(--white);
     }
 
+    #life-view .appointments-scan-title,
     #appointments-view .appointments-scan-title {
       font-weight: 600;
       font-size: 0.95rem;
       color: var(--text-primary);
     }
 
+    #life-view .appointments-scan-actions,
+    #life-view .appointments-parse-actions,
     #appointments-view .appointments-scan-actions,
     #appointments-view .appointments-parse-actions {
       display: flex;
@@ -3104,12 +3111,14 @@
       gap: 8px;
     }
 
+    #life-view .appointments-scan-preview,
     #appointments-view .appointments-scan-preview {
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
 
+    #life-view .appointments-scan-image,
     #appointments-view .appointments-scan-image {
       width: 100%;
       border-radius: 12px;
@@ -3118,17 +3127,20 @@
       max-height: 220px;
     }
 
+    #life-view .appointments-scan-note,
     #appointments-view .appointments-scan-note {
       margin: 0;
       font-size: 0.85rem;
       color: var(--text-secondary);
     }
 
+    #life-view .appointments-text-details,
     #appointments-view .appointments-text-details {
       font-size: 0.9rem;
       color: var(--text-secondary);
     }
 
+    #life-view .appointments-text-preview,
     #appointments-view .appointments-text-preview {
       white-space: pre-wrap;
       border: 1px dashed var(--border);
@@ -3139,6 +3151,7 @@
       background: rgba(248, 250, 252, 0.6);
     }
 
+    #life-view .appointments-summary,
     #appointments-view .appointments-summary {
       display: flex;
       flex-direction: column;
@@ -3149,23 +3162,27 @@
       background: var(--white);
     }
 
+    #life-view .appointments-summary-card,
     #appointments-view .appointments-summary-card {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
+    #life-view .appointments-summary-header,
     #appointments-view .appointments-summary-header {
       font-weight: 600;
       color: var(--text-primary);
       font-size: 0.95rem;
     }
 
+    #life-view .appointments-summary-rows,
     #appointments-view .appointments-summary-rows {
       display: grid;
       gap: 10px;
     }
 
+    #life-view .appointments-summary-row,
     #appointments-view .appointments-summary-row {
       display: grid;
       grid-template-columns: minmax(0, 120px) minmax(0, 1fr) auto;
@@ -3177,26 +3194,31 @@
       border: 1px solid rgba(148, 163, 184, 0.25);
     }
 
+    #life-view .appointments-summary-label,
     #appointments-view .appointments-summary-label {
       font-size: 0.8rem;
       color: var(--text-secondary);
     }
 
+    #life-view .appointments-summary-value,
     #appointments-view .appointments-summary-value {
       font-size: 0.95rem;
       color: var(--text-primary);
       word-break: break-word;
     }
 
+    #life-view .appointments-summary-value.is-empty,
     #appointments-view .appointments-summary-value.is-empty {
       color: var(--text-secondary);
     }
 
+    #life-view .appointments-summary-row-actions,
     #appointments-view .appointments-summary-row-actions {
       display: flex;
       gap: 8px;
     }
 
+    #life-view .appointments-icon-btn,
     #appointments-view .appointments-icon-btn {
       border: 1px solid var(--border);
       background: var(--white);
@@ -3211,10 +3233,13 @@
       font-size: 0.9rem;
     }
 
+    #life-view .appointments-summary-edit,
     #appointments-view .appointments-summary-edit {
       grid-column: 2 / span 2;
     }
 
+    #life-view .appointments-summary-edit input,
+    #life-view .appointments-summary-edit textarea,
     #appointments-view .appointments-summary-edit input,
     #appointments-view .appointments-summary-edit textarea {
       width: 100%;
@@ -3225,15 +3250,18 @@
       color: var(--text-primary);
     }
 
+    #life-view .appointments-summary-edit textarea,
     #appointments-view .appointments-summary-edit textarea {
       min-height: 90px;
       resize: vertical;
     }
 
+    #life-view .appointments-summary-notes details,
     #appointments-view .appointments-summary-notes details {
       color: var(--text-primary);
     }
 
+    #life-view .appointments-summary-notes summary,
     #appointments-view .appointments-summary-notes summary {
       cursor: pointer;
       font-size: 0.85rem;
@@ -3241,16 +3269,19 @@
       margin-top: 6px;
     }
 
+    #life-view .appointments-summary-notes .appointments-summary-notes-text,
     #appointments-view .appointments-summary-notes .appointments-summary-notes-text {
       margin-top: 6px;
       white-space: pre-wrap;
       color: var(--text-primary);
     }
 
+    #life-view .appointments-summary-actions,
     #appointments-view .appointments-summary-actions {
       margin-top: 4px;
     }
 
+    #life-view .appointments-form-fields.is-hidden,
     #appointments-view .appointments-form-fields.is-hidden {
       display: none;
     }
@@ -4652,6 +4683,7 @@
       <div class="life-appointments-body" id="lifeAppointmentsBody">
         <div class="life-appointments-actions">
           <button class="life-btn" id="lifeAppointmentsAdd" type="button">Add appointment</button>
+          <button class="life-btn secondary" id="lifeAppointmentsScan" type="button">Scan appointment</button>
         </div>
         <div class="life-appointments-list" id="lifeAppointmentsList"></div>
         <button class="life-appointments-past-toggle" id="lifeAppointmentsPastToggle" type="button" aria-expanded="false">Show past</button>
@@ -4699,11 +4731,6 @@
     <div class="unstuck-panel" id="lifeUnstuckPanel" aria-live="polite"></div>
   </div>
 
-  <div class="life-section" data-tab-panel="calendar" style="display: none;">
-    <h3 class="section-subtitle">Calendar</h3>
-    <p class="section-text">Use the Calendar tab in the sidebar to review all appointments.</p>
-  </div>
-
   <div class="life-section" data-tab-panel="settings" style="display: none;">
     <h3 class="section-subtitle">Settings</h3>
     <div class="life-row">
@@ -4735,215 +4762,90 @@
         <button class="life-btn secondary" id="lifeAppointmentClose" type="button">Close</button>
       </div>
       <form class="appointment-form" id="lifeAppointmentForm">
+        <div class="appointments-scan">
+          <div class="appointments-scan-title">Scan appointment</div>
+          <div class="appointments-scan-actions">
+            <button class="life-btn secondary" id="lifeAppointmentScanTake" type="button">Take photo (paper card)</button>
+            <button class="life-btn secondary" id="lifeAppointmentScanUpload" type="button">Choose screenshot (Photos/Files)</button>
+            <input type="file" id="lifeAppointmentScanTakeInput" accept="image/*" capture="environment" style="display: none;" />
+            <input type="file" id="lifeAppointmentScanUploadInput" accept="image/*" style="display: none;" />
+          </div>
+          <div class="appointments-scan-preview" id="lifeAppointmentScanPreview" style="display: none;">
+            <img class="appointments-scan-image" id="lifeAppointmentScanImage" alt="Appointment image preview" />
+            <p class="appointments-scan-note">This image stays in the app and isn’t saved.</p>
+          </div>
+        </div>
+        <div class="appointments-parse">
+          <label for="lifeAppointmentTextInput">Paste text (recommended)</label>
+          <textarea class="appointments-textarea" id="lifeAppointmentTextInput" placeholder="Paste SMS or email text here" maxlength="600"></textarea>
+          <div class="appointments-parse-actions">
+            <button class="life-btn secondary" id="lifeAppointmentParseBtn" type="button">Parse</button>
+          </div>
+          <details class="appointments-text-details" id="lifeAppointmentOriginalDetails" style="display: none;">
+            <summary>Original text</summary>
+            <div class="appointments-text-preview" id="lifeAppointmentOriginalText"></div>
+          </details>
+        </div>
         <div class="appointment-field" id="lifeAppointmentPersonRow">
           <label for="lifeAppointmentPerson">Person</label>
           <select class="life-select" id="lifeAppointmentPerson" required></select>
         </div>
-        <div class="appointment-field">
-          <label for="lifeAppointmentTitleInput">Title</label>
-          <input class="life-input" id="lifeAppointmentTitleInput" type="text" placeholder="Appointment title" maxlength="120" required />
-        </div>
-        <div class="appointment-row">
-          <div class="appointment-field">
-            <label for="lifeAppointmentDate">Date</label>
-            <input class="life-input" id="lifeAppointmentDate" type="date" required />
+        <div class="appointments-summary" id="lifeAppointmentSummary" style="display: none;">
+          <div class="appointments-summary-card">
+            <div class="appointments-summary-header">
+              <span>Appointment card</span>
+            </div>
+            <div class="appointments-summary-rows" id="lifeAppointmentSummaryRows"></div>
           </div>
-          <div class="appointment-field">
-            <label for="lifeAppointmentTime">Time</label>
-            <input class="life-input" id="lifeAppointmentTime" type="time" required />
+          <div class="appointment-modal-actions appointments-summary-actions">
+            <button class="life-btn" id="lifeAppointmentSummarySave" type="button">Add appointment</button>
+            <button class="life-btn secondary" id="lifeAppointmentSummaryDiscard" type="button">Discard</button>
           </div>
         </div>
-        <div class="appointment-row">
+        <div class="appointments-form-fields" id="lifeAppointmentFormFields">
           <div class="appointment-field">
-            <label for="lifeAppointmentClinic">Clinic name</label>
-            <input class="life-input" id="lifeAppointmentClinic" type="text" placeholder="Clinic or facility" maxlength="120" />
+            <label for="lifeAppointmentTitleInput">Title</label>
+            <input class="life-input" id="lifeAppointmentTitleInput" type="text" placeholder="Appointment title" maxlength="120" required />
+          </div>
+          <div class="appointment-row">
+            <div class="appointment-field">
+              <label for="lifeAppointmentDate">Date</label>
+              <input class="life-input" id="lifeAppointmentDate" type="date" required />
+            </div>
+            <div class="appointment-field">
+              <label for="lifeAppointmentTime">Time</label>
+              <input class="life-input" id="lifeAppointmentTime" type="time" required />
+            </div>
+          </div>
+          <div class="appointment-row">
+            <div class="appointment-field">
+              <label for="lifeAppointmentClinic">Clinic name</label>
+              <input class="life-input" id="lifeAppointmentClinic" type="text" placeholder="Clinic or facility" maxlength="120" />
+            </div>
+            <div class="appointment-field">
+              <label for="lifeAppointmentDoctor">Doctor name</label>
+              <input class="life-input" id="lifeAppointmentDoctor" type="text" placeholder="Doctor or provider" maxlength="120" />
+            </div>
           </div>
           <div class="appointment-field">
-            <label for="lifeAppointmentDoctor">Doctor name</label>
-            <input class="life-input" id="lifeAppointmentDoctor" type="text" placeholder="Doctor or provider" maxlength="120" />
+            <label for="lifeAppointmentAddress">Address</label>
+            <input class="life-input" id="lifeAppointmentAddress" type="text" placeholder="Street address, Suburb NSW 2000" maxlength="160" />
           </div>
-        </div>
-        <div class="appointment-field">
-          <label for="lifeAppointmentAddress">Address</label>
-          <input class="life-input" id="lifeAppointmentAddress" type="text" placeholder="Street address, Suburb NSW 2000" maxlength="160" />
-        </div>
-        <div class="appointment-field">
-          <label for="lifeAppointmentPhone">Phone number</label>
-          <input class="life-input" id="lifeAppointmentPhone" type="tel" placeholder="04xx xxx xxx or 02 xxxx xxxx" maxlength="40" />
-        </div>
-        <div class="appointment-field">
-          <label for="lifeAppointmentNotes">Notes</label>
-          <textarea class="life-textarea" id="lifeAppointmentNotes" placeholder="Notes (optional)" maxlength="300"></textarea>
-        </div>
-        <div class="appointment-modal-actions">
-          <button class="life-btn" id="lifeAppointmentSave" type="submit">Save appointment</button>
-          <button class="life-btn secondary" id="lifeAppointmentDelete" type="button" style="display: none;">Delete</button>
+          <div class="appointment-field">
+            <label for="lifeAppointmentPhone">Phone number</label>
+            <input class="life-input" id="lifeAppointmentPhone" type="tel" placeholder="04xx xxx xxx or 02 xxxx xxxx" maxlength="40" />
+          </div>
+          <div class="appointment-field">
+            <label for="lifeAppointmentNotes">Notes</label>
+            <textarea class="life-textarea" id="lifeAppointmentNotes" placeholder="Notes (optional)" maxlength="300"></textarea>
+          </div>
+          <div class="appointment-modal-actions">
+            <button class="life-btn" id="lifeAppointmentSave" type="submit">Save appointment</button>
+            <button class="life-btn secondary" id="lifeAppointmentDelete" type="button" style="display: none;">Delete</button>
+          </div>
         </div>
       </form>
     </div>
-  </div>
-</section>
-
-<section id="calendar-view" class="view" aria-hidden="true">
-  <div id="appointments-view">
-    <div class="appointments-header">
-      <div>
-        <h2 class="section-title">Appointments</h2>
-        <p class="section-text">Upcoming appointments across everyone in one calm feed.</p>
-      </div>
-      <button class="appointments-btn" id="appointmentsAddGlobal" type="button">Add appointment</button>
-    </div>
-    <div class="appointments-filters" id="appointmentsFilters"></div>
-    <div class="appointments-feed" id="appointmentsFeed"></div>
-    <button class="appointments-past-toggle" id="appointmentsPastToggle" type="button" aria-expanded="false">Show past</button>
-    <div class="appointments-feed" id="appointmentsPastFeed" style="display: none;"></div>
-
-    <div class="appointment-modal" id="appointmentsModal" aria-hidden="true">
-      <div class="appointment-modal-backdrop" data-close></div>
-      <div class="appointment-modal-card" role="dialog" aria-modal="true" aria-labelledby="appointmentsModalTitle">
-        <div class="appointment-modal-header">
-          <h3 class="section-subtitle" id="appointmentsModalTitle">Add appointment</h3>
-          <button class="appointments-btn secondary" id="appointmentsModalClose" type="button">Close</button>
-        </div>
-        <form class="appointment-form" id="appointmentsModalForm">
-          <div class="appointments-scan">
-            <div class="appointments-scan-title">Scan appointment</div>
-            <div class="appointments-scan-actions">
-              <button class="appointments-btn secondary" id="appointmentsScanTake" type="button">Take photo (paper card)</button>
-              <button class="appointments-btn secondary" id="appointmentsScanUpload" type="button">Choose screenshot (Photos/Files)</button>
-              <input type="file" id="appointmentsScanTakeInput" accept="image/*" capture="environment" style="display: none;" />
-              <input type="file" id="appointmentsScanUploadInput" accept="image/*" style="display: none;" />
-            </div>
-            <div class="appointments-scan-preview" id="appointmentsScanPreview" style="display: none;">
-              <img class="appointments-scan-image" id="appointmentsScanImage" alt="Appointment image preview" />
-              <p class="appointments-scan-note">This image stays in the app and isn’t saved unless you choose to save it.</p>
-            </div>
-          </div>
-          <div class="appointments-parse">
-            <label for="appointmentsTextInput">Paste text (recommended)</label>
-            <textarea class="appointments-textarea" id="appointmentsTextInput" placeholder="Paste SMS or email text here" maxlength="600"></textarea>
-            <div class="appointments-parse-actions">
-              <button class="appointments-btn secondary" id="appointmentsParseBtn" type="button">Parse</button>
-            </div>
-            <details class="appointments-text-details" id="appointmentsOriginalDetails" style="display: none;">
-              <summary>Original text</summary>
-              <div class="appointments-text-preview" id="appointmentsOriginalText"></div>
-            </details>
-          </div>
-          <div class="appointment-field">
-            <label for="appointmentsModalPerson">Person</label>
-            <select class="appointments-select" id="appointmentsModalPerson" required></select>
-          </div>
-          <div class="appointments-summary" id="appointmentsSummary" style="display: none;">
-            <div class="appointments-summary-card">
-              <div class="appointments-summary-header">
-                <span>Appointment card</span>
-              </div>
-              <div class="appointments-summary-rows" id="appointmentsSummaryRows"></div>
-            </div>
-            <div class="appointment-modal-actions appointments-summary-actions">
-              <button class="appointments-btn" id="appointmentsSummarySave" type="button">Confirm &amp; Save appointment</button>
-              <button class="appointments-btn secondary" id="appointmentsSummaryDiscard" type="button">Discard</button>
-            </div>
-          </div>
-          <div class="appointments-form-fields" id="appointmentsFormFields">
-            <div class="appointment-field">
-              <label for="appointmentsModalTitleInput">Title</label>
-              <input class="appointments-input" id="appointmentsModalTitleInput" type="text" placeholder="Appointment title" maxlength="120" required />
-            </div>
-            <div class="appointment-row">
-              <div class="appointment-field">
-                <label for="appointmentsModalDate">Date</label>
-                <input class="appointments-input" id="appointmentsModalDate" type="date" required />
-              </div>
-              <div class="appointment-field">
-                <label for="appointmentsModalTime">Time</label>
-                <input class="appointments-input" id="appointmentsModalTime" type="time" required />
-              </div>
-            </div>
-            <div class="appointment-row">
-              <div class="appointment-field">
-                <label for="appointmentsModalClinic">Clinic name</label>
-                <input class="appointments-input" id="appointmentsModalClinic" type="text" placeholder="Clinic or facility" maxlength="120" />
-              </div>
-              <div class="appointment-field">
-                <label for="appointmentsModalDoctor">Doctor name</label>
-                <input class="appointments-input" id="appointmentsModalDoctor" type="text" placeholder="Doctor or provider" maxlength="120" />
-              </div>
-            </div>
-            <div class="appointment-field">
-              <label for="appointmentsModalAddress">Address</label>
-              <input class="appointments-input" id="appointmentsModalAddress" type="text" placeholder="Street address, Suburb NSW 2000" maxlength="160" />
-            </div>
-            <div class="appointment-field">
-              <label for="appointmentsModalPhone">Phone number</label>
-              <input class="appointments-input" id="appointmentsModalPhone" type="tel" placeholder="04xx xxx xxx or 02 xxxx xxxx" maxlength="40" />
-            </div>
-            <div class="appointment-field">
-              <label for="appointmentsModalNotes">Notes</label>
-              <textarea class="appointments-textarea" id="appointmentsModalNotes" placeholder="Notes (optional)" maxlength="300"></textarea>
-            </div>
-            <div class="appointment-modal-actions">
-              <button class="appointments-btn" id="appointmentsModalSave" type="submit">Save appointment</button>
-              <button class="appointments-btn secondary" id="appointmentsModalDelete" type="button" style="display: none;">Delete</button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="calendar-import-view" class="view" aria-hidden="true">
-  <div class="calendar-import-card">
-    <div class="calendar-import-header">
-      <h2 class="section-title">Review &amp; Save</h2>
-      <p class="calendar-import-meta">Check the details from your message before adding to the family calendar.</p>
-    </div>
-
-    <div class="calendar-import-success" id="calendarImportSuccess" aria-live="polite">
-      <h3>Added</h3>
-      <p>Your appointment is saved.</p>
-      <div class="calendar-import-actions">
-        <button class="calendar-import-btn" id="calendarImportBack" type="button">Back to Calendar</button>
-        <button class="calendar-import-btn secondary" id="calendarImportBackPerson" type="button" style="display: none;">Back to Person</button>
-        <button class="calendar-import-btn secondary" id="calendarImportAddAnother" type="button">Add another</button>
-      </div>
-    </div>
-
-    <form class="calendar-import-form" id="calendarImportForm">
-      <div class="calendar-import-row">
-        <select class="calendar-import-select" id="calendarImportPerson" required></select>
-        <input class="calendar-import-input" id="calendarImportTitle" type="text" placeholder="Title" maxlength="120" required />
-      </div>
-      <div class="calendar-import-row">
-        <input class="calendar-import-input" id="calendarImportDate" type="date" required />
-        <label class="calendar-import-toggle">
-          <input type="checkbox" id="calendarImportAllDay" />
-          <span>All-day</span>
-        </label>
-      </div>
-      <div class="calendar-import-row" id="calendarImportTimeRow">
-        <input class="calendar-import-input" id="calendarImportStart" type="time" required />
-        <input class="calendar-import-input" id="calendarImportEnd" type="time" placeholder="End time (optional)" />
-      </div>
-      <div class="calendar-import-row">
-        <input class="calendar-import-input" id="calendarImportLocation" type="text" placeholder="Location (optional)" maxlength="120" />
-        <button class="calendar-import-btn secondary" id="calendarImportDirections" type="button" style="display: none;">Directions</button>
-      </div>
-      <details class="calendar-import-notes" id="calendarImportNotesDetails">
-        <summary>Notes (optional)</summary>
-        <textarea class="calendar-import-textarea" id="calendarImportNotes" maxlength="400"></textarea>
-      </details>
-      <details class="calendar-import-notes" id="calendarImportOriginalDetails">
-        <summary>Original message</summary>
-        <div class="calendar-import-preview" id="calendarImportOriginal"></div>
-      </details>
-      <div class="calendar-import-actions">
-        <button class="calendar-import-btn" id="calendarImportSave" type="submit">Save event</button>
-        <button class="calendar-import-btn secondary" id="calendarImportCancel" type="button">Cancel</button>
-      </div>
-    </form>
   </div>
 </section>
 
@@ -5033,15 +4935,6 @@
         <path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2 4 4 0 0 1 7 2c0 5.65-7 10-7 10z"/>
       </svg>
       <span>Life</span>
-    </button>
-    <button class="menu-item" id="btnCalendar" type="button">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-        <line x1="16" y1="2" x2="16" y2="6"/>
-        <line x1="8" y1="2" x2="8" y2="6"/>
-        <line x1="3" y1="10" x2="21" y2="10"/>
-      </svg>
-      <span>Calendar</span>
     </button>
     <button class="menu-item" id="btnFrictionSocial" type="button">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -7057,7 +6950,7 @@
     }
 
     function isCalendarImportRoute() {
-      return window.location.pathname === '/calendar/import';
+      return window.location.pathname === '/calendar/import' && !!document.getElementById('calendar-import-view');
     }
 
     function buildValidYmd(year, month, day) {
@@ -8848,8 +8741,11 @@
       context.draft = buildAppointmentDraft(appt, personId);
       syncAppointmentFormInputs(context);
       if (context.summary) {
-        setAppointmentSummaryVisible(context, true);
-        renderAppointmentSummary(context);
+        var showSummary = !!(options && options.showSummary);
+        setAppointmentSummaryVisible(context, showSummary);
+        if (showSummary) {
+          renderAppointmentSummary(context);
+        }
       }
       context.modal.classList.add('active');
       context.modal.setAttribute('aria-hidden', 'false');
@@ -9007,7 +8903,7 @@
           }
           var parsed = parseAppointmentText(text);
           applyAppointmentFields(context, parsed);
-          setAppointmentOriginalText(context, '');
+          setAppointmentOriginalText(context, text);
           if (context.summary) {
             setAppointmentSummaryVisible(context, true);
             renderAppointmentSummary(context);
@@ -9019,8 +8915,8 @@
           var text = context.textInput.value.trim();
           if (!text) return;
           if (!context.draft) context.draft = buildAppointmentDraft(null, context.personSelect ? context.personSelect.value : '');
-          context.draft.notes = text;
-          syncAppointmentFormInputs(context);
+          applyAppointmentFields(context, parseAppointmentText(text));
+          setAppointmentOriginalText(context, text);
           if (context.summary) {
             setAppointmentSummaryVisible(context, true);
             renderAppointmentSummary(context);
@@ -9920,6 +9816,7 @@
     const lifeAppointmentsToggle = document.getElementById('lifeAppointmentsToggle');
     const lifeAppointmentsBody = document.getElementById('lifeAppointmentsBody');
     const lifeAppointmentsAdd = document.getElementById('lifeAppointmentsAdd');
+    const lifeAppointmentsScan = document.getElementById('lifeAppointmentsScan');
     const lifeAppointmentsList = document.getElementById('lifeAppointmentsList');
     const lifeAppointmentsPastToggle = document.getElementById('lifeAppointmentsPastToggle');
     const lifeAppointmentsPast = document.getElementById('lifeAppointmentsPast');
@@ -9928,6 +9825,21 @@
     const lifeAppointmentPersonRow = document.getElementById('lifeAppointmentPersonRow');
     const lifeAppointmentPerson = document.getElementById('lifeAppointmentPerson');
     const lifeAppointmentTitle = document.getElementById('lifeAppointmentModalTitle');
+    const lifeAppointmentScanTake = document.getElementById('lifeAppointmentScanTake');
+    const lifeAppointmentScanUpload = document.getElementById('lifeAppointmentScanUpload');
+    const lifeAppointmentScanTakeInput = document.getElementById('lifeAppointmentScanTakeInput');
+    const lifeAppointmentScanUploadInput = document.getElementById('lifeAppointmentScanUploadInput');
+    const lifeAppointmentScanPreview = document.getElementById('lifeAppointmentScanPreview');
+    const lifeAppointmentScanImage = document.getElementById('lifeAppointmentScanImage');
+    const lifeAppointmentTextInput = document.getElementById('lifeAppointmentTextInput');
+    const lifeAppointmentParseBtn = document.getElementById('lifeAppointmentParseBtn');
+    const lifeAppointmentOriginalDetails = document.getElementById('lifeAppointmentOriginalDetails');
+    const lifeAppointmentOriginalText = document.getElementById('lifeAppointmentOriginalText');
+    const lifeAppointmentSummary = document.getElementById('lifeAppointmentSummary');
+    const lifeAppointmentSummaryRows = document.getElementById('lifeAppointmentSummaryRows');
+    const lifeAppointmentSummarySave = document.getElementById('lifeAppointmentSummarySave');
+    const lifeAppointmentSummaryDiscard = document.getElementById('lifeAppointmentSummaryDiscard');
+    const lifeAppointmentFormFields = document.getElementById('lifeAppointmentFormFields');
     const lifeAppointmentTitleInput = document.getElementById('lifeAppointmentTitleInput');
     const lifeAppointmentDate = document.getElementById('lifeAppointmentDate');
     const lifeAppointmentTime = document.getElementById('lifeAppointmentTime');
@@ -10028,6 +9940,21 @@
         personRow: lifeAppointmentPersonRow,
         personSelect: lifeAppointmentPerson,
         title: lifeAppointmentTitle,
+        scanTakeBtn: lifeAppointmentScanTake,
+        scanUploadBtn: lifeAppointmentScanUpload,
+        scanTakeInput: lifeAppointmentScanTakeInput,
+        scanUploadInput: lifeAppointmentScanUploadInput,
+        scanPreview: lifeAppointmentScanPreview,
+        scanImage: lifeAppointmentScanImage,
+        textInput: lifeAppointmentTextInput,
+        parseBtn: lifeAppointmentParseBtn,
+        originalDetails: lifeAppointmentOriginalDetails,
+        originalText: lifeAppointmentOriginalText,
+        summary: lifeAppointmentSummary,
+        summaryRows: lifeAppointmentSummaryRows,
+        summarySaveBtn: lifeAppointmentSummarySave,
+        summaryDiscardBtn: lifeAppointmentSummaryDiscard,
+        formFields: lifeAppointmentFormFields,
         titleInput: lifeAppointmentTitleInput,
         dateInput: lifeAppointmentDate,
         timeInput: lifeAppointmentTime,
@@ -10390,11 +10317,11 @@
     var activeView = 'chat';
 
     function getViewFromLocation() {
-      if (isCalendarImportRoute()) return 'calendar-import';
+      if (isCalendarImportRoute()) return 'life';
       if (window.location.hash === '#friction-social') return 'social';
       if (window.location.hash === '#goals') return 'goals';
       if (window.location.hash === '#life') return 'life';
-      if (window.location.hash === '#calendar') return 'calendar';
+      if (window.location.hash === '#calendar') return 'life';
       return 'chat';
     }
 
@@ -10447,6 +10374,9 @@
     }
 
     function setActiveView(view, pushState) {
+      if (view === 'calendar' || view === 'calendar-import') {
+        view = 'life';
+      }
       activeView = view;
       var showSocial = view === 'social';
       var showGoals = view === 'goals';
@@ -10479,7 +10409,6 @@
         if (view === 'social') nextHash = '#friction-social';
         if (view === 'goals') nextHash = '#goals';
         if (view === 'life') nextHash = '#life';
-        if (view === 'calendar') nextHash = '#calendar';
         history.pushState({ view: view }, '', nextHash);
       }
       if (showSocial) {
@@ -12045,6 +11974,16 @@
       lifeAppointmentsAdd.addEventListener('click', function() {
         if (!activePersonId) return;
         openAppointmentModal(appointmentModalContexts.life, null, { lockPersonId: activePersonId });
+      });
+    }
+
+    if (lifeAppointmentsScan) {
+      lifeAppointmentsScan.addEventListener('click', function() {
+        if (!activePersonId) return;
+        openAppointmentModal(appointmentModalContexts.life, null, { lockPersonId: activePersonId, showSummary: false });
+        if (appointmentModalContexts.life && appointmentModalContexts.life.textInput) {
+          appointmentModalContexts.life.textInput.focus();
+        }
       });
     }
 
