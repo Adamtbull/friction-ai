@@ -2561,6 +2561,48 @@
       min-height: 20px;
     }
 
+    #friction-social-view .fs-pause-upnext {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: var(--grey-light);
+    }
+
+    #friction-social-view .fs-pause-upnext.active {
+      display: flex;
+    }
+
+    #friction-social-view .fs-pause-goal {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    #friction-social-view .fs-pause-goal-text {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    #friction-social-view .fs-pause-goal-action {
+      border: none;
+      background: transparent;
+      color: var(--teal-dark);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    #friction-social-view .fs-pause-goal-action:disabled {
+      color: var(--text-secondary);
+      cursor: default;
+    }
+
     /* =================== */
     /* MOBILE RESPONSIVE   */
     /* =================== */
@@ -2808,9 +2850,17 @@
       <h3 class="fs-pause-title" id="fsPauseTitle">Tiny pause?</h3>
       <p class="fs-pause-text" id="fsPausePrompt"></p>
       <div class="fs-pause-timer" id="fsPauseTimer"></div>
+      <div class="fs-pause-upnext" id="fsPauseUpNextPanel">
+        <div class="fs-pause-goal">
+          <span class="fs-pause-goal-text" id="fsPauseGoalText"></span>
+          <button class="fs-pause-goal-action" id="fsPauseGoalDone" type="button">Mark done</button>
+        </div>
+        <button class="fs-pause-btn" id="fsPauseContinue" type="button" disabled>Continue to Up Next</button>
+      </div>
       <div class="fs-pause-actions">
         <button class="fs-pause-btn secondary" id="fsPauseWatch" type="button">Watch another</button>
         <button class="fs-pause-btn" id="fsPauseTake" type="button">Take 60 seconds</button>
+        <button class="fs-pause-btn secondary" id="fsPauseUpNext" type="button">Up Next (30s)</button>
         <button class="fs-pause-btn secondary" id="fsPauseSkip" type="button" style="display: none;">Skip</button>
         <button class="fs-pause-btn secondary" id="fsPauseDone" type="button">Done for now</button>
       </div>
@@ -4108,12 +4158,18 @@
     const frictionSocialIntroDismiss = document.getElementById('fsIntroDismiss');
     const frictionSocialIntroContinue = document.getElementById('fsIntroContinue');
     const frictionSocialPauseOverlay = document.getElementById('fsPauseOverlay');
+    const frictionSocialPauseTitle = document.getElementById('fsPauseTitle');
     const frictionSocialPausePrompt = document.getElementById('fsPausePrompt');
     const frictionSocialPauseTimer = document.getElementById('fsPauseTimer');
     const frictionSocialPauseWatch = document.getElementById('fsPauseWatch');
     const frictionSocialPauseTake = document.getElementById('fsPauseTake');
+    const frictionSocialPauseUpNext = document.getElementById('fsPauseUpNext');
     const frictionSocialPauseSkip = document.getElementById('fsPauseSkip');
     const frictionSocialPauseDone = document.getElementById('fsPauseDone');
+    const frictionSocialPauseUpNextPanel = document.getElementById('fsPauseUpNextPanel');
+    const frictionSocialPauseGoalText = document.getElementById('fsPauseGoalText');
+    const frictionSocialPauseGoalDone = document.getElementById('fsPauseGoalDone');
+    const frictionSocialPauseContinue = document.getElementById('fsPauseContinue');
     const frictionSocialFrictionEnabled = document.getElementById('fsFrictionEnabled');
     const frictionSocialFrequencyInputs = document.querySelectorAll('input[name="fsFrictionFrequency"]');
     const frictionSocialPauseInputs = document.querySelectorAll('input[name="fsPauseSeconds"]');
@@ -4542,6 +4598,7 @@
     var FRICTION_SOCIAL_FRICTION_FREQUENCY_KEY = 'friction_social_friction_frequency_v1';
     var FRICTION_SOCIAL_PAUSE_SECONDS_KEY = 'friction_social_pause_seconds_v1';
     var FRICTION_SOCIAL_SESSION_WATCHED_KEY = 'friction_social_session_watched_count_v1';
+    var FRICTION_SOCIAL_MIX_INDEX_KEY = 'friction_social_mix_index_v1';
     var FRICTION_SOCIAL_CHANNEL_LIMIT = 12;
     var FRICTION_SOCIAL_POOL_LIMIT = 50;
     var frictionSocialState = {
@@ -4559,8 +4616,15 @@
     var frictionSocialSeenMap = {};
     var frictionSocialSessionWatchedCount = 0;
     var frictionSocialActiveVideoId = null;
+    var frictionSocialActiveMixIndex = null;
+    var frictionSocialMixIndex = -1;
     var frictionSocialPauseTimerId = null;
     var frictionSocialPauseRemaining = 0;
+    var frictionSocialUpNextTimerId = null;
+    var frictionSocialUpNextRemaining = 0;
+    var frictionSocialUpNextGoalIndex = null;
+    var frictionSocialUpNextReady = false;
+    var frictionSocialPauseTitleDefault = frictionSocialPauseTitle ? frictionSocialPauseTitle.textContent : 'Tiny pause?';
     var frictionSocialPausePrompts = [
       'What do you want from the next video?',
       'If you stop after one more, what’s next?',
@@ -4704,6 +4768,205 @@
       return parseInt(frictionSocialPrefs.frictionFrequency, 10) || 1;
     }
 
+    function loadFrictionSocialMixIndex() {
+      var saved = localStorage.getItem(FRICTION_SOCIAL_MIX_INDEX_KEY);
+      var parsed = parseInt(saved, 10);
+      return isNaN(parsed) ? -1 : parsed;
+    }
+
+    function saveFrictionSocialMixIndex(index) {
+      if (typeof index !== 'number' || index < 0) return;
+      frictionSocialMixIndex = index;
+      localStorage.setItem(FRICTION_SOCIAL_MIX_INDEX_KEY, String(index));
+    }
+
+    function getFrictionSocialMixQueue() {
+      if (!frictionSocialShelves) return [];
+      var shelves = frictionSocialShelves.querySelectorAll('.fs-shelf');
+      var mixShelf = null;
+      shelves.forEach(function(shelf) {
+        var titleEl = shelf.querySelector('.fs-shelf-title');
+        var title = titleEl ? titleEl.textContent : '';
+        if (title && /mix|up next/i.test(title)) {
+          mixShelf = shelf;
+        }
+      });
+      if (!mixShelf) return [];
+      var cards = mixShelf.querySelectorAll('.fs-row .fs-card');
+      var queue = [];
+      cards.forEach(function(card) {
+        var id = card.dataset.videoId;
+        if (!id) return;
+        queue.push({
+          id: id,
+          title: card.dataset.videoTitle || 'Untitled video',
+          channel: card.dataset.videoChannel || '',
+          publishedAt: card.dataset.videoPublishedAt || ''
+        });
+      });
+      return queue;
+    }
+
+    function findFrictionSocialMixIndex(videoId) {
+      if (!videoId) return null;
+      var queue = getFrictionSocialMixQueue();
+      for (var i = 0; i < queue.length; i += 1) {
+        if (queue[i].id === videoId) return i;
+      }
+      return null;
+    }
+
+    function setFrictionSocialActiveMixIndex(videoId, preferredIndex) {
+      if (typeof preferredIndex === 'number') {
+        frictionSocialActiveMixIndex = preferredIndex;
+        return;
+      }
+      var index = findFrictionSocialMixIndex(videoId);
+      frictionSocialActiveMixIndex = index !== null ? index : null;
+    }
+
+    function clearFrictionSocialUpNextTimer() {
+      if (frictionSocialUpNextTimerId) {
+        clearInterval(frictionSocialUpNextTimerId);
+        frictionSocialUpNextTimerId = null;
+      }
+    }
+
+    function setFrictionSocialPauseMode(mode) {
+      var isUpNext = mode === 'upnext';
+      if (frictionSocialPauseUpNextPanel) {
+        frictionSocialPauseUpNextPanel.classList.toggle('active', isUpNext);
+      }
+      if (frictionSocialPausePrompt) {
+        frictionSocialPausePrompt.style.display = isUpNext ? 'none' : '';
+      }
+      if (frictionSocialPauseWatch) {
+        frictionSocialPauseWatch.style.display = isUpNext ? 'none' : '';
+      }
+      if (frictionSocialPauseTake) {
+        frictionSocialPauseTake.style.display = isUpNext ? 'none' : '';
+      }
+      if (frictionSocialPauseUpNext) {
+        frictionSocialPauseUpNext.style.display = isUpNext ? 'none' : '';
+      }
+      if (frictionSocialPauseSkip) {
+        frictionSocialPauseSkip.style.display = 'none';
+      }
+    }
+
+    function getFrictionSocialUpNextGoal() {
+      var goals = loadGoalsViewShort();
+      var index = goals.findIndex(function(goal) {
+        return goal && !goal.done;
+      });
+      if (index < 0) {
+        return { goal: null, index: null, goals: goals };
+      }
+      return { goal: goals[index], index: index, goals: goals };
+    }
+
+    function renderFrictionSocialUpNextGoal() {
+      if (!frictionSocialPauseGoalText) return;
+      var result = getFrictionSocialUpNextGoal();
+      frictionSocialUpNextGoalIndex = result.index;
+      if (!result.goal) {
+        frictionSocialPauseGoalText.textContent = 'No short-term goals set — add one anytime in Goals.';
+        if (frictionSocialPauseGoalDone) {
+          frictionSocialPauseGoalDone.style.display = 'none';
+        }
+        return;
+      }
+      frictionSocialPauseGoalText.textContent = 'Short-term goal: ' + result.goal.text;
+      if (frictionSocialPauseGoalDone) {
+        frictionSocialPauseGoalDone.style.display = 'inline-flex';
+        frictionSocialPauseGoalDone.disabled = false;
+      }
+    }
+
+    function markFrictionSocialUpNextGoalDone() {
+      if (frictionSocialUpNextGoalIndex === null) return;
+      var goals = loadGoalsViewShort();
+      var goal = goals[frictionSocialUpNextGoalIndex];
+      if (!goal) return;
+      goal.done = true;
+      goal.completedAt = Date.now();
+      localStorage.setItem(GOALS_SHORT_KEY, JSON.stringify(goals));
+      goalsShort = goals;
+      renderShortGoals();
+      renderFrictionSocialUpNextGoal();
+    }
+
+    function resetFrictionSocialUpNextState() {
+      clearFrictionSocialUpNextTimer();
+      frictionSocialUpNextRemaining = 0;
+      frictionSocialUpNextReady = false;
+      if (frictionSocialPauseContinue) {
+        frictionSocialPauseContinue.disabled = true;
+      }
+      if (frictionSocialPauseTimer) {
+        frictionSocialPauseTimer.textContent = '';
+      }
+      setFrictionSocialPauseMode('default');
+      if (frictionSocialPauseTitle) {
+        frictionSocialPauseTitle.textContent = frictionSocialPauseTitleDefault;
+      }
+    }
+
+    function startFrictionSocialUpNextCountdown() {
+      frictionSocialUpNextRemaining = 30;
+      frictionSocialUpNextReady = false;
+      if (frictionSocialPauseContinue) {
+        frictionSocialPauseContinue.disabled = true;
+      }
+      if (frictionSocialPauseTimer) {
+        frictionSocialPauseTimer.textContent = 'Up Next in ' + frictionSocialUpNextRemaining + ' seconds';
+      }
+      clearFrictionSocialUpNextTimer();
+      frictionSocialUpNextTimerId = setInterval(function() {
+        frictionSocialUpNextRemaining -= 1;
+        if (frictionSocialPauseTimer) {
+          frictionSocialPauseTimer.textContent = 'Up Next in ' + frictionSocialUpNextRemaining + ' seconds';
+        }
+        if (frictionSocialUpNextRemaining <= 0) {
+          clearFrictionSocialUpNextTimer();
+          frictionSocialUpNextReady = true;
+          if (frictionSocialPauseTimer) {
+            frictionSocialPauseTimer.textContent = 'Ready when you are.';
+          }
+          if (frictionSocialPauseContinue) {
+            frictionSocialPauseContinue.disabled = false;
+          }
+        }
+      }, 1000);
+    }
+
+    function startFrictionSocialUpNextFlow() {
+      clearFrictionSocialPauseTimer();
+      setFrictionSocialPauseMode('upnext');
+      if (frictionSocialPauseTitle) {
+        frictionSocialPauseTitle.textContent = 'Up Next';
+      }
+      renderFrictionSocialUpNextGoal();
+      startFrictionSocialUpNextCountdown();
+    }
+
+    function openNextFrictionSocialMixVideo() {
+      if (!frictionSocialUpNextReady) return;
+      var queue = getFrictionSocialMixQueue();
+      if (!queue.length) return;
+      var nextIndex = (typeof frictionSocialMixIndex === 'number' ? frictionSocialMixIndex : -1) + 1;
+      if (nextIndex < 0 || nextIndex >= queue.length) return;
+      var nextVideo = queue[nextIndex];
+      setFrictionSocialActiveMixIndex(nextVideo.id, nextIndex);
+      hideFrictionSocialPauseOverlay();
+      openFrictionSocialModal({
+        id: nextVideo.id,
+        title: nextVideo.title,
+        channel: nextVideo.channel,
+        publishedAt: nextVideo.publishedAt
+      });
+    }
+
     function clearFrictionSocialPauseTimer() {
       if (frictionSocialPauseTimerId) {
         clearInterval(frictionSocialPauseTimerId);
@@ -4715,10 +4978,12 @@
       if (!frictionSocialPauseOverlay) return;
       frictionSocialPauseOverlay.classList.remove('active');
       frictionSocialPauseOverlay.setAttribute('aria-hidden', 'true');
-      frictionSocialPauseTimer.textContent = '';
-      frictionSocialPauseSkip.style.display = 'none';
+      resetFrictionSocialUpNextState();
       frictionSocialPauseTake.disabled = false;
       frictionSocialPauseWatch.disabled = false;
+      if (frictionSocialPauseUpNext) {
+        frictionSocialPauseUpNext.disabled = false;
+      }
       clearFrictionSocialPauseTimer();
       unlockBodyScroll();
     }
@@ -4728,6 +4993,9 @@
       frictionSocialPauseSkip.style.display = 'inline-flex';
       frictionSocialPauseTake.disabled = true;
       frictionSocialPauseWatch.disabled = true;
+      if (frictionSocialPauseUpNext) {
+        frictionSocialPauseUpNext.disabled = true;
+      }
       frictionSocialPauseTimer.textContent = 'Remaining: ' + frictionSocialPauseRemaining + ' seconds';
       clearFrictionSocialPauseTimer();
       frictionSocialPauseTimerId = setInterval(function() {
@@ -4741,6 +5009,7 @@
 
     function showFrictionSocialPauseOverlay() {
       if (!frictionSocialPauseOverlay || frictionSocialPauseOverlay.classList.contains('active')) return;
+      resetFrictionSocialUpNextState();
       var prompt = frictionSocialPausePrompts[Math.floor(Math.random() * frictionSocialPausePrompts.length)];
       frictionSocialPausePrompt.textContent = prompt;
       frictionSocialPauseTake.textContent = 'Take ' + getFrictionSocialPauseSeconds() + ' seconds';
@@ -4748,6 +5017,9 @@
       frictionSocialPauseSkip.style.display = 'none';
       frictionSocialPauseTake.disabled = false;
       frictionSocialPauseWatch.disabled = false;
+      if (frictionSocialPauseUpNext) {
+        frictionSocialPauseUpNext.disabled = false;
+      }
       frictionSocialPauseOverlay.classList.add('active');
       frictionSocialPauseOverlay.setAttribute('aria-hidden', 'false');
       lockBodyScroll();
@@ -5366,6 +5638,7 @@
       if (!video || !video.id) return;
       markFrictionSocialSeen(video.id);
       frictionSocialActiveVideoId = video.id;
+      setFrictionSocialActiveMixIndex(video.id);
       frictionSocialScrollTop = frictionSocialView.scrollTop;
       frictionSocialView.classList.add('modal-open');
       frictionSocialModal.classList.add('active');
@@ -5386,6 +5659,10 @@
         frictionSocialActiveVideoId = null;
         recordFrictionSocialWatch();
       }
+      if (frictionSocialActiveMixIndex !== null) {
+        saveFrictionSocialMixIndex(frictionSocialActiveMixIndex);
+        frictionSocialActiveMixIndex = null;
+      }
       setTimeout(function() {
         frictionSocialView.scrollTop = frictionSocialScrollTop;
       }, 0);
@@ -5396,6 +5673,7 @@
     frictionSocialSeenMap = loadFrictionSocialSeenMap();
     loadFrictionSocialPrefs();
     applyFrictionSocialPrefsToUI();
+    frictionSocialMixIndex = loadFrictionSocialMixIndex();
     frictionSocialSessionWatchedCount = 0;
     localStorage.setItem(FRICTION_SOCIAL_SESSION_WATCHED_KEY, '0');
     renderFrictionSocialShelves();
@@ -5478,6 +5756,24 @@
       frictionSocialPauseTake.addEventListener('click', function() {
         if (frictionSocialPauseTimerId) return;
         startFrictionSocialPauseCountdown();
+      });
+    }
+
+    if (frictionSocialPauseUpNext) {
+      frictionSocialPauseUpNext.addEventListener('click', function() {
+        startFrictionSocialUpNextFlow();
+      });
+    }
+
+    if (frictionSocialPauseGoalDone) {
+      frictionSocialPauseGoalDone.addEventListener('click', function() {
+        markFrictionSocialUpNextGoalDone();
+      });
+    }
+
+    if (frictionSocialPauseContinue) {
+      frictionSocialPauseContinue.addEventListener('click', function() {
+        openNextFrictionSocialMixVideo();
       });
     }
 
