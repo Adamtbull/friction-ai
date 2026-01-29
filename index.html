@@ -2135,6 +2135,256 @@
       color: var(--text-secondary);
     }
 
+    #goals-view .goals-filter {
+      margin-top: 12px;
+    }
+
+    #goals-view .goals-area-select {
+      min-width: 180px;
+    }
+
+    #goals-view .goals-area-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--teal-lighter);
+      font-size: 0.75rem;
+      color: var(--text-primary);
+    }
+
+    #goals-view .goals-banner {
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    #goals-view .unstuck-panel {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #goals-view .unstuck-panel.active {
+      display: flex;
+    }
+
+    #goals-view .unstuck-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    #goals-view .unstuck-step-row {
+      display: grid;
+      grid-template-columns: 1fr 80px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    #goals-view .unstuck-step-row input {
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--white);
+    }
+
+    #goals-view .unstuck-meta {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    /* =================== */
+    /* LIFE VIEW           */
+    /* =================== */
+    #life-view {
+      display: none;
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 20px calc(24px + var(--safe-bottom));
+    }
+
+    #life-view.active {
+      display: block;
+    }
+
+    #life-view .life-header {
+      margin-bottom: 16px;
+    }
+
+    #life-view .life-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    #life-view .life-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    #life-view .life-tab {
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--white);
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    #life-view .life-tab.active {
+      border-color: var(--teal);
+      background: var(--teal-lighter);
+      color: var(--text-primary);
+    }
+
+    #life-view .life-section {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 6px 16px var(--shadow);
+    }
+
+    #life-view .life-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    #life-view .life-input,
+    #life-view .life-select,
+    #life-view .life-textarea {
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--white);
+      font: inherit;
+    }
+
+    #life-view .life-input {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    #life-view .life-textarea {
+      width: 100%;
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    #life-view .life-btn {
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--teal);
+      background: var(--teal);
+      color: var(--white);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    #life-view .life-btn.secondary {
+      border-color: var(--border);
+      background: var(--white);
+      color: var(--text-primary);
+    }
+
+    #life-view .life-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #life-view .life-item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: var(--white);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    #life-view .life-item.completed {
+      background: rgba(90, 154, 148, 0.08);
+      text-decoration: line-through;
+      color: var(--text-secondary);
+    }
+
+    #life-view .life-item-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    #life-view .life-meta {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    #life-view .life-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--teal-lighter);
+      font-size: 0.75rem;
+      color: var(--text-primary);
+    }
+
+    #life-view .unstuck-panel {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #life-view .unstuck-panel.active {
+      display: flex;
+    }
+
+    #life-view .unstuck-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    #life-view .unstuck-step-row {
+      display: grid;
+      grid-template-columns: 1fr 80px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    #life-view .unstuck-step-row input {
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--white);
+    }
     /* =================== */
     /* FRICTION SOCIAL     */
     /* =================== */
@@ -2822,12 +3072,17 @@
   <div class="goals-header">
     <h2 class="section-title">Goals</h2>
     <p class="section-text">Keep your intentions visible and easy to revisit.</p>
+    <div class="goals-row goals-filter">
+      <span class="goals-meta">Area</span>
+      <select class="goals-input goals-area-select" id="goalsAreaFilter"></select>
+    </div>
   </div>
 
   <div class="goals-section">
     <h3 class="section-subtitle">Short-term goals</h3>
     <div class="goals-row">
       <input class="goals-input" id="shortGoalInput" type="text" placeholder="Add a short-term goal" maxlength="80" />
+      <select class="goals-input goals-area-select" id="shortGoalArea"></select>
       <button class="goals-btn" id="shortGoalAdd" type="button">Add</button>
     </div>
     <div class="goals-list" id="shortGoalList"></div>
@@ -2836,10 +3091,15 @@
 
   <div class="goals-section">
     <h3 class="section-subtitle">Long-term goals</h3>
+    <div class="goals-banner" id="goalsNudge" style="display: none;">
+      <div class="goals-meta">You’ve had goals sitting for a while. Want help breaking one into steps?</div>
+      <button class="goals-btn goals-btn-secondary" id="goalsNudgeBtn" type="button">Break into steps</button>
+    </div>
     <form id="longGoalForm">
       <div class="goals-row">
         <input class="goals-input" id="longGoalTitle" type="text" placeholder="Goal title" required maxlength="120" />
         <input class="goals-input" id="longGoalDate" type="date" />
+        <select class="goals-input goals-area-select" id="longGoalArea"></select>
       </div>
       <div class="goals-row">
         <textarea class="goals-textarea" id="longGoalNote" placeholder="Add a note (optional)" maxlength="300"></textarea>
@@ -2850,6 +3110,112 @@
       </div>
     </form>
     <div class="goals-list" id="longGoalList"></div>
+    <div class="unstuck-panel" id="goalsUnstuckPanel" aria-live="polite"></div>
+  </div>
+</section>
+
+<section id="life-view" class="view" aria-hidden="true">
+  <div class="life-header">
+    <h2 class="section-title">Life</h2>
+    <p class="section-text">Track what matters across all areas of life.</p>
+  </div>
+  <div class="life-controls">
+    <select class="life-select" id="lifeAreaFilter"></select>
+    <div class="life-tabs" id="lifeTabs">
+      <button class="life-tab active" data-tab="today" type="button">Today</button>
+      <button class="life-tab" data-tab="goals" type="button">Goals</button>
+      <button class="life-tab" data-tab="tasks" type="button">Tasks</button>
+      <button class="life-tab" data-tab="calendar" type="button">Calendar</button>
+      <button class="life-tab" data-tab="settings" type="button">Settings</button>
+    </div>
+  </div>
+
+  <div class="life-section" data-tab-panel="today">
+    <h3 class="section-subtitle">Today</h3>
+    <div class="life-list" id="lifeTodayList"></div>
+  </div>
+
+  <div class="life-section" data-tab-panel="goals" style="display: none;">
+    <h3 class="section-subtitle">Goals</h3>
+    <div class="life-list" id="lifeGoalsList"></div>
+  </div>
+
+  <div class="life-section" data-tab-panel="tasks" style="display: none;">
+    <h3 class="section-subtitle">Tasks</h3>
+    <div class="life-row">
+      <input class="life-input" id="lifeTaskText" type="text" placeholder="Add a task" maxlength="120" />
+      <select class="life-select" id="lifeTaskArea"></select>
+    </div>
+    <div class="life-row">
+      <input class="life-input" id="lifeTaskTags" type="text" placeholder="Tags (comma separated)" maxlength="120" />
+      <input class="life-input" id="lifeTaskDue" type="date" />
+    </div>
+    <div class="life-row">
+      <label><input type="checkbox" id="lifeTaskNeedsPeople" /> Needs other people</label>
+      <label><input type="checkbox" id="lifeTaskNeedsAppt" /> Needs appointment</label>
+      <select class="life-select" id="lifeTaskEnergy">
+        <option value="">Energy type</option>
+        <option value="admin">Admin</option>
+        <option value="physical">Physical</option>
+        <option value="thinking">Thinking</option>
+        <option value="social">Social</option>
+      </select>
+    </div>
+    <div class="life-row">
+      <button class="life-btn" id="lifeTaskAdd" type="button">Add task</button>
+      <button class="life-btn secondary" id="lifeTaskCancel" type="button" style="display: none;">Cancel edit</button>
+    </div>
+    <div class="life-list" id="lifeTaskList"></div>
+    <div class="unstuck-panel" id="lifeUnstuckPanel" aria-live="polite"></div>
+  </div>
+
+  <div class="life-section" data-tab-panel="calendar" style="display: none;">
+    <h3 class="section-subtitle">Calendar</h3>
+    <div class="life-row">
+      <input class="life-input" id="lifeApptTitle" type="text" placeholder="Appointment title" maxlength="120" />
+      <select class="life-select" id="lifeApptArea"></select>
+    </div>
+    <div class="life-row">
+      <input class="life-input" id="lifeApptStart" type="datetime-local" />
+      <input class="life-input" id="lifeApptEnd" type="datetime-local" />
+    </div>
+    <div class="life-row">
+      <input class="life-input" id="lifeApptLocation" type="text" placeholder="Location (optional)" maxlength="120" />
+    </div>
+    <div class="life-row">
+      <textarea class="life-textarea" id="lifeApptNotes" placeholder="Notes (optional)" maxlength="300"></textarea>
+    </div>
+    <div class="life-row">
+      <select class="life-select" id="lifeApptLinkedTasks" multiple size="3"></select>
+    </div>
+    <div class="life-row">
+      <button class="life-btn" id="lifeApptAdd" type="button">Add appointment</button>
+      <button class="life-btn secondary" id="lifeApptCancel" type="button" style="display: none;">Cancel edit</button>
+    </div>
+    <div class="life-list" id="lifeCalendarList"></div>
+  </div>
+
+  <div class="life-section" data-tab-panel="settings" style="display: none;">
+    <h3 class="section-subtitle">Settings</h3>
+    <div class="life-row">
+      <label><input type="checkbox" id="lifeFrictionEnabled" /> Friction reminders</label>
+    </div>
+    <div class="life-row">
+      <span class="life-meta">Reminder frequency</span>
+      <label><input type="radio" name="lifeFrictionFrequency" value="1" /> After every video</label>
+      <label><input type="radio" name="lifeFrictionFrequency" value="2" /> Every 2 videos</label>
+    </div>
+    <div class="life-row">
+      <span class="life-meta">Pause timer</span>
+      <label><input type="radio" name="lifePauseSeconds" value="30" /> 30 seconds</label>
+      <label><input type="radio" name="lifePauseSeconds" value="60" /> 60 seconds</label>
+      <label><input type="radio" name="lifePauseSeconds" value="120" /> 120 seconds</label>
+    </div>
+    <div class="life-row">
+      <input class="life-input" id="lifeChildName" type="text" placeholder="Add child name" maxlength="40" />
+      <button class="life-btn secondary" id="lifeAddChild" type="button">Add child</button>
+    </div>
+    <div class="life-list" id="lifeAreasList"></div>
   </div>
 </section>
 
@@ -2933,6 +3299,12 @@
         <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
       </svg>
       <span>Goals</span>
+    </button>
+    <button class="menu-item" id="btnLife" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2 4 4 0 0 1 7 2c0 5.65-7 10-7 10z"/>
+      </svg>
+      <span>Life</span>
     </button>
     <button class="menu-item" id="btnFrictionSocial" type="button">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -3412,19 +3784,147 @@
       bgGoal.style.opacity = opacity.toString();
     }
 
+    // LIFE AREAS
+    var LIFE_AREAS_KEY = 'friction_life_areas_v1';
+    var lifeAreas = [];
+
+    function generateLifeAreaId() {
+      return 'area_' + Date.now().toString(36) + '_' + Math.floor(Math.random() * 100000).toString(36);
+    }
+
+    function buildDefaultLifeAreas() {
+      var now = Date.now();
+      return [
+        { id: generateLifeAreaId(), name: 'Me', type: 'me', createdAt: now },
+        { id: generateLifeAreaId(), name: 'Work', type: 'work', createdAt: now },
+        { id: generateLifeAreaId(), name: 'Family', type: 'family', createdAt: now }
+      ];
+    }
+
+    function normalizeLifeAreas(items) {
+      if (!Array.isArray(items)) return [];
+      return items.map(function(area) {
+        if (!area || typeof area !== 'object') return null;
+        return {
+          id: area.id || generateLifeAreaId(),
+          name: area.name || 'Me',
+          type: area.type || 'me',
+          createdAt: area.createdAt || Date.now()
+        };
+      }).filter(Boolean);
+    }
+
+    function ensureDefaultLifeAreas(items) {
+      var areas = normalizeLifeAreas(items);
+      var hasMe = areas.some(function(area) { return area.type === 'me'; });
+      var hasWork = areas.some(function(area) { return area.type === 'work'; });
+      var hasFamily = areas.some(function(area) { return area.type === 'family'; });
+      if (!hasMe || !hasWork || !hasFamily) {
+        var defaults = buildDefaultLifeAreas();
+        if (!hasMe) areas.push(defaults[0]);
+        if (!hasWork) areas.push(defaults[1]);
+        if (!hasFamily) areas.push(defaults[2]);
+      }
+      return areas;
+    }
+
+    function loadLifeAreas() {
+      var saved = localStorage.getItem(LIFE_AREAS_KEY);
+      if (saved) {
+        try {
+          lifeAreas = ensureDefaultLifeAreas(JSON.parse(saved));
+          return;
+        } catch (e) {
+          lifeAreas = buildDefaultLifeAreas();
+        }
+      } else {
+        lifeAreas = buildDefaultLifeAreas();
+      }
+      saveLifeAreas();
+    }
+
+    function saveLifeAreas() {
+      localStorage.setItem(LIFE_AREAS_KEY, JSON.stringify(lifeAreas));
+    }
+
+    function getDefaultAreaId() {
+      if (!lifeAreas.length) return '';
+      var me = lifeAreas.find(function(area) { return area.type === 'me'; });
+      return me ? me.id : lifeAreas[0].id;
+    }
+
+    function getAreaById(areaId) {
+      return lifeAreas.find(function(area) { return area.id === areaId; }) || null;
+    }
+
+    function getAreaLabel(areaId) {
+      var area = getAreaById(areaId);
+      return area ? area.name : 'Me';
+    }
+
+    function getAreaOwnerName(areaId) {
+      var area = getAreaById(areaId);
+      if (!area) return '';
+      if (area.type === 'child') {
+        return area.name.replace(/^Child:\s*/i, '').trim();
+      }
+      return '';
+    }
+
+    function buildAreaOptions(includeAll) {
+      var options = [];
+      if (includeAll) {
+        options.push({ id: 'all', name: 'All' });
+      }
+      lifeAreas.forEach(function(area) {
+        options.push({ id: area.id, name: area.name });
+      });
+      return options;
+    }
+
+    function renderAreaSelect(selectEl, includeAll, selectedId) {
+      if (!selectEl) return;
+      selectEl.innerHTML = '';
+      var options = buildAreaOptions(includeAll);
+      options.forEach(function(option) {
+        var opt = document.createElement('option');
+        opt.value = option.id;
+        opt.textContent = option.name;
+        selectEl.appendChild(opt);
+      });
+      if (selectedId) {
+        selectEl.value = selectedId;
+      }
+    }
+
     // GOALS VIEW DATA
     var GOALS_SHORT_KEY = 'friction_goals_short_v1';
     var GOALS_LONG_KEY = 'friction_goals_long_v1';
     var goalsShort = [];
     var goalsLong = [];
     var editingLongGoalId = null;
+    var goalsAreaFilterValue = 'all';
 
     function loadGoalsViewShort() {
       var saved = localStorage.getItem(GOALS_SHORT_KEY);
       if (!saved) return [];
       try {
         var parsed = JSON.parse(saved);
-        return Array.isArray(parsed) ? parsed : [];
+        if (!Array.isArray(parsed)) return [];
+        var updated = parsed.map(function(goal) {
+          if (!goal || typeof goal !== 'object') return null;
+          var areaId = goal.areaId || getDefaultAreaId();
+          return {
+            id: goal.id || generateGoalId('short'),
+            text: goal.text || '',
+            done: typeof goal.done === 'boolean' ? goal.done : !!goal.completed,
+            areaId: areaId,
+            ownerName: goal.ownerName || getAreaOwnerName(areaId) || null,
+            createdAt: goal.createdAt || Date.now(),
+            completedAt: goal.completedAt || null
+          };
+        }).filter(Boolean);
+        return updated;
       } catch (e) {
         return [];
       }
@@ -3435,7 +3935,21 @@
       if (!saved) return [];
       try {
         var parsed = JSON.parse(saved);
-        return Array.isArray(parsed) ? parsed : [];
+        if (!Array.isArray(parsed)) return [];
+        return parsed.map(function(goal) {
+          if (!goal || typeof goal !== 'object') return null;
+          var areaId = goal.areaId || getDefaultAreaId();
+          return {
+            id: goal.id || generateGoalId('long'),
+            title: goal.title || '',
+            note: goal.note || '',
+            targetDate: goal.targetDate || null,
+            areaId: areaId,
+            ownerName: goal.ownerName || getAreaOwnerName(areaId) || null,
+            createdAt: goal.createdAt || Date.now(),
+            updatedAt: goal.updatedAt || goal.createdAt || Date.now()
+          };
+        }).filter(Boolean);
       } catch (e) {
         return [];
       }
@@ -3453,17 +3967,27 @@
       return prefix + '_' + Date.now().toString(36) + '_' + Math.floor(Math.random() * 100000).toString(36);
     }
 
+    function shouldIncludeGoalForArea(areaId, filterValue) {
+      if (!filterValue || filterValue === 'all') return true;
+      return areaId === filterValue;
+    }
+
     function renderShortGoals() {
       if (!shortGoalList) return;
       shortGoalList.innerHTML = '';
-      if (goalsShort.length === 0) {
+      var filtered = goalsShort.filter(function(goal) {
+        return shouldIncludeGoalForArea(goal.areaId, goalsAreaFilterValue);
+      });
+      if (filtered.length === 0) {
         var empty = document.createElement('div');
         empty.className = 'goals-meta';
-        empty.textContent = 'No short-term goals yet.';
+        empty.textContent = goalsShort.length === 0
+          ? 'No short-term goals yet.'
+          : 'No short-term goals in this area.';
         shortGoalList.appendChild(empty);
         return;
       }
-      goalsShort.forEach(function(goal) {
+      filtered.forEach(function(goal) {
         var item = document.createElement('div');
         item.className = 'goals-item' + (goal.done ? ' completed' : '');
 
@@ -3475,6 +3999,7 @@
           goal.completedAt = this.checked ? Date.now() : null;
           item.classList.toggle('completed', this.checked);
           saveGoalsViewShort();
+          renderLifeToday();
         });
 
         var input = document.createElement('input');
@@ -3522,13 +4047,22 @@
           goalsShort = goalsShort.filter(function(item) { return item.id !== goal.id; });
           saveGoalsViewShort();
           renderShortGoals();
+          renderLifeToday();
         });
 
         actions.appendChild(editBtn);
         actions.appendChild(deleteBtn);
 
+        var meta = document.createElement('div');
+        meta.className = 'goals-meta';
+        var areaPill = document.createElement('span');
+        areaPill.className = 'goals-area-pill';
+        areaPill.textContent = getAreaLabel(goal.areaId);
+        meta.appendChild(areaPill);
+
         item.appendChild(checkbox);
         item.appendChild(input);
+        item.appendChild(meta);
         item.appendChild(actions);
         shortGoalList.appendChild(item);
       });
@@ -3537,14 +4071,19 @@
     function renderLongGoals() {
       if (!longGoalList) return;
       longGoalList.innerHTML = '';
-      if (goalsLong.length === 0) {
+      var filtered = goalsLong.filter(function(goal) {
+        return shouldIncludeGoalForArea(goal.areaId, goalsAreaFilterValue);
+      });
+      if (filtered.length === 0) {
         var empty = document.createElement('div');
         empty.className = 'goals-meta';
-        empty.textContent = 'No long-term goals yet.';
+        empty.textContent = goalsLong.length === 0
+          ? 'No long-term goals yet.'
+          : 'No long-term goals in this area.';
         longGoalList.appendChild(empty);
         return;
       }
-      goalsLong.forEach(function(goal) {
+      filtered.forEach(function(goal) {
         var item = document.createElement('div');
         item.className = 'goals-item';
 
@@ -3558,12 +4097,20 @@
         note.className = 'goals-meta';
         note.textContent = goal.note ? goal.note : '';
 
+        var areaMeta = document.createElement('div');
+        areaMeta.className = 'goals-meta';
+        var areaPill = document.createElement('span');
+        areaPill.className = 'goals-area-pill';
+        areaPill.textContent = getAreaLabel(goal.areaId);
+        areaMeta.appendChild(areaPill);
+
         var meta = document.createElement('div');
         meta.className = 'goals-meta';
         meta.textContent = goal.targetDate ? 'Target date: ' + goal.targetDate : '';
 
         content.appendChild(title);
         if (goal.note) content.appendChild(note);
+        content.appendChild(areaMeta);
         if (goal.targetDate) content.appendChild(meta);
 
         var actions = document.createElement('div');
@@ -3578,6 +4125,9 @@
           longGoalTitle.value = goal.title || '';
           longGoalNote.value = goal.note || '';
           longGoalDate.value = goal.targetDate || '';
+          if (longGoalArea) {
+            longGoalArea.value = goal.areaId || getDefaultAreaId();
+          }
           longGoalAdd.textContent = 'Save';
           longGoalCancel.style.display = 'inline-flex';
           if (activeView !== 'goals') {
@@ -3594,15 +4144,44 @@
           goalsLong = goalsLong.filter(function(item) { return item.id !== goal.id; });
           saveGoalsViewLong();
           renderLongGoals();
+          renderGoalsNudge();
+          renderLifeGoals();
+        });
+
+        var breakBtn = document.createElement('button');
+        breakBtn.type = 'button';
+        breakBtn.className = 'goals-btn goals-btn-secondary';
+        breakBtn.textContent = 'Break into steps';
+        breakBtn.addEventListener('click', function() {
+          openUnstuckPanel({
+            source: 'goal',
+            mode: 'break',
+            item: goal
+          });
+        });
+
+        var helpBtn = document.createElement('button');
+        helpBtn.type = 'button';
+        helpBtn.className = 'goals-btn goals-btn-secondary';
+        helpBtn.textContent = 'Help me start';
+        helpBtn.addEventListener('click', function() {
+          openUnstuckPanel({
+            source: 'goal',
+            mode: 'start',
+            item: goal
+          });
         });
 
         actions.appendChild(editBtn);
+        actions.appendChild(breakBtn);
+        actions.appendChild(helpBtn);
         actions.appendChild(deleteBtn);
 
         item.appendChild(content);
         item.appendChild(actions);
         longGoalList.appendChild(item);
       });
+      renderGoalsNudge();
     }
 
     function resetLongGoalForm() {
@@ -3610,8 +4189,706 @@
       longGoalTitle.value = '';
       longGoalNote.value = '';
       longGoalDate.value = '';
+      if (longGoalArea) {
+        longGoalArea.value = getDefaultAreaId();
+      }
       longGoalAdd.textContent = 'Add';
       longGoalCancel.style.display = 'none';
+    }
+
+    // LIFE TASKS + APPOINTMENTS
+    var TASKS_KEY = 'friction_tasks_v1';
+    var APPOINTMENTS_KEY = 'friction_appointments_v1';
+    var tasks = [];
+    var appointments = [];
+    var editingTaskId = null;
+    var editingApptId = null;
+    var lifeAreaFilterValue = 'all';
+    var lifeActiveTab = 'today';
+
+    function loadTasks() {
+      var saved = localStorage.getItem(TASKS_KEY);
+      if (!saved) return [];
+      try {
+        var parsed = JSON.parse(saved);
+        if (!Array.isArray(parsed)) return [];
+        return parsed.map(function(task) {
+          if (!task || typeof task !== 'object') return null;
+          var areaId = task.areaId || getDefaultAreaId();
+          return {
+            id: task.id || generateGoalId('task'),
+            text: task.text || '',
+            areaId: areaId,
+            ownerName: task.ownerName || getAreaOwnerName(areaId) || null,
+            tags: Array.isArray(task.tags) ? task.tags : (task.tags ? String(task.tags).split(',').map(function(t) { return t.trim(); }).filter(Boolean) : []),
+            needsOtherPeople: !!task.needsOtherPeople,
+            needsAppointment: !!task.needsAppointment,
+            energyType: task.energyType || '',
+            done: !!task.done,
+            createdAt: task.createdAt || Date.now(),
+            dueDate: task.dueDate || null
+          };
+        }).filter(Boolean);
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function loadAppointments() {
+      var saved = localStorage.getItem(APPOINTMENTS_KEY);
+      if (!saved) return [];
+      try {
+        var parsed = JSON.parse(saved);
+        if (!Array.isArray(parsed)) return [];
+        return parsed.map(function(appt) {
+          if (!appt || typeof appt !== 'object') return null;
+          var areaId = appt.areaId || getDefaultAreaId();
+          return {
+            id: appt.id || generateGoalId('appt'),
+            title: appt.title || '',
+            areaId: areaId,
+            ownerName: appt.ownerName || getAreaOwnerName(areaId) || null,
+            dateTimeStart: appt.dateTimeStart || '',
+            dateTimeEnd: appt.dateTimeEnd || null,
+            location: appt.location || '',
+            notes: appt.notes || '',
+            linkedTaskIds: Array.isArray(appt.linkedTaskIds) ? appt.linkedTaskIds : [],
+            createdAt: appt.createdAt || Date.now()
+          };
+        }).filter(Boolean);
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveTasks() {
+      localStorage.setItem(TASKS_KEY, JSON.stringify(tasks));
+    }
+
+    function saveAppointments() {
+      localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(appointments));
+    }
+
+    function renderGoalsNudge() {
+      if (!goalsNudge) return;
+      var cutoff = Date.now() - (14 * 24 * 60 * 60 * 1000);
+      var stale = goalsLong.filter(function(goal) {
+        return !goal.completedAt && goal.createdAt && goal.createdAt <= cutoff;
+      });
+      if (stale.length > 0) {
+        goalsNudge.style.display = 'flex';
+        goalsNudge.dataset.goalId = stale[0].id;
+      } else {
+        goalsNudge.style.display = 'none';
+        goalsNudge.dataset.goalId = '';
+      }
+    }
+
+    function formatTaskMeta(task) {
+      var parts = [];
+      if (task.dueDate) parts.push('Due ' + task.dueDate);
+      if (task.tags && task.tags.length) parts.push('Tags: ' + task.tags.join(', '));
+      if (task.energyType) parts.push('Energy: ' + task.energyType);
+      if (task.needsOtherPeople) parts.push('Needs people');
+      if (task.needsAppointment) parts.push('Needs appt');
+      return parts.join(' • ');
+    }
+
+    function getLifeFiltered(items) {
+      return (items || []).filter(function(item) {
+        return shouldIncludeGoalForArea(item.areaId, lifeAreaFilterValue);
+      });
+    }
+
+    function renderLifeToday() {
+      if (!lifeTodayList) return;
+      lifeTodayList.innerHTML = '';
+      var actionableGoals = getLifeFiltered(goalsShort).filter(function(goal) { return !goal.done; });
+      var actionableTasks = getLifeFiltered(tasks).filter(function(task) { return !task.done; });
+      var combined = actionableGoals.map(function(goal) {
+        return { type: 'goal', text: goal.text, areaId: goal.areaId };
+      }).concat(actionableTasks.map(function(task) {
+        return { type: 'task', text: task.text, areaId: task.areaId };
+      }));
+      var topFive = combined.slice(0, 5);
+      if (topFive.length === 0) {
+        var empty = document.createElement('div');
+        empty.className = 'life-meta';
+        empty.textContent = 'No actionable items yet.';
+        lifeTodayList.appendChild(empty);
+        return;
+      }
+      topFive.forEach(function(item) {
+        var row = document.createElement('div');
+        row.className = 'life-item';
+        var title = document.createElement('div');
+        title.textContent = item.text;
+        var meta = document.createElement('div');
+        meta.className = 'life-meta';
+        var pill = document.createElement('span');
+        pill.className = 'life-pill';
+        pill.textContent = getAreaLabel(item.areaId);
+        meta.appendChild(pill);
+        meta.appendChild(document.createTextNode(' · ' + (item.type === 'goal' ? 'Short-term goal' : 'Task')));
+        row.appendChild(title);
+        row.appendChild(meta);
+        lifeTodayList.appendChild(row);
+      });
+    }
+
+    function renderLifeGoals() {
+      if (!lifeGoalsList) return;
+      lifeGoalsList.innerHTML = '';
+      var filteredLong = getLifeFiltered(goalsLong);
+      if (filteredLong.length === 0) {
+        var empty = document.createElement('div');
+        empty.className = 'life-meta';
+        empty.textContent = 'No long-term goals in this area.';
+        lifeGoalsList.appendChild(empty);
+        return;
+      }
+      filteredLong.forEach(function(goal) {
+        var card = document.createElement('div');
+        card.className = 'life-item';
+        var title = document.createElement('div');
+        title.textContent = goal.title || 'Untitled goal';
+        var meta = document.createElement('div');
+        meta.className = 'life-meta';
+        var pill = document.createElement('span');
+        pill.className = 'life-pill';
+        pill.textContent = getAreaLabel(goal.areaId);
+        meta.appendChild(pill);
+        if (goal.targetDate) {
+          meta.appendChild(document.createTextNode(' · Target ' + goal.targetDate));
+        }
+        card.appendChild(title);
+        card.appendChild(meta);
+        if (goal.note) {
+          var note = document.createElement('div');
+          note.className = 'life-meta';
+          note.textContent = goal.note;
+          card.appendChild(note);
+        }
+        var linked = goalsShort.filter(function(shortGoal) {
+          return shortGoal.areaId === goal.areaId;
+        });
+        if (linked.length) {
+          var linkedWrap = document.createElement('div');
+          linkedWrap.className = 'life-meta';
+          linkedWrap.textContent = 'Linked short-term: ' + linked.map(function(item) { return item.text; }).join(', ');
+          card.appendChild(linkedWrap);
+        }
+        lifeGoalsList.appendChild(card);
+      });
+    }
+
+    function renderLifeTasks() {
+      if (!lifeTaskList) return;
+      lifeTaskList.innerHTML = '';
+      var filteredTasks = getLifeFiltered(tasks);
+      if (filteredTasks.length === 0) {
+        var empty = document.createElement('div');
+        empty.className = 'life-meta';
+        empty.textContent = tasks.length === 0 ? 'No tasks yet.' : 'No tasks in this area.';
+        lifeTaskList.appendChild(empty);
+        return;
+      }
+      filteredTasks.forEach(function(task) {
+        var item = document.createElement('div');
+        item.className = 'life-item' + (task.done ? ' completed' : '');
+
+        var header = document.createElement('div');
+        var checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = !!task.done;
+        checkbox.addEventListener('change', function() {
+          task.done = this.checked;
+          saveTasks();
+          renderLifeTasks();
+          renderLifeToday();
+        });
+        var text = document.createElement('span');
+        text.textContent = task.text || '';
+        header.appendChild(checkbox);
+        header.appendChild(text);
+
+        var meta = document.createElement('div');
+        meta.className = 'life-meta';
+        meta.textContent = formatTaskMeta(task);
+        var areaMeta = document.createElement('div');
+        areaMeta.className = 'life-meta';
+        var pill = document.createElement('span');
+        pill.className = 'life-pill';
+        pill.textContent = getAreaLabel(task.areaId);
+        areaMeta.appendChild(pill);
+
+        var actions = document.createElement('div');
+        actions.className = 'life-item-actions';
+        var editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.className = 'life-btn secondary';
+        editBtn.textContent = 'Edit';
+        editBtn.addEventListener('click', function() {
+          editingTaskId = task.id;
+          lifeTaskText.value = task.text || '';
+          lifeTaskArea.value = task.areaId || getDefaultAreaId();
+          lifeTaskTags.value = (task.tags || []).join(', ');
+          lifeTaskDue.value = task.dueDate || '';
+          lifeTaskNeedsPeople.checked = !!task.needsOtherPeople;
+          lifeTaskNeedsAppt.checked = !!task.needsAppointment;
+          lifeTaskEnergy.value = task.energyType || '';
+          lifeTaskAdd.textContent = 'Save task';
+          lifeTaskCancel.style.display = 'inline-flex';
+          if (activeView !== 'life') {
+            setActiveView('life', true);
+          }
+          lifeTaskText.focus();
+        });
+
+        var breakBtn = document.createElement('button');
+        breakBtn.type = 'button';
+        breakBtn.className = 'life-btn secondary';
+        breakBtn.textContent = 'Break into steps';
+        breakBtn.addEventListener('click', function() {
+          openUnstuckPanel({
+            source: 'task',
+            mode: 'break',
+            item: task
+          });
+        });
+
+        var helpBtn = document.createElement('button');
+        helpBtn.type = 'button';
+        helpBtn.className = 'life-btn secondary';
+        helpBtn.textContent = 'Help me start';
+        helpBtn.addEventListener('click', function() {
+          openUnstuckPanel({
+            source: 'task',
+            mode: 'start',
+            item: task
+          });
+        });
+
+        var deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'life-btn secondary';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.addEventListener('click', function() {
+          tasks = tasks.filter(function(item) { return item.id !== task.id; });
+          saveTasks();
+          renderLifeTasks();
+          renderLifeToday();
+          renderLinkedTaskOptions();
+        });
+
+        actions.appendChild(editBtn);
+        actions.appendChild(breakBtn);
+        actions.appendChild(helpBtn);
+        actions.appendChild(deleteBtn);
+
+        item.appendChild(header);
+        if (meta.textContent) item.appendChild(meta);
+        item.appendChild(areaMeta);
+        item.appendChild(actions);
+        lifeTaskList.appendChild(item);
+      });
+    }
+
+    function renderLinkedTaskOptions() {
+      if (!lifeApptLinkedTasks) return;
+      lifeApptLinkedTasks.innerHTML = '';
+      tasks.forEach(function(task) {
+        var opt = document.createElement('option');
+        opt.value = task.id;
+        opt.textContent = task.text || 'Untitled task';
+        lifeApptLinkedTasks.appendChild(opt);
+      });
+    }
+
+    function renderLifeCalendar() {
+      if (!lifeCalendarList) return;
+      lifeCalendarList.innerHTML = '';
+      var filtered = getLifeFiltered(appointments).filter(function(appt) {
+        return appt.dateTimeStart;
+      });
+      filtered.sort(function(a, b) {
+        return new Date(a.dateTimeStart) - new Date(b.dateTimeStart);
+      });
+      if (filtered.length === 0) {
+        var empty = document.createElement('div');
+        empty.className = 'life-meta';
+        empty.textContent = appointments.length === 0 ? 'No appointments yet.' : 'No appointments in this area.';
+        lifeCalendarList.appendChild(empty);
+        return;
+      }
+      var lastDate = '';
+      filtered.forEach(function(appt) {
+        var start = new Date(appt.dateTimeStart);
+        var dateLabel = isNaN(start.getTime()) ? 'Upcoming' : start.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+        if (dateLabel !== lastDate) {
+          var dateHeader = document.createElement('div');
+          dateHeader.className = 'life-meta';
+          dateHeader.textContent = dateLabel;
+          lifeCalendarList.appendChild(dateHeader);
+          lastDate = dateLabel;
+        }
+        var card = document.createElement('div');
+        card.className = 'life-item';
+        var title = document.createElement('div');
+        title.textContent = appt.title || 'Untitled appointment';
+        var meta = document.createElement('div');
+        meta.className = 'life-meta';
+        var timeLabel = appt.dateTimeStart ? new Date(appt.dateTimeStart).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) : '';
+        if (appt.dateTimeEnd) {
+          var endLabel = new Date(appt.dateTimeEnd).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+          timeLabel = timeLabel + ' - ' + endLabel;
+        }
+        meta.textContent = [timeLabel, appt.location].filter(Boolean).join(' · ');
+        var linked = appt.linkedTaskIds && appt.linkedTaskIds.length
+          ? appt.linkedTaskIds.map(function(id) {
+            var task = tasks.find(function(t) { return t.id === id; });
+            return task ? task.text : '';
+          }).filter(Boolean).join(', ')
+          : '';
+        if (linked) {
+          var linkedMeta = document.createElement('div');
+          linkedMeta.className = 'life-meta';
+          linkedMeta.textContent = 'Linked tasks: ' + linked;
+          card.appendChild(linkedMeta);
+        }
+        var areaMeta = document.createElement('div');
+        areaMeta.className = 'life-meta';
+        var pill = document.createElement('span');
+        pill.className = 'life-pill';
+        pill.textContent = getAreaLabel(appt.areaId);
+        areaMeta.appendChild(pill);
+
+        var actions = document.createElement('div');
+        actions.className = 'life-item-actions';
+        var editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.className = 'life-btn secondary';
+        editBtn.textContent = 'Edit';
+        editBtn.addEventListener('click', function() {
+          editingApptId = appt.id;
+          lifeApptTitle.value = appt.title || '';
+          lifeApptArea.value = appt.areaId || getDefaultAreaId();
+          lifeApptStart.value = appt.dateTimeStart || '';
+          lifeApptEnd.value = appt.dateTimeEnd || '';
+          lifeApptLocation.value = appt.location || '';
+          lifeApptNotes.value = appt.notes || '';
+          Array.from(lifeApptLinkedTasks.options).forEach(function(option) {
+            option.selected = appt.linkedTaskIds.indexOf(option.value) >= 0;
+          });
+          lifeApptAdd.textContent = 'Save appointment';
+          lifeApptCancel.style.display = 'inline-flex';
+          if (activeView !== 'life') {
+            setActiveView('life', true);
+          }
+          lifeApptTitle.focus();
+        });
+        var deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'life-btn secondary';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.addEventListener('click', function() {
+          appointments = appointments.filter(function(item) { return item.id !== appt.id; });
+          saveAppointments();
+          renderLifeCalendar();
+        });
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
+
+        card.appendChild(title);
+        if (meta.textContent) card.appendChild(meta);
+        card.appendChild(areaMeta);
+        card.appendChild(actions);
+        lifeCalendarList.appendChild(card);
+      });
+    }
+
+    function renderLifeAreasList() {
+      if (!lifeAreasList) return;
+      lifeAreasList.innerHTML = '';
+      lifeAreas.forEach(function(area) {
+        var row = document.createElement('div');
+        row.className = 'life-item';
+        var title = document.createElement('div');
+        title.textContent = area.name;
+        var meta = document.createElement('div');
+        meta.className = 'life-meta';
+        meta.textContent = 'Type: ' + area.type;
+        row.appendChild(title);
+        row.appendChild(meta);
+        if (area.type === 'child') {
+          var actions = document.createElement('div');
+          actions.className = 'life-item-actions';
+          var removeBtn = document.createElement('button');
+          removeBtn.type = 'button';
+          removeBtn.className = 'life-btn secondary';
+          removeBtn.textContent = 'Remove';
+          removeBtn.addEventListener('click', function() {
+            lifeAreas = lifeAreas.filter(function(item) { return item.id !== area.id; });
+            saveLifeAreas();
+            renderAreaSelects();
+            renderLifeAreasList();
+          });
+          actions.appendChild(removeBtn);
+          row.appendChild(actions);
+        }
+        lifeAreasList.appendChild(row);
+      });
+    }
+
+    function renderAreaSelects() {
+      if (goalsAreaFilterValue !== 'all' && !lifeAreas.some(function(area) { return area.id === goalsAreaFilterValue; })) {
+        goalsAreaFilterValue = 'all';
+      }
+      if (lifeAreaFilterValue !== 'all' && !lifeAreas.some(function(area) { return area.id === lifeAreaFilterValue; })) {
+        lifeAreaFilterValue = 'all';
+      }
+      renderAreaSelect(goalsAreaFilter, true, goalsAreaFilterValue);
+      renderAreaSelect(shortGoalArea, false, goalsAreaFilterValue !== 'all' ? goalsAreaFilterValue : getDefaultAreaId());
+      renderAreaSelect(longGoalArea, false, goalsAreaFilterValue !== 'all' ? goalsAreaFilterValue : getDefaultAreaId());
+      renderAreaSelect(lifeAreaFilter, true, lifeAreaFilterValue);
+      renderAreaSelect(lifeTaskArea, false, lifeAreaFilterValue !== 'all' ? lifeAreaFilterValue : getDefaultAreaId());
+      renderAreaSelect(lifeApptArea, false, lifeAreaFilterValue !== 'all' ? lifeAreaFilterValue : getDefaultAreaId());
+    }
+
+    function setLifeTab(nextTab) {
+      lifeActiveTab = nextTab;
+      var tabs = document.querySelectorAll('#lifeTabs .life-tab');
+      tabs.forEach(function(tab) {
+        tab.classList.toggle('active', tab.dataset.tab === nextTab);
+      });
+      var panels = document.querySelectorAll('#life-view [data-tab-panel]');
+      panels.forEach(function(panel) {
+        panel.style.display = panel.dataset.tabPanel === nextTab ? '' : 'none';
+      });
+    }
+
+    async function callUnstuckAssistant(prompt) {
+      var idToken = localStorage.getItem('google_id_token');
+      if (!idToken) {
+        throw new Error('Please sign in again to continue.');
+      }
+      var res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + idToken
+        },
+        body: JSON.stringify({
+          model: modelSelect.value,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+      if (!res.ok) {
+        var errorMsg = 'Backend API error';
+        try {
+          var error = await res.json();
+          errorMsg = error.error || errorMsg;
+        } catch (e) {}
+        if (res.status === 401) {
+          signOut();
+          throw new Error('Session expired. Please sign in again.');
+        }
+        throw new Error(errorMsg);
+      }
+      var data = await res.json();
+      return data.response;
+    }
+
+    function stripJsonFences(text) {
+      if (!text) return '';
+      var trimmed = text.trim();
+      if (trimmed.startsWith('```')) {
+        trimmed = trimmed.replace(/^```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();
+      }
+      return trimmed;
+    }
+
+    function openUnstuckPanel(config) {
+      var panel = config.source === 'goal' ? goalsUnstuckPanel : lifeUnstuckPanel;
+      if (!panel) return;
+      panel.innerHTML = '';
+      panel.classList.add('active');
+
+      var title = document.createElement('div');
+      title.className = config.source === 'goal' ? 'goals-meta' : 'life-meta';
+      title.textContent = (config.mode === 'break' ? 'Break into steps' : 'Help me start') + ' · ' + getAreaLabel(config.item.areaId);
+
+      var doneInput = document.createElement('input');
+      doneInput.type = 'text';
+      doneInput.placeholder = 'Done definition (optional)';
+      doneInput.className = config.source === 'goal' ? 'goals-input' : 'life-input';
+
+      var roadblockSelect = document.createElement('select');
+      roadblockSelect.className = config.source === 'goal' ? 'goals-input' : 'life-select';
+      ['No roadblock', 'Overwhelmed', 'Too many steps', 'Low energy', 'Waiting on others', 'No time', 'Other'].forEach(function(label) {
+        var opt = document.createElement('option');
+        opt.value = label;
+        opt.textContent = label;
+        roadblockSelect.appendChild(opt);
+      });
+
+      var roadblockInput = document.createElement('input');
+      roadblockInput.type = 'text';
+      roadblockInput.placeholder = 'Roadblock details (optional)';
+      roadblockInput.className = config.source === 'goal' ? 'goals-input' : 'life-input';
+
+      var sizeSelect = document.createElement('select');
+      sizeSelect.className = config.source === 'goal' ? 'goals-input' : 'life-select';
+      ['Tiny', 'Small', 'Medium'].forEach(function(label) {
+        var opt = document.createElement('option');
+        opt.value = label;
+        opt.textContent = 'First-step size: ' + label;
+        sizeSelect.appendChild(opt);
+      });
+
+      var actionRow = document.createElement('div');
+      actionRow.className = config.source === 'goal' ? 'goals-row' : 'life-row';
+      var submitBtn = document.createElement('button');
+      submitBtn.type = 'button';
+      submitBtn.className = config.source === 'goal' ? 'goals-btn' : 'life-btn';
+      submitBtn.textContent = 'Run AI';
+      var closeBtn = document.createElement('button');
+      closeBtn.type = 'button';
+      closeBtn.className = config.source === 'goal' ? 'goals-btn goals-btn-secondary' : 'life-btn secondary';
+      closeBtn.textContent = 'Close';
+      closeBtn.addEventListener('click', function() {
+        panel.classList.remove('active');
+        panel.innerHTML = '';
+      });
+      actionRow.appendChild(submitBtn);
+      actionRow.appendChild(closeBtn);
+
+      var status = document.createElement('div');
+      status.className = config.source === 'goal' ? 'goals-meta' : 'life-meta';
+
+      var results = document.createElement('div');
+      results.className = config.source === 'goal' ? 'unstuck-steps' : 'unstuck-steps';
+
+      panel.appendChild(title);
+      panel.appendChild(doneInput);
+      panel.appendChild(roadblockSelect);
+      panel.appendChild(roadblockInput);
+      panel.appendChild(sizeSelect);
+      panel.appendChild(actionRow);
+      panel.appendChild(status);
+      panel.appendChild(results);
+
+      submitBtn.addEventListener('click', async function() {
+        status.textContent = 'Thinking...';
+        results.innerHTML = '';
+        var maxSteps = config.mode === 'break' ? 5 : 3;
+        var prompt = [
+          'Return JSON only with schema:',
+          '{"stuck_reason":"string (optional, max 120 chars)","steps":[{"text":"string","minutes":number,"done_when":"string"}],"if_stuck_try":["string"]}',
+          'Rules: max ' + maxSteps + ' steps, step 1 must be <= 5 minutes, no extra prose.',
+          'Context:',
+          'Area: ' + getAreaLabel(config.item.areaId),
+          'Item: ' + (config.item.title || config.item.text || 'Untitled'),
+          'Notes: ' + (config.item.note || config.item.notes || ''),
+          'Target/Due: ' + (config.item.targetDate || config.item.dueDate || ''),
+          'Tags: ' + ((config.item.tags || []).join(', ')),
+          'Done definition: ' + doneInput.value.trim(),
+          'Roadblock: ' + roadblockSelect.value + (roadblockInput.value.trim() ? ' - ' + roadblockInput.value.trim() : ''),
+          'First-step size: ' + sizeSelect.value
+        ].join('\n');
+        try {
+          var response = await callUnstuckAssistant(prompt);
+          var parsed = JSON.parse(stripJsonFences(response));
+          renderUnstuckResults(panel, parsed, config.item.areaId);
+          status.textContent = '';
+        } catch (err) {
+          status.textContent = err && err.message ? err.message : 'Unable to get AI steps.';
+        }
+      });
+    }
+
+    function renderUnstuckResults(panel, data, areaId) {
+      var results = panel.querySelector('.unstuck-steps');
+      if (!results) return;
+      results.innerHTML = '';
+      var steps = Array.isArray(data.steps) ? data.steps : [];
+      var tips = Array.isArray(data.if_stuck_try) ? data.if_stuck_try : [];
+      if (data.stuck_reason) {
+        var reason = document.createElement('div');
+        reason.className = panel.closest('#goals-view') ? 'goals-meta' : 'life-meta';
+        reason.textContent = 'Stuck reason: ' + data.stuck_reason;
+        results.appendChild(reason);
+      }
+
+      var stepsLabel = document.createElement('div');
+      stepsLabel.className = panel.closest('#goals-view') ? 'goals-meta' : 'life-meta';
+      stepsLabel.textContent = 'Review steps';
+      results.appendChild(stepsLabel);
+
+      steps.forEach(function(step) {
+        var row = document.createElement('div');
+        row.className = 'unstuck-step-row';
+        var textInput = document.createElement('input');
+        textInput.type = 'text';
+        textInput.value = step.text || '';
+        var minutesInput = document.createElement('input');
+        minutesInput.type = 'number';
+        minutesInput.min = '1';
+        minutesInput.max = '180';
+        minutesInput.value = step.minutes || 5;
+        row.appendChild(textInput);
+        row.appendChild(minutesInput);
+        results.appendChild(row);
+
+        var doneWhen = document.createElement('input');
+        doneWhen.type = 'text';
+        doneWhen.value = step.done_when || '';
+        doneWhen.placeholder = 'Done when...';
+        doneWhen.className = panel.closest('#goals-view') ? 'goals-input' : 'life-input';
+        results.appendChild(doneWhen);
+      });
+
+      if (tips.length) {
+        var tipsLabel = document.createElement('div');
+        tipsLabel.className = panel.closest('#goals-view') ? 'goals-meta' : 'life-meta';
+        tipsLabel.textContent = 'If stuck, try';
+        results.appendChild(tipsLabel);
+        tips.forEach(function(tip) {
+          var tipInput = document.createElement('input');
+          tipInput.type = 'text';
+          tipInput.value = tip || '';
+          tipInput.className = panel.closest('#goals-view') ? 'goals-input' : 'life-input';
+          results.appendChild(tipInput);
+        });
+      }
+
+      var addBtn = document.createElement('button');
+      addBtn.type = 'button';
+      addBtn.className = panel.closest('#goals-view') ? 'goals-btn' : 'life-btn';
+      addBtn.textContent = 'Add to short-term checklist';
+      addBtn.addEventListener('click', function() {
+        var stepRows = results.querySelectorAll('.unstuck-step-row');
+        var newGoals = [];
+        stepRows.forEach(function(row) {
+          var textInput = row.querySelector('input[type="text"]');
+          if (!textInput || !textInput.value.trim()) return;
+          newGoals.push({
+            id: generateGoalId('short'),
+            text: textInput.value.trim(),
+            done: false,
+            areaId: areaId || getDefaultAreaId(),
+            ownerName: getAreaOwnerName(areaId),
+            createdAt: Date.now(),
+            completedAt: null
+          });
+        });
+        if (!newGoals.length) return;
+        goalsShort = newGoals.concat(goalsShort);
+        saveGoalsViewShort();
+        renderShortGoals();
+        renderLifeToday();
+      });
+      results.appendChild(addBtn);
     }
 
     // SETTINGS MANAGEMENT
@@ -4087,6 +5364,7 @@
     const btnSettings = document.getElementById('btnSettings');
     const btnAbout = document.getElementById('btnAbout');
     const btnGoals = document.getElementById('btnGoals');
+    const btnLife = document.getElementById('btnLife');
     const btnFrictionSocial = document.getElementById('btnFrictionSocial');
     const chatInputArea = document.querySelector('.chat-input-area');
 
@@ -4118,10 +5396,13 @@
     const frictionSocialFrequencyInputs = document.querySelectorAll('input[name="fsFrictionFrequency"]');
     const frictionSocialPauseInputs = document.querySelectorAll('input[name="fsPauseSeconds"]');
     const goalsView = document.getElementById('goals-view');
+    const lifeView = document.getElementById('life-view');
+    const goalsAreaFilter = document.getElementById('goalsAreaFilter');
     const shortGoalInput = document.getElementById('shortGoalInput');
     const shortGoalAdd = document.getElementById('shortGoalAdd');
     const shortGoalList = document.getElementById('shortGoalList');
     const shortGoalClear = document.getElementById('shortGoalClear');
+    const shortGoalArea = document.getElementById('shortGoalArea');
     const longGoalForm = document.getElementById('longGoalForm');
     const longGoalTitle = document.getElementById('longGoalTitle');
     const longGoalDate = document.getElementById('longGoalDate');
@@ -4129,6 +5410,42 @@
     const longGoalAdd = document.getElementById('longGoalAdd');
     const longGoalCancel = document.getElementById('longGoalCancel');
     const longGoalList = document.getElementById('longGoalList');
+    const longGoalArea = document.getElementById('longGoalArea');
+    const goalsUnstuckPanel = document.getElementById('goalsUnstuckPanel');
+    const goalsNudge = document.getElementById('goalsNudge');
+    const goalsNudgeBtn = document.getElementById('goalsNudgeBtn');
+
+    const lifeAreaFilter = document.getElementById('lifeAreaFilter');
+    const lifeTabs = document.getElementById('lifeTabs');
+    const lifeTodayList = document.getElementById('lifeTodayList');
+    const lifeGoalsList = document.getElementById('lifeGoalsList');
+    const lifeTaskText = document.getElementById('lifeTaskText');
+    const lifeTaskArea = document.getElementById('lifeTaskArea');
+    const lifeTaskTags = document.getElementById('lifeTaskTags');
+    const lifeTaskDue = document.getElementById('lifeTaskDue');
+    const lifeTaskNeedsPeople = document.getElementById('lifeTaskNeedsPeople');
+    const lifeTaskNeedsAppt = document.getElementById('lifeTaskNeedsAppt');
+    const lifeTaskEnergy = document.getElementById('lifeTaskEnergy');
+    const lifeTaskAdd = document.getElementById('lifeTaskAdd');
+    const lifeTaskCancel = document.getElementById('lifeTaskCancel');
+    const lifeTaskList = document.getElementById('lifeTaskList');
+    const lifeUnstuckPanel = document.getElementById('lifeUnstuckPanel');
+    const lifeApptTitle = document.getElementById('lifeApptTitle');
+    const lifeApptArea = document.getElementById('lifeApptArea');
+    const lifeApptStart = document.getElementById('lifeApptStart');
+    const lifeApptEnd = document.getElementById('lifeApptEnd');
+    const lifeApptLocation = document.getElementById('lifeApptLocation');
+    const lifeApptNotes = document.getElementById('lifeApptNotes');
+    const lifeApptLinkedTasks = document.getElementById('lifeApptLinkedTasks');
+    const lifeApptAdd = document.getElementById('lifeApptAdd');
+    const lifeApptCancel = document.getElementById('lifeApptCancel');
+    const lifeCalendarList = document.getElementById('lifeCalendarList');
+    const lifeFrictionEnabled = document.getElementById('lifeFrictionEnabled');
+    const lifeChildName = document.getElementById('lifeChildName');
+    const lifeAddChild = document.getElementById('lifeAddChild');
+    const lifeAreasList = document.getElementById('lifeAreasList');
+    const lifeFrictionFrequencyInputs = document.querySelectorAll('input[name="lifeFrictionFrequency"]');
+    const lifePauseInputs = document.querySelectorAll('input[name="lifePauseSeconds"]');
     
     // Profile elements
     const profilePic = document.getElementById('profilePic');
@@ -4385,6 +5702,7 @@
     function getViewFromLocation() {
       if (window.location.hash === '#friction-social') return 'social';
       if (window.location.hash === '#goals') return 'goals';
+      if (window.location.hash === '#life') return 'life';
       return 'chat';
     }
 
@@ -4406,16 +5724,30 @@
           btnGoals.style.color = '';
         }
       }
+      if (btnLife) {
+        if (view === 'life') {
+          btnLife.style.background = 'var(--teal-lighter)';
+          btnLife.style.color = 'var(--text-primary)';
+        } else {
+          btnLife.style.background = '';
+          btnLife.style.color = '';
+        }
+      }
     }
 
     function setActiveView(view, pushState) {
       activeView = view;
       var showSocial = view === 'social';
       var showGoals = view === 'goals';
+      var showLife = view === 'life';
       frictionSocialView.classList.toggle('active', showSocial);
       frictionSocialView.setAttribute('aria-hidden', showSocial ? 'false' : 'true');
       goalsView.classList.toggle('active', showGoals);
       goalsView.setAttribute('aria-hidden', showGoals ? 'false' : 'true');
+      if (lifeView) {
+        lifeView.classList.toggle('active', showLife);
+        lifeView.setAttribute('aria-hidden', showLife ? 'false' : 'true');
+      }
       var showChat = view === 'chat';
       chatMessages.style.display = showChat ? '' : 'none';
       typingIndicator.style.display = showChat ? '' : 'none';
@@ -4425,6 +5757,7 @@
         var nextHash = '#chat';
         if (view === 'social') nextHash = '#friction-social';
         if (view === 'goals') nextHash = '#goals';
+        if (view === 'life') nextHash = '#life';
         history.pushState({ view: view }, '', nextHash);
       }
       if (showSocial) {
@@ -4515,6 +5848,13 @@
       btnGoals.addEventListener('click', function() {
         closeMenu();
         setActiveView('goals', true);
+      });
+    }
+
+    if (btnLife) {
+      btnLife.addEventListener('click', function() {
+        closeMenu();
+        setActiveView('life', true);
       });
     }
 
@@ -4676,6 +6016,15 @@
         input.checked = input.value === frictionSocialPrefs.frictionFrequency;
       });
       frictionSocialPauseInputs.forEach(function(input) {
+        input.checked = input.value === frictionSocialPrefs.pauseSeconds;
+      });
+      if (lifeFrictionEnabled) {
+        lifeFrictionEnabled.checked = frictionSocialPrefs.frictionEnabled;
+      }
+      lifeFrictionFrequencyInputs.forEach(function(input) {
+        input.checked = input.value === frictionSocialPrefs.frictionFrequency;
+      });
+      lifePauseInputs.forEach(function(input) {
         input.checked = input.value === frictionSocialPrefs.pauseSeconds;
       });
     }
@@ -5429,6 +6778,32 @@
       });
     });
 
+    if (lifeFrictionEnabled) {
+      lifeFrictionEnabled.addEventListener('change', function() {
+        frictionSocialPrefs.frictionEnabled = this.checked;
+        saveFrictionSocialPrefs();
+        applyFrictionSocialPrefsToUI();
+      });
+    }
+
+    lifeFrictionFrequencyInputs.forEach(function(input) {
+      input.addEventListener('change', function() {
+        if (!this.checked) return;
+        frictionSocialPrefs.frictionFrequency = this.value;
+        saveFrictionSocialPrefs();
+        applyFrictionSocialPrefsToUI();
+      });
+    });
+
+    lifePauseInputs.forEach(function(input) {
+      input.addEventListener('change', function() {
+        if (!this.checked) return;
+        frictionSocialPrefs.pauseSeconds = this.value;
+        saveFrictionSocialPrefs();
+        applyFrictionSocialPrefsToUI();
+      });
+    });
+
     frictionSocialAdd.addEventListener('click', addFrictionSocialVideo);
     if (frictionSocialAddChannel) {
       frictionSocialAddChannel.addEventListener('click', addFrictionSocialChannel);
@@ -5501,25 +6876,46 @@
       }
     });
 
+    loadLifeAreas();
+    renderAreaSelects();
+
     goalsShort = loadGoalsViewShort();
     goalsLong = loadGoalsViewLong();
+    tasks = loadTasks();
+    appointments = loadAppointments();
+    saveGoalsViewShort();
+    saveGoalsViewLong();
+    saveTasks();
+    saveAppointments();
     renderShortGoals();
     renderLongGoals();
+    renderGoalsNudge();
+    renderLinkedTaskOptions();
+    renderLifeToday();
+    renderLifeGoals();
+    renderLifeTasks();
+    renderLifeCalendar();
+    renderLifeAreasList();
+    setLifeTab('today');
 
     if (shortGoalAdd) {
       shortGoalAdd.addEventListener('click', function() {
         var text = shortGoalInput.value.trim();
         if (!text) return;
+        var areaId = shortGoalArea ? shortGoalArea.value : getDefaultAreaId();
         goalsShort.unshift({
           id: generateGoalId('short'),
           text: text,
           done: false,
+          areaId: areaId,
+          ownerName: getAreaOwnerName(areaId),
           createdAt: Date.now(),
           completedAt: null
         });
         shortGoalInput.value = '';
         saveGoalsViewShort();
         renderShortGoals();
+        renderLifeToday();
       });
     }
 
@@ -5537,6 +6933,7 @@
         goalsShort = goalsShort.filter(function(goal) { return !goal.done; });
         saveGoalsViewShort();
         renderShortGoals();
+        renderLifeToday();
       });
     }
 
@@ -5547,6 +6944,7 @@
         if (!title) return;
         var note = longGoalNote.value.trim();
         var date = longGoalDate.value;
+        var areaId = longGoalArea ? longGoalArea.value : getDefaultAreaId();
         if (editingLongGoalId) {
           goalsLong = goalsLong.map(function(goal) {
             if (goal.id !== editingLongGoalId) return goal;
@@ -5555,7 +6953,10 @@
               title: title,
               note: note,
               targetDate: date || null,
-              createdAt: goal.createdAt
+              areaId: areaId,
+              ownerName: getAreaOwnerName(areaId),
+              createdAt: goal.createdAt,
+              updatedAt: Date.now()
             };
           });
         } else {
@@ -5564,11 +6965,16 @@
             title: title,
             note: note,
             targetDate: date || null,
-            createdAt: Date.now()
+            areaId: areaId,
+            ownerName: getAreaOwnerName(areaId),
+            createdAt: Date.now(),
+            updatedAt: Date.now()
           });
         }
         saveGoalsViewLong();
         renderLongGoals();
+        renderGoalsNudge();
+        renderLifeGoals();
         resetLongGoalForm();
       });
     }
@@ -5576,6 +6982,194 @@
     if (longGoalCancel) {
       longGoalCancel.addEventListener('click', function() {
         resetLongGoalForm();
+      });
+    }
+
+    if (goalsAreaFilter) {
+      goalsAreaFilter.addEventListener('change', function() {
+        goalsAreaFilterValue = this.value;
+        renderAreaSelects();
+        renderShortGoals();
+        renderLongGoals();
+      });
+    }
+
+    if (lifeAreaFilter) {
+      lifeAreaFilter.addEventListener('change', function() {
+        lifeAreaFilterValue = this.value;
+        renderAreaSelects();
+        renderLifeToday();
+        renderLifeGoals();
+        renderLifeTasks();
+        renderLifeCalendar();
+      });
+    }
+
+    if (lifeTabs) {
+      lifeTabs.addEventListener('click', function(event) {
+        var button = event.target.closest('.life-tab');
+        if (!button) return;
+        setLifeTab(button.dataset.tab || 'today');
+      });
+    }
+
+    if (lifeTaskAdd) {
+      lifeTaskAdd.addEventListener('click', function() {
+        var text = lifeTaskText.value.trim();
+        if (!text) return;
+        var areaId = lifeTaskArea ? lifeTaskArea.value : getDefaultAreaId();
+        var tags = lifeTaskTags.value.split(',').map(function(t) { return t.trim(); }).filter(Boolean);
+        if (editingTaskId) {
+          tasks = tasks.map(function(task) {
+            if (task.id !== editingTaskId) return task;
+            return {
+              id: task.id,
+              text: text,
+              areaId: areaId,
+              ownerName: getAreaOwnerName(areaId),
+              tags: tags,
+              needsOtherPeople: lifeTaskNeedsPeople.checked,
+              needsAppointment: lifeTaskNeedsAppt.checked,
+              energyType: lifeTaskEnergy.value || '',
+              done: task.done,
+              createdAt: task.createdAt,
+              dueDate: lifeTaskDue.value || null
+            };
+          });
+        } else {
+          tasks.unshift({
+            id: generateGoalId('task'),
+            text: text,
+            areaId: areaId,
+            ownerName: getAreaOwnerName(areaId),
+            tags: tags,
+            needsOtherPeople: lifeTaskNeedsPeople.checked,
+            needsAppointment: lifeTaskNeedsAppt.checked,
+            energyType: lifeTaskEnergy.value || '',
+            done: false,
+            createdAt: Date.now(),
+            dueDate: lifeTaskDue.value || null
+          });
+        }
+        saveTasks();
+        renderLifeTasks();
+        renderLifeToday();
+        renderLinkedTaskOptions();
+        editingTaskId = null;
+        lifeTaskText.value = '';
+        lifeTaskTags.value = '';
+        lifeTaskDue.value = '';
+        lifeTaskNeedsPeople.checked = false;
+        lifeTaskNeedsAppt.checked = false;
+        lifeTaskEnergy.value = '';
+        lifeTaskAdd.textContent = 'Add task';
+        lifeTaskCancel.style.display = 'none';
+      });
+    }
+
+    if (lifeTaskCancel) {
+      lifeTaskCancel.addEventListener('click', function() {
+        editingTaskId = null;
+        lifeTaskText.value = '';
+        lifeTaskTags.value = '';
+        lifeTaskDue.value = '';
+        lifeTaskNeedsPeople.checked = false;
+        lifeTaskNeedsAppt.checked = false;
+        lifeTaskEnergy.value = '';
+        lifeTaskAdd.textContent = 'Add task';
+        lifeTaskCancel.style.display = 'none';
+      });
+    }
+
+    if (lifeApptAdd) {
+      lifeApptAdd.addEventListener('click', function() {
+        var title = lifeApptTitle.value.trim();
+        if (!title) return;
+        var areaId = lifeApptArea ? lifeApptArea.value : getDefaultAreaId();
+        var selectedTasks = Array.from(lifeApptLinkedTasks.options).filter(function(opt) { return opt.selected; }).map(function(opt) { return opt.value; });
+        if (editingApptId) {
+          appointments = appointments.map(function(appt) {
+            if (appt.id !== editingApptId) return appt;
+            return {
+              id: appt.id,
+              title: title,
+              areaId: areaId,
+              ownerName: getAreaOwnerName(areaId),
+              dateTimeStart: lifeApptStart.value,
+              dateTimeEnd: lifeApptEnd.value || null,
+              location: lifeApptLocation.value.trim(),
+              notes: lifeApptNotes.value.trim(),
+              linkedTaskIds: selectedTasks,
+              createdAt: appt.createdAt
+            };
+          });
+        } else {
+          appointments.unshift({
+            id: generateGoalId('appt'),
+            title: title,
+            areaId: areaId,
+            ownerName: getAreaOwnerName(areaId),
+            dateTimeStart: lifeApptStart.value,
+            dateTimeEnd: lifeApptEnd.value || null,
+            location: lifeApptLocation.value.trim(),
+            notes: lifeApptNotes.value.trim(),
+            linkedTaskIds: selectedTasks,
+            createdAt: Date.now()
+          });
+        }
+        saveAppointments();
+        renderLifeCalendar();
+        editingApptId = null;
+        lifeApptTitle.value = '';
+        lifeApptStart.value = '';
+        lifeApptEnd.value = '';
+        lifeApptLocation.value = '';
+        lifeApptNotes.value = '';
+        Array.from(lifeApptLinkedTasks.options).forEach(function(option) { option.selected = false; });
+        lifeApptAdd.textContent = 'Add appointment';
+        lifeApptCancel.style.display = 'none';
+      });
+    }
+
+    if (lifeApptCancel) {
+      lifeApptCancel.addEventListener('click', function() {
+        editingApptId = null;
+        lifeApptTitle.value = '';
+        lifeApptStart.value = '';
+        lifeApptEnd.value = '';
+        lifeApptLocation.value = '';
+        lifeApptNotes.value = '';
+        Array.from(lifeApptLinkedTasks.options).forEach(function(option) { option.selected = false; });
+        lifeApptAdd.textContent = 'Add appointment';
+        lifeApptCancel.style.display = 'none';
+      });
+    }
+
+    if (lifeAddChild) {
+      lifeAddChild.addEventListener('click', function() {
+        var name = lifeChildName.value.trim();
+        if (!name) return;
+        var childName = name.startsWith('Child:') ? name : 'Child: ' + name;
+        lifeAreas.push({
+          id: generateLifeAreaId(),
+          name: childName,
+          type: 'child',
+          createdAt: Date.now()
+        });
+        lifeChildName.value = '';
+        saveLifeAreas();
+        renderAreaSelects();
+        renderLifeAreasList();
+      });
+    }
+
+    if (goalsNudgeBtn) {
+      goalsNudgeBtn.addEventListener('click', function() {
+        var goalId = goalsNudge.dataset.goalId;
+        var target = goalsLong.find(function(goal) { return goal.id === goalId; }) || goalsLong[0];
+        if (target) {
+          openUnstuckPanel({ source: 'goal', mode: 'break', item: target });
+        }
       });
     }
 
