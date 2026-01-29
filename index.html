@@ -2006,6 +2006,136 @@
     }
 
     /* =================== */
+    /* GOALS VIEW          */
+    /* =================== */
+    #goals-view {
+      display: none;
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 20px calc(24px + var(--safe-bottom));
+    }
+
+    #goals-view.active {
+      display: block;
+    }
+
+    #goals-view .goals-header {
+      margin-bottom: 20px;
+    }
+
+    #goals-view .goals-section {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 6px 16px var(--shadow);
+    }
+
+    #goals-view .goals-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    #goals-view .goals-input {
+      flex: 1;
+      min-width: 200px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--white);
+    }
+
+    #goals-view .goals-textarea {
+      width: 100%;
+      min-height: 90px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--white);
+      resize: vertical;
+    }
+
+    #goals-view .goals-btn {
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--teal);
+      background: var(--teal);
+      color: var(--white);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    #goals-view .goals-btn-secondary {
+      border-color: var(--border);
+      background: var(--white);
+      color: var(--text-primary);
+    }
+
+    #goals-view .goals-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    #goals-view .goals-item {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--white);
+    }
+
+    #goals-view .goals-item.completed {
+      background: rgba(90, 154, 148, 0.08);
+    }
+
+    #goals-view .goals-item-input {
+      flex: 1;
+      min-width: 180px;
+      border: none;
+      background: transparent;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      padding: 0;
+    }
+
+    #goals-view .goals-item-input:read-only {
+      outline: none;
+    }
+
+    #goals-view .goals-item.completed .goals-item-input {
+      text-decoration: line-through;
+      color: var(--text-secondary);
+    }
+
+    #goals-view .goals-item-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    #goals-view .goals-item-content {
+      flex: 1;
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    #goals-view .goals-meta {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    /* =================== */
     /* FRICTION SOCIAL     */
     /* =================== */
     #friction-social-view {
@@ -2029,6 +2159,53 @@
       gap: 12px;
       align-items: center;
       margin-bottom: 20px;
+    }
+
+    #friction-social-view .fs-friction-controls {
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 6px 16px var(--shadow);
+    }
+
+    #friction-social-view .fs-friction-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+    }
+
+    #friction-social-view .fs-friction-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    #friction-social-view .fs-friction-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      min-width: 130px;
+    }
+
+    #friction-social-view .fs-friction-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    #friction-social-view .fs-friction-options label,
+    #friction-social-view .fs-friction-toggle {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      font-size: 0.9rem;
+      color: var(--text-primary);
     }
 
     #friction-social-view .fs-search {
@@ -2294,6 +2471,96 @@
       overflow: hidden;
     }
 
+    #friction-social-view .fs-intent-overlay,
+    #friction-social-view .fs-pause-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 3100;
+      padding: 24px;
+    }
+
+    #friction-social-view .fs-intent-overlay.active,
+    #friction-social-view .fs-pause-overlay.active {
+      display: flex;
+    }
+
+    #friction-social-view .fs-intent-backdrop,
+    #friction-social-view .fs-pause-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+    }
+
+    #friction-social-view .fs-intent-card,
+    #friction-social-view .fs-pause-card {
+      position: relative;
+      z-index: 1;
+      width: min(92vw, 520px);
+      background: var(--white);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    #friction-social-view .fs-intent-title,
+    #friction-social-view .fs-pause-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    #friction-social-view .fs-intent-text,
+    #friction-social-view .fs-pause-text {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    #friction-social-view .fs-intent-actions,
+    #friction-social-view .fs-pause-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    #friction-social-view .fs-intent-btn,
+    #friction-social-view .fs-pause-btn {
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--teal);
+      background: var(--teal);
+      color: var(--white);
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    #friction-social-view .fs-intent-btn.secondary,
+    #friction-social-view .fs-pause-btn.secondary {
+      border-color: var(--border);
+      background: var(--white);
+      color: var(--text-primary);
+    }
+
+    #friction-social-view .fs-intent-checkbox {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    #friction-social-view .fs-pause-timer {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      min-height: 20px;
+    }
+
     /* =================== */
     /* MOBILE RESPONSIVE   */
     /* =================== */
@@ -2463,6 +2730,30 @@
     <h2 class="section-title">Friction Social</h2>
     <p class="section-text">Curate YouTube moments that reinforce slow, intentional habits.</p>
   </div>
+  <div class="fs-friction-controls" id="fsFrictionControls">
+    <div class="fs-friction-title">Friction controls</div>
+    <div class="fs-friction-row">
+      <label class="fs-friction-toggle">
+        <input type="checkbox" id="fsFrictionEnabled" />
+        <span>Friction reminders</span>
+      </label>
+    </div>
+    <div class="fs-friction-row">
+      <div class="fs-friction-label">Reminder frequency</div>
+      <div class="fs-friction-options">
+        <label><input type="radio" name="fsFrictionFrequency" value="1" />After every video</label>
+        <label><input type="radio" name="fsFrictionFrequency" value="2" />Every 2 videos</label>
+      </div>
+    </div>
+    <div class="fs-friction-row">
+      <div class="fs-friction-label">Pause timer</div>
+      <div class="fs-friction-options">
+        <label><input type="radio" name="fsPauseSeconds" value="30" />30 seconds</label>
+        <label><input type="radio" name="fsPauseSeconds" value="60" />60 seconds</label>
+        <label><input type="radio" name="fsPauseSeconds" value="120" />120 seconds</label>
+      </div>
+    </div>
+  </div>
   <div class="fs-controls">
     <label class="fs-search" for="fsSearchInput">
       <input type="text" id="fsSearchInput" placeholder="Search videos, channels, or IDs" />
@@ -2491,6 +2782,74 @@
         <a class="fs-modal-link" id="fsModalLink" href="#" target="_blank" rel="noopener">Watch on YouTube</a>
       </div>
     </div>
+  </div>
+
+  <div class="fs-intent-overlay" id="fsIntroOverlay" aria-hidden="true">
+    <div class="fs-intent-backdrop"></div>
+    <div class="fs-intent-card" role="dialog" aria-modal="true" aria-labelledby="fsIntroTitle">
+      <h3 class="fs-intent-title" id="fsIntroTitle">Friction Social</h3>
+      <p class="fs-intent-text">
+        This isn’t a feed. It’s a calm shelf of videos you choose.
+        Tiny pauses help you stay intentional — no guilt, no judgement.
+      </p>
+      <label class="fs-intent-checkbox">
+        <input type="checkbox" id="fsIntroDismiss" />
+        <span>Don’t show again</span>
+      </label>
+      <div class="fs-intent-actions">
+        <button class="fs-intent-btn" id="fsIntroContinue" type="button">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="fs-pause-overlay" id="fsPauseOverlay" aria-hidden="true">
+    <div class="fs-pause-backdrop"></div>
+    <div class="fs-pause-card" role="dialog" aria-modal="true" aria-labelledby="fsPauseTitle">
+      <h3 class="fs-pause-title" id="fsPauseTitle">Tiny pause?</h3>
+      <p class="fs-pause-text" id="fsPausePrompt"></p>
+      <div class="fs-pause-timer" id="fsPauseTimer"></div>
+      <div class="fs-pause-actions">
+        <button class="fs-pause-btn secondary" id="fsPauseWatch" type="button">Watch another</button>
+        <button class="fs-pause-btn" id="fsPauseTake" type="button">Take 60 seconds</button>
+        <button class="fs-pause-btn secondary" id="fsPauseSkip" type="button" style="display: none;">Skip</button>
+        <button class="fs-pause-btn secondary" id="fsPauseDone" type="button">Done for now</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="goals-view" class="view" aria-hidden="true">
+  <div class="goals-header">
+    <h2 class="section-title">Goals</h2>
+    <p class="section-text">Keep your intentions visible and easy to revisit.</p>
+  </div>
+
+  <div class="goals-section">
+    <h3 class="section-subtitle">Short-term goals</h3>
+    <div class="goals-row">
+      <input class="goals-input" id="shortGoalInput" type="text" placeholder="Add a short-term goal" maxlength="80" />
+      <button class="goals-btn" id="shortGoalAdd" type="button">Add</button>
+    </div>
+    <div class="goals-list" id="shortGoalList"></div>
+    <button class="goals-btn goals-btn-secondary" id="shortGoalClear" type="button">Clear completed</button>
+  </div>
+
+  <div class="goals-section">
+    <h3 class="section-subtitle">Long-term goals</h3>
+    <form id="longGoalForm">
+      <div class="goals-row">
+        <input class="goals-input" id="longGoalTitle" type="text" placeholder="Goal title" required maxlength="120" />
+        <input class="goals-input" id="longGoalDate" type="date" />
+      </div>
+      <div class="goals-row">
+        <textarea class="goals-textarea" id="longGoalNote" placeholder="Add a note (optional)" maxlength="300"></textarea>
+      </div>
+      <div class="goals-row">
+        <button class="goals-btn" id="longGoalAdd" type="submit">Add</button>
+        <button class="goals-btn goals-btn-secondary" id="longGoalCancel" type="button" style="display: none;">Cancel edit</button>
+      </div>
+    </form>
+    <div class="goals-list" id="longGoalList"></div>
   </div>
 </section>
 
@@ -2567,6 +2926,13 @@
         <line x1="12" y1="8" x2="12.01" y2="8"/>
       </svg>
       <span>About</span>
+    </button>
+    <button class="menu-item" id="btnGoals" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 11l3 3L22 4"/>
+        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </svg>
+      <span>Goals</span>
     </button>
     <button class="menu-item" id="btnFrictionSocial" type="button">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -3046,6 +3412,208 @@
       bgGoal.style.opacity = opacity.toString();
     }
 
+    // GOALS VIEW DATA
+    var GOALS_SHORT_KEY = 'friction_goals_short_v1';
+    var GOALS_LONG_KEY = 'friction_goals_long_v1';
+    var goalsShort = [];
+    var goalsLong = [];
+    var editingLongGoalId = null;
+
+    function loadGoalsViewShort() {
+      var saved = localStorage.getItem(GOALS_SHORT_KEY);
+      if (!saved) return [];
+      try {
+        var parsed = JSON.parse(saved);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function loadGoalsViewLong() {
+      var saved = localStorage.getItem(GOALS_LONG_KEY);
+      if (!saved) return [];
+      try {
+        var parsed = JSON.parse(saved);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveGoalsViewShort() {
+      localStorage.setItem(GOALS_SHORT_KEY, JSON.stringify(goalsShort));
+    }
+
+    function saveGoalsViewLong() {
+      localStorage.setItem(GOALS_LONG_KEY, JSON.stringify(goalsLong));
+    }
+
+    function generateGoalId(prefix) {
+      return prefix + '_' + Date.now().toString(36) + '_' + Math.floor(Math.random() * 100000).toString(36);
+    }
+
+    function renderShortGoals() {
+      if (!shortGoalList) return;
+      shortGoalList.innerHTML = '';
+      if (goalsShort.length === 0) {
+        var empty = document.createElement('div');
+        empty.className = 'goals-meta';
+        empty.textContent = 'No short-term goals yet.';
+        shortGoalList.appendChild(empty);
+        return;
+      }
+      goalsShort.forEach(function(goal) {
+        var item = document.createElement('div');
+        item.className = 'goals-item' + (goal.done ? ' completed' : '');
+
+        var checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = !!goal.done;
+        checkbox.addEventListener('change', function() {
+          goal.done = this.checked;
+          goal.completedAt = this.checked ? Date.now() : null;
+          item.classList.toggle('completed', this.checked);
+          saveGoalsViewShort();
+        });
+
+        var input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'goals-item-input';
+        input.value = goal.text || '';
+        input.readOnly = true;
+        input.addEventListener('keydown', function(event) {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            editBtn.click();
+          }
+        });
+
+        var actions = document.createElement('div');
+        actions.className = 'goals-item-actions';
+
+        var editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.className = 'goals-btn goals-btn-secondary';
+        editBtn.textContent = 'Edit';
+        editBtn.addEventListener('click', function() {
+          if (input.readOnly) {
+            input.readOnly = false;
+            input.focus();
+            editBtn.textContent = 'Save';
+            return;
+          }
+          var nextText = input.value.trim();
+          if (!nextText) {
+            input.value = goal.text || '';
+          } else {
+            goal.text = nextText;
+            saveGoalsViewShort();
+          }
+          input.readOnly = true;
+          editBtn.textContent = 'Edit';
+        });
+
+        var deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'goals-btn goals-btn-secondary';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.addEventListener('click', function() {
+          goalsShort = goalsShort.filter(function(item) { return item.id !== goal.id; });
+          saveGoalsViewShort();
+          renderShortGoals();
+        });
+
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
+
+        item.appendChild(checkbox);
+        item.appendChild(input);
+        item.appendChild(actions);
+        shortGoalList.appendChild(item);
+      });
+    }
+
+    function renderLongGoals() {
+      if (!longGoalList) return;
+      longGoalList.innerHTML = '';
+      if (goalsLong.length === 0) {
+        var empty = document.createElement('div');
+        empty.className = 'goals-meta';
+        empty.textContent = 'No long-term goals yet.';
+        longGoalList.appendChild(empty);
+        return;
+      }
+      goalsLong.forEach(function(goal) {
+        var item = document.createElement('div');
+        item.className = 'goals-item';
+
+        var content = document.createElement('div');
+        content.className = 'goals-item-content';
+
+        var title = document.createElement('div');
+        title.textContent = goal.title || 'Untitled goal';
+
+        var note = document.createElement('div');
+        note.className = 'goals-meta';
+        note.textContent = goal.note ? goal.note : '';
+
+        var meta = document.createElement('div');
+        meta.className = 'goals-meta';
+        meta.textContent = goal.targetDate ? 'Target date: ' + goal.targetDate : '';
+
+        content.appendChild(title);
+        if (goal.note) content.appendChild(note);
+        if (goal.targetDate) content.appendChild(meta);
+
+        var actions = document.createElement('div');
+        actions.className = 'goals-item-actions';
+
+        var editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.className = 'goals-btn goals-btn-secondary';
+        editBtn.textContent = 'Edit';
+        editBtn.addEventListener('click', function() {
+          editingLongGoalId = goal.id;
+          longGoalTitle.value = goal.title || '';
+          longGoalNote.value = goal.note || '';
+          longGoalDate.value = goal.targetDate || '';
+          longGoalAdd.textContent = 'Save';
+          longGoalCancel.style.display = 'inline-flex';
+          if (activeView !== 'goals') {
+            setActiveView('goals', true);
+          }
+          longGoalTitle.focus();
+        });
+
+        var deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'goals-btn goals-btn-secondary';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.addEventListener('click', function() {
+          goalsLong = goalsLong.filter(function(item) { return item.id !== goal.id; });
+          saveGoalsViewLong();
+          renderLongGoals();
+        });
+
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
+
+        item.appendChild(content);
+        item.appendChild(actions);
+        longGoalList.appendChild(item);
+      });
+    }
+
+    function resetLongGoalForm() {
+      editingLongGoalId = null;
+      longGoalTitle.value = '';
+      longGoalNote.value = '';
+      longGoalDate.value = '';
+      longGoalAdd.textContent = 'Add';
+      longGoalCancel.style.display = 'none';
+    }
+
     // SETTINGS MANAGEMENT
     let settings = {
       frictionMode: 'full', // 'off', 'light', 'full'
@@ -3518,6 +4086,7 @@
     const btnSignOut = document.getElementById('btnSignOut');
     const btnSettings = document.getElementById('btnSettings');
     const btnAbout = document.getElementById('btnAbout');
+    const btnGoals = document.getElementById('btnGoals');
     const btnFrictionSocial = document.getElementById('btnFrictionSocial');
     const chatInputArea = document.querySelector('.chat-input-area');
 
@@ -3535,6 +4104,31 @@
     const frictionSocialModalChannel = document.getElementById('fsModalChannel');
     const frictionSocialModalLink = document.getElementById('fsModalLink');
     const frictionSocialModalFrame = document.getElementById('fsModalFrame');
+    const frictionSocialIntroOverlay = document.getElementById('fsIntroOverlay');
+    const frictionSocialIntroDismiss = document.getElementById('fsIntroDismiss');
+    const frictionSocialIntroContinue = document.getElementById('fsIntroContinue');
+    const frictionSocialPauseOverlay = document.getElementById('fsPauseOverlay');
+    const frictionSocialPausePrompt = document.getElementById('fsPausePrompt');
+    const frictionSocialPauseTimer = document.getElementById('fsPauseTimer');
+    const frictionSocialPauseWatch = document.getElementById('fsPauseWatch');
+    const frictionSocialPauseTake = document.getElementById('fsPauseTake');
+    const frictionSocialPauseSkip = document.getElementById('fsPauseSkip');
+    const frictionSocialPauseDone = document.getElementById('fsPauseDone');
+    const frictionSocialFrictionEnabled = document.getElementById('fsFrictionEnabled');
+    const frictionSocialFrequencyInputs = document.querySelectorAll('input[name="fsFrictionFrequency"]');
+    const frictionSocialPauseInputs = document.querySelectorAll('input[name="fsPauseSeconds"]');
+    const goalsView = document.getElementById('goals-view');
+    const shortGoalInput = document.getElementById('shortGoalInput');
+    const shortGoalAdd = document.getElementById('shortGoalAdd');
+    const shortGoalList = document.getElementById('shortGoalList');
+    const shortGoalClear = document.getElementById('shortGoalClear');
+    const longGoalForm = document.getElementById('longGoalForm');
+    const longGoalTitle = document.getElementById('longGoalTitle');
+    const longGoalDate = document.getElementById('longGoalDate');
+    const longGoalNote = document.getElementById('longGoalNote');
+    const longGoalAdd = document.getElementById('longGoalAdd');
+    const longGoalCancel = document.getElementById('longGoalCancel');
+    const longGoalList = document.getElementById('longGoalList');
     
     // Profile elements
     const profilePic = document.getElementById('profilePic');
@@ -3789,7 +4383,9 @@
     var activeView = 'chat';
 
     function getViewFromLocation() {
-      return window.location.hash === '#friction-social' ? 'social' : 'chat';
+      if (window.location.hash === '#friction-social') return 'social';
+      if (window.location.hash === '#goals') return 'goals';
+      return 'chat';
     }
 
     function updateMenuActive(view) {
@@ -3801,26 +4397,41 @@
         btnFrictionSocial.style.background = '';
         btnFrictionSocial.style.color = '';
       }
+      if (btnGoals) {
+        if (view === 'goals') {
+          btnGoals.style.background = 'var(--teal-lighter)';
+          btnGoals.style.color = 'var(--text-primary)';
+        } else {
+          btnGoals.style.background = '';
+          btnGoals.style.color = '';
+        }
+      }
     }
 
     function setActiveView(view, pushState) {
       activeView = view;
-      if (view === 'social') {
-        frictionSocialView.classList.add('active');
-        frictionSocialView.setAttribute('aria-hidden', 'false');
-        chatMessages.style.display = 'none';
-        typingIndicator.style.display = 'none';
-        chatInputArea.style.display = 'none';
-      } else {
-        frictionSocialView.classList.remove('active');
-        frictionSocialView.setAttribute('aria-hidden', 'true');
-        chatMessages.style.display = '';
-        typingIndicator.style.display = '';
-        chatInputArea.style.display = '';
-      }
+      var showSocial = view === 'social';
+      var showGoals = view === 'goals';
+      frictionSocialView.classList.toggle('active', showSocial);
+      frictionSocialView.setAttribute('aria-hidden', showSocial ? 'false' : 'true');
+      goalsView.classList.toggle('active', showGoals);
+      goalsView.setAttribute('aria-hidden', showGoals ? 'false' : 'true');
+      var showChat = view === 'chat';
+      chatMessages.style.display = showChat ? '' : 'none';
+      typingIndicator.style.display = showChat ? '' : 'none';
+      chatInputArea.style.display = showChat ? '' : 'none';
       updateMenuActive(view);
       if (pushState) {
-        history.pushState({ view: view }, '', view === 'social' ? '#friction-social' : '#chat');
+        var nextHash = '#chat';
+        if (view === 'social') nextHash = '#friction-social';
+        if (view === 'goals') nextHash = '#goals';
+        history.pushState({ view: view }, '', nextHash);
+      }
+      if (showSocial) {
+        showFrictionSocialIntroIfNeeded();
+      } else {
+        hideFrictionSocialIntro();
+        hideFrictionSocialPauseOverlay();
       }
     }
 
@@ -3900,6 +4511,13 @@
       closeMenu();
     });
 
+    if (btnGoals) {
+      btnGoals.addEventListener('click', function() {
+        closeMenu();
+        setActiveView('goals', true);
+      });
+    }
+
     if (btnFrictionSocial) {
       btnFrictionSocial.addEventListener('click', function() {
         closeMenu();
@@ -3919,16 +4537,36 @@
     // FRICTION SOCIAL
     var FRICTION_SOCIAL_CHANNELS_KEY = 'friction_social_channels_v1';
     var FRICTION_SOCIAL_SEEN_KEY = 'friction_social_seen_v1';
+    var FRICTION_SOCIAL_INTRO_KEY = 'friction_social_intro_dismissed_v1';
+    var FRICTION_SOCIAL_FRICTION_ENABLED_KEY = 'friction_social_friction_enabled_v1';
+    var FRICTION_SOCIAL_FRICTION_FREQUENCY_KEY = 'friction_social_friction_frequency_v1';
+    var FRICTION_SOCIAL_PAUSE_SECONDS_KEY = 'friction_social_pause_seconds_v1';
+    var FRICTION_SOCIAL_SESSION_WATCHED_KEY = 'friction_social_session_watched_count_v1';
     var FRICTION_SOCIAL_CHANNEL_LIMIT = 12;
     var FRICTION_SOCIAL_POOL_LIMIT = 50;
     var frictionSocialState = {
       shelves: [],
       query: ''
     };
+    var frictionSocialPrefs = {
+      frictionEnabled: true,
+      frictionFrequency: '1',
+      pauseSeconds: '60'
+    };
     var frictionSocialScrollTop = 0;
     var frictionSocialMetadataCache = {};
     var frictionSocialChannels = [];
     var frictionSocialSeenMap = {};
+    var frictionSocialSessionWatchedCount = 0;
+    var frictionSocialActiveVideoId = null;
+    var frictionSocialPauseTimerId = null;
+    var frictionSocialPauseRemaining = 0;
+    var frictionSocialPausePrompts = [
+      'What do you want from the next video?',
+      'If you stop after one more, what’s next?',
+      'Short-term you: what do you need right now?',
+      'Long-term you: what would future-you thank you for?'
+    ];
 
     function getFrictionSocialDefaults() {
       return [
@@ -4013,6 +4651,116 @@
         }
       }
       return {};
+    }
+
+    function loadFrictionSocialPrefs() {
+      var enabled = localStorage.getItem(FRICTION_SOCIAL_FRICTION_ENABLED_KEY);
+      var frequency = localStorage.getItem(FRICTION_SOCIAL_FRICTION_FREQUENCY_KEY);
+      var pauseSeconds = localStorage.getItem(FRICTION_SOCIAL_PAUSE_SECONDS_KEY);
+      frictionSocialPrefs.frictionEnabled = enabled !== 'false';
+      frictionSocialPrefs.frictionFrequency = frequency === '2' ? '2' : '1';
+      frictionSocialPrefs.pauseSeconds = pauseSeconds === '30' || pauseSeconds === '120' ? pauseSeconds : '60';
+    }
+
+    function saveFrictionSocialPrefs() {
+      localStorage.setItem(FRICTION_SOCIAL_FRICTION_ENABLED_KEY, frictionSocialPrefs.frictionEnabled ? 'true' : 'false');
+      localStorage.setItem(FRICTION_SOCIAL_FRICTION_FREQUENCY_KEY, frictionSocialPrefs.frictionFrequency);
+      localStorage.setItem(FRICTION_SOCIAL_PAUSE_SECONDS_KEY, frictionSocialPrefs.pauseSeconds);
+    }
+
+    function applyFrictionSocialPrefsToUI() {
+      if (frictionSocialFrictionEnabled) {
+        frictionSocialFrictionEnabled.checked = frictionSocialPrefs.frictionEnabled;
+      }
+      frictionSocialFrequencyInputs.forEach(function(input) {
+        input.checked = input.value === frictionSocialPrefs.frictionFrequency;
+      });
+      frictionSocialPauseInputs.forEach(function(input) {
+        input.checked = input.value === frictionSocialPrefs.pauseSeconds;
+      });
+    }
+
+    function showFrictionSocialIntroIfNeeded() {
+      if (!frictionSocialIntroOverlay) return;
+      var dismissed = localStorage.getItem(FRICTION_SOCIAL_INTRO_KEY) === 'true';
+      if (dismissed || frictionSocialIntroOverlay.classList.contains('active')) return;
+      frictionSocialIntroOverlay.classList.add('active');
+      frictionSocialIntroOverlay.setAttribute('aria-hidden', 'false');
+      lockBodyScroll();
+    }
+
+    function hideFrictionSocialIntro() {
+      if (!frictionSocialIntroOverlay) return;
+      frictionSocialIntroOverlay.classList.remove('active');
+      frictionSocialIntroOverlay.setAttribute('aria-hidden', 'true');
+      unlockBodyScroll();
+    }
+
+    function getFrictionSocialPauseSeconds() {
+      return parseInt(frictionSocialPrefs.pauseSeconds, 10) || 60;
+    }
+
+    function getFrictionSocialFrequency() {
+      return parseInt(frictionSocialPrefs.frictionFrequency, 10) || 1;
+    }
+
+    function clearFrictionSocialPauseTimer() {
+      if (frictionSocialPauseTimerId) {
+        clearInterval(frictionSocialPauseTimerId);
+        frictionSocialPauseTimerId = null;
+      }
+    }
+
+    function hideFrictionSocialPauseOverlay() {
+      if (!frictionSocialPauseOverlay) return;
+      frictionSocialPauseOverlay.classList.remove('active');
+      frictionSocialPauseOverlay.setAttribute('aria-hidden', 'true');
+      frictionSocialPauseTimer.textContent = '';
+      frictionSocialPauseSkip.style.display = 'none';
+      frictionSocialPauseTake.disabled = false;
+      frictionSocialPauseWatch.disabled = false;
+      clearFrictionSocialPauseTimer();
+      unlockBodyScroll();
+    }
+
+    function startFrictionSocialPauseCountdown() {
+      frictionSocialPauseRemaining = getFrictionSocialPauseSeconds();
+      frictionSocialPauseSkip.style.display = 'inline-flex';
+      frictionSocialPauseTake.disabled = true;
+      frictionSocialPauseWatch.disabled = true;
+      frictionSocialPauseTimer.textContent = 'Remaining: ' + frictionSocialPauseRemaining + ' seconds';
+      clearFrictionSocialPauseTimer();
+      frictionSocialPauseTimerId = setInterval(function() {
+        frictionSocialPauseRemaining -= 1;
+        frictionSocialPauseTimer.textContent = 'Remaining: ' + frictionSocialPauseRemaining + ' seconds';
+        if (frictionSocialPauseRemaining <= 0) {
+          hideFrictionSocialPauseOverlay();
+        }
+      }, 1000);
+    }
+
+    function showFrictionSocialPauseOverlay() {
+      if (!frictionSocialPauseOverlay || frictionSocialPauseOverlay.classList.contains('active')) return;
+      var prompt = frictionSocialPausePrompts[Math.floor(Math.random() * frictionSocialPausePrompts.length)];
+      frictionSocialPausePrompt.textContent = prompt;
+      frictionSocialPauseTake.textContent = 'Take ' + getFrictionSocialPauseSeconds() + ' seconds';
+      frictionSocialPauseTimer.textContent = '';
+      frictionSocialPauseSkip.style.display = 'none';
+      frictionSocialPauseTake.disabled = false;
+      frictionSocialPauseWatch.disabled = false;
+      frictionSocialPauseOverlay.classList.add('active');
+      frictionSocialPauseOverlay.setAttribute('aria-hidden', 'false');
+      lockBodyScroll();
+    }
+
+    function recordFrictionSocialWatch() {
+      frictionSocialSessionWatchedCount += 1;
+      localStorage.setItem(FRICTION_SOCIAL_SESSION_WATCHED_KEY, String(frictionSocialSessionWatchedCount));
+      if (!frictionSocialPrefs.frictionEnabled) return;
+      var frequency = getFrictionSocialFrequency();
+      if (frictionSocialSessionWatchedCount % frequency !== 0) return;
+      if (frictionSocialIntroOverlay && frictionSocialIntroOverlay.classList.contains('active')) return;
+      showFrictionSocialPauseOverlay();
     }
 
     function saveFrictionSocialShelves() {
@@ -4617,6 +5365,7 @@
     function openFrictionSocialModal(video) {
       if (!video || !video.id) return;
       markFrictionSocialSeen(video.id);
+      frictionSocialActiveVideoId = video.id;
       frictionSocialScrollTop = frictionSocialView.scrollTop;
       frictionSocialView.classList.add('modal-open');
       frictionSocialModal.classList.add('active');
@@ -4633,6 +5382,10 @@
       frictionSocialModal.setAttribute('aria-hidden', 'true');
       frictionSocialView.classList.remove('modal-open');
       frictionSocialModalFrame.src = '';
+      if (frictionSocialActiveVideoId) {
+        frictionSocialActiveVideoId = null;
+        recordFrictionSocialWatch();
+      }
       setTimeout(function() {
         frictionSocialView.scrollTop = frictionSocialScrollTop;
       }, 0);
@@ -4641,12 +5394,39 @@
     frictionSocialState.shelves = loadFrictionSocialShelves();
     frictionSocialChannels = loadFrictionSocialChannels();
     frictionSocialSeenMap = loadFrictionSocialSeenMap();
+    loadFrictionSocialPrefs();
+    applyFrictionSocialPrefsToUI();
+    frictionSocialSessionWatchedCount = 0;
+    localStorage.setItem(FRICTION_SOCIAL_SESSION_WATCHED_KEY, '0');
     renderFrictionSocialShelves();
     refreshFrictionSocialMetadata();
 
     frictionSocialSearch.addEventListener('input', function() {
       frictionSocialState.query = this.value || '';
       renderFrictionSocialShelves();
+    });
+
+    if (frictionSocialFrictionEnabled) {
+      frictionSocialFrictionEnabled.addEventListener('change', function() {
+        frictionSocialPrefs.frictionEnabled = this.checked;
+        saveFrictionSocialPrefs();
+      });
+    }
+
+    frictionSocialFrequencyInputs.forEach(function(input) {
+      input.addEventListener('change', function() {
+        if (!this.checked) return;
+        frictionSocialPrefs.frictionFrequency = this.value;
+        saveFrictionSocialPrefs();
+      });
+    });
+
+    frictionSocialPauseInputs.forEach(function(input) {
+      input.addEventListener('change', function() {
+        if (!this.checked) return;
+        frictionSocialPrefs.pauseSeconds = this.value;
+        saveFrictionSocialPrefs();
+      });
     });
 
     frictionSocialAdd.addEventListener('click', addFrictionSocialVideo);
@@ -4679,11 +5459,125 @@
 
     frictionSocialModalClose.addEventListener('click', closeFrictionSocialModal);
 
+    if (frictionSocialIntroContinue) {
+      frictionSocialIntroContinue.addEventListener('click', function() {
+        if (frictionSocialIntroDismiss && frictionSocialIntroDismiss.checked) {
+          localStorage.setItem(FRICTION_SOCIAL_INTRO_KEY, 'true');
+        }
+        hideFrictionSocialIntro();
+      });
+    }
+
+    if (frictionSocialPauseWatch) {
+      frictionSocialPauseWatch.addEventListener('click', function() {
+        hideFrictionSocialPauseOverlay();
+      });
+    }
+
+    if (frictionSocialPauseTake) {
+      frictionSocialPauseTake.addEventListener('click', function() {
+        if (frictionSocialPauseTimerId) return;
+        startFrictionSocialPauseCountdown();
+      });
+    }
+
+    if (frictionSocialPauseSkip) {
+      frictionSocialPauseSkip.addEventListener('click', function() {
+        hideFrictionSocialPauseOverlay();
+      });
+    }
+
+    if (frictionSocialPauseDone) {
+      frictionSocialPauseDone.addEventListener('click', function() {
+        hideFrictionSocialPauseOverlay();
+      });
+    }
+
     document.addEventListener('keydown', function(event) {
       if (event.key === 'Escape') {
         closeFrictionSocialModal();
+        hideFrictionSocialPauseOverlay();
+        hideFrictionSocialIntro();
       }
     });
+
+    goalsShort = loadGoalsViewShort();
+    goalsLong = loadGoalsViewLong();
+    renderShortGoals();
+    renderLongGoals();
+
+    if (shortGoalAdd) {
+      shortGoalAdd.addEventListener('click', function() {
+        var text = shortGoalInput.value.trim();
+        if (!text) return;
+        goalsShort.unshift({
+          id: generateGoalId('short'),
+          text: text,
+          done: false,
+          createdAt: Date.now(),
+          completedAt: null
+        });
+        shortGoalInput.value = '';
+        saveGoalsViewShort();
+        renderShortGoals();
+      });
+    }
+
+    if (shortGoalInput) {
+      shortGoalInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          shortGoalAdd.click();
+        }
+      });
+    }
+
+    if (shortGoalClear) {
+      shortGoalClear.addEventListener('click', function() {
+        goalsShort = goalsShort.filter(function(goal) { return !goal.done; });
+        saveGoalsViewShort();
+        renderShortGoals();
+      });
+    }
+
+    if (longGoalForm) {
+      longGoalForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        var title = longGoalTitle.value.trim();
+        if (!title) return;
+        var note = longGoalNote.value.trim();
+        var date = longGoalDate.value;
+        if (editingLongGoalId) {
+          goalsLong = goalsLong.map(function(goal) {
+            if (goal.id !== editingLongGoalId) return goal;
+            return {
+              id: goal.id,
+              title: title,
+              note: note,
+              targetDate: date || null,
+              createdAt: goal.createdAt
+            };
+          });
+        } else {
+          goalsLong.unshift({
+            id: generateGoalId('long'),
+            title: title,
+            note: note,
+            targetDate: date || null,
+            createdAt: Date.now()
+          });
+        }
+        saveGoalsViewLong();
+        renderLongGoals();
+        resetLongGoalForm();
+      });
+    }
+
+    if (longGoalCancel) {
+      longGoalCancel.addEventListener('click', function() {
+        resetLongGoalForm();
+      });
+    }
 
     // Settings event listeners
     document.getElementById('settingsClose').addEventListener('click', hideSettings);
