@@ -2785,6 +2785,94 @@
     #life-view .life-appointments-actions {
       display: flex;
       justify-content: flex-start;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    #life-view .life-person-tasks-card {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.92);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    #life-view .life-person-tasks-body.is-collapsed {
+      display: none;
+    }
+
+    #life-view .life-person-tasks-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      align-items: center;
+    }
+
+    #life-view .life-person-tasks-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    #life-view .life-task-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      background: var(--white);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #life-view .life-task-card.is-done {
+      opacity: 0.6;
+      text-decoration: line-through;
+    }
+
+    #life-view .life-task-title {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    #life-view .life-task-barrier {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(248, 250, 252, 0.9);
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      width: fit-content;
+    }
+
+    #life-view .life-task-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    #life-view .life-task-plan {
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: rgba(248, 250, 252, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.9rem;
+    }
+
+    #life-view .life-task-plan ul {
+      margin: 0;
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
 
     #life-view .life-appointments-list,
@@ -3102,6 +3190,22 @@
       color: var(--text-primary);
     }
 
+    #life-view .appointments-scan-option {
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: rgba(248, 250, 252, 0.7);
+    }
+
+    #life-view .appointments-scan-option-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+    }
+
     #life-view .appointments-scan-actions,
     #life-view .appointments-parse-actions,
     #appointments-view .appointments-scan-actions,
@@ -3178,82 +3282,30 @@
 
     #life-view .appointments-summary-rows,
     #appointments-view .appointments-summary-rows {
-      display: grid;
-      gap: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.95rem;
     }
 
     #life-view .appointments-summary-row,
     #appointments-view .appointments-summary-row {
-      display: grid;
-      grid-template-columns: minmax(0, 120px) minmax(0, 1fr) auto;
-      gap: 12px;
-      align-items: center;
-      padding: 10px;
-      border-radius: 12px;
-      background: rgba(248, 250, 252, 0.7);
-      border: 1px solid rgba(148, 163, 184, 0.25);
-    }
-
-    #life-view .appointments-summary-label,
-    #appointments-view .appointments-summary-label {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-    }
-
-    #life-view .appointments-summary-value,
-    #appointments-view .appointments-summary-value {
-      font-size: 0.95rem;
-      color: var(--text-primary);
-      word-break: break-word;
-    }
-
-    #life-view .appointments-summary-value.is-empty,
-    #appointments-view .appointments-summary-value.is-empty {
-      color: var(--text-secondary);
-    }
-
-    #life-view .appointments-summary-row-actions,
-    #appointments-view .appointments-summary-row-actions {
       display: flex;
       gap: 8px;
-    }
-
-    #life-view .appointments-icon-btn,
-    #appointments-view .appointments-icon-btn {
-      border: 1px solid var(--border);
-      background: var(--white);
-      border-radius: 999px;
-      width: 32px;
-      height: 32px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      color: var(--text-primary);
-      font-size: 0.9rem;
-    }
-
-    #life-view .appointments-summary-edit,
-    #appointments-view .appointments-summary-edit {
-      grid-column: 2 / span 2;
-    }
-
-    #life-view .appointments-summary-edit input,
-    #life-view .appointments-summary-edit textarea,
-    #appointments-view .appointments-summary-edit input,
-    #appointments-view .appointments-summary-edit textarea {
-      width: 100%;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 8px 10px;
-      font-size: 0.95rem;
+      align-items: flex-start;
       color: var(--text-primary);
     }
 
-    #life-view .appointments-summary-edit textarea,
-    #appointments-view .appointments-summary-edit textarea {
-      min-height: 90px;
-      resize: vertical;
+    #life-view .appointments-summary-row span,
+    #appointments-view .appointments-summary-row span {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    #life-view .appointments-summary-row .is-empty,
+    #appointments-view .appointments-summary-row .is-empty {
+      color: var(--text-secondary);
+      font-weight: 400;
     }
 
     #life-view .appointments-summary-notes details,
@@ -3274,6 +3326,25 @@
       margin-top: 6px;
       white-space: pre-wrap;
       color: var(--text-primary);
+    }
+
+    #life-view .appointments-fix-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    #life-view .appointments-fix-panel label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    #life-view .appointments-fix-error {
+      color: #b91c1c;
+      font-size: 0.85rem;
+      background: rgba(254, 226, 226, 0.6);
+      border-radius: 10px;
+      padding: 8px 10px;
     }
 
     #life-view .appointments-summary-actions,
@@ -4676,11 +4747,11 @@
     </div>
 
     <div class="life-appointments-card">
-      <button class="life-appointments-toggle" id="lifeAppointmentsToggle" type="button" aria-expanded="true">
+      <button class="life-appointments-toggle" id="lifeAppointmentsToggle" type="button" aria-expanded="false">
         <span>Appointments</span>
         <span class="life-chevron">▾</span>
       </button>
-      <div class="life-appointments-body" id="lifeAppointmentsBody">
+      <div class="life-appointments-body is-collapsed" id="lifeAppointmentsBody">
         <div class="life-appointments-actions">
           <button class="life-btn" id="lifeAppointmentsAdd" type="button">Add appointment</button>
           <button class="life-btn secondary" id="lifeAppointmentsScan" type="button">Scan appointment</button>
@@ -4688,6 +4759,21 @@
         <div class="life-appointments-list" id="lifeAppointmentsList"></div>
         <button class="life-appointments-past-toggle" id="lifeAppointmentsPastToggle" type="button" aria-expanded="false">Show past</button>
         <div class="life-appointments-past" id="lifeAppointmentsPast" style="display: none;"></div>
+      </div>
+    </div>
+
+    <div class="life-person-tasks-card">
+      <button class="life-appointments-toggle" id="lifePersonTasksToggle" type="button" aria-expanded="false">
+        <span>Tasks</span>
+        <span class="life-chevron">▾</span>
+      </button>
+      <div class="life-person-tasks-body is-collapsed" id="lifePersonTasksBody">
+        <div class="life-person-tasks-actions">
+          <input class="life-input" id="lifePersonTaskTitle" type="text" placeholder="Add a task" maxlength="120" />
+          <input class="life-input" id="lifePersonTaskBarrier" type="text" placeholder="Barrier (optional)" maxlength="80" />
+          <button class="life-btn" id="lifePersonTaskAdd" type="button">Add task</button>
+        </div>
+        <div class="life-person-tasks-list" id="lifePersonTasksList"></div>
       </div>
     </div>
   </div>
@@ -4759,89 +4845,72 @@
     <div class="appointment-modal-card" role="dialog" aria-modal="true" aria-labelledby="lifeAppointmentModalTitle">
       <div class="appointment-modal-header">
         <h3 class="section-subtitle" id="lifeAppointmentModalTitle">Add appointment</h3>
-        <button class="life-btn secondary" id="lifeAppointmentClose" type="button">Close</button>
+        <button class="life-btn secondary" id="lifeAppointmentClose" type="button">Discard</button>
       </div>
       <form class="appointment-form" id="lifeAppointmentForm">
         <div class="appointments-scan">
           <div class="appointments-scan-title">Scan appointment</div>
-          <div class="appointments-scan-actions">
-            <button class="life-btn secondary" id="lifeAppointmentScanTake" type="button">Take photo (paper card)</button>
-            <button class="life-btn secondary" id="lifeAppointmentScanUpload" type="button">Choose screenshot (Photos/Files)</button>
-            <input type="file" id="lifeAppointmentScanTakeInput" accept="image/*" capture="environment" style="display: none;" />
-            <input type="file" id="lifeAppointmentScanUploadInput" accept="image/*" style="display: none;" />
+          <div class="appointments-scan-option">
+            <div class="appointments-scan-option-title">Paste text (recommended)</div>
+            <label for="lifeAppointmentTextInput">Paste text</label>
+            <textarea class="appointments-textarea" id="lifeAppointmentTextInput" placeholder="Paste SMS or email text here" maxlength="600"></textarea>
+            <div class="appointments-parse-actions">
+              <button class="life-btn secondary" id="lifeAppointmentParseBtn" type="button">Parse</button>
+            </div>
           </div>
-          <div class="appointments-scan-preview" id="lifeAppointmentScanPreview" style="display: none;">
-            <img class="appointments-scan-image" id="lifeAppointmentScanImage" alt="Appointment image preview" />
-            <p class="appointments-scan-note">This image stays in the app and isn’t saved.</p>
+
+          <div class="appointments-scan-option">
+            <div class="appointments-scan-option-title">Choose screenshot</div>
+            <div class="appointments-scan-actions">
+              <button class="life-btn secondary" id="lifeAppointmentScanUpload" type="button">Choose screenshot</button>
+              <input type="file" id="lifeAppointmentScanUploadInput" accept="image/*" style="display: none;" />
+            </div>
+            <div class="appointments-scan-preview" id="lifeAppointmentScanPreview" style="display: none;">
+              <img class="appointments-scan-image" id="lifeAppointmentScanImage" alt="Screenshot preview" />
+              <button class="life-btn secondary appointments-open-full" id="lifeAppointmentScanOpen" type="button">Open full screen</button>
+              <p class="appointments-scan-note">On iPhone, press and hold text on the image to copy (Live Text). Return here and paste below.</p>
+              <label for="lifeAppointmentScanTextInput">Paste extracted text</label>
+              <textarea class="appointments-textarea" id="lifeAppointmentScanTextInput" placeholder="Paste extracted text here" maxlength="600"></textarea>
+              <div class="appointments-parse-actions">
+                <button class="life-btn secondary" id="lifeAppointmentScanParseBtn" type="button">Parse</button>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="appointments-parse">
-          <label for="lifeAppointmentTextInput">Paste text (recommended)</label>
-          <textarea class="appointments-textarea" id="lifeAppointmentTextInput" placeholder="Paste SMS or email text here" maxlength="600"></textarea>
-          <div class="appointments-parse-actions">
-            <button class="life-btn secondary" id="lifeAppointmentParseBtn" type="button">Parse</button>
+
+          <div class="appointments-scan-option">
+            <div class="appointments-scan-option-title">Take photo</div>
+            <div class="appointments-scan-actions">
+              <button class="life-btn secondary" id="lifeAppointmentScanTake" type="button">Take photo</button>
+              <input type="file" id="lifeAppointmentScanTakeInput" accept="image/*" capture="environment" style="display: none;" />
+            </div>
+            <div class="appointments-scan-preview" id="lifeAppointmentPhotoPreview" style="display: none;">
+              <img class="appointments-scan-image" id="lifeAppointmentPhotoImage" alt="Photo preview" />
+              <button class="life-btn secondary appointments-open-full" id="lifeAppointmentPhotoOpen" type="button">Open full screen</button>
+              <p class="appointments-scan-note">On iPhone, press and hold text on the image to copy (Live Text). Return here and paste below.</p>
+              <label for="lifeAppointmentPhotoTextInput">Paste extracted text</label>
+              <textarea class="appointments-textarea" id="lifeAppointmentPhotoTextInput" placeholder="Paste extracted text here" maxlength="600"></textarea>
+              <div class="appointments-parse-actions">
+                <button class="life-btn secondary" id="lifeAppointmentPhotoParseBtn" type="button">Parse</button>
+              </div>
+            </div>
           </div>
-          <details class="appointments-text-details" id="lifeAppointmentOriginalDetails" style="display: none;">
-            <summary>Original text</summary>
-            <div class="appointments-text-preview" id="lifeAppointmentOriginalText"></div>
-          </details>
-        </div>
-        <div class="appointment-field" id="lifeAppointmentPersonRow">
-          <label for="lifeAppointmentPerson">Person</label>
-          <select class="life-select" id="lifeAppointmentPerson" required></select>
         </div>
         <div class="appointments-summary" id="lifeAppointmentSummary" style="display: none;">
           <div class="appointments-summary-card">
             <div class="appointments-summary-header">
-              <span>Appointment card</span>
+              <span>Appointment</span>
             </div>
             <div class="appointments-summary-rows" id="lifeAppointmentSummaryRows"></div>
           </div>
+          <div class="appointments-fix-panel">
+            <label for="lifeAppointmentFixes">Fix anything?</label>
+            <textarea class="appointments-textarea" id="lifeAppointmentFixes" placeholder="e.g. ‘Time is 3:30pm, venue is Westmead Medical Centre’" maxlength="240"></textarea>
+            <div class="appointments-fix-error" id="lifeAppointmentSummaryError" style="display: none;"></div>
+          </div>
           <div class="appointment-modal-actions appointments-summary-actions">
-            <button class="life-btn" id="lifeAppointmentSummarySave" type="button">Add appointment</button>
+            <button class="life-btn secondary" id="lifeAppointmentApplyFixes" type="button">Apply fixes</button>
+            <button class="life-btn" id="lifeAppointmentSummarySave" type="button">Save appointment</button>
             <button class="life-btn secondary" id="lifeAppointmentSummaryDiscard" type="button">Discard</button>
-          </div>
-        </div>
-        <div class="appointments-form-fields" id="lifeAppointmentFormFields">
-          <div class="appointment-field">
-            <label for="lifeAppointmentTitleInput">Title</label>
-            <input class="life-input" id="lifeAppointmentTitleInput" type="text" placeholder="Appointment title" maxlength="120" required />
-          </div>
-          <div class="appointment-row">
-            <div class="appointment-field">
-              <label for="lifeAppointmentDate">Date</label>
-              <input class="life-input" id="lifeAppointmentDate" type="date" required />
-            </div>
-            <div class="appointment-field">
-              <label for="lifeAppointmentTime">Time</label>
-              <input class="life-input" id="lifeAppointmentTime" type="time" required />
-            </div>
-          </div>
-          <div class="appointment-row">
-            <div class="appointment-field">
-              <label for="lifeAppointmentClinic">Clinic name</label>
-              <input class="life-input" id="lifeAppointmentClinic" type="text" placeholder="Clinic or facility" maxlength="120" />
-            </div>
-            <div class="appointment-field">
-              <label for="lifeAppointmentDoctor">Doctor name</label>
-              <input class="life-input" id="lifeAppointmentDoctor" type="text" placeholder="Doctor or provider" maxlength="120" />
-            </div>
-          </div>
-          <div class="appointment-field">
-            <label for="lifeAppointmentAddress">Address</label>
-            <input class="life-input" id="lifeAppointmentAddress" type="text" placeholder="Street address, Suburb NSW 2000" maxlength="160" />
-          </div>
-          <div class="appointment-field">
-            <label for="lifeAppointmentPhone">Phone number</label>
-            <input class="life-input" id="lifeAppointmentPhone" type="tel" placeholder="04xx xxx xxx or 02 xxxx xxxx" maxlength="40" />
-          </div>
-          <div class="appointment-field">
-            <label for="lifeAppointmentNotes">Notes</label>
-            <textarea class="life-textarea" id="lifeAppointmentNotes" placeholder="Notes (optional)" maxlength="300"></textarea>
-          </div>
-          <div class="appointment-modal-actions">
-            <button class="life-btn" id="lifeAppointmentSave" type="submit">Save appointment</button>
-            <button class="life-btn secondary" id="lifeAppointmentDelete" type="button" style="display: none;">Delete</button>
           </div>
         </div>
       </form>
@@ -5980,8 +6049,8 @@
         }
       });
       tasks.forEach(function(task) {
-        if (task.personId === personId && !task.done) {
-          items.push({ type: 'task', text: task.text, meta: formatTaskMeta(task), createdAt: task.createdAt || 0 });
+        if (task.personId === personId && task.status !== 'done') {
+          items.push({ type: 'task', text: task.title || task.text, meta: formatTaskMeta(task), createdAt: task.createdAt || 0 });
         }
       });
       items.sort(function(a, b) { return b.createdAt - a.createdAt; });
@@ -6294,12 +6363,19 @@
       setPersonViewActive(true);
       lifeAppointmentsPastExpanded = false;
       if (lifeAppointmentsBody) {
-        lifeAppointmentsBody.classList.remove('is-collapsed');
+        lifeAppointmentsBody.classList.add('is-collapsed');
       }
       if (lifeAppointmentsToggle) {
-        lifeAppointmentsToggle.setAttribute('aria-expanded', 'true');
+        lifeAppointmentsToggle.setAttribute('aria-expanded', 'false');
+      }
+      if (lifePersonTasksBody) {
+        lifePersonTasksBody.classList.add('is-collapsed');
+      }
+      if (lifePersonTasksToggle) {
+        lifePersonTasksToggle.setAttribute('aria-expanded', 'false');
       }
       renderPersonAppointments(person.id);
+      renderPersonTasks(person.id);
     }
 
     function createImageThumbnail(file) {
@@ -7540,6 +7616,7 @@
     var editingTaskId = null;
     var appointmentEditingId = null;
     var editingApptId = null;
+    var taskAssistErrors = {};
     var appointmentModalLockPersonId = null;
     var appointmentModalSource = 'life';
     var appointmentsFilterPersonId = 'all';
@@ -7556,20 +7633,13 @@
         if (!Array.isArray(parsed)) return [];
         return parsed.map(function(task) {
           if (!task || typeof task !== 'object') return null;
-          var areaId = task.areaId || getDefaultAreaId();
           return {
             id: task.id || generateGoalId('task'),
-            text: task.text || '',
-            areaId: areaId,
-            ownerName: task.ownerName || getAreaOwnerName(areaId) || null,
             personId: task.personId || null,
-            tags: Array.isArray(task.tags) ? task.tags : (task.tags ? String(task.tags).split(',').map(function(t) { return t.trim(); }).filter(Boolean) : []),
-            needsOtherPeople: !!task.needsOtherPeople,
-            needsAppointment: !!task.needsAppointment,
-            energyType: task.energyType || '',
-            done: !!task.done,
-            createdAt: task.createdAt || Date.now(),
-            dueDate: task.dueDate || null
+            title: task.title || task.text || '',
+            barrier: task.barrier || '',
+            status: task.status === 'done' || task.done ? 'done' : 'open',
+            aiPlan: task.aiPlan || null
           };
         }).filter(Boolean);
       } catch (e) {
@@ -7608,11 +7678,12 @@
         title: appt.title || 'Untitled appointment',
         date: date || '',
         time: time || '',
-        clinicName: appt.clinicName || appt.clinic || '',
-        doctorName: appt.doctorName || appt.doctor || '',
+        venueName: appt.venueName || appt.clinicName || appt.clinic || '',
+        contactName: appt.contactName || appt.doctorName || appt.doctor || '',
         address: appt.address || appt.location || '',
         phone: appt.phone || '',
         notes: appt.notes || '',
+        venueUrl: appt.venueUrl || '',
         createdAt: appt.createdAt || Date.now(),
         updatedAt: appt.updatedAt || appt.createdAt || Date.now()
       };
@@ -7645,8 +7716,9 @@
     }
 
     function getAppointmentDateTime(appt) {
-      if (!appt || !appt.date || !appt.time) return null;
-      var dateTime = new Date(appt.date + 'T' + appt.time);
+      if (!appt || !appt.date) return null;
+      var timeValue = appt.time || '00:00';
+      var dateTime = new Date(appt.date + 'T' + timeValue);
       if (Number.isNaN(dateTime.getTime())) return null;
       return dateTime;
     }
@@ -7659,12 +7731,20 @@
     function formatAppointmentDateTime(appt) {
       var dateTime = getAppointmentDateTime(appt);
       if (!dateTime) return '';
+      if (!appt.time) {
+        return dateTime.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+      }
       return dateTime.toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     }
 
-    function buildAppleMapsUrl(address) {
-      if (!address) return '';
-      return 'https://maps.apple.com/?q=' + encodeURIComponent(address);
+    function buildAppleMapsUrl(address, venueName) {
+      if (address) {
+        return 'https://maps.apple.com/?daddr=' + encodeURIComponent(address);
+      }
+      if (venueName) {
+        return 'https://maps.apple.com/?q=' + encodeURIComponent(venueName);
+      }
+      return '';
     }
 
     function splitAppointmentsByTime(list) {
@@ -7673,7 +7753,10 @@
       var past = [];
       list.forEach(function(appt) {
         var timestamp = getAppointmentTimestamp(appt);
-        if (timestamp === null) return;
+        if (timestamp === null) {
+          upcoming.push(appt);
+          return;
+        }
         if (timestamp >= now) {
           upcoming.push(appt);
         } else {
@@ -7681,7 +7764,11 @@
         }
       });
       upcoming.sort(function(a, b) {
-        return getAppointmentTimestamp(a) - getAppointmentTimestamp(b);
+        var aTime = getAppointmentTimestamp(a);
+        var bTime = getAppointmentTimestamp(b);
+        if (aTime === null) return -1;
+        if (bTime === null) return 1;
+        return aTime - bTime;
       });
       past.sort(function(a, b) {
         return getAppointmentTimestamp(b) - getAppointmentTimestamp(a);
@@ -7711,7 +7798,7 @@
       var meta = document.createElement('div');
       meta.className = 'appointment-meta';
       var metaParts = [formatAppointmentDateTime(appt)];
-      if (appt.clinicName) metaParts.push(appt.clinicName);
+      if (appt.venueName) metaParts.push(appt.venueName);
       if (options && options.showPerson) {
         metaParts.push(getPersonDisplayName(appt.personId));
       }
@@ -7728,10 +7815,11 @@
       var body = document.createElement('div');
       body.className = 'appointment-body';
       var detailFields = [
-        { label: 'Doctor', value: appt.doctorName },
+        { label: 'Venue', value: appt.venueName },
         { label: 'Address', value: appt.address },
+        { label: 'Contact', value: appt.contactName },
         { label: 'Phone', value: appt.phone },
-        { label: 'Notes', value: appt.notes }
+        { label: 'Notes', value: appt.notes, type: 'notes' }
       ];
       detailFields.forEach(function(field) {
         if (!field.value) return;
@@ -7740,7 +7828,18 @@
         var label = document.createElement('span');
         label.textContent = field.label;
         var value = document.createElement('div');
-        value.textContent = field.value;
+        if (field.type === 'notes') {
+          var details = document.createElement('details');
+          var summary = document.createElement('summary');
+          summary.textContent = 'Show notes';
+          var notesText = document.createElement('div');
+          notesText.textContent = field.value;
+          details.appendChild(summary);
+          details.appendChild(notesText);
+          value.appendChild(details);
+        } else {
+          value.textContent = field.value;
+        }
         detail.appendChild(label);
         detail.appendChild(value);
         body.appendChild(detail);
@@ -7748,14 +7847,23 @@
 
       var actions = document.createElement('div');
       actions.className = 'appointment-actions';
-      if (appt.address) {
+      if (appt.address || appt.venueName) {
         var directions = document.createElement('a');
         directions.className = 'appointment-action';
-        directions.href = buildAppleMapsUrl(appt.address);
+        directions.href = buildAppleMapsUrl(appt.address, appt.venueName);
         directions.target = '_blank';
         directions.rel = 'noopener';
         directions.textContent = 'Directions';
         actions.appendChild(directions);
+      }
+      if (appt.venueUrl) {
+        var openVenue = document.createElement('a');
+        openVenue.className = 'appointment-action';
+        openVenue.href = appt.venueUrl;
+        openVenue.target = '_blank';
+        openVenue.rel = 'noopener';
+        openVenue.textContent = 'Open venue';
+        actions.appendChild(openVenue);
       }
       if (appt.phone) {
         var call = document.createElement('a');
@@ -7819,6 +7927,7 @@
 
     function formatTaskMeta(task) {
       var parts = [];
+      if (task.barrier) parts.push('Barrier: ' + task.barrier);
       if (task.dueDate) parts.push('Due ' + task.dueDate);
       if (task.tags && task.tags.length) parts.push('Tags: ' + task.tags.join(', '));
       if (task.energyType) parts.push('Energy: ' + task.energyType);
@@ -7837,11 +7946,11 @@
       if (!lifeTodayList) return;
       lifeTodayList.innerHTML = '';
       var actionableGoals = getLifeFiltered(goalsShort).filter(function(goal) { return !goal.done; });
-      var actionableTasks = getLifeFiltered(tasks).filter(function(task) { return !task.done; });
+      var actionableTasks = getLifeFiltered(tasks).filter(function(task) { return task.status !== 'done'; });
       var combined = actionableGoals.map(function(goal) {
         return { type: 'goal', text: goal.text, areaId: goal.areaId };
       }).concat(actionableTasks.map(function(task) {
-        return { type: 'task', text: task.text, areaId: task.areaId };
+        return { type: 'task', text: task.title || task.text || 'Untitled task', areaId: task.areaId };
       }));
       var topFive = combined.slice(0, 5);
       if (topFive.length === 0) {
@@ -7928,20 +8037,20 @@
       }
       filteredTasks.forEach(function(task) {
         var item = document.createElement('div');
-        item.className = 'life-item' + (task.done ? ' completed' : '');
+        item.className = 'life-item' + (task.status === 'done' ? ' completed' : '');
 
         var header = document.createElement('div');
         var checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
-        checkbox.checked = !!task.done;
+        checkbox.checked = task.status === 'done';
         checkbox.addEventListener('change', function() {
-          task.done = this.checked;
+          task.status = this.checked ? 'done' : 'open';
           saveTasks();
           renderLifeTasks();
           renderLifeToday();
         });
         var text = document.createElement('span');
-        text.textContent = task.text || '';
+        text.textContent = task.title || task.text || '';
         header.appendChild(checkbox);
         header.appendChild(text);
 
@@ -7963,7 +8072,7 @@
         editBtn.textContent = 'Edit';
         editBtn.addEventListener('click', function() {
           editingTaskId = task.id;
-          lifeTaskText.value = task.text || '';
+          lifeTaskText.value = task.title || task.text || '';
           lifeTaskArea.value = task.areaId || getDefaultAreaId();
           lifeTaskTags.value = (task.tags || []).join(', ');
           lifeTaskDue.value = task.dueDate || '';
@@ -8033,7 +8142,7 @@
       tasks.forEach(function(task) {
         var opt = document.createElement('option');
         opt.value = task.id;
-        opt.textContent = task.text || 'Untitled task';
+        opt.textContent = task.title || task.text || 'Untitled task';
         lifeApptLinkedTasks.appendChild(opt);
       });
     }
@@ -8080,7 +8189,7 @@
         var linked = appt.linkedTaskIds && appt.linkedTaskIds.length
           ? appt.linkedTaskIds.map(function(id) {
             var task = tasks.find(function(t) { return t.id === id; });
-            return task ? task.text : '';
+            return task ? (task.title || task.text) : '';
           }).filter(Boolean).join(', ')
           : '';
         if (linked) {
@@ -8203,6 +8312,98 @@
       if (lifeAppointmentsPast) {
         lifeAppointmentsPast.style.display = lifeAppointmentsPastExpanded ? '' : 'none';
       }
+    }
+
+    function renderPersonTasks(personId) {
+      if (!lifePersonTasksList) return;
+      lifePersonTasksList.innerHTML = '';
+      if (!personId) return;
+      var personTasks = tasks.filter(function(task) {
+        return task.personId === personId;
+      });
+      if (!personTasks.length) {
+        var empty = document.createElement('div');
+        empty.className = 'life-meta';
+        empty.textContent = 'No tasks yet.';
+        lifePersonTasksList.appendChild(empty);
+        return;
+      }
+      personTasks.forEach(function(task) {
+        var card = document.createElement('div');
+        card.className = 'life-task-card' + (task.status === 'done' ? ' is-done' : '');
+
+        var title = document.createElement('div');
+        title.className = 'life-task-title';
+        title.textContent = task.title || 'Untitled task';
+        card.appendChild(title);
+
+        if (task.barrier) {
+          var barrier = document.createElement('div');
+          barrier.className = 'life-task-barrier';
+          barrier.textContent = 'Barrier: ' + task.barrier;
+          card.appendChild(barrier);
+        }
+
+        if (task.aiPlan) {
+          var plan = document.createElement('div');
+          plan.className = 'life-task-plan';
+          var summary = document.createElement('div');
+          summary.textContent = task.aiPlan.summary || '';
+          plan.appendChild(summary);
+          if (task.aiPlan.first_step_2min) {
+            var firstStep = document.createElement('div');
+            firstStep.textContent = 'First step (2 min): ' + task.aiPlan.first_step_2min;
+            plan.appendChild(firstStep);
+          }
+          if (Array.isArray(task.aiPlan.steps) && task.aiPlan.steps.length) {
+            var list = document.createElement('ul');
+            task.aiPlan.steps.forEach(function(step) {
+              if (!step) return;
+              var item = document.createElement('li');
+              item.textContent = step;
+              list.appendChild(item);
+            });
+            plan.appendChild(list);
+          }
+          card.appendChild(plan);
+        }
+
+        if (taskAssistErrors[task.id]) {
+          var error = document.createElement('div');
+          error.className = 'life-meta';
+          error.textContent = taskAssistErrors[task.id];
+          card.appendChild(error);
+        }
+
+        var actions = document.createElement('div');
+        actions.className = 'life-task-actions';
+        var helpBtn = document.createElement('button');
+        helpBtn.type = 'button';
+        helpBtn.className = 'life-btn secondary';
+        helpBtn.textContent = 'Help me start (30s)';
+        helpBtn.disabled = task.status === 'done';
+        helpBtn.addEventListener('click', function() {
+          requestTaskStartPlan(task);
+        });
+
+        var doneBtn = document.createElement('button');
+        doneBtn.type = 'button';
+        doneBtn.className = 'life-btn';
+        doneBtn.textContent = 'Done';
+        doneBtn.disabled = task.status === 'done';
+        doneBtn.addEventListener('click', function() {
+          task.status = 'done';
+          saveTasks();
+          renderPersonTasks(personId);
+          renderLifeToday();
+        });
+
+        actions.appendChild(helpBtn);
+        actions.appendChild(doneBtn);
+        card.appendChild(actions);
+
+        lifePersonTasksList.appendChild(card);
+      });
     }
 
     function renderAppointmentsFilters() {
@@ -8400,23 +8601,6 @@
     function inferAppointmentTitle(text) {
       if (!text) return 'Appointment';
       var lower = text.toLowerCase();
-      var activityMatch = lower.match(/\b([a-z]+)\s+training\b/);
-      if (activityMatch && activityMatch[1]) {
-        return titleCase(activityMatch[1] + ' training');
-      }
-      var lessonMatch = lower.match(/\b([a-z]+)\s+lesson\b/);
-      if (lessonMatch && lessonMatch[1]) {
-        return titleCase(lessonMatch[1] + ' lesson');
-      }
-      if (lower.includes('swimming')) {
-        return 'Swimming';
-      }
-      if (lower.includes('training')) {
-        return 'Training';
-      }
-      if (lower.includes('lesson')) {
-        return 'Lesson';
-      }
       var medicalIndicators = ['dr', 'doctor', 'gp', 'clinic', 'hospital', 'medical', 'specialist', 'paediatric', 'appointment'];
       var hasMedical = medicalIndicators.some(function(term) {
         return new RegExp('\\b' + term + '\\b', 'i').test(text);
@@ -8426,7 +8610,7 @@
 
     function extractVenueName(lines) {
       if (!lines || !lines.length) return '';
-      var venueKeywords = /(clinic|hospital|medical centre|medical center|practice|surgery|pool|school|centre|center)/i;
+      var venueKeywords = /(clinic|hospital|medical centre|medical center|practice|pool|school)/i;
       var line = lines.find(function(item) { return venueKeywords.test(item); });
       if (!line) return '';
       var cleaned = line.replace(/^(at|location|venue|clinic)\s*[:\-]\s*/i, '').trim();
@@ -8454,17 +8638,149 @@
       };
     }
 
+    function isValidVenueName(value) {
+      if (!value) return false;
+      var trimmed = String(value).trim();
+      if (!trimmed || trimmed.length > 60) return false;
+      if (/[.!?]/.test(trimmed) || trimmed.split(',').length > 2) return false;
+      return /(clinic|hospital|medical centre|medical center|practice|pool|school)/i.test(trimmed);
+    }
+
+    function sanitizeAppointmentField(fieldKey, value, rawText) {
+      if (!value) return '';
+      var trimmed = String(value).trim();
+      if (!trimmed) return '';
+      if (fieldKey === 'title') {
+        if (rawText && trimmed === rawText.trim()) return '';
+        if (trimmed.length > 120) return '';
+        return trimmed;
+      }
+      if (fieldKey === 'venueName') {
+        return isValidVenueName(trimmed) ? trimmed : '';
+      }
+      if (fieldKey === 'phone') {
+        return normalizeAuPhone(trimmed);
+      }
+      return trimmed;
+    }
+
+    function shouldApplyFix(fieldKey, currentValue, nextValue, fixesText) {
+      if (!nextValue) return false;
+      if (!currentValue) return true;
+      if (!fixesText) return false;
+      var lower = fixesText.toLowerCase();
+      var keywords = {
+        title: ['title'],
+        date: ['date', 'day'],
+        time: ['time'],
+        venueName: ['venue', 'location', 'clinic', 'hospital', 'medical', 'practice', 'pool', 'school'],
+        address: ['address'],
+        contactName: ['contact', 'doctor', 'dr', 'provider'],
+        phone: ['phone', 'call'],
+        venueUrl: ['url', 'link'],
+        notes: ['note', 'notes', 'text']
+      };
+      if (currentValue && lower.includes(String(currentValue).toLowerCase())) return true;
+      return (keywords[fieldKey] || []).some(function(term) { return lower.includes(term); });
+    }
+
+    function handleAppointmentParse(context, text) {
+      if (!context) return;
+      var trimmed = (text || '').trim();
+      if (!trimmed) {
+        alert('Paste appointment text to parse.');
+        return;
+      }
+      context.rawText = trimmed;
+      context.draft = buildAppointmentDraft(null, appointmentModalLockPersonId || getDefaultPersonId());
+      var parsed = parseAppointmentText(trimmed);
+      applyAppointmentFields(context, parsed);
+      if (context.summaryError) {
+        context.summaryError.style.display = 'none';
+        context.summaryError.textContent = '';
+      }
+      setAppointmentSummaryVisible(context, true);
+      renderAppointmentSummary(context);
+    }
+
+    async function applyAppointmentFixes(context) {
+      if (!context) return;
+      var fixesText = context.fixesInput ? context.fixesInput.value.trim() : '';
+      if (!context.rawText) {
+        if (context.summaryError) {
+          context.summaryError.textContent = 'Parse an appointment before applying fixes.';
+          context.summaryError.style.display = '';
+        }
+        return;
+      }
+      if (!fixesText) {
+        if (context.summaryError) {
+          context.summaryError.textContent = 'Add a fix to apply.';
+          context.summaryError.style.display = '';
+        }
+        return;
+      }
+      if (context.applyFixesBtn) {
+        context.applyFixesBtn.disabled = true;
+      }
+      if (context.summaryError) {
+        context.summaryError.style.display = 'none';
+        context.summaryError.textContent = '';
+      }
+      try {
+        var aiFields = await callAppointmentStructure(context.rawText, fixesText);
+        applyAppointmentFixFields(context, aiFields, fixesText);
+      } catch (err) {
+        if (context.summaryError) {
+          context.summaryError.textContent = err && err.message ? err.message : 'Unable to apply fixes with AI.';
+          context.summaryError.style.display = '';
+        }
+        var fallbackFields = parseAppointmentText(context.rawText + '\n' + fixesText);
+        applyAppointmentFixFields(context, fallbackFields, fixesText);
+      } finally {
+        if (context.applyFixesBtn) {
+          context.applyFixesBtn.disabled = false;
+        }
+      }
+    }
+
+    function applyAppointmentFixFields(context, fields, fixesText) {
+      if (!context || !fields) return;
+      var updates = {
+        title: sanitizeAppointmentField('title', fields.title, context.rawText),
+        date: sanitizeAppointmentField('date', fields.date, context.rawText),
+        time: sanitizeAppointmentField('time', fields.time, context.rawText),
+        venueName: sanitizeAppointmentField('venueName', fields.venueName, context.rawText),
+        address: sanitizeAppointmentField('address', fields.address, context.rawText),
+        contactName: sanitizeAppointmentField('contactName', fields.contactName, context.rawText),
+        phone: sanitizeAppointmentField('phone', fields.phone, context.rawText),
+        venueUrl: sanitizeAppointmentField('venueUrl', fields.venueUrl, context.rawText)
+      };
+      Object.keys(updates).forEach(function(key) {
+        var nextValue = updates[key];
+        if (!nextValue) return;
+        var currentValue = context.draft && context.draft[key] ? context.draft[key] : '';
+        if (!shouldApplyFix(key, currentValue, nextValue, fixesText)) return;
+        context.draft[key] = nextValue;
+      });
+      if (context.rawText) {
+        context.draft.notes = context.rawText;
+      }
+      renderAppointmentSummary(context);
+    }
+
     function buildAppointmentDraft(appt, personId) {
       return {
         personId: appt ? appt.personId : (personId || ''),
         title: appt ? (appt.title || '') : '',
         date: appt ? (appt.date || '') : '',
         time: appt ? (appt.time || '') : '',
-        clinicName: appt ? (appt.clinicName || '') : '',
-        doctorName: appt ? (appt.doctorName || '') : '',
+        venueName: appt ? (appt.venueName || '') : '',
+        contactName: appt ? (appt.contactName || '') : '',
         address: appt ? (appt.address || '') : '',
         phone: appt ? (appt.phone || '') : '',
-        notes: appt ? (appt.notes || '') : ''
+        notes: appt ? (appt.notes || '') : '',
+        venueUrl: appt ? (appt.venueUrl || '') : ''
       };
     }
 
@@ -8473,14 +8789,6 @@
       if (context.personSelect && context.draft.personId) {
         context.personSelect.value = context.draft.personId;
       }
-      if (context.titleInput) context.titleInput.value = context.draft.title || '';
-      if (context.dateInput) context.dateInput.value = context.draft.date || '';
-      if (context.timeInput) context.timeInput.value = context.draft.time || '';
-      if (context.clinicInput) context.clinicInput.value = context.draft.clinicName || '';
-      if (context.doctorInput) context.doctorInput.value = context.draft.doctorName || '';
-      if (context.addressInput) context.addressInput.value = context.draft.address || '';
-      if (context.phoneInput) context.phoneInput.value = context.draft.phone || '';
-      if (context.notesInput) context.notesInput.value = context.draft.notes || '';
     }
 
     function setAppointmentSummaryVisible(context, isVisible) {
@@ -8499,126 +8807,52 @@
       if (!context || !context.summaryRows || !context.draft) return;
       context.summaryRows.innerHTML = '';
       var fields = [
-        { key: 'title', label: 'Title', type: 'text', placeholder: 'Appointment title' },
-        { key: 'date', label: 'Date', type: 'date' },
-        { key: 'time', label: 'Time', type: 'time' },
-        { key: 'clinicName', label: 'Venue name', type: 'text', placeholder: 'Clinic or facility' },
-        { key: 'address', label: 'Address', type: 'text', placeholder: 'Street address, Suburb NSW 2000' },
-        { key: 'doctorName', label: 'Contact name', type: 'text', placeholder: 'Doctor or provider' },
-        { key: 'phone', label: 'Phone', type: 'tel', placeholder: '04xx xxx xxx or 02 xxxx xxxx' },
-        { key: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Notes (optional)' }
+        { key: 'title', label: 'Title' },
+        { key: 'date', label: 'Date' },
+        { key: 'time', label: 'Time' },
+        { key: 'venueName', label: 'Venue' },
+        { key: 'address', label: 'Address' },
+        { key: 'contactName', label: 'Contact' },
+        { key: 'phone', label: 'Phone' }
       ];
       fields.forEach(function(field) {
         var row = document.createElement('div');
         row.className = 'appointments-summary-row';
-        row.dataset.field = field.key;
-        var label = document.createElement('div');
-        label.className = 'appointments-summary-label';
-        label.textContent = field.label;
+        var label = document.createElement('span');
+        label.textContent = '• ' + field.label + ':';
         var value = document.createElement('div');
-        value.className = 'appointments-summary-value';
         var rawValue = formatSummaryValue(context.draft[field.key]);
-        if (field.key === 'notes' && rawValue) {
-          value.classList.add('appointments-summary-notes');
-          var details = document.createElement('details');
-          var summary = document.createElement('summary');
-          summary.textContent = 'Show more';
-          var notesText = document.createElement('div');
-          notesText.className = 'appointments-summary-notes-text';
-          notesText.textContent = rawValue;
-          details.appendChild(summary);
-          details.appendChild(notesText);
-          value.appendChild(details);
-        } else if (rawValue) {
+        if (rawValue) {
           value.textContent = rawValue;
         } else {
           value.textContent = '—';
-          value.classList.add('is-empty');
+          value.className = 'is-empty';
         }
-
-        var actions = document.createElement('div');
-        actions.className = 'appointments-summary-row-actions';
-        var editBtn = document.createElement('button');
-        editBtn.type = 'button';
-        editBtn.className = 'appointments-icon-btn';
-        editBtn.textContent = '✎';
-        editBtn.setAttribute('aria-label', 'Edit ' + field.label);
-        var saveBtn = document.createElement('button');
-        saveBtn.type = 'button';
-        saveBtn.className = 'appointments-icon-btn';
-        saveBtn.textContent = '✓';
-        saveBtn.setAttribute('aria-label', 'Save ' + field.label);
-        saveBtn.style.display = 'none';
-        var cancelBtn = document.createElement('button');
-        cancelBtn.type = 'button';
-        cancelBtn.className = 'appointments-icon-btn';
-        cancelBtn.textContent = '✕';
-        cancelBtn.setAttribute('aria-label', 'Cancel ' + field.label);
-        cancelBtn.style.display = 'none';
-
-        actions.appendChild(editBtn);
-        actions.appendChild(saveBtn);
-        actions.appendChild(cancelBtn);
-
-        var editWrap = document.createElement('div');
-        editWrap.className = 'appointments-summary-edit';
-        editWrap.style.display = 'none';
-        var input;
-        if (field.type === 'textarea') {
-          input = document.createElement('textarea');
-          input.rows = 3;
-        } else {
-          input = document.createElement('input');
-          input.type = field.type;
-        }
-        if (field.placeholder) input.placeholder = field.placeholder;
-        input.value = context.draft[field.key] || '';
-        if (field.key === 'phone') {
-          input.addEventListener('blur', function() {
-            input.value = normalizeAuPhone(input.value);
-          });
-        }
-        editWrap.appendChild(input);
-
-        function closeEdit() {
-          editWrap.style.display = 'none';
-          value.style.display = '';
-          editBtn.style.display = '';
-          saveBtn.style.display = 'none';
-          cancelBtn.style.display = 'none';
-        }
-
-        editBtn.addEventListener('click', function() {
-          input.value = context.draft[field.key] || '';
-          editWrap.style.display = '';
-          value.style.display = 'none';
-          editBtn.style.display = 'none';
-          saveBtn.style.display = '';
-          cancelBtn.style.display = '';
-          input.focus();
-        });
-
-        saveBtn.addEventListener('click', function() {
-          var newValue = input.value.trim();
-          if (field.key === 'phone') {
-            newValue = normalizeAuPhone(newValue);
-          }
-          if (!context.draft) context.draft = {};
-          context.draft[field.key] = newValue;
-          syncAppointmentFormInputs(context);
-          renderAppointmentSummary(context);
-        });
-
-        cancelBtn.addEventListener('click', function() {
-          closeEdit();
-        });
 
         row.appendChild(label);
         row.appendChild(value);
-        row.appendChild(actions);
-        row.appendChild(editWrap);
         context.summaryRows.appendChild(row);
       });
+
+      if (context.rawText) {
+        var notesRow = document.createElement('div');
+        notesRow.className = 'appointments-summary-row appointments-summary-notes';
+        var notesLabel = document.createElement('span');
+        notesLabel.textContent = '• Notes:';
+        var notesValue = document.createElement('div');
+        var details = document.createElement('details');
+        var summary = document.createElement('summary');
+        summary.textContent = 'Show original text';
+        var notesText = document.createElement('div');
+        notesText.className = 'appointments-summary-notes-text';
+        notesText.textContent = context.rawText;
+        details.appendChild(summary);
+        details.appendChild(notesText);
+        notesValue.appendChild(details);
+        notesRow.appendChild(notesLabel);
+        notesRow.appendChild(notesValue);
+        context.summaryRows.appendChild(notesRow);
+      }
     }
 
     function applyAppointmentFields(context, fields) {
@@ -8627,36 +8861,29 @@
       if (fields.title) context.draft.title = fields.title;
       if (fields.date) context.draft.date = fields.date;
       if (fields.time) context.draft.time = fields.time;
-      if (fields.venueName) context.draft.clinicName = fields.venueName;
-      if (fields.contactName) context.draft.doctorName = fields.contactName;
+      if (fields.venueName) context.draft.venueName = fields.venueName;
+      if (fields.contactName) context.draft.contactName = fields.contactName;
       if (fields.address) context.draft.address = fields.address;
       if (fields.phone) context.draft.phone = normalizeAuPhone(fields.phone);
-      if (fields.notes) context.draft.notes = fields.notes;
+      if (fields.venueUrl) context.draft.venueUrl = fields.venueUrl;
+      if (context.rawText) {
+        context.draft.notes = context.rawText;
+      } else if (fields.notes) {
+        context.draft.notes = fields.notes;
+      }
       syncAppointmentFormInputs(context);
       renderAppointmentSummary(context);
     }
 
-    function setAppointmentOriginalText(context, text) {
-      if (!context || !context.originalDetails || !context.originalText) return;
-      if (!text) {
-        context.originalDetails.style.display = 'none';
-        context.originalText.textContent = '';
-        return;
-      }
-      context.originalText.textContent = text;
-      context.originalDetails.style.display = '';
-      context.originalDetails.open = false;
-    }
-
-    function updateAppointmentScanPreview(context, file) {
-      if (!context || !context.scanPreview || !context.scanImage) return;
+    function updateAppointmentScanPreview(previewEl, imageEl, context, key, file) {
+      if (!previewEl || !imageEl || !context) return;
       if (!file) return;
-      if (context.captureUrl) {
-        URL.revokeObjectURL(context.captureUrl);
+      if (context[key]) {
+        URL.revokeObjectURL(context[key]);
       }
-      context.captureUrl = URL.createObjectURL(file);
-      context.scanImage.src = context.captureUrl;
-      context.scanPreview.style.display = '';
+      context[key] = URL.createObjectURL(file);
+      imageEl.src = context[key];
+      previewEl.style.display = '';
     }
 
     function resetAppointmentCapture(context, options) {
@@ -8665,17 +8892,26 @@
       if (context.scanUploadInput) context.scanUploadInput.value = '';
       if (context.scanPreview) context.scanPreview.style.display = 'none';
       if (context.scanImage) context.scanImage.removeAttribute('src');
-      if (context.captureUrl) {
-        URL.revokeObjectURL(context.captureUrl);
-        context.captureUrl = null;
+      if (context.photoPreview) context.photoPreview.style.display = 'none';
+      if (context.photoImage) context.photoImage.removeAttribute('src');
+      if (context.scanCaptureUrl) {
+        URL.revokeObjectURL(context.scanCaptureUrl);
+        context.scanCaptureUrl = null;
+      }
+      if (context.photoCaptureUrl) {
+        URL.revokeObjectURL(context.photoCaptureUrl);
+        context.photoCaptureUrl = null;
       }
       if (context.textInput) context.textInput.value = '';
-      setAppointmentOriginalText(context, '');
-      if (context.aiBtn) {
-        context.aiBtn.classList.remove('is-loading');
-        context.aiBtn.disabled = false;
+      if (context.scanTextInput) context.scanTextInput.value = '';
+      if (context.photoTextInput) context.photoTextInput.value = '';
+      if (context.fixesInput) context.fixesInput.value = '';
+      if (context.summaryError) {
+        context.summaryError.style.display = 'none';
+        context.summaryError.textContent = '';
       }
       if (!options || !options.preserveDraft) {
+        context.rawText = '';
         if (context.summaryRows) context.summaryRows.innerHTML = '';
         if (context.summary) context.summary.style.display = 'none';
         if (context.formFields) context.formFields.classList.remove('is-hidden');
@@ -8683,7 +8919,7 @@
       }
     }
 
-    async function callAppointmentStructure(text) {
+    async function callAppointmentStructure(rawText, fixesText) {
       var idToken = localStorage.getItem('google_id_token');
       if (!idToken) {
         throw new Error('Please sign in again to continue.');
@@ -8694,7 +8930,7 @@
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + idToken
         },
-        body: JSON.stringify({ text: text })
+        body: JSON.stringify({ rawText: rawText, fixesText: fixesText })
       });
       if (!res.ok) {
         var errorMsg = 'Backend API error';
@@ -8709,7 +8945,10 @@
         throw new Error(errorMsg);
       }
       var data = await res.json();
-      return (data && data.fields) ? data.fields : {};
+      if (data && data.fields && typeof data.fields === 'object') {
+        return data.fields;
+      }
+      return data && typeof data === 'object' ? data : {};
     }
 
     function openAppointmentModal(context, appt, options) {
@@ -8719,29 +8958,12 @@
       appointmentModalLockPersonId = options && options.lockPersonId ? options.lockPersonId : null;
       context.title.textContent = appt ? 'Edit appointment' : 'Add appointment';
       var personId = appt ? appt.personId : (appointmentModalLockPersonId || getDefaultPersonId());
-      renderAppointmentPersonOptions(context.personSelect, personId);
-      if (context.personRow) {
-        var isLocked = !!appointmentModalLockPersonId;
-        context.personRow.style.display = isLocked ? 'none' : '';
-        context.personSelect.disabled = isLocked;
-      }
-      if (appointmentModalLockPersonId) {
-        context.personSelect.value = appointmentModalLockPersonId;
-      }
-      context.titleInput.value = appt ? appt.title || '' : '';
-      context.dateInput.value = appt ? appt.date || '' : '';
-      context.timeInput.value = appt ? appt.time || '' : '';
-      context.clinicInput.value = appt ? appt.clinicName || '' : '';
-      context.doctorInput.value = appt ? appt.doctorName || '' : '';
-      context.addressInput.value = appt ? appt.address || '' : '';
-      context.phoneInput.value = appt ? appt.phone || '' : '';
-      context.notesInput.value = appt ? appt.notes || '' : '';
-      context.deleteBtn.style.display = appt ? 'inline-flex' : 'none';
       resetAppointmentCapture(context, { preserveDraft: true });
       context.draft = buildAppointmentDraft(appt, personId);
+      context.rawText = appt ? (appt.notes || '') : '';
       syncAppointmentFormInputs(context);
       if (context.summary) {
-        var showSummary = !!(options && options.showSummary);
+        var showSummary = appt ? true : !!(options && options.showSummary);
         setAppointmentSummaryVisible(context, showSummary);
         if (showSummary) {
           renderAppointmentSummary(context);
@@ -8765,35 +8987,22 @@
     function handleAppointmentSubmit(event, context) {
       event.preventDefault();
       if (!context) return;
-      var useDraft = !!context.summary;
-      var draft = useDraft && context.draft ? context.draft : null;
-      var personId = useDraft
-        ? (draft.personId || (context.personSelect ? context.personSelect.value : ''))
-        : (context.personSelect ? context.personSelect.value : '');
-      if (appointmentModalLockPersonId) {
-        personId = appointmentModalLockPersonId;
-      }
-      if (!personId) {
-        alert('Please select a person.');
-        return;
-      }
-      var title = useDraft ? (draft.title || '').trim() : context.titleInput.value.trim();
+      var draft = context.draft || {};
+      var personId = appointmentModalLockPersonId || draft.personId || activePersonId || getDefaultPersonId();
+      var title = (draft.title || '').trim();
       if (!title) {
         alert('Please enter a title.');
-        if (context.titleInput) context.titleInput.focus();
         return;
       }
-      var date = useDraft ? (draft.date || '') : context.dateInput.value;
-      var time = useDraft ? (draft.time || '') : context.timeInput.value;
-      if (!date || !time) {
-        alert('Please select a date and time.');
-        return;
-      }
-      var dateTime = new Date(date + 'T' + time);
-      if (!Number.isNaN(dateTime.getTime()) && dateTime.getTime() < Date.now()) {
-        var proceed = window.confirm('This appointment is in the past. Save anyway?');
-        if (!proceed) {
-          return;
+      var date = draft.date || '';
+      var time = draft.time || '';
+      if (date && time) {
+        var dateTime = new Date(date + 'T' + time);
+        if (!Number.isNaN(dateTime.getTime()) && dateTime.getTime() < Date.now()) {
+          var proceed = window.confirm('This appointment is in the past. Save anyway?');
+          if (!proceed) {
+            return;
+          }
         }
       }
       var existing = appointmentEditingId
@@ -8805,11 +9014,12 @@
         title: title,
         date: date,
         time: time,
-        clinicName: useDraft ? (draft.clinicName || '').trim() : context.clinicInput.value.trim(),
-        doctorName: useDraft ? (draft.doctorName || '').trim() : context.doctorInput.value.trim(),
-        address: useDraft ? (draft.address || '').trim() : context.addressInput.value.trim(),
-        phone: useDraft ? normalizeAuPhone(draft.phone || '') : normalizeAuPhone(context.phoneInput.value.trim()),
-        notes: useDraft ? (draft.notes || '').trim() : context.notesInput.value.trim(),
+        venueName: (draft.venueName || '').trim(),
+        contactName: (draft.contactName || '').trim(),
+        address: (draft.address || '').trim(),
+        phone: normalizeAuPhone(draft.phone || ''),
+        notes: (context.rawText || draft.notes || '').trim(),
+        venueUrl: (draft.venueUrl || '').trim(),
         createdAt: existing && existing.createdAt ? existing.createdAt : Date.now(),
         updatedAt: Date.now()
       };
@@ -8843,24 +9053,11 @@
       context.form.addEventListener('submit', function(event) {
         handleAppointmentSubmit(event, context);
       });
-      if (context.phoneInput) {
-        context.phoneInput.addEventListener('blur', function() {
-          this.value = normalizeAuPhone(this.value);
-        });
-      }
       if (context.personSelect) {
         context.personSelect.addEventListener('change', function() {
           if (!context.draft) context.draft = buildAppointmentDraft(null, '');
           context.draft.personId = this.value;
           syncAppointmentFormInputs(context);
-        });
-      }
-      if (context.deleteBtn) {
-        context.deleteBtn.addEventListener('click', function() {
-          if (!appointmentEditingId) return;
-          var appt = appointments.find(function(item) { return item.id === appointmentEditingId; });
-          deleteAppointment(appt);
-          closeAppointmentModal(context);
         });
       }
       if (context.scanTakeBtn && context.scanTakeInput) {
@@ -8870,11 +9067,7 @@
         context.scanTakeInput.addEventListener('change', function(event) {
           var file = event.target.files && event.target.files[0];
           if (file) {
-            updateAppointmentScanPreview(context, file);
-            if (context.summary) {
-              setAppointmentSummaryVisible(context, true);
-              renderAppointmentSummary(context);
-            }
+            updateAppointmentScanPreview(context.photoPreview, context.photoImage, context, 'photoCaptureUrl', file);
           }
         });
       }
@@ -8885,64 +9078,42 @@
         context.scanUploadInput.addEventListener('change', function(event) {
           var file = event.target.files && event.target.files[0];
           if (file) {
-            updateAppointmentScanPreview(context, file);
-            if (context.summary) {
-              setAppointmentSummaryVisible(context, true);
-              renderAppointmentSummary(context);
-            }
+            updateAppointmentScanPreview(context.scanPreview, context.scanImage, context, 'scanCaptureUrl', file);
+          }
+        });
+      }
+      if (context.scanOpenBtn && context.scanImage) {
+        context.scanOpenBtn.addEventListener('click', function() {
+          if (context.scanImage.src) {
+            window.open(context.scanImage.src, '_blank');
+          }
+        });
+      }
+      if (context.photoOpenBtn && context.photoImage) {
+        context.photoOpenBtn.addEventListener('click', function() {
+          if (context.photoImage.src) {
+            window.open(context.photoImage.src, '_blank');
           }
         });
       }
       if (context.parseBtn && context.textInput) {
         context.parseBtn.addEventListener('click', function() {
-          var text = context.textInput.value.trim();
-          if (!text) {
-            alert('Paste appointment text to parse.');
-            context.textInput.focus();
-            return;
-          }
-          var parsed = parseAppointmentText(text);
-          applyAppointmentFields(context, parsed);
-          setAppointmentOriginalText(context, text);
-          if (context.summary) {
-            setAppointmentSummaryVisible(context, true);
-            renderAppointmentSummary(context);
-          }
+          handleAppointmentParse(context, context.textInput.value);
         });
       }
-      if (context.textInput) {
-        context.textInput.addEventListener('blur', function() {
-          var text = context.textInput.value.trim();
-          if (!text) return;
-          if (!context.draft) context.draft = buildAppointmentDraft(null, context.personSelect ? context.personSelect.value : '');
-          applyAppointmentFields(context, parseAppointmentText(text));
-          setAppointmentOriginalText(context, text);
-          if (context.summary) {
-            setAppointmentSummaryVisible(context, true);
-            renderAppointmentSummary(context);
-          }
+      if (context.scanParseBtn && context.scanTextInput) {
+        context.scanParseBtn.addEventListener('click', function() {
+          handleAppointmentParse(context, context.scanTextInput.value);
         });
       }
-      if (context.aiBtn && context.textInput) {
-        context.aiBtn.addEventListener('click', async function() {
-          var text = context.textInput.value.trim();
-          if (!text) {
-            alert('Paste appointment text to use AI.');
-            context.textInput.focus();
-            return;
-          }
-          context.aiBtn.classList.add('is-loading');
-          context.aiBtn.disabled = true;
-          try {
-            var fields = await callAppointmentStructure(text);
-            applyAppointmentFields(context, fields);
-            setAppointmentOriginalText(context, text);
-          } catch (err) {
-            alert(err && err.message ? err.message : 'Unable to structure the appointment text.');
-          } finally {
-            context.aiBtn.classList.remove('is-loading');
-            context.aiBtn.disabled = false;
-          }
+      if (context.photoParseBtn && context.photoTextInput) {
+        context.photoParseBtn.addEventListener('click', function() {
+          handleAppointmentParse(context, context.photoTextInput.value);
+        });
+      }
+      if (context.applyFixesBtn) {
+        context.applyFixesBtn.addEventListener('click', function() {
+          applyAppointmentFixes(context);
         });
       }
       if (context.summarySaveBtn) {
@@ -9065,6 +9236,66 @@
         trimmed = trimmed.replace(/^```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();
       }
       return trimmed;
+    }
+
+    function buildTaskStartPrompt(task) {
+      return [
+        'Return STRICT JSON only with schema:',
+        '{"summary":"string","first_step_2min":"string","steps":["string"]}',
+        'Rules: summary must be 1 sentence. first_step_2min is a single actionable step <= 2 minutes.',
+        'Steps must be 3-7 bullets max. No motivational language. No long text.',
+        'Task: ' + (task.title || 'Untitled task'),
+        'Barrier: ' + (task.barrier || 'None')
+      ].join('\n');
+    }
+
+    function normalizeTaskPlan(plan) {
+      if (!plan || typeof plan !== 'object') return null;
+      var summary = String(plan.summary || '').trim();
+      var firstStep = String(plan.first_step_2min || '').trim();
+      var steps = Array.isArray(plan.steps)
+        ? plan.steps.map(function(step) { return String(step || '').trim(); }).filter(Boolean)
+        : [];
+      if (!summary || !firstStep || steps.length < 3) return null;
+      return {
+        summary: summary,
+        first_step_2min: firstStep,
+        steps: steps.slice(0, 7)
+      };
+    }
+
+    function buildFallbackTaskPlan(task) {
+      var title = task.title || 'this task';
+      return {
+        summary: 'Quick start plan for ' + title + '.',
+        first_step_2min: 'Open a note and write what done looks like for ' + title + '.',
+        steps: [
+          'List the smallest next action you can do right now.',
+          'Gather any info or tools needed for the first action.',
+          'Block 5 minutes to start the first action.'
+        ]
+      };
+    }
+
+    async function requestTaskStartPlan(task) {
+      if (!task) return;
+      if (taskAssistErrors[task.id]) {
+        delete taskAssistErrors[task.id];
+      }
+      try {
+        var response = await callUnstuckAssistant(buildTaskStartPrompt(task));
+        var parsed = JSON.parse(stripJsonFences(response));
+        var normalized = normalizeTaskPlan(parsed);
+        if (!normalized) {
+          throw new Error('Invalid AI response.');
+        }
+        task.aiPlan = normalized;
+      } catch (err) {
+        taskAssistErrors[task.id] = err && err.message ? err.message : 'Unable to fetch AI help.';
+        task.aiPlan = buildFallbackTaskPlan(task);
+      }
+      saveTasks();
+      renderPersonTasks(task.personId);
     }
 
     function openUnstuckPanel(config) {
@@ -9820,10 +10051,14 @@
     const lifeAppointmentsList = document.getElementById('lifeAppointmentsList');
     const lifeAppointmentsPastToggle = document.getElementById('lifeAppointmentsPastToggle');
     const lifeAppointmentsPast = document.getElementById('lifeAppointmentsPast');
+    const lifePersonTasksToggle = document.getElementById('lifePersonTasksToggle');
+    const lifePersonTasksBody = document.getElementById('lifePersonTasksBody');
+    const lifePersonTaskTitle = document.getElementById('lifePersonTaskTitle');
+    const lifePersonTaskBarrier = document.getElementById('lifePersonTaskBarrier');
+    const lifePersonTaskAdd = document.getElementById('lifePersonTaskAdd');
+    const lifePersonTasksList = document.getElementById('lifePersonTasksList');
     const lifeAppointmentModal = document.getElementById('lifeAppointmentModal');
     const lifeAppointmentForm = document.getElementById('lifeAppointmentForm');
-    const lifeAppointmentPersonRow = document.getElementById('lifeAppointmentPersonRow');
-    const lifeAppointmentPerson = document.getElementById('lifeAppointmentPerson');
     const lifeAppointmentTitle = document.getElementById('lifeAppointmentModalTitle');
     const lifeAppointmentScanTake = document.getElementById('lifeAppointmentScanTake');
     const lifeAppointmentScanUpload = document.getElementById('lifeAppointmentScanUpload');
@@ -9831,25 +10066,23 @@
     const lifeAppointmentScanUploadInput = document.getElementById('lifeAppointmentScanUploadInput');
     const lifeAppointmentScanPreview = document.getElementById('lifeAppointmentScanPreview');
     const lifeAppointmentScanImage = document.getElementById('lifeAppointmentScanImage');
+    const lifeAppointmentScanOpen = document.getElementById('lifeAppointmentScanOpen');
+    const lifeAppointmentScanTextInput = document.getElementById('lifeAppointmentScanTextInput');
+    const lifeAppointmentScanParseBtn = document.getElementById('lifeAppointmentScanParseBtn');
+    const lifeAppointmentPhotoPreview = document.getElementById('lifeAppointmentPhotoPreview');
+    const lifeAppointmentPhotoImage = document.getElementById('lifeAppointmentPhotoImage');
+    const lifeAppointmentPhotoOpen = document.getElementById('lifeAppointmentPhotoOpen');
+    const lifeAppointmentPhotoTextInput = document.getElementById('lifeAppointmentPhotoTextInput');
+    const lifeAppointmentPhotoParseBtn = document.getElementById('lifeAppointmentPhotoParseBtn');
     const lifeAppointmentTextInput = document.getElementById('lifeAppointmentTextInput');
     const lifeAppointmentParseBtn = document.getElementById('lifeAppointmentParseBtn');
-    const lifeAppointmentOriginalDetails = document.getElementById('lifeAppointmentOriginalDetails');
-    const lifeAppointmentOriginalText = document.getElementById('lifeAppointmentOriginalText');
     const lifeAppointmentSummary = document.getElementById('lifeAppointmentSummary');
     const lifeAppointmentSummaryRows = document.getElementById('lifeAppointmentSummaryRows');
+    const lifeAppointmentFixes = document.getElementById('lifeAppointmentFixes');
+    const lifeAppointmentApplyFixes = document.getElementById('lifeAppointmentApplyFixes');
+    const lifeAppointmentSummaryError = document.getElementById('lifeAppointmentSummaryError');
     const lifeAppointmentSummarySave = document.getElementById('lifeAppointmentSummarySave');
     const lifeAppointmentSummaryDiscard = document.getElementById('lifeAppointmentSummaryDiscard');
-    const lifeAppointmentFormFields = document.getElementById('lifeAppointmentFormFields');
-    const lifeAppointmentTitleInput = document.getElementById('lifeAppointmentTitleInput');
-    const lifeAppointmentDate = document.getElementById('lifeAppointmentDate');
-    const lifeAppointmentTime = document.getElementById('lifeAppointmentTime');
-    const lifeAppointmentClinic = document.getElementById('lifeAppointmentClinic');
-    const lifeAppointmentDoctor = document.getElementById('lifeAppointmentDoctor');
-    const lifeAppointmentAddress = document.getElementById('lifeAppointmentAddress');
-    const lifeAppointmentPhone = document.getElementById('lifeAppointmentPhone');
-    const lifeAppointmentNotes = document.getElementById('lifeAppointmentNotes');
-    const lifeAppointmentSave = document.getElementById('lifeAppointmentSave');
-    const lifeAppointmentDelete = document.getElementById('lifeAppointmentDelete');
     const lifeAppointmentClose = document.getElementById('lifeAppointmentClose');
     const lifeAgendaRange = document.getElementById('lifeAgendaRange');
     const lifeAgendaList = document.getElementById('lifeAgendaList');
@@ -9858,7 +10091,6 @@
     const lifePersonParkedList = document.getElementById('lifePersonParkedList');
     const lifePersonParkedToggle = document.getElementById('lifePersonParkedToggle');
     const lifePersonTaskText = document.getElementById('lifePersonTaskText');
-    const lifePersonTaskAdd = document.getElementById('lifePersonTaskAdd');
     const lifePersonApptTitle = document.getElementById('lifePersonApptTitle');
     const lifePersonApptStart = document.getElementById('lifePersonApptStart');
     const lifePersonApptAdd = document.getElementById('lifePersonApptAdd');
@@ -9900,45 +10132,12 @@
     const appointmentsFeed = document.getElementById('appointmentsFeed');
     const appointmentsPastToggle = document.getElementById('appointmentsPastToggle');
     const appointmentsPastFeed = document.getElementById('appointmentsPastFeed');
-    const appointmentsModal = document.getElementById('appointmentsModal');
-    const appointmentsModalTitle = document.getElementById('appointmentsModalTitle');
-    const appointmentsModalForm = document.getElementById('appointmentsModalForm');
-    const appointmentsModalPerson = document.getElementById('appointmentsModalPerson');
-    const appointmentsModalTitleInput = document.getElementById('appointmentsModalTitleInput');
-    const appointmentsModalDate = document.getElementById('appointmentsModalDate');
-    const appointmentsModalTime = document.getElementById('appointmentsModalTime');
-    const appointmentsModalClinic = document.getElementById('appointmentsModalClinic');
-    const appointmentsModalDoctor = document.getElementById('appointmentsModalDoctor');
-    const appointmentsModalAddress = document.getElementById('appointmentsModalAddress');
-    const appointmentsModalPhone = document.getElementById('appointmentsModalPhone');
-    const appointmentsModalNotes = document.getElementById('appointmentsModalNotes');
-    const appointmentsModalSave = document.getElementById('appointmentsModalSave');
-    const appointmentsModalDelete = document.getElementById('appointmentsModalDelete');
-    const appointmentsModalClose = document.getElementById('appointmentsModalClose');
-    const appointmentsScanTake = document.getElementById('appointmentsScanTake');
-    const appointmentsScanUpload = document.getElementById('appointmentsScanUpload');
-    const appointmentsScanTakeInput = document.getElementById('appointmentsScanTakeInput');
-    const appointmentsScanUploadInput = document.getElementById('appointmentsScanUploadInput');
-    const appointmentsScanPreview = document.getElementById('appointmentsScanPreview');
-    const appointmentsScanImage = document.getElementById('appointmentsScanImage');
-    const appointmentsTextInput = document.getElementById('appointmentsTextInput');
-    const appointmentsParseBtn = document.getElementById('appointmentsParseBtn');
-    const appointmentsAiBtn = document.getElementById('appointmentsAiBtn');
-    const appointmentsOriginalDetails = document.getElementById('appointmentsOriginalDetails');
-    const appointmentsOriginalText = document.getElementById('appointmentsOriginalText');
-    const appointmentsSummary = document.getElementById('appointmentsSummary');
-    const appointmentsSummaryRows = document.getElementById('appointmentsSummaryRows');
-    const appointmentsSummarySave = document.getElementById('appointmentsSummarySave');
-    const appointmentsSummaryDiscard = document.getElementById('appointmentsSummaryDiscard');
-    const appointmentsFormFields = document.getElementById('appointmentsFormFields');
 
     if (lifeAppointmentModal) {
       appointmentModalContexts.life = {
         source: 'life',
         modal: lifeAppointmentModal,
         form: lifeAppointmentForm,
-        personRow: lifeAppointmentPersonRow,
-        personSelect: lifeAppointmentPerson,
         title: lifeAppointmentTitle,
         scanTakeBtn: lifeAppointmentScanTake,
         scanUploadBtn: lifeAppointmentScanUpload,
@@ -9946,64 +10145,24 @@
         scanUploadInput: lifeAppointmentScanUploadInput,
         scanPreview: lifeAppointmentScanPreview,
         scanImage: lifeAppointmentScanImage,
+        scanOpenBtn: lifeAppointmentScanOpen,
+        scanTextInput: lifeAppointmentScanTextInput,
+        scanParseBtn: lifeAppointmentScanParseBtn,
+        photoPreview: lifeAppointmentPhotoPreview,
+        photoImage: lifeAppointmentPhotoImage,
+        photoOpenBtn: lifeAppointmentPhotoOpen,
+        photoTextInput: lifeAppointmentPhotoTextInput,
+        photoParseBtn: lifeAppointmentPhotoParseBtn,
         textInput: lifeAppointmentTextInput,
         parseBtn: lifeAppointmentParseBtn,
-        originalDetails: lifeAppointmentOriginalDetails,
-        originalText: lifeAppointmentOriginalText,
         summary: lifeAppointmentSummary,
         summaryRows: lifeAppointmentSummaryRows,
+        fixesInput: lifeAppointmentFixes,
+        applyFixesBtn: lifeAppointmentApplyFixes,
+        summaryError: lifeAppointmentSummaryError,
         summarySaveBtn: lifeAppointmentSummarySave,
         summaryDiscardBtn: lifeAppointmentSummaryDiscard,
-        formFields: lifeAppointmentFormFields,
-        titleInput: lifeAppointmentTitleInput,
-        dateInput: lifeAppointmentDate,
-        timeInput: lifeAppointmentTime,
-        clinicInput: lifeAppointmentClinic,
-        doctorInput: lifeAppointmentDoctor,
-        addressInput: lifeAppointmentAddress,
-        phoneInput: lifeAppointmentPhone,
-        notesInput: lifeAppointmentNotes,
-        saveBtn: lifeAppointmentSave,
-        deleteBtn: lifeAppointmentDelete,
         closeBtn: lifeAppointmentClose
-      };
-    }
-
-    if (appointmentsModal) {
-      appointmentModalContexts.calendar = {
-        source: 'calendar',
-        modal: appointmentsModal,
-        form: appointmentsModalForm,
-        personRow: null,
-        personSelect: appointmentsModalPerson,
-        title: appointmentsModalTitle,
-        titleInput: appointmentsModalTitleInput,
-        dateInput: appointmentsModalDate,
-        timeInput: appointmentsModalTime,
-        clinicInput: appointmentsModalClinic,
-        doctorInput: appointmentsModalDoctor,
-        addressInput: appointmentsModalAddress,
-        phoneInput: appointmentsModalPhone,
-        notesInput: appointmentsModalNotes,
-        saveBtn: appointmentsModalSave,
-        deleteBtn: appointmentsModalDelete,
-        closeBtn: appointmentsModalClose,
-        scanTakeBtn: appointmentsScanTake,
-        scanUploadBtn: appointmentsScanUpload,
-        scanTakeInput: appointmentsScanTakeInput,
-        scanUploadInput: appointmentsScanUploadInput,
-        scanPreview: appointmentsScanPreview,
-        scanImage: appointmentsScanImage,
-        textInput: appointmentsTextInput,
-        parseBtn: appointmentsParseBtn,
-        aiBtn: appointmentsAiBtn,
-        originalDetails: appointmentsOriginalDetails,
-        originalText: appointmentsOriginalText,
-        summary: appointmentsSummary,
-        summaryRows: appointmentsSummaryRows,
-        summarySaveBtn: appointmentsSummarySave,
-        summaryDiscardBtn: appointmentsSummaryDiscard,
-        formFields: appointmentsFormFields
       };
     }
 
@@ -11784,7 +11943,6 @@
         hideFrictionSocialIntro();
         closeCalendarModals();
         closeAppointmentModal(appointmentModalContexts.life);
-        closeAppointmentModal(appointmentModalContexts.calendar);
       }
     });
 
@@ -11816,7 +11974,6 @@
     renderCalendarMonth();
     setLifeTab('people');
     setupAppointmentModal(appointmentModalContexts.life);
-    setupAppointmentModal(appointmentModalContexts.calendar);
     if (isCalendarImportRoute()) {
       showCalendarImportForm();
       populateCalendarImportForm();
@@ -11967,6 +12124,13 @@
         var isExpanded = lifeAppointmentsToggle.getAttribute('aria-expanded') === 'true';
         lifeAppointmentsToggle.setAttribute('aria-expanded', isExpanded ? 'false' : 'true');
         lifeAppointmentsBody.classList.toggle('is-collapsed', isExpanded);
+      });
+    }
+    if (lifePersonTasksToggle && lifePersonTasksBody) {
+      lifePersonTasksToggle.addEventListener('click', function() {
+        var isExpanded = lifePersonTasksToggle.getAttribute('aria-expanded') === 'true';
+        lifePersonTasksToggle.setAttribute('aria-expanded', isExpanded ? 'false' : 'true');
+        lifePersonTasksBody.classList.toggle('is-collapsed', isExpanded);
       });
     }
 
@@ -12145,29 +12309,22 @@
     if (lifePersonTaskAdd) {
       lifePersonTaskAdd.addEventListener('click', function() {
         if (!activePersonId) return;
-        var text = lifePersonTaskText ? lifePersonTaskText.value.trim() : '';
-        if (!text) return;
-        var areaId = getDefaultAreaId();
+        var title = lifePersonTaskTitle ? lifePersonTaskTitle.value.trim() : '';
+        if (!title) return;
+        var barrier = lifePersonTaskBarrier ? lifePersonTaskBarrier.value.trim() : '';
         tasks.unshift({
           id: generateGoalId('task'),
-          text: text,
-          areaId: areaId,
-          ownerName: getAreaOwnerName(areaId),
           personId: activePersonId,
-          tags: [],
-          needsOtherPeople: false,
-          needsAppointment: false,
-          energyType: '',
-          done: false,
-          createdAt: Date.now(),
-          dueDate: null
+          title: title,
+          barrier: barrier,
+          status: 'open',
+          aiPlan: null
         });
         saveTasks();
-        renderLifeTasks();
+        renderPersonTasks(activePersonId);
         renderLifeToday();
-        renderLinkedTaskOptions();
-        if (lifePersonTaskText) lifePersonTaskText.value = '';
-        renderPersonRightNow(activePersonId);
+        if (lifePersonTaskTitle) lifePersonTaskTitle.value = '';
+        if (lifePersonTaskBarrier) lifePersonTaskBarrier.value = '';
       });
     }
 
@@ -12225,43 +12382,29 @@
 
     if (lifeTaskAdd) {
       lifeTaskAdd.addEventListener('click', function() {
-        var text = lifeTaskText.value.trim();
-        if (!text) return;
-        var areaId = lifeTaskArea ? lifeTaskArea.value : getDefaultAreaId();
-        var tags = lifeTaskTags.value.split(',').map(function(t) { return t.trim(); }).filter(Boolean);
+        var title = lifeTaskText.value.trim();
+        if (!title) return;
         if (editingTaskId) {
           tasks = tasks.map(function(task) {
             if (task.id !== editingTaskId) return task;
-          return {
-            id: task.id,
-            text: text,
-            areaId: areaId,
-            ownerName: getAreaOwnerName(areaId),
-            personId: task.personId || null,
-            tags: tags,
-            needsOtherPeople: lifeTaskNeedsPeople.checked,
-            needsAppointment: lifeTaskNeedsAppt.checked,
-            energyType: lifeTaskEnergy.value || '',
-            done: task.done,
-            createdAt: task.createdAt,
-            dueDate: lifeTaskDue.value || null
-          };
-        });
-      } else {
-        tasks.unshift({
-          id: generateGoalId('task'),
-          text: text,
-          areaId: areaId,
-          ownerName: getAreaOwnerName(areaId),
-          personId: activePersonId || null,
-          tags: tags,
-          needsOtherPeople: lifeTaskNeedsPeople.checked,
-          needsAppointment: lifeTaskNeedsAppt.checked,
-          energyType: lifeTaskEnergy.value || '',
-          done: false,
-          createdAt: Date.now(),
-          dueDate: lifeTaskDue.value || null
-        });
+            return {
+              id: task.id,
+              personId: task.personId || null,
+              title: title,
+              barrier: task.barrier || '',
+              status: task.status || 'open',
+              aiPlan: task.aiPlan || null
+            };
+          });
+        } else {
+          tasks.unshift({
+            id: generateGoalId('task'),
+            personId: activePersonId || null,
+            title: title,
+            barrier: '',
+            status: 'open',
+            aiPlan: null
+          });
         }
         saveTasks();
         renderLifeTasks();
@@ -12377,11 +12520,6 @@
       });
     }
 
-    if (appointmentsAddGlobal) {
-      appointmentsAddGlobal.addEventListener('click', function() {
-        openAppointmentModal(appointmentModalContexts.calendar, null, { lockPersonId: null });
-      });
-    }
 
     if (appointmentsPastToggle) {
       appointmentsPastToggle.addEventListener('click', function() {
