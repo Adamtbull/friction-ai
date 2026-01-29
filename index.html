@@ -4027,6 +4027,17 @@
       localStorage.setItem(FRICTION_SOCIAL_SEEN_KEY, JSON.stringify(frictionSocialSeenMap));
     }
 
+    function removeFrictionSocialChannel(channelId, channelTitle) {
+      if (!channelId) return;
+      var label = channelTitle ? '"' + channelTitle + '"' : 'this channel';
+      if (!confirm('Remove ' + label + ' from Friction Social?')) return;
+      frictionSocialChannels = frictionSocialChannels.filter(function(channel) {
+        return channel.channelId !== channelId;
+      });
+      saveFrictionSocialChannels();
+      renderFrictionSocialShelves();
+    }
+
     function extractYouTubeId(value) {
       if (!value) return '';
       var trimmed = value.trim();
@@ -4444,8 +4455,18 @@
           refreshFrictionSocialChannelRotation(channel.channelId, refreshBtn);
         });
 
+        var removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'fs-add-btn fs-secondary-btn fs-remove-btn';
+        removeBtn.textContent = 'Remove';
+        removeBtn.addEventListener('click', function(event) {
+          event.stopPropagation();
+          removeFrictionSocialChannel(channel.channelId, channelTitle);
+        });
+
         actions.appendChild(countEl);
         actions.appendChild(refreshBtn);
+        actions.appendChild(removeBtn);
 
         header.appendChild(titleEl);
         header.appendChild(actions);
