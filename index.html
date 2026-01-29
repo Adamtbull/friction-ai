@@ -3003,6 +3003,154 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
+
+    /* =================== */
+    /* CALENDAR IMPORT     */
+    /* =================== */
+    #calendar-import-view {
+      display: none;
+      flex: 1;
+      overflow-y: auto;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 48px 24px calc(48px + var(--safe-bottom));
+    }
+
+    #calendar-import-view.active {
+      display: block;
+    }
+
+    #calendar-import-view .calendar-import-card {
+      background: var(--white);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 20px 40px -30px rgba(31, 41, 55, 0.35);
+      border: 1px solid rgba(209, 213, 219, 0.6);
+    }
+
+    #calendar-import-view .calendar-import-header {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+
+    #calendar-import-view .calendar-import-meta {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    #calendar-import-view .calendar-import-form {
+      display: grid;
+      gap: 16px;
+    }
+
+    #calendar-import-view .calendar-import-row {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+
+    #calendar-import-view .calendar-import-input,
+    #calendar-import-view .calendar-import-select,
+    #calendar-import-view .calendar-import-textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+    }
+
+    #calendar-import-view .calendar-import-textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    #calendar-import-view .calendar-import-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+    }
+
+    #calendar-import-view .calendar-import-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    #calendar-import-view .calendar-import-btn {
+      border-radius: 999px;
+      padding: 10px 18px;
+      border: 1px solid transparent;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--teal);
+      color: var(--white);
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    #calendar-import-view .calendar-import-btn.secondary {
+      background: var(--white);
+      color: var(--text-primary);
+      border-color: var(--border);
+    }
+
+    #calendar-import-view .calendar-import-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px -18px rgba(31, 41, 55, 0.3);
+    }
+
+    #calendar-import-view .calendar-import-preview {
+      background: #f3f4f6;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      white-space: pre-wrap;
+    }
+
+    #calendar-import-view .calendar-import-notes summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    #calendar-import-view .calendar-import-success {
+      display: none;
+      text-align: center;
+      padding: 40px 24px;
+    }
+
+    #calendar-import-view .calendar-import-success.active {
+      display: block;
+    }
+
+    #calendar-import-view .calendar-import-success h3 {
+      margin: 0 0 8px;
+      font-size: 1.4rem;
+    }
+
+    #calendar-import-view .calendar-import-success p {
+      margin: 0 0 20px;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 640px) {
+      #calendar-import-view {
+        padding: 32px 18px calc(32px + var(--safe-bottom));
+      }
+
+      #calendar-import-view .calendar-import-card {
+        padding: 20px;
+      }
+    }
     /* =================== */
     /* FRICTION SOCIAL     */
     /* =================== */
@@ -4023,6 +4171,58 @@
         </div>
       </form>
     </div>
+  </div>
+</section>
+
+<section id="calendar-import-view" class="view" aria-hidden="true">
+  <div class="calendar-import-card">
+    <div class="calendar-import-header">
+      <h2 class="section-title">Review &amp; Save</h2>
+      <p class="calendar-import-meta">Check the details from your message before adding to the family calendar.</p>
+    </div>
+
+    <div class="calendar-import-success" id="calendarImportSuccess" aria-live="polite">
+      <h3>Added</h3>
+      <p>Your appointment is saved.</p>
+      <div class="calendar-import-actions">
+        <button class="calendar-import-btn" id="calendarImportBack" type="button">Back to Calendar</button>
+        <button class="calendar-import-btn secondary" id="calendarImportAddAnother" type="button">Add another</button>
+      </div>
+    </div>
+
+    <form class="calendar-import-form" id="calendarImportForm">
+      <div class="calendar-import-row">
+        <select class="calendar-import-select" id="calendarImportPerson" required></select>
+        <input class="calendar-import-input" id="calendarImportTitle" type="text" placeholder="Title" maxlength="120" required />
+      </div>
+      <div class="calendar-import-row">
+        <input class="calendar-import-input" id="calendarImportDate" type="date" required />
+        <label class="calendar-import-toggle">
+          <input type="checkbox" id="calendarImportAllDay" />
+          <span>All-day</span>
+        </label>
+      </div>
+      <div class="calendar-import-row" id="calendarImportTimeRow">
+        <input class="calendar-import-input" id="calendarImportStart" type="time" required />
+        <input class="calendar-import-input" id="calendarImportEnd" type="time" placeholder="End time (optional)" />
+      </div>
+      <div class="calendar-import-row">
+        <input class="calendar-import-input" id="calendarImportLocation" type="text" placeholder="Location (optional)" maxlength="120" />
+        <button class="calendar-import-btn secondary" id="calendarImportDirections" type="button" style="display: none;">Directions</button>
+      </div>
+      <details class="calendar-import-notes" id="calendarImportNotesDetails">
+        <summary>Notes (optional)</summary>
+        <textarea class="calendar-import-textarea" id="calendarImportNotes" maxlength="400"></textarea>
+      </details>
+      <div>
+        <div class="section-subtitle">Original message</div>
+        <div class="calendar-import-preview" id="calendarImportOriginal"></div>
+      </div>
+      <div class="calendar-import-actions">
+        <button class="calendar-import-btn" id="calendarImportSave" type="submit">Save event</button>
+        <button class="calendar-import-btn secondary" id="calendarImportCancel" type="button">Cancel</button>
+      </div>
+    </form>
   </div>
 </section>
 
@@ -5148,13 +5348,34 @@
       if (!lifePersonComingList) return;
       lifePersonComingList.innerHTML = '';
       var now = Date.now();
-      var upcoming = appointments.filter(function(appt) {
-        if (appt.personId !== personId || !appt.dateTimeStart) return false;
+      var upcoming = [];
+      appointments.forEach(function(appt) {
+        if (appt.personId !== personId || !appt.dateTimeStart) return;
         var time = new Date(appt.dateTimeStart).getTime();
-        return Number.isNaN(time) ? true : time >= now;
+        if (!Number.isNaN(time) && time < now) return;
+        upcoming.push({
+          type: 'appointment',
+          title: appt.title || 'Untitled appointment',
+          dateTime: new Date(appt.dateTimeStart),
+          location: appt.location || ''
+        });
+      });
+      calendarEvents.forEach(function(event) {
+        if (event.personId !== personId || !event.date) return;
+        var timeValue = event.startTime || '00:00';
+        var dateTime = new Date(event.date + 'T' + timeValue);
+        if (Number.isNaN(dateTime.getTime())) return;
+        if (dateTime.getTime() < now) return;
+        upcoming.push({
+          type: 'calendar',
+          title: event.title || 'Untitled event',
+          dateTime: dateTime,
+          location: event.location || '',
+          allDay: !!event.allDay
+        });
       });
       upcoming.sort(function(a, b) {
-        return new Date(a.dateTimeStart) - new Date(b.dateTimeStart);
+        return a.dateTime - b.dateTime;
       });
       if (!upcoming.length) {
         var empty = document.createElement('div');
@@ -5170,7 +5391,10 @@
         title.textContent = appt.title || 'Untitled appointment';
         var meta = document.createElement('div');
         meta.className = 'life-meta';
-        var timeLabel = appt.dateTimeStart ? new Date(appt.dateTimeStart).toLocaleString() : '';
+        var timeLabel = appt.dateTime ? appt.dateTime.toLocaleString() : '';
+        if (appt.allDay) {
+          timeLabel = appt.dateTime ? appt.dateTime.toLocaleDateString() + ' (All day)' : 'All day';
+        }
         meta.textContent = [timeLabel, appt.location].filter(Boolean).join(' · ');
         row.appendChild(title);
         if (meta.textContent) row.appendChild(meta);
@@ -5326,7 +5550,9 @@
     }
 
     function formatTimeRange(event) {
-      if (!event || !event.startTime) return '';
+      if (!event) return '';
+      if (event.allDay) return 'All day';
+      if (!event.startTime) return '';
       if (event.endTime) {
         return event.startTime + '–' + event.endTime;
       }
@@ -5358,6 +5584,7 @@
         endTime: event.endTime || '',
         location: event.location || '',
         notes: event.notes || '',
+        allDay: !!event.allDay,
         recurrence: {
           type: type,
           weekdays: Array.isArray(recurrence.weekdays) ? recurrence.weekdays.slice() : [],
@@ -5860,6 +6087,281 @@
         renderDayModal();
       }
       closeEventModal();
+    }
+
+    function isCalendarImportRoute() {
+      return window.location.pathname === '/calendar/import';
+    }
+
+    function buildValidYmd(year, month, day) {
+      var date = new Date(year, month - 1, day);
+      if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+        return '';
+      }
+      return [year, padNumber(month), padNumber(day)].join('-');
+    }
+
+    function parseDateFromText(text) {
+      if (!text) return '';
+      var match = text.match(/(\d{4})-(\d{2})-(\d{2})/);
+      if (match) {
+        var ymd = buildValidYmd(parseInt(match[1], 10), parseInt(match[2], 10), parseInt(match[3], 10));
+        if (ymd) return ymd;
+      }
+      match = text.match(/(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?/);
+      if (match) {
+        var month = parseInt(match[1], 10);
+        var day = parseInt(match[2], 10);
+        var year = match[3] ? parseInt(match[3], 10) : new Date().getFullYear();
+        if (year < 100) {
+          year = 2000 + year;
+        }
+        var mdYmd = buildValidYmd(year, month, day);
+        if (mdYmd) return mdYmd;
+      }
+      match = text.match(/\b(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\s+(\d{1,2})(?:,?\s*(\d{4}))?/i);
+      if (match) {
+        var months = {
+          jan: 1, january: 1, feb: 2, february: 2, mar: 3, march: 3, apr: 4, april: 4, may: 5,
+          jun: 6, june: 6, jul: 7, july: 7, aug: 8, august: 8, sep: 9, sept: 9, september: 9,
+          oct: 10, october: 10, nov: 11, november: 11, dec: 12, december: 12
+        };
+        var key = match[1].toLowerCase();
+        var monthValue = months[key];
+        var dayValue = parseInt(match[2], 10);
+        var yearValue = match[3] ? parseInt(match[3], 10) : new Date().getFullYear();
+        var monthYmd = buildValidYmd(yearValue, monthValue, dayValue);
+        if (monthYmd) return monthYmd;
+      }
+      return '';
+    }
+
+    function normalizeTimeValue(hour, minute, meridiem) {
+      var h = parseInt(hour, 10);
+      var m = minute ? parseInt(minute, 10) : 0;
+      if (Number.isNaN(h) || Number.isNaN(m)) return '';
+      if (meridiem) {
+        var lower = meridiem.toLowerCase();
+        if (lower === 'pm' && h < 12) h += 12;
+        if (lower === 'am' && h === 12) h = 0;
+      }
+      if (h < 0 || h > 23 || m < 0 || m > 59) return '';
+      return padNumber(h) + ':' + padNumber(m);
+    }
+
+    function parseTimesFromText(text) {
+      if (!text) return [];
+      var matches = [];
+      var regex12 = /(\d{1,2})(?::(\d{2}))?\s*(am|pm)\b/gi;
+      var match12;
+      while ((match12 = regex12.exec(text)) !== null) {
+        var time12 = normalizeTimeValue(match12[1], match12[2], match12[3]);
+        if (time12) {
+          matches.push({ index: match12.index, time: time12 });
+        }
+      }
+      var regex24 = /\b([01]?\d|2[0-3]):([0-5]\d)\b/g;
+      var match24;
+      while ((match24 = regex24.exec(text)) !== null) {
+        var time24 = normalizeTimeValue(match24[1], match24[2], null);
+        if (time24) {
+          matches.push({ index: match24.index, time: time24 });
+        }
+      }
+      matches.sort(function(a, b) { return a.index - b.index; });
+      var times = [];
+      matches.forEach(function(item) {
+        if (!times.includes(item.time)) {
+          times.push(item.time);
+        }
+      });
+      return times;
+    }
+
+    function parseLocationFromText(text) {
+      if (!text) return '';
+      var match = text.match(/\b(?:location|loc|address)\s*[:\-]\s*([^\n,]+)\b/i);
+      if (match && match[1]) return match[1].trim();
+      match = text.match(/\b(?:at|@)\s+([^,\n]+)\b/i);
+      if (match && match[1]) return match[1].trim();
+      return '';
+    }
+
+    function parseTitleFromText(text) {
+      if (!text) return '';
+      var cleaned = text.replace(/\s+/g, ' ').trim();
+      var split = cleaned.split(/\b(?:at|@|on)\b/i);
+      var candidate = split[0] ? split[0].trim() : '';
+      candidate = candidate.replace(/\b(\d{1,2})(?::(\d{2}))?\s*(am|pm)\b/gi, '').trim();
+      candidate = candidate.replace(/\b([01]?\d|2[0-3]):([0-5]\d)\b/g, '').trim();
+      candidate = candidate.replace(/\b\d{4}-\d{2}-\d{2}\b/g, '').trim();
+      if (candidate.length >= 3 && candidate.length <= 80) return candidate;
+      return '';
+    }
+
+    function parseCalendarImportText(text) {
+      var date = parseDateFromText(text);
+      var times = parseTimesFromText(text);
+      var location = parseLocationFromText(text);
+      var title = parseTitleFromText(text);
+      var hasStructured = Boolean(date || times.length || location || title);
+      var startTime = times[0] || '';
+      var endTime = times[1] || '';
+      var allDay = !startTime;
+      if (!hasStructured) {
+        return {
+          title: '',
+          date: '',
+          startTime: '',
+          endTime: '',
+          location: '',
+          allDay: false
+        };
+      }
+      return {
+        title: title,
+        date: date,
+        startTime: startTime,
+        endTime: endTime,
+        location: location,
+        allDay: allDay
+      };
+    }
+
+    function renderCalendarImportPeopleOptions(selectedId) {
+      if (!calendarImportPerson) return;
+      var familyPeople = getFamilyPeople();
+      calendarImportPerson.innerHTML = '';
+      if (!familyPeople.length) {
+        var option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'Add a family member in Life first';
+        option.disabled = true;
+        option.selected = true;
+        calendarImportPerson.appendChild(option);
+        calendarImportPerson.disabled = true;
+        return;
+      }
+      calendarImportPerson.disabled = false;
+      familyPeople.forEach(function(person) {
+        var option = document.createElement('option');
+        option.value = person.id;
+        option.textContent = person.name + (person.role ? ' · ' + getPersonRoleLabel(person) : '');
+        calendarImportPerson.appendChild(option);
+      });
+      if (selectedId && familyPeople.some(function(person) { return person.id === selectedId; })) {
+        calendarImportPerson.value = selectedId;
+      } else {
+        calendarImportPerson.value = familyPeople[0].id;
+      }
+    }
+
+    function updateCalendarImportDirections() {
+      if (!calendarImportDirections || !calendarImportLocation) return;
+      var location = calendarImportLocation.value.trim();
+      if (!location) {
+        calendarImportDirections.style.display = 'none';
+        return;
+      }
+      calendarImportDirections.style.display = 'inline-flex';
+    }
+
+    function updateCalendarImportTimeVisibility() {
+      if (!calendarImportAllDay || !calendarImportTimeRow || !calendarImportStart) return;
+      var isAllDay = calendarImportAllDay.checked;
+      calendarImportTimeRow.style.display = isAllDay ? 'none' : '';
+      calendarImportStart.required = !isAllDay;
+    }
+
+    function resetCalendarImportForm() {
+      if (!calendarImportForm) return;
+      calendarImportForm.reset();
+      if (calendarImportNotesDetails) {
+        calendarImportNotesDetails.open = false;
+      }
+      updateCalendarImportTimeVisibility();
+      updateCalendarImportDirections();
+    }
+
+    function populateCalendarImportForm() {
+      if (!calendarImportOriginal) return;
+      var params = new URLSearchParams(window.location.search);
+      var rawText = params.get('text') || '';
+      var personId = params.get('personId') || '';
+      var decodedText = rawText.replace(/\+/g, ' ').trim();
+      var parsed = parseCalendarImportText(decodedText);
+      renderCalendarImportPeopleOptions(personId);
+      calendarImportOriginal.textContent = decodedText || 'No message text received.';
+      if (calendarImportNotes) calendarImportNotes.value = decodedText;
+      if (calendarImportTitle) calendarImportTitle.value = parsed.title || '';
+      if (calendarImportDate) calendarImportDate.value = parsed.date || '';
+      if (calendarImportStart) calendarImportStart.value = parsed.startTime || '';
+      if (calendarImportEnd) calendarImportEnd.value = parsed.endTime || '';
+      if (calendarImportLocation) calendarImportLocation.value = parsed.location || '';
+      if (calendarImportAllDay) calendarImportAllDay.checked = parsed.allDay;
+      updateCalendarImportTimeVisibility();
+      updateCalendarImportDirections();
+    }
+
+    function showCalendarImportSuccess() {
+      if (!calendarImportSuccess || !calendarImportForm) return;
+      calendarImportForm.style.display = 'none';
+      calendarImportSuccess.classList.add('active');
+    }
+
+    function showCalendarImportForm() {
+      if (!calendarImportSuccess || !calendarImportForm) return;
+      calendarImportSuccess.classList.remove('active');
+      calendarImportForm.style.display = 'grid';
+    }
+
+    function handleCalendarImportSave(event) {
+      event.preventDefault();
+      if (!calendarImportPerson || !calendarImportTitle || !calendarImportDate) return;
+      var personId = calendarImportPerson.value;
+      if (!personId) {
+        alert('Please select a person.');
+        return;
+      }
+      var title = calendarImportTitle.value.trim();
+      if (!title) {
+        alert('Please enter a title.');
+        calendarImportTitle.focus();
+        return;
+      }
+      var date = calendarImportDate.value;
+      if (!date) {
+        alert('Please select a date.');
+        calendarImportDate.focus();
+        return;
+      }
+      var isAllDay = calendarImportAllDay && calendarImportAllDay.checked;
+      var startTime = isAllDay ? '00:00' : (calendarImportStart ? calendarImportStart.value : '');
+      if (!isAllDay && !startTime) {
+        alert('Please select a start time.');
+        calendarImportStart.focus();
+        return;
+      }
+      var payload = {
+        personId: personId,
+        title: title,
+        date: date,
+        startTime: startTime,
+        endTime: isAllDay ? '' : (calendarImportEnd ? calendarImportEnd.value : ''),
+        location: calendarImportLocation ? calendarImportLocation.value.trim() : '',
+        notes: calendarImportNotes ? calendarImportNotes.value.trim() : '',
+        allDay: isAllDay,
+        recurrence: { type: 'none' },
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      };
+      calendarEvents.unshift(normalizeCalendarEvent(payload));
+      saveCalendarEvents();
+      renderCalendarMonth();
+      if (activePersonId === personId) {
+        renderPersonComingUp(personId);
+      }
+      showCalendarImportSuccess();
     }
 
     // GOALS VIEW DATA
@@ -7303,6 +7805,8 @@
           updateModelAccess();
           updateProfileDisplay();
           showChat();
+        } else if (isCalendarImportRoute()) {
+          showChat();
         }
         
         // Reveal UI after state is known
@@ -7316,6 +7820,9 @@
     // Fallback: reveal UI after timeout in case Google script fails
     setTimeout(function() {
       document.body.classList.add('ready');
+      if (isCalendarImportRoute() && chatApp && !chatApp.classList.contains('active')) {
+        showChat();
+      }
     }, 1000);
 
     initGoogleSignIn();
@@ -7378,6 +7885,7 @@
     const goalsView = document.getElementById('goals-view');
     const lifeView = document.getElementById('life-view');
     const calendarView = document.getElementById('calendar-view');
+    const calendarImportView = document.getElementById('calendar-import-view');
     const goalsAreaFilter = document.getElementById('goalsAreaFilter');
     const shortGoalInput = document.getElementById('shortGoalInput');
     const shortGoalAdd = document.getElementById('shortGoalAdd');
@@ -7490,6 +7998,24 @@
     const calendarEventDelete = document.getElementById('calendarEventDelete');
     const calendarEventClose = document.getElementById('calendarEventClose');
     const calendarEventDirections = document.getElementById('calendarEventDirections');
+    const calendarImportForm = document.getElementById('calendarImportForm');
+    const calendarImportPerson = document.getElementById('calendarImportPerson');
+    const calendarImportTitle = document.getElementById('calendarImportTitle');
+    const calendarImportDate = document.getElementById('calendarImportDate');
+    const calendarImportAllDay = document.getElementById('calendarImportAllDay');
+    const calendarImportTimeRow = document.getElementById('calendarImportTimeRow');
+    const calendarImportStart = document.getElementById('calendarImportStart');
+    const calendarImportEnd = document.getElementById('calendarImportEnd');
+    const calendarImportLocation = document.getElementById('calendarImportLocation');
+    const calendarImportDirections = document.getElementById('calendarImportDirections');
+    const calendarImportNotes = document.getElementById('calendarImportNotes');
+    const calendarImportNotesDetails = document.getElementById('calendarImportNotesDetails');
+    const calendarImportOriginal = document.getElementById('calendarImportOriginal');
+    const calendarImportSave = document.getElementById('calendarImportSave');
+    const calendarImportCancel = document.getElementById('calendarImportCancel');
+    const calendarImportSuccess = document.getElementById('calendarImportSuccess');
+    const calendarImportBack = document.getElementById('calendarImportBack');
+    const calendarImportAddAnother = document.getElementById('calendarImportAddAnother');
     
     // Profile elements
     const profilePic = document.getElementById('profilePic');
@@ -7749,6 +8275,7 @@
     var activeView = 'chat';
 
     function getViewFromLocation() {
+      if (isCalendarImportRoute()) return 'calendar-import';
       if (window.location.hash === '#friction-social') return 'social';
       if (window.location.hash === '#goals') return 'goals';
       if (window.location.hash === '#life') return 'life';
@@ -7800,6 +8327,7 @@
       var showGoals = view === 'goals';
       var showLife = view === 'life';
       var showCalendar = view === 'calendar';
+      var showCalendarImport = view === 'calendar-import';
       frictionSocialView.classList.toggle('active', showSocial);
       frictionSocialView.setAttribute('aria-hidden', showSocial ? 'false' : 'true');
       goalsView.classList.toggle('active', showGoals);
@@ -7811,6 +8339,10 @@
       if (calendarView) {
         calendarView.classList.toggle('active', showCalendar);
         calendarView.setAttribute('aria-hidden', showCalendar ? 'false' : 'true');
+      }
+      if (calendarImportView) {
+        calendarImportView.classList.toggle('active', showCalendarImport);
+        calendarImportView.setAttribute('aria-hidden', showCalendarImport ? 'false' : 'true');
       }
       var showChat = view === 'chat';
       chatMessages.style.display = showChat ? '' : 'none';
@@ -7833,6 +8365,9 @@
         if (showCalendar) {
           renderCalendarPeopleOptions();
           renderCalendarMonth();
+        }
+        if (showCalendarImport) {
+          populateCalendarImportForm();
         }
       }
     }
@@ -8981,6 +9516,10 @@
     renderPeopleOverview();
     renderCalendarMonth();
     setLifeTab('people');
+    if (isCalendarImportRoute()) {
+      showCalendarImportForm();
+      populateCalendarImportForm();
+    }
 
     if (shortGoalAdd) {
       shortGoalAdd.addEventListener('click', function() {
@@ -9585,6 +10124,59 @@
         el.addEventListener('click', function() {
           closeEventModal();
         });
+      });
+    }
+
+    if (calendarImportForm) {
+      calendarImportForm.addEventListener('submit', handleCalendarImportSave);
+    }
+
+    if (calendarImportAllDay) {
+      calendarImportAllDay.addEventListener('change', function() {
+        updateCalendarImportTimeVisibility();
+      });
+    }
+
+    if (calendarImportLocation) {
+      calendarImportLocation.addEventListener('input', function() {
+        updateCalendarImportDirections();
+      });
+    }
+
+    if (calendarImportDirections) {
+      calendarImportDirections.addEventListener('click', function() {
+        if (!calendarImportLocation) return;
+        var location = calendarImportLocation.value.trim();
+        if (!location) return;
+        window.open(buildDirectionsUrl(location), '_blank');
+      });
+    }
+
+    if (calendarImportCancel) {
+      calendarImportCancel.addEventListener('click', function() {
+        window.location.assign('/#calendar');
+      });
+    }
+
+    if (calendarImportBack) {
+      calendarImportBack.addEventListener('click', function() {
+        var personId = calendarImportPerson ? calendarImportPerson.value : '';
+        var person = getPersonById(personId);
+        if (person) {
+          history.pushState({ view: 'life' }, '', '/#life');
+          setActiveView('life', false);
+          setLifeTab('people');
+          openPersonView(person);
+          return;
+        }
+        window.location.assign('/#calendar');
+      });
+    }
+
+    if (calendarImportAddAnother) {
+      calendarImportAddAnother.addEventListener('click', function() {
+        showCalendarImportForm();
+        populateCalendarImportForm();
       });
     }
 
