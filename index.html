@@ -2745,6 +2745,341 @@
       background: var(--white);
     }
 
+    #life-view .life-appointments-card {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.92);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    #life-view .life-appointments-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 8px 4px;
+      cursor: pointer;
+    }
+
+    #life-view .life-chevron {
+      transition: transform 0.2s ease;
+      font-size: 1.1rem;
+    }
+
+    #life-view .life-appointments-toggle[aria-expanded="false"] .life-chevron {
+      transform: rotate(-90deg);
+    }
+
+    #life-view .life-appointments-body.is-collapsed {
+      display: none;
+    }
+
+    #life-view .life-appointments-actions {
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    #life-view .life-appointments-list,
+    #life-view .life-appointments-past,
+    #appointments-view .appointments-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    #life-view .life-appointments-past-toggle,
+    #appointments-view .appointments-past-toggle {
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-align: left;
+      padding: 4px 0;
+      min-height: 44px;
+    }
+
+    #life-view .appointment-card,
+    #appointments-view .appointment-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 0;
+      background: var(--white);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #life-view .appointment-header,
+    #appointments-view .appointment-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      width: 100%;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      min-height: 56px;
+    }
+
+    #life-view .appointment-chevron,
+    #appointments-view .appointment-chevron {
+      transition: transform 0.2s ease;
+      color: var(--text-secondary);
+    }
+
+    #life-view .appointment-card.expanded .appointment-chevron,
+    #appointments-view .appointment-card.expanded .appointment-chevron {
+      transform: rotate(180deg);
+    }
+
+    #life-view .appointment-header-content,
+    #appointments-view .appointment-header-content {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    #life-view .appointment-title,
+    #appointments-view .appointment-title {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    #life-view .appointment-meta,
+    #appointments-view .appointment-meta {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    #life-view .appointment-body,
+    #appointments-view .appointment-body {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.2s ease, opacity 0.2s ease;
+      padding: 0 16px;
+    }
+
+    #life-view .appointment-card.expanded .appointment-body,
+    #appointments-view .appointment-card.expanded .appointment-body {
+      max-height: 500px;
+      opacity: 1;
+      padding-bottom: 16px;
+    }
+
+    #life-view .appointment-detail,
+    #appointments-view .appointment-detail {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+
+    #life-view .appointment-detail span,
+    #appointments-view .appointment-detail span {
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    #life-view .appointment-actions,
+    #appointments-view .appointment-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    #life-view .appointment-action,
+    #appointments-view .appointment-action {
+      border-radius: 999px;
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      background: var(--white);
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-decoration: none;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #life-view .appointment-action.primary,
+    #appointments-view .appointment-action.primary {
+      background: var(--teal);
+      color: var(--white);
+      border-color: transparent;
+    }
+
+    #life-view .appointment-empty,
+    #appointments-view .appointment-empty {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      padding: 8px 0;
+    }
+
+    #life-view .appointment-modal,
+    #appointments-view .appointment-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 40;
+      padding: 24px;
+    }
+
+    #life-view .appointment-modal.active,
+    #appointments-view .appointment-modal.active {
+      display: flex;
+    }
+
+    #life-view .appointment-modal-backdrop,
+    #appointments-view .appointment-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.35);
+    }
+
+    #life-view .appointment-modal-card,
+    #appointments-view .appointment-modal-card {
+      position: relative;
+      background: var(--white);
+      border-radius: 18px;
+      padding: 20px;
+      width: min(92vw, 520px);
+      max-height: min(86vh, 720px);
+      overflow-y: auto;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    #life-view .appointment-modal-header,
+    #appointments-view .appointment-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    #life-view .appointment-form,
+    #appointments-view .appointment-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    #life-view .appointment-row,
+    #appointments-view .appointment-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    #life-view .appointment-field,
+    #appointments-view .appointment-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    #life-view .appointment-field label,
+    #appointments-view .appointment-field label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    #life-view .appointment-modal-actions,
+    #appointments-view .appointment-modal-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    #appointments-view .appointments-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    #appointments-view .appointments-filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    #appointments-view .appointments-chip {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      background: var(--white);
+      min-height: 44px;
+    }
+
+    #appointments-view .appointments-chip.active {
+      background: var(--teal);
+      color: var(--white);
+      border-color: transparent;
+    }
+
+    #appointments-view .appointments-btn {
+      border-radius: 999px;
+      padding: 10px 16px;
+      border: none;
+      background: var(--teal);
+      color: var(--white);
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 44px;
+    }
+
+    #appointments-view .appointments-btn.secondary {
+      border: 1px solid var(--border);
+      background: var(--white);
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    #appointments-view .appointments-input,
+    #appointments-view .appointments-select,
+    #appointments-view .appointments-textarea {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      background: var(--white);
+      color: var(--text-primary);
+    }
+
+    #appointments-view .appointments-textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
     #calendar-view {
       display: none;
       flex: 1;
@@ -4105,18 +4440,21 @@
           <div class="life-person-org" id="lifePersonOrgDisplay"></div>
         </div>
       </div>
-      <button class="life-btn" id="lifePersonAddEvent" type="button">Add event</button>
     </div>
 
-    <div class="life-agenda-card">
-      <div class="life-agenda-controls">
-        <div class="life-agenda-segmented" id="lifeAgendaRange">
-          <button class="life-agenda-segment" data-range="today" type="button">Today</button>
-          <button class="life-agenda-segment active" data-range="7" type="button">7 Days</button>
-          <button class="life-agenda-segment" data-range="30" type="button">30 Days</button>
+    <div class="life-appointments-card">
+      <button class="life-appointments-toggle" id="lifeAppointmentsToggle" type="button" aria-expanded="true">
+        <span>Appointments</span>
+        <span class="life-chevron">▾</span>
+      </button>
+      <div class="life-appointments-body" id="lifeAppointmentsBody">
+        <div class="life-appointments-actions">
+          <button class="life-btn" id="lifeAppointmentsAdd" type="button">Add appointment</button>
         </div>
+        <div class="life-appointments-list" id="lifeAppointmentsList"></div>
+        <button class="life-appointments-past-toggle" id="lifeAppointmentsPastToggle" type="button" aria-expanded="false">Show past</button>
+        <div class="life-appointments-past" id="lifeAppointmentsPast" style="display: none;"></div>
       </div>
-      <div class="life-agenda-list" id="lifeAgendaList"></div>
     </div>
   </div>
 
@@ -4161,28 +4499,7 @@
 
   <div class="life-section" data-tab-panel="calendar" style="display: none;">
     <h3 class="section-subtitle">Calendar</h3>
-    <div class="life-row">
-      <input class="life-input" id="lifeApptTitle" type="text" placeholder="Appointment title" maxlength="120" />
-      <select class="life-select" id="lifeApptArea"></select>
-    </div>
-    <div class="life-row">
-      <input class="life-input" id="lifeApptStart" type="datetime-local" />
-      <input class="life-input" id="lifeApptEnd" type="datetime-local" />
-    </div>
-    <div class="life-row">
-      <input class="life-input" id="lifeApptLocation" type="text" placeholder="Location (optional)" maxlength="120" />
-    </div>
-    <div class="life-row">
-      <textarea class="life-textarea" id="lifeApptNotes" placeholder="Notes (optional)" maxlength="300"></textarea>
-    </div>
-    <div class="life-row">
-      <select class="life-select" id="lifeApptLinkedTasks" multiple size="3"></select>
-    </div>
-    <div class="life-row">
-      <button class="life-btn" id="lifeApptAdd" type="button">Add appointment</button>
-      <button class="life-btn secondary" id="lifeApptCancel" type="button" style="display: none;">Cancel edit</button>
-    </div>
-    <div class="life-list" id="lifeCalendarList"></div>
+    <p class="section-text">Use the Calendar tab in the sidebar to review all appointments.</p>
   </div>
 
   <div class="life-section" data-tab-panel="settings" style="display: none;">
@@ -4207,92 +4524,132 @@
     </div>
     <div class="life-list" id="lifeAreasList"></div>
   </div>
+
+  <div class="appointment-modal" id="lifeAppointmentModal" aria-hidden="true">
+    <div class="appointment-modal-backdrop" data-close></div>
+    <div class="appointment-modal-card" role="dialog" aria-modal="true" aria-labelledby="lifeAppointmentModalTitle">
+      <div class="appointment-modal-header">
+        <h3 class="section-subtitle" id="lifeAppointmentModalTitle">Add appointment</h3>
+        <button class="life-btn secondary" id="lifeAppointmentClose" type="button">Close</button>
+      </div>
+      <form class="appointment-form" id="lifeAppointmentForm">
+        <div class="appointment-field" id="lifeAppointmentPersonRow">
+          <label for="lifeAppointmentPerson">Person</label>
+          <select class="life-select" id="lifeAppointmentPerson" required></select>
+        </div>
+        <div class="appointment-field">
+          <label for="lifeAppointmentTitleInput">Title</label>
+          <input class="life-input" id="lifeAppointmentTitleInput" type="text" placeholder="Appointment title" maxlength="120" required />
+        </div>
+        <div class="appointment-row">
+          <div class="appointment-field">
+            <label for="lifeAppointmentDate">Date</label>
+            <input class="life-input" id="lifeAppointmentDate" type="date" required />
+          </div>
+          <div class="appointment-field">
+            <label for="lifeAppointmentTime">Time</label>
+            <input class="life-input" id="lifeAppointmentTime" type="time" required />
+          </div>
+        </div>
+        <div class="appointment-row">
+          <div class="appointment-field">
+            <label for="lifeAppointmentClinic">Clinic name</label>
+            <input class="life-input" id="lifeAppointmentClinic" type="text" placeholder="Clinic or facility" maxlength="120" />
+          </div>
+          <div class="appointment-field">
+            <label for="lifeAppointmentDoctor">Doctor name</label>
+            <input class="life-input" id="lifeAppointmentDoctor" type="text" placeholder="Doctor or provider" maxlength="120" />
+          </div>
+        </div>
+        <div class="appointment-field">
+          <label for="lifeAppointmentAddress">Address</label>
+          <input class="life-input" id="lifeAppointmentAddress" type="text" placeholder="Street, city, state" maxlength="160" />
+        </div>
+        <div class="appointment-field">
+          <label for="lifeAppointmentPhone">Phone number</label>
+          <input class="life-input" id="lifeAppointmentPhone" type="tel" placeholder="(555) 555-5555" maxlength="40" />
+        </div>
+        <div class="appointment-field">
+          <label for="lifeAppointmentNotes">Notes</label>
+          <textarea class="life-textarea" id="lifeAppointmentNotes" placeholder="Notes (optional)" maxlength="300"></textarea>
+        </div>
+        <div class="appointment-modal-actions">
+          <button class="life-btn" id="lifeAppointmentSave" type="submit">Save appointment</button>
+          <button class="life-btn secondary" id="lifeAppointmentDelete" type="button" style="display: none;">Delete</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </section>
 
 <section id="calendar-view" class="view" aria-hidden="true">
-  <div class="calendar-header">
-    <div>
-      <h2 class="section-title">Calendar</h2>
-      <p class="section-text">Plan family moments, appointments, and routines in one calm place.</p>
+  <div id="appointments-view">
+    <div class="appointments-header">
+      <div>
+        <h2 class="section-title">Appointments</h2>
+        <p class="section-text">Upcoming appointments across everyone in one calm feed.</p>
+      </div>
+      <button class="appointments-btn" id="appointmentsAddGlobal" type="button">Add appointment</button>
     </div>
-    <button class="calendar-btn primary" id="calendarAddEvent" type="button">Add event</button>
-  </div>
-  <div class="calendar-controls">
-    <button class="calendar-btn secondary" id="calendarPrevMonth" type="button" aria-label="Previous month">←</button>
-    <div class="calendar-month-label" id="calendarMonthLabel"></div>
-    <button class="calendar-btn secondary" id="calendarNextMonth" type="button" aria-label="Next month">→</button>
-  </div>
-  <div class="calendar-grid" id="calendarGrid"></div>
+    <div class="appointments-filters" id="appointmentsFilters"></div>
+    <div class="appointments-feed" id="appointmentsFeed"></div>
+    <button class="appointments-past-toggle" id="appointmentsPastToggle" type="button" aria-expanded="false">Show past</button>
+    <div class="appointments-feed" id="appointmentsPastFeed" style="display: none;"></div>
 
-  <div class="calendar-modal" id="calendarDayModal" aria-hidden="true">
-    <div class="calendar-modal-backdrop" data-close></div>
-    <div class="calendar-modal-card" role="dialog" aria-modal="true" aria-labelledby="calendarDayTitle">
-      <div class="calendar-modal-header">
-        <div>
-          <h3 class="section-subtitle" id="calendarDayTitle">Day details</h3>
-          <div class="calendar-event-meta" id="calendarDaySubtitle"></div>
+    <div class="appointment-modal" id="appointmentsModal" aria-hidden="true">
+      <div class="appointment-modal-backdrop" data-close></div>
+      <div class="appointment-modal-card" role="dialog" aria-modal="true" aria-labelledby="appointmentsModalTitle">
+        <div class="appointment-modal-header">
+          <h3 class="section-subtitle" id="appointmentsModalTitle">Add appointment</h3>
+          <button class="appointments-btn secondary" id="appointmentsModalClose" type="button">Close</button>
         </div>
-        <button class="calendar-btn secondary" id="calendarDayClose" type="button">Close</button>
-      </div>
-      <div class="calendar-day-list" id="calendarDayList"></div>
-      <button class="calendar-btn primary" id="calendarDayAdd" type="button">Add event</button>
-    </div>
-  </div>
-
-  <div class="calendar-modal" id="calendarEventModal" aria-hidden="true">
-    <div class="calendar-modal-backdrop" data-close></div>
-    <div class="calendar-modal-card" role="dialog" aria-modal="true" aria-labelledby="calendarEventTitle">
-      <div class="calendar-modal-header">
-        <h3 class="section-subtitle" id="calendarEventTitle">Add event</h3>
-        <button class="calendar-btn secondary" id="calendarEventClose" type="button">Close</button>
-      </div>
-      <form class="calendar-form" id="calendarEventForm">
-        <div class="calendar-person-row">
-          <div class="calendar-person-avatar">
-            <img id="calendarEventPersonAvatar" alt="Selected person avatar" />
+        <form class="appointment-form" id="appointmentsModalForm">
+          <div class="appointment-field">
+            <label for="appointmentsModalPerson">Person</label>
+            <select class="appointments-select" id="appointmentsModalPerson" required></select>
           </div>
-          <select class="calendar-select" id="calendarEventPerson"></select>
-        </div>
-        <input class="calendar-input" id="calendarEventTitleInput" type="text" placeholder="Event title" maxlength="120" required />
-        <div class="calendar-form-row">
-          <input class="calendar-input" id="calendarEventDate" type="date" required />
-          <label class="calendar-toggle">
-            <input type="checkbox" id="calendarEventAllDay" />
-            <span>All-day</span>
-          </label>
-        </div>
-        <div class="calendar-form-row" id="calendarEventTimeRow">
-          <input class="calendar-input" id="calendarEventStart" type="time" required />
-          <input class="calendar-input" id="calendarEventEnd" type="time" placeholder="End time (optional)" />
-        </div>
-        <div class="calendar-form-row">
-          <input class="calendar-input" id="calendarEventLocation" type="text" placeholder="Location (optional)" maxlength="120" />
-        </div>
-        <button class="calendar-btn secondary" id="calendarEventDirections" type="button" style="display: none;">Directions</button>
-        <textarea class="calendar-textarea" id="calendarEventNotes" placeholder="Notes (optional)" maxlength="300"></textarea>
-        <div class="calendar-form-row single">
-          <select class="calendar-select" id="calendarEventRepeat">
-            <option value="none">Repeat: None</option>
-            <option value="weekly">Repeat: Weekly</option>
-            <option value="fortnightly">Repeat: Fortnightly</option>
-            <option value="custom_weekdays">Repeat: Custom days</option>
-          </select>
-        </div>
-        <div class="calendar-repeat-options" id="calendarCustomWeekdays" style="display: none;">
-          <label class="calendar-repeat-day"><input type="checkbox" value="0" />Sun</label>
-          <label class="calendar-repeat-day"><input type="checkbox" value="1" />Mon</label>
-          <label class="calendar-repeat-day"><input type="checkbox" value="2" />Tue</label>
-          <label class="calendar-repeat-day"><input type="checkbox" value="3" />Wed</label>
-          <label class="calendar-repeat-day"><input type="checkbox" value="4" />Thu</label>
-          <label class="calendar-repeat-day"><input type="checkbox" value="5" />Fri</label>
-          <label class="calendar-repeat-day"><input type="checkbox" value="6" />Sat</label>
-        </div>
-        <input class="calendar-input" id="calendarCustomUntil" type="date" placeholder="Repeat until (optional)" style="display: none;" />
-        <div class="calendar-form-row">
-          <button class="calendar-btn primary" id="calendarEventSave" type="submit">Save event</button>
-          <button class="calendar-btn secondary" id="calendarEventDelete" type="button" style="display: none;">Delete</button>
-        </div>
-      </form>
+          <div class="appointment-field">
+            <label for="appointmentsModalTitleInput">Title</label>
+            <input class="appointments-input" id="appointmentsModalTitleInput" type="text" placeholder="Appointment title" maxlength="120" required />
+          </div>
+          <div class="appointment-row">
+            <div class="appointment-field">
+              <label for="appointmentsModalDate">Date</label>
+              <input class="appointments-input" id="appointmentsModalDate" type="date" required />
+            </div>
+            <div class="appointment-field">
+              <label for="appointmentsModalTime">Time</label>
+              <input class="appointments-input" id="appointmentsModalTime" type="time" required />
+            </div>
+          </div>
+          <div class="appointment-row">
+            <div class="appointment-field">
+              <label for="appointmentsModalClinic">Clinic name</label>
+              <input class="appointments-input" id="appointmentsModalClinic" type="text" placeholder="Clinic or facility" maxlength="120" />
+            </div>
+            <div class="appointment-field">
+              <label for="appointmentsModalDoctor">Doctor name</label>
+              <input class="appointments-input" id="appointmentsModalDoctor" type="text" placeholder="Doctor or provider" maxlength="120" />
+            </div>
+          </div>
+          <div class="appointment-field">
+            <label for="appointmentsModalAddress">Address</label>
+            <input class="appointments-input" id="appointmentsModalAddress" type="text" placeholder="Street, city, state" maxlength="160" />
+          </div>
+          <div class="appointment-field">
+            <label for="appointmentsModalPhone">Phone number</label>
+            <input class="appointments-input" id="appointmentsModalPhone" type="tel" placeholder="(555) 555-5555" maxlength="40" />
+          </div>
+          <div class="appointment-field">
+            <label for="appointmentsModalNotes">Notes</label>
+            <textarea class="appointments-textarea" id="appointmentsModalNotes" placeholder="Notes (optional)" maxlength="300"></textarea>
+          </div>
+          <div class="appointment-modal-actions">
+            <button class="appointments-btn" id="appointmentsModalSave" type="submit">Save appointment</button>
+            <button class="appointments-btn secondary" id="appointmentsModalDelete" type="button" style="display: none;">Delete</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </section>
@@ -5464,6 +5821,8 @@
       if (typeof renderCalendarPeopleOptions === 'function') {
         renderCalendarPeopleOptions();
       }
+      renderAppointmentsFilters();
+      renderAppointmentsView();
     }
 
     function setPersonViewActive(isActive) {
@@ -5799,8 +6158,15 @@
         lifePersonAvatar.src = getAvatarDataUrl(person);
         lifePersonAvatar.alt = person.name || 'Person';
       }
-      setAgendaRange(lifeAgendaRangeDays);
       setPersonViewActive(true);
+      lifeAppointmentsPastExpanded = false;
+      if (lifeAppointmentsBody) {
+        lifeAppointmentsBody.classList.remove('is-collapsed');
+      }
+      if (lifeAppointmentsToggle) {
+        lifeAppointmentsToggle.setAttribute('aria-expanded', 'true');
+      }
+      renderPersonAppointments(person.id);
     }
 
     function createImageThumbnail(file) {
@@ -7037,8 +7403,15 @@
     var APPOINTMENTS_KEY = 'friction_appointments_v1';
     var tasks = [];
     var appointments = [];
+    var appointmentModalContexts = {};
     var editingTaskId = null;
+    var appointmentEditingId = null;
     var editingApptId = null;
+    var appointmentModalLockPersonId = null;
+    var appointmentModalSource = 'life';
+    var appointmentsFilterPersonId = 'all';
+    var lifeAppointmentsPastExpanded = false;
+    var appointmentsPastExpanded = false;
     var lifeAreaFilterValue = 'all';
     var lifeActiveTab = 'people';
 
@@ -7071,29 +7444,54 @@
       }
     }
 
+    function generateAppointmentId() {
+      return 'appt_' + Date.now().toString(36) + '_' + Math.floor(Math.random() * 100000).toString(36);
+    }
+
+    function formatTimeValue(date) {
+      if (!(date instanceof Date)) return '';
+      return padNumber(date.getHours()) + ':' + padNumber(date.getMinutes());
+    }
+
+    function normalizeAppointment(appt) {
+      if (!appt || typeof appt !== 'object') return null;
+      var date = appt.date || '';
+      var time = appt.time || '';
+      var legacyStart = appt.dateTimeStart || '';
+      if ((!date || !time) && legacyStart) {
+        var legacyDate = new Date(legacyStart);
+        if (!Number.isNaN(legacyDate.getTime())) {
+          date = date || toYmd(legacyDate);
+          time = time || formatTimeValue(legacyDate);
+        }
+      }
+      if ((!date || !time) && appt.date && appt.startTime) {
+        date = date || appt.date;
+        time = time || appt.startTime;
+      }
+      return {
+        id: appt.id || generateAppointmentId(),
+        personId: appt.personId || 'me',
+        title: appt.title || 'Untitled appointment',
+        date: date || '',
+        time: time || '',
+        clinicName: appt.clinicName || appt.clinic || '',
+        doctorName: appt.doctorName || appt.doctor || '',
+        address: appt.address || appt.location || '',
+        phone: appt.phone || '',
+        notes: appt.notes || '',
+        createdAt: appt.createdAt || Date.now(),
+        updatedAt: appt.updatedAt || appt.createdAt || Date.now()
+      };
+    }
+
     function loadAppointments() {
       var saved = localStorage.getItem(APPOINTMENTS_KEY);
       if (!saved) return [];
       try {
         var parsed = JSON.parse(saved);
         if (!Array.isArray(parsed)) return [];
-        return parsed.map(function(appt) {
-          if (!appt || typeof appt !== 'object') return null;
-          var areaId = appt.areaId || getDefaultAreaId();
-          return {
-            id: appt.id || generateGoalId('appt'),
-            title: appt.title || '',
-            areaId: areaId,
-            ownerName: appt.ownerName || getAreaOwnerName(areaId) || null,
-            personId: appt.personId || null,
-            dateTimeStart: appt.dateTimeStart || '',
-            dateTimeEnd: appt.dateTimeEnd || null,
-            location: appt.location || '',
-            notes: appt.notes || '',
-            linkedTaskIds: Array.isArray(appt.linkedTaskIds) ? appt.linkedTaskIds : [],
-            createdAt: appt.createdAt || Date.now()
-          };
-        }).filter(Boolean);
+        return parsed.map(normalizeAppointment).filter(Boolean);
       } catch (e) {
         return [];
       }
@@ -7105,6 +7503,170 @@
 
     function saveAppointments() {
       localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(appointments));
+    }
+
+    function getDefaultPersonId() {
+      var mePerson = people.find(function(person) { return person && (person.id === 'me' || person.type === 'me'); });
+      if (mePerson) return mePerson.id;
+      return people.length ? people[0].id : 'me';
+    }
+
+    function getAppointmentDateTime(appt) {
+      if (!appt || !appt.date || !appt.time) return null;
+      var dateTime = new Date(appt.date + 'T' + appt.time);
+      if (Number.isNaN(dateTime.getTime())) return null;
+      return dateTime;
+    }
+
+    function getAppointmentTimestamp(appt) {
+      var dateTime = getAppointmentDateTime(appt);
+      return dateTime ? dateTime.getTime() : null;
+    }
+
+    function formatAppointmentDateTime(appt) {
+      var dateTime = getAppointmentDateTime(appt);
+      if (!dateTime) return '';
+      return dateTime.toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    function buildAppleMapsUrl(address) {
+      if (!address) return '';
+      return 'https://maps.apple.com/?q=' + encodeURIComponent(address);
+    }
+
+    function splitAppointmentsByTime(list) {
+      var now = Date.now();
+      var upcoming = [];
+      var past = [];
+      list.forEach(function(appt) {
+        var timestamp = getAppointmentTimestamp(appt);
+        if (timestamp === null) return;
+        if (timestamp >= now) {
+          upcoming.push(appt);
+        } else {
+          past.push(appt);
+        }
+      });
+      upcoming.sort(function(a, b) {
+        return getAppointmentTimestamp(a) - getAppointmentTimestamp(b);
+      });
+      past.sort(function(a, b) {
+        return getAppointmentTimestamp(b) - getAppointmentTimestamp(a);
+      });
+      return { upcoming: upcoming, past: past };
+    }
+
+    function getPersonDisplayName(personId) {
+      var person = getPersonById(personId);
+      if (person) return person.name || 'Unknown';
+      if (personId === 'me') return 'Me';
+      return 'Unknown';
+    }
+
+    function renderAppointmentCard(appt, options) {
+      var card = document.createElement('div');
+      card.className = 'appointment-card';
+      var headerBtn = document.createElement('button');
+      headerBtn.type = 'button';
+      headerBtn.className = 'appointment-header';
+      headerBtn.setAttribute('aria-expanded', 'false');
+      var headerContent = document.createElement('div');
+      headerContent.className = 'appointment-header-content';
+      var title = document.createElement('div');
+      title.className = 'appointment-title';
+      title.textContent = appt.title || 'Untitled appointment';
+      var meta = document.createElement('div');
+      meta.className = 'appointment-meta';
+      var metaParts = [formatAppointmentDateTime(appt)];
+      if (appt.clinicName) metaParts.push(appt.clinicName);
+      if (options && options.showPerson) {
+        metaParts.push(getPersonDisplayName(appt.personId));
+      }
+      meta.textContent = metaParts.filter(Boolean).join(' · ');
+      headerContent.appendChild(title);
+      if (meta.textContent) headerContent.appendChild(meta);
+      var chevron = document.createElement('span');
+      chevron.className = 'appointment-chevron';
+      chevron.textContent = '▾';
+      headerBtn.appendChild(headerContent);
+      headerBtn.appendChild(chevron);
+      card.appendChild(headerBtn);
+
+      var body = document.createElement('div');
+      body.className = 'appointment-body';
+      var detailFields = [
+        { label: 'Doctor', value: appt.doctorName },
+        { label: 'Address', value: appt.address },
+        { label: 'Phone', value: appt.phone },
+        { label: 'Notes', value: appt.notes }
+      ];
+      detailFields.forEach(function(field) {
+        if (!field.value) return;
+        var detail = document.createElement('div');
+        detail.className = 'appointment-detail';
+        var label = document.createElement('span');
+        label.textContent = field.label;
+        var value = document.createElement('div');
+        value.textContent = field.value;
+        detail.appendChild(label);
+        detail.appendChild(value);
+        body.appendChild(detail);
+      });
+
+      var actions = document.createElement('div');
+      actions.className = 'appointment-actions';
+      if (appt.address) {
+        var directions = document.createElement('a');
+        directions.className = 'appointment-action';
+        directions.href = buildAppleMapsUrl(appt.address);
+        directions.target = '_blank';
+        directions.rel = 'noopener';
+        directions.textContent = 'Directions';
+        actions.appendChild(directions);
+      }
+      if (appt.phone) {
+        var call = document.createElement('a');
+        call.className = 'appointment-action';
+        call.href = 'tel:' + appt.phone;
+        call.textContent = 'Call';
+        actions.appendChild(call);
+      }
+      var editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'appointment-action';
+      editBtn.textContent = 'Edit';
+      editBtn.addEventListener('click', function(event) {
+        event.stopPropagation();
+        if (options && typeof options.onEdit === 'function') {
+          options.onEdit(appt);
+        }
+      });
+      actions.appendChild(editBtn);
+
+      var deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.className = 'appointment-action';
+      deleteBtn.textContent = 'Delete';
+      deleteBtn.addEventListener('click', function(event) {
+        event.stopPropagation();
+        if (options && typeof options.onDelete === 'function') {
+          options.onDelete(appt);
+        }
+      });
+      actions.appendChild(deleteBtn);
+
+      if (actions.children.length) {
+        body.appendChild(actions);
+      }
+      card.appendChild(body);
+
+      headerBtn.addEventListener('click', function() {
+        var isExpanded = card.classList.contains('expanded');
+        card.classList.toggle('expanded', !isExpanded);
+        headerBtn.setAttribute('aria-expanded', isExpanded ? 'false' : 'true');
+      });
+
+      return card;
     }
 
     function renderGoalsNudge() {
@@ -7443,6 +8005,280 @@
         card.appendChild(actions);
         lifeCalendarList.appendChild(card);
       });
+    }
+
+    function renderAppointmentList(container, list, options) {
+      if (!container) return;
+      container.innerHTML = '';
+      if (!list.length) {
+        var empty = document.createElement('div');
+        empty.className = 'appointment-empty';
+        empty.textContent = options && options.emptyMessage ? options.emptyMessage : 'No appointments found.';
+        container.appendChild(empty);
+        return;
+      }
+      list.forEach(function(appt) {
+        var card = renderAppointmentCard(appt, {
+          showPerson: options && options.showPerson,
+          onEdit: function(item) {
+            var context = getAppointmentModalContext(options && options.source ? options.source : 'life');
+            openAppointmentModal(context, item, { lockPersonId: options && options.lockPersonId ? options.lockPersonId : null });
+          },
+          onDelete: function(item) {
+            deleteAppointment(item);
+          }
+        });
+        container.appendChild(card);
+      });
+    }
+
+    function getAppointmentModalContext(source) {
+      return appointmentModalContexts[source] || null;
+    }
+
+    function updatePastToggle(toggleEl, expanded, count, label) {
+      if (!toggleEl) return;
+      if (!count) {
+        toggleEl.style.display = 'none';
+        return;
+      }
+      toggleEl.style.display = '';
+      toggleEl.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      toggleEl.textContent = (expanded ? 'Hide' : 'Show') + ' ' + label + ' (' + count + ')';
+    }
+
+    function renderPersonAppointments(personId) {
+      if (!lifeAppointmentsList || !lifeAppointmentsPast) return;
+      if (!personId) return;
+      var personAppointments = appointments.filter(function(appt) {
+        return appt.personId === personId;
+      });
+      var split = splitAppointmentsByTime(personAppointments);
+      renderAppointmentList(lifeAppointmentsList, split.upcoming, {
+        showPerson: false,
+        source: 'life',
+        lockPersonId: personId,
+        emptyMessage: 'No upcoming appointments yet.'
+      });
+      renderAppointmentList(lifeAppointmentsPast, split.past, {
+        showPerson: false,
+        source: 'life',
+        lockPersonId: personId,
+        emptyMessage: 'No past appointments yet.'
+      });
+      updatePastToggle(lifeAppointmentsPastToggle, lifeAppointmentsPastExpanded, split.past.length, 'past');
+      if (lifeAppointmentsPast) {
+        lifeAppointmentsPast.style.display = lifeAppointmentsPastExpanded ? '' : 'none';
+      }
+    }
+
+    function renderAppointmentsFilters() {
+      if (!appointmentsFilters) return;
+      appointmentsFilters.innerHTML = '';
+      var family = getFamilyPeople();
+      if (appointmentsFilterPersonId !== 'all' && !family.some(function(person) { return person.id === appointmentsFilterPersonId; })) {
+        appointmentsFilterPersonId = 'all';
+      }
+      var filterOptions = [{ id: 'all', label: 'All' }].concat(family.map(function(person) {
+        return { id: person.id, label: person.name || 'Person' };
+      }));
+      filterOptions.forEach(function(option) {
+        var chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'appointments-chip' + (appointmentsFilterPersonId === option.id ? ' active' : '');
+        chip.textContent = option.label;
+        chip.addEventListener('click', function() {
+          appointmentsFilterPersonId = option.id;
+          renderAppointmentsView();
+        });
+        appointmentsFilters.appendChild(chip);
+      });
+    }
+
+    function renderAppointmentsView() {
+      if (!appointmentsFeed || !appointmentsPastFeed) return;
+      renderAppointmentsFilters();
+      var list = appointments.slice();
+      if (appointmentsFilterPersonId !== 'all') {
+        list = list.filter(function(appt) { return appt.personId === appointmentsFilterPersonId; });
+      }
+      var split = splitAppointmentsByTime(list);
+      renderAppointmentList(appointmentsFeed, split.upcoming, {
+        showPerson: appointmentsFilterPersonId === 'all',
+        source: 'calendar',
+        emptyMessage: 'No upcoming appointments scheduled.'
+      });
+      renderAppointmentList(appointmentsPastFeed, split.past, {
+        showPerson: appointmentsFilterPersonId === 'all',
+        source: 'calendar',
+        emptyMessage: 'No past appointments yet.'
+      });
+      updatePastToggle(appointmentsPastToggle, appointmentsPastExpanded, split.past.length, 'past');
+      appointmentsPastFeed.style.display = appointmentsPastExpanded ? '' : 'none';
+    }
+
+    function deleteAppointment(appt) {
+      if (!appt) return;
+      var confirmRemove = window.confirm('Delete "' + (appt.title || 'this appointment') + '"?');
+      if (!confirmRemove) return;
+      appointments = appointments.filter(function(item) { return item.id !== appt.id; });
+      saveAppointments();
+      if (activePersonId) {
+        renderPersonAppointments(activePersonId);
+      }
+      renderAppointmentsView();
+    }
+
+    function renderAppointmentPersonOptions(selectEl, selectedId) {
+      if (!selectEl) return;
+      var family = getFamilyPeople();
+      selectEl.innerHTML = '';
+      if (!family.length) {
+        var option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'Add a person in Life first';
+        option.disabled = true;
+        option.selected = true;
+        selectEl.appendChild(option);
+        selectEl.disabled = true;
+        return;
+      }
+      selectEl.disabled = false;
+      family.forEach(function(person) {
+        var opt = document.createElement('option');
+        opt.value = person.id;
+        opt.textContent = person.name || 'Person';
+        selectEl.appendChild(opt);
+      });
+      if (selectedId) {
+        selectEl.value = selectedId;
+      }
+    }
+
+    function openAppointmentModal(context, appt, options) {
+      if (!context || !context.modal) return;
+      appointmentEditingId = appt ? appt.id : null;
+      appointmentModalSource = context.source || 'life';
+      appointmentModalLockPersonId = options && options.lockPersonId ? options.lockPersonId : null;
+      context.title.textContent = appt ? 'Edit appointment' : 'Add appointment';
+      var personId = appt ? appt.personId : (appointmentModalLockPersonId || getDefaultPersonId());
+      renderAppointmentPersonOptions(context.personSelect, personId);
+      if (context.personRow) {
+        var isLocked = !!appointmentModalLockPersonId;
+        context.personRow.style.display = isLocked ? 'none' : '';
+        context.personSelect.disabled = isLocked;
+      }
+      if (appointmentModalLockPersonId) {
+        context.personSelect.value = appointmentModalLockPersonId;
+      }
+      context.titleInput.value = appt ? appt.title || '' : '';
+      context.dateInput.value = appt ? appt.date || '' : '';
+      context.timeInput.value = appt ? appt.time || '' : '';
+      context.clinicInput.value = appt ? appt.clinicName || '' : '';
+      context.doctorInput.value = appt ? appt.doctorName || '' : '';
+      context.addressInput.value = appt ? appt.address || '' : '';
+      context.phoneInput.value = appt ? appt.phone || '' : '';
+      context.notesInput.value = appt ? appt.notes || '' : '';
+      context.deleteBtn.style.display = appt ? 'inline-flex' : 'none';
+      context.modal.classList.add('active');
+      context.modal.setAttribute('aria-hidden', 'false');
+      lockBodyScroll();
+    }
+
+    function closeAppointmentModal(context) {
+      if (!context || !context.modal) return;
+      context.modal.classList.remove('active');
+      context.modal.setAttribute('aria-hidden', 'true');
+      appointmentEditingId = null;
+      appointmentModalLockPersonId = null;
+      unlockBodyScroll();
+    }
+
+    function handleAppointmentSubmit(event, context) {
+      event.preventDefault();
+      if (!context) return;
+      var personId = context.personSelect ? context.personSelect.value : '';
+      if (appointmentModalLockPersonId) {
+        personId = appointmentModalLockPersonId;
+      }
+      if (!personId) {
+        alert('Please select a person.');
+        return;
+      }
+      var title = context.titleInput.value.trim();
+      if (!title) {
+        alert('Please enter a title.');
+        context.titleInput.focus();
+        return;
+      }
+      var date = context.dateInput.value;
+      var time = context.timeInput.value;
+      if (!date || !time) {
+        alert('Please select a date and time.');
+        return;
+      }
+      var dateTime = new Date(date + 'T' + time);
+      if (!Number.isNaN(dateTime.getTime()) && dateTime.getTime() < Date.now()) {
+        var proceed = window.confirm('This appointment is in the past. Save anyway?');
+        if (!proceed) {
+          return;
+        }
+      }
+      var existing = appointmentEditingId
+        ? appointments.find(function(item) { return item.id === appointmentEditingId; })
+        : null;
+      var record = {
+        id: appointmentEditingId || generateAppointmentId(),
+        personId: personId,
+        title: title,
+        date: date,
+        time: time,
+        clinicName: context.clinicInput.value.trim(),
+        doctorName: context.doctorInput.value.trim(),
+        address: context.addressInput.value.trim(),
+        phone: context.phoneInput.value.trim(),
+        notes: context.notesInput.value.trim(),
+        createdAt: existing && existing.createdAt ? existing.createdAt : Date.now(),
+        updatedAt: Date.now()
+      };
+      if (existing) {
+        appointments = appointments.map(function(item) {
+          return item.id === appointmentEditingId ? record : item;
+        });
+      } else {
+        appointments.unshift(record);
+      }
+      saveAppointments();
+      if (activePersonId) {
+        renderPersonAppointments(activePersonId);
+      }
+      renderAppointmentsView();
+      closeAppointmentModal(context);
+    }
+
+    function setupAppointmentModal(context) {
+      if (!context || !context.modal) return;
+      context.modal.addEventListener('click', function(event) {
+        if (event.target.dataset.close !== undefined) {
+          closeAppointmentModal(context);
+        }
+      });
+      if (context.closeBtn) {
+        context.closeBtn.addEventListener('click', function() {
+          closeAppointmentModal(context);
+        });
+      }
+      context.form.addEventListener('submit', function(event) {
+        handleAppointmentSubmit(event, context);
+      });
+      if (context.deleteBtn) {
+        context.deleteBtn.addEventListener('click', function() {
+          if (!appointmentEditingId) return;
+          var appt = appointments.find(function(item) { return item.id === appointmentEditingId; });
+          deleteAppointment(appt);
+          closeAppointmentModal(context);
+        });
+      }
     }
 
     function renderLifeAreasList() {
@@ -8301,7 +9137,28 @@
     const lifePersonNameDisplay = document.getElementById('lifePersonNameDisplay');
     const lifePersonRoleDisplay = document.getElementById('lifePersonRoleDisplay');
     const lifePersonOrgDisplay = document.getElementById('lifePersonOrgDisplay');
-    const lifePersonAddEvent = document.getElementById('lifePersonAddEvent');
+    const lifeAppointmentsToggle = document.getElementById('lifeAppointmentsToggle');
+    const lifeAppointmentsBody = document.getElementById('lifeAppointmentsBody');
+    const lifeAppointmentsAdd = document.getElementById('lifeAppointmentsAdd');
+    const lifeAppointmentsList = document.getElementById('lifeAppointmentsList');
+    const lifeAppointmentsPastToggle = document.getElementById('lifeAppointmentsPastToggle');
+    const lifeAppointmentsPast = document.getElementById('lifeAppointmentsPast');
+    const lifeAppointmentModal = document.getElementById('lifeAppointmentModal');
+    const lifeAppointmentForm = document.getElementById('lifeAppointmentForm');
+    const lifeAppointmentPersonRow = document.getElementById('lifeAppointmentPersonRow');
+    const lifeAppointmentPerson = document.getElementById('lifeAppointmentPerson');
+    const lifeAppointmentTitle = document.getElementById('lifeAppointmentModalTitle');
+    const lifeAppointmentTitleInput = document.getElementById('lifeAppointmentTitleInput');
+    const lifeAppointmentDate = document.getElementById('lifeAppointmentDate');
+    const lifeAppointmentTime = document.getElementById('lifeAppointmentTime');
+    const lifeAppointmentClinic = document.getElementById('lifeAppointmentClinic');
+    const lifeAppointmentDoctor = document.getElementById('lifeAppointmentDoctor');
+    const lifeAppointmentAddress = document.getElementById('lifeAppointmentAddress');
+    const lifeAppointmentPhone = document.getElementById('lifeAppointmentPhone');
+    const lifeAppointmentNotes = document.getElementById('lifeAppointmentNotes');
+    const lifeAppointmentSave = document.getElementById('lifeAppointmentSave');
+    const lifeAppointmentDelete = document.getElementById('lifeAppointmentDelete');
+    const lifeAppointmentClose = document.getElementById('lifeAppointmentClose');
     const lifeAgendaRange = document.getElementById('lifeAgendaRange');
     const lifeAgendaList = document.getElementById('lifeAgendaList');
     const lifePersonNowList = document.getElementById('lifePersonNowList');
@@ -8344,6 +9201,72 @@
     const lifeAreasList = document.getElementById('lifeAreasList');
     const lifeFrictionFrequencyInputs = document.querySelectorAll('input[name="lifeFrictionFrequency"]');
     const lifePauseInputs = document.querySelectorAll('input[name="lifePauseSeconds"]');
+
+    const appointmentsView = document.getElementById('appointments-view');
+    const appointmentsAddGlobal = document.getElementById('appointmentsAddGlobal');
+    const appointmentsFilters = document.getElementById('appointmentsFilters');
+    const appointmentsFeed = document.getElementById('appointmentsFeed');
+    const appointmentsPastToggle = document.getElementById('appointmentsPastToggle');
+    const appointmentsPastFeed = document.getElementById('appointmentsPastFeed');
+    const appointmentsModal = document.getElementById('appointmentsModal');
+    const appointmentsModalTitle = document.getElementById('appointmentsModalTitle');
+    const appointmentsModalForm = document.getElementById('appointmentsModalForm');
+    const appointmentsModalPerson = document.getElementById('appointmentsModalPerson');
+    const appointmentsModalTitleInput = document.getElementById('appointmentsModalTitleInput');
+    const appointmentsModalDate = document.getElementById('appointmentsModalDate');
+    const appointmentsModalTime = document.getElementById('appointmentsModalTime');
+    const appointmentsModalClinic = document.getElementById('appointmentsModalClinic');
+    const appointmentsModalDoctor = document.getElementById('appointmentsModalDoctor');
+    const appointmentsModalAddress = document.getElementById('appointmentsModalAddress');
+    const appointmentsModalPhone = document.getElementById('appointmentsModalPhone');
+    const appointmentsModalNotes = document.getElementById('appointmentsModalNotes');
+    const appointmentsModalSave = document.getElementById('appointmentsModalSave');
+    const appointmentsModalDelete = document.getElementById('appointmentsModalDelete');
+    const appointmentsModalClose = document.getElementById('appointmentsModalClose');
+
+    if (lifeAppointmentModal) {
+      appointmentModalContexts.life = {
+        source: 'life',
+        modal: lifeAppointmentModal,
+        form: lifeAppointmentForm,
+        personRow: lifeAppointmentPersonRow,
+        personSelect: lifeAppointmentPerson,
+        title: lifeAppointmentTitle,
+        titleInput: lifeAppointmentTitleInput,
+        dateInput: lifeAppointmentDate,
+        timeInput: lifeAppointmentTime,
+        clinicInput: lifeAppointmentClinic,
+        doctorInput: lifeAppointmentDoctor,
+        addressInput: lifeAppointmentAddress,
+        phoneInput: lifeAppointmentPhone,
+        notesInput: lifeAppointmentNotes,
+        saveBtn: lifeAppointmentSave,
+        deleteBtn: lifeAppointmentDelete,
+        closeBtn: lifeAppointmentClose
+      };
+    }
+
+    if (appointmentsModal) {
+      appointmentModalContexts.calendar = {
+        source: 'calendar',
+        modal: appointmentsModal,
+        form: appointmentsModalForm,
+        personRow: null,
+        personSelect: appointmentsModalPerson,
+        title: appointmentsModalTitle,
+        titleInput: appointmentsModalTitleInput,
+        dateInput: appointmentsModalDate,
+        timeInput: appointmentsModalTime,
+        clinicInput: appointmentsModalClinic,
+        doctorInput: appointmentsModalDoctor,
+        addressInput: appointmentsModalAddress,
+        phoneInput: appointmentsModalPhone,
+        notesInput: appointmentsModalNotes,
+        saveBtn: appointmentsModalSave,
+        deleteBtn: appointmentsModalDelete,
+        closeBtn: appointmentsModalClose
+      };
+    }
 
     const calendarMonthLabel = document.getElementById('calendarMonthLabel');
     const calendarGrid = document.getElementById('calendarGrid');
@@ -8753,8 +9676,7 @@
         hideFrictionSocialIntro();
         hideFrictionSocialPauseOverlay();
         if (showCalendar) {
-          renderCalendarPeopleOptions();
-          renderCalendarMonth();
+          renderAppointmentsView();
         }
         if (showCalendarImport) {
           populateCalendarImportForm();
@@ -10120,6 +11042,8 @@
         hideFrictionSocialPauseOverlay();
         hideFrictionSocialIntro();
         closeCalendarModals();
+        closeAppointmentModal(appointmentModalContexts.life);
+        closeAppointmentModal(appointmentModalContexts.calendar);
       }
     });
 
@@ -10147,8 +11071,11 @@
     renderLifeCalendar();
     renderLifeAreasList();
     renderPeopleOverview();
+    renderAppointmentsView();
     renderCalendarMonth();
     setLifeTab('people');
+    setupAppointmentModal(appointmentModalContexts.life);
+    setupAppointmentModal(appointmentModalContexts.calendar);
     if (isCalendarImportRoute()) {
       showCalendarImportForm();
       populateCalendarImportForm();
@@ -10294,10 +11221,25 @@
       });
     }
 
-    if (lifePersonAddEvent) {
-      lifePersonAddEvent.addEventListener('click', function() {
+    if (lifeAppointmentsToggle && lifeAppointmentsBody) {
+      lifeAppointmentsToggle.addEventListener('click', function() {
+        var isExpanded = lifeAppointmentsToggle.getAttribute('aria-expanded') === 'true';
+        lifeAppointmentsToggle.setAttribute('aria-expanded', isExpanded ? 'false' : 'true');
+        lifeAppointmentsBody.classList.toggle('is-collapsed', isExpanded);
+      });
+    }
+
+    if (lifeAppointmentsAdd) {
+      lifeAppointmentsAdd.addEventListener('click', function() {
         if (!activePersonId) return;
-        openEventModal(null, toYmd(new Date()), { lockPersonId: activePersonId });
+        openAppointmentModal(appointmentModalContexts.life, null, { lockPersonId: activePersonId });
+      });
+    }
+
+    if (lifeAppointmentsPastToggle) {
+      lifeAppointmentsPastToggle.addEventListener('click', function() {
+        lifeAppointmentsPastExpanded = !lifeAppointmentsPastExpanded;
+        renderPersonAppointments(activePersonId);
       });
     }
 
@@ -10681,6 +11623,19 @@
         saveLifeAreas();
         renderAreaSelects();
         renderLifeAreasList();
+      });
+    }
+
+    if (appointmentsAddGlobal) {
+      appointmentsAddGlobal.addEventListener('click', function() {
+        openAppointmentModal(appointmentModalContexts.calendar, null, { lockPersonId: null });
+      });
+    }
+
+    if (appointmentsPastToggle) {
+      appointmentsPastToggle.addEventListener('click', function() {
+        appointmentsPastExpanded = !appointmentsPastExpanded;
+        renderAppointmentsView();
       });
     }
 
