@@ -2006,6 +2006,227 @@
     }
 
     /* =================== */
+    /* FRICTION SOCIAL     */
+    /* =================== */
+    #friction-social-view {
+      display: none;
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 20px calc(24px + var(--safe-bottom));
+    }
+
+    #friction-social-view.active {
+      display: block;
+    }
+
+    #friction-social-view .fs-header {
+      margin-bottom: 20px;
+    }
+
+    #friction-social-view .fs-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    #friction-social-view .fs-search {
+      flex: 1;
+      min-width: 220px;
+    }
+
+    #friction-social-view .fs-search input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--white);
+    }
+
+    #friction-social-view .fs-add-btn {
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--teal);
+      background: var(--teal);
+      color: var(--white);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    #friction-social-view .fs-add-btn:hover {
+      background: var(--teal-dark);
+    }
+
+    #friction-social-view .fs-shelf {
+      margin-bottom: 24px;
+    }
+
+    #friction-social-view .fs-shelf-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    #friction-social-view .fs-shelf-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    #friction-social-view .fs-shelf-count {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    #friction-social-view .fs-row {
+      display: flex;
+      gap: 14px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+
+    #friction-social-view .fs-card {
+      min-width: 180px;
+      max-width: 180px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: 0 6px 16px var(--shadow);
+    }
+
+    #friction-social-view .fs-card img {
+      width: 100%;
+      height: 100px;
+      object-fit: cover;
+      background: var(--grey-light);
+    }
+
+    #friction-social-view .fs-card-body {
+      padding: 10px 12px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    #friction-social-view .fs-card-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    #friction-social-view .fs-card-channel {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    #friction-social-view .fs-empty {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      text-align: center;
+      padding: 32px 12px;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    #friction-social-view .fs-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+    }
+
+    #friction-social-view .fs-modal.active {
+      display: flex;
+    }
+
+    #friction-social-view .fs-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+    }
+
+    #friction-social-view .fs-modal-card {
+      position: relative;
+      width: min(90vw, 860px);
+      background: var(--white);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #friction-social-view .fs-modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    #friction-social-view .fs-modal-player {
+      width: 100%;
+      background: #000;
+      aspect-ratio: 16 / 9;
+    }
+
+    #friction-social-view .fs-modal-player iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    #friction-social-view .fs-modal-meta {
+      padding: 16px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    #friction-social-view .fs-modal-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    #friction-social-view .fs-modal-channel {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    #friction-social-view .fs-modal-link {
+      font-size: 0.85rem;
+      color: var(--teal-dark);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    #friction-social-view.modal-open {
+      overflow: hidden;
+    }
+
+    /* =================== */
     /* MOBILE RESPONSIVE   */
     /* =================== */
     @media (max-width: 600px) {
@@ -2169,6 +2390,40 @@
   <div class="typing-dot"></div>
 </div>
 
+<section id="friction-social-view" class="view" aria-hidden="true">
+  <div class="fs-header">
+    <h2 class="section-title">Friction Social</h2>
+    <p class="section-text">Curate YouTube moments that reinforce slow, intentional habits.</p>
+  </div>
+  <div class="fs-controls">
+    <label class="fs-search" for="fsSearchInput">
+      <input type="text" id="fsSearchInput" placeholder="Search videos, channels, or IDs" />
+    </label>
+    <button class="fs-add-btn" id="fsAddVideo" type="button">Add video link</button>
+  </div>
+  <div class="fs-shelves" id="fsShelves"></div>
+  <div class="fs-empty" id="fsEmpty" style="display: none;"></div>
+
+  <div class="fs-modal" id="fsModal" aria-hidden="true">
+    <div class="fs-modal-backdrop" data-close></div>
+    <div class="fs-modal-card" role="dialog" aria-modal="true" aria-label="YouTube player">
+      <button class="fs-modal-close" id="fsModalClose" type="button" aria-label="Close video">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+      <div class="fs-modal-player">
+        <iframe id="fsModalFrame" title="YouTube video player" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      </div>
+      <div class="fs-modal-meta">
+        <div class="fs-modal-title" id="fsModalTitle"></div>
+        <div class="fs-modal-channel" id="fsModalChannel"></div>
+        <a class="fs-modal-link" id="fsModalLink" href="#" target="_blank" rel="noopener">Watch on YouTube</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <div class="chat-input-area">
   <div class="attachment-preview" id="attachmentPreview" style="display: none;"></div>
   <div class="chat-input-wrapper">
@@ -2242,6 +2497,13 @@
         <line x1="12" y1="8" x2="12.01" y2="8"/>
       </svg>
       <span>About</span>
+    </button>
+    <button class="menu-item" id="btnFrictionSocial" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="5" width="18" height="14" rx="2" ry="2"/>
+        <polygon points="10 9 16 12 10 15 10 9"/>
+      </svg>
+      <span>Friction Social</span>
     </button>
     <button class="menu-item" id="btnAdmin" type="button" style="display: none;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -3186,6 +3448,21 @@
     const btnSignOut = document.getElementById('btnSignOut');
     const btnSettings = document.getElementById('btnSettings');
     const btnAbout = document.getElementById('btnAbout');
+    const btnFrictionSocial = document.getElementById('btnFrictionSocial');
+    const chatInputArea = document.querySelector('.chat-input-area');
+
+    // Friction Social elements
+    const frictionSocialView = document.getElementById('friction-social-view');
+    const frictionSocialShelves = document.getElementById('fsShelves');
+    const frictionSocialSearch = document.getElementById('fsSearchInput');
+    const frictionSocialAdd = document.getElementById('fsAddVideo');
+    const frictionSocialEmpty = document.getElementById('fsEmpty');
+    const frictionSocialModal = document.getElementById('fsModal');
+    const frictionSocialModalClose = document.getElementById('fsModalClose');
+    const frictionSocialModalTitle = document.getElementById('fsModalTitle');
+    const frictionSocialModalChannel = document.getElementById('fsModalChannel');
+    const frictionSocialModalLink = document.getElementById('fsModalLink');
+    const frictionSocialModalFrame = document.getElementById('fsModalFrame');
     
     // Profile elements
     const profilePic = document.getElementById('profilePic');
@@ -3405,6 +3682,8 @@
       
       homepage.classList.add('hidden');
       chatApp.classList.add('active');
+
+      setActiveView(getViewFromLocation(), false);
       
       // Restore chat messages (or show welcome if empty)
       if (state.messages.length > 0) {
@@ -3433,6 +3712,49 @@
       chatMessages.innerHTML = '<div class="chat-background-goal" id="chatBackgroundGoal"></div><div class="welcome-message"><div class="welcome-icon">✦</div><h2>How can I help you today?</h2><p>Remember: slow is intentional.</p></div>';
       document.documentElement.style.setProperty('--kb', '0px');
     }
+
+    // VIEW NAVIGATION
+    var activeView = 'chat';
+
+    function getViewFromLocation() {
+      return window.location.hash === '#friction-social' ? 'social' : 'chat';
+    }
+
+    function updateMenuActive(view) {
+      if (!btnFrictionSocial) return;
+      if (view === 'social') {
+        btnFrictionSocial.style.background = 'var(--teal-lighter)';
+        btnFrictionSocial.style.color = 'var(--text-primary)';
+      } else {
+        btnFrictionSocial.style.background = '';
+        btnFrictionSocial.style.color = '';
+      }
+    }
+
+    function setActiveView(view, pushState) {
+      activeView = view;
+      if (view === 'social') {
+        frictionSocialView.classList.add('active');
+        frictionSocialView.setAttribute('aria-hidden', 'false');
+        chatMessages.style.display = 'none';
+        typingIndicator.style.display = 'none';
+        chatInputArea.style.display = 'none';
+      } else {
+        frictionSocialView.classList.remove('active');
+        frictionSocialView.setAttribute('aria-hidden', 'true');
+        chatMessages.style.display = '';
+        typingIndicator.style.display = '';
+        chatInputArea.style.display = '';
+      }
+      updateMenuActive(view);
+      if (pushState) {
+        history.pushState({ view: view }, '', view === 'social' ? '#friction-social' : '#chat');
+      }
+    }
+
+    window.addEventListener('popstate', function() {
+      setActiveView(getViewFromLocation(), false);
+    });
 
     btnApple.addEventListener('click', function() {
       // TODO: Apple Sign-In
@@ -3487,6 +3809,7 @@
       clearChatState();
       state.currentChatId = generateChatId();
       chatMessages.innerHTML = '<div class="welcome-message"><div class="welcome-icon">✦</div><h2>How can I help you today?</h2><p>Remember: slow is intentional.</p></div>';
+      setActiveView('chat', true);
       closeMenu();
     });
 
@@ -3505,6 +3828,13 @@
       closeMenu();
     });
 
+    if (btnFrictionSocial) {
+      btnFrictionSocial.addEventListener('click', function() {
+        closeMenu();
+        setActiveView('social', true);
+      });
+    }
+
     // Admin button
     var btnAdmin = document.getElementById('btnAdmin');
     if (btnAdmin) {
@@ -3513,6 +3843,247 @@
         window.location.href = '/admin.html';
       });
     }
+
+    // FRICTION SOCIAL
+    var frictionSocialState = {
+      shelves: [],
+      query: ''
+    };
+    var frictionSocialScrollTop = 0;
+
+    function getFrictionSocialDefaults() {
+      return [
+        {
+          title: 'Focus',
+          videos: [
+            { id: 'jfKfPfyJRdk', title: 'lofi hip hop radio - beats to relax/study to', channel: 'Lofi Girl' },
+            { id: '5qap5aO4i9A', title: 'lofi hip hop radio - beats to sleep/chill to', channel: 'ChilledCow' }
+          ]
+        },
+        {
+          title: 'Perspective',
+          videos: [
+            { id: 'dQw4w9WgXcQ', title: 'Never Gonna Give You Up', channel: 'Rick Astley' },
+            { id: 'kxopViU98Xo', title: 'Keyboard Cat', channel: 'Keyboard Cat' }
+          ]
+        }
+      ];
+    }
+
+    function loadFrictionSocialShelves() {
+      var saved = localStorage.getItem('friction_social_shelves');
+      if (saved) {
+        try {
+          var parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            return parsed;
+          }
+        } catch (e) {
+          return getFrictionSocialDefaults();
+        }
+      }
+      return getFrictionSocialDefaults();
+    }
+
+    function saveFrictionSocialShelves() {
+      localStorage.setItem('friction_social_shelves', JSON.stringify(frictionSocialState.shelves));
+    }
+
+    function extractYouTubeId(value) {
+      if (!value) return '';
+      var trimmed = value.trim();
+      var urlMatch = trimmed.match(/(?:v=|\/embed\/|\/shorts\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+      if (urlMatch && urlMatch[1]) {
+        return urlMatch[1];
+      }
+      if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) {
+        return trimmed;
+      }
+      return '';
+    }
+
+    function getOrCreateShelf(title) {
+      var shelf = frictionSocialState.shelves.find(function(item) {
+        return item.title === title;
+      });
+      if (!shelf) {
+        shelf = { title: title, videos: [] };
+        frictionSocialState.shelves.unshift(shelf);
+      }
+      return shelf;
+    }
+
+    function addFrictionSocialVideo() {
+      var input = prompt('Paste a YouTube link or video ID:');
+      if (!input) return;
+      var videoId = extractYouTubeId(input);
+      if (!videoId) {
+        alert('Please provide a valid YouTube link or 11-character video ID.');
+        return;
+      }
+      var exists = frictionSocialState.shelves.some(function(shelf) {
+        return (shelf.videos || []).some(function(video) {
+          return video.id === videoId;
+        });
+      });
+      if (exists) {
+        alert('That video is already saved.');
+        return;
+      }
+
+      var title = prompt('Video title (optional):') || 'Untitled video';
+      var channel = prompt('Channel name (optional):') || 'Unknown channel';
+      var shelf = getOrCreateShelf('Saved');
+      shelf.videos.unshift({
+        id: videoId,
+        title: title.trim() || 'Untitled video',
+        channel: channel.trim() || 'Unknown channel'
+      });
+      saveFrictionSocialShelves();
+      renderFrictionSocialShelves();
+    }
+
+    function renderFrictionSocialShelves() {
+      var query = (frictionSocialState.query || '').trim().toLowerCase();
+      frictionSocialShelves.innerHTML = '';
+      var totalMatches = 0;
+
+      frictionSocialState.shelves.forEach(function(shelf) {
+        var videos = Array.isArray(shelf.videos) ? shelf.videos : [];
+        var filtered = videos.filter(function(video) {
+          if (!query) return true;
+          var title = (video.title || '').toLowerCase();
+          var channel = (video.channel || '').toLowerCase();
+          var id = (video.id || '').toLowerCase();
+          return title.indexOf(query) >= 0 || channel.indexOf(query) >= 0 || id.indexOf(query) >= 0;
+        });
+
+        if (filtered.length === 0) return;
+        totalMatches += filtered.length;
+
+        var shelfEl = document.createElement('div');
+        shelfEl.className = 'fs-shelf';
+
+        var header = document.createElement('div');
+        header.className = 'fs-shelf-header';
+
+        var titleEl = document.createElement('div');
+        titleEl.className = 'fs-shelf-title';
+        titleEl.textContent = shelf.title || 'Untitled shelf';
+
+        var countEl = document.createElement('div');
+        countEl.className = 'fs-shelf-count';
+        countEl.textContent = filtered.length + (filtered.length === 1 ? ' video' : ' videos');
+
+        header.appendChild(titleEl);
+        header.appendChild(countEl);
+
+        var row = document.createElement('div');
+        row.className = 'fs-row';
+
+        filtered.forEach(function(video) {
+          var card = document.createElement('button');
+          card.type = 'button';
+          card.className = 'fs-card';
+          card.dataset.videoId = video.id;
+          card.dataset.videoTitle = video.title || 'Untitled video';
+          card.dataset.videoChannel = video.channel || '';
+
+          var img = document.createElement('img');
+          img.src = 'https://i.ytimg.com/vi/' + video.id + '/hqdefault.jpg';
+          img.alt = video.title || 'YouTube thumbnail';
+          img.loading = 'lazy';
+
+          var body = document.createElement('div');
+          body.className = 'fs-card-body';
+
+          var cardTitle = document.createElement('div');
+          cardTitle.className = 'fs-card-title';
+          cardTitle.textContent = video.title || 'Untitled video';
+
+          var cardChannel = document.createElement('div');
+          cardChannel.className = 'fs-card-channel';
+          cardChannel.textContent = video.channel || 'Unknown channel';
+
+          body.appendChild(cardTitle);
+          body.appendChild(cardChannel);
+
+          card.appendChild(img);
+          card.appendChild(body);
+          row.appendChild(card);
+        });
+
+        shelfEl.appendChild(header);
+        shelfEl.appendChild(row);
+        frictionSocialShelves.appendChild(shelfEl);
+      });
+
+      if (totalMatches === 0) {
+        frictionSocialEmpty.style.display = 'block';
+        frictionSocialEmpty.textContent = query
+          ? 'No videos match your search.'
+          : 'No videos saved yet. Add a YouTube link to start your library.';
+      } else {
+        frictionSocialEmpty.style.display = 'none';
+      }
+    }
+
+    function openFrictionSocialModal(video) {
+      if (!video || !video.id) return;
+      frictionSocialScrollTop = frictionSocialView.scrollTop;
+      frictionSocialView.classList.add('modal-open');
+      frictionSocialModal.classList.add('active');
+      frictionSocialModal.setAttribute('aria-hidden', 'false');
+      frictionSocialModalFrame.src = 'https://www.youtube.com/embed/' + video.id + '?autoplay=1&rel=0&modestbranding=1';
+      frictionSocialModalTitle.textContent = video.title || 'Untitled video';
+      frictionSocialModalChannel.textContent = video.channel || 'Unknown channel';
+      frictionSocialModalLink.href = 'https://www.youtube.com/watch?v=' + video.id;
+    }
+
+    function closeFrictionSocialModal() {
+      if (!frictionSocialModal.classList.contains('active')) return;
+      frictionSocialModal.classList.remove('active');
+      frictionSocialModal.setAttribute('aria-hidden', 'true');
+      frictionSocialView.classList.remove('modal-open');
+      frictionSocialModalFrame.src = '';
+      setTimeout(function() {
+        frictionSocialView.scrollTop = frictionSocialScrollTop;
+      }, 0);
+    }
+
+    frictionSocialState.shelves = loadFrictionSocialShelves();
+    renderFrictionSocialShelves();
+
+    frictionSocialSearch.addEventListener('input', function() {
+      frictionSocialState.query = this.value || '';
+      renderFrictionSocialShelves();
+    });
+
+    frictionSocialAdd.addEventListener('click', addFrictionSocialVideo);
+
+    frictionSocialShelves.addEventListener('click', function(event) {
+      var card = event.target.closest('.fs-card');
+      if (!card) return;
+      openFrictionSocialModal({
+        id: card.dataset.videoId,
+        title: card.dataset.videoTitle,
+        channel: card.dataset.videoChannel
+      });
+    });
+
+    frictionSocialModal.addEventListener('click', function(event) {
+      if (event.target.dataset.close !== undefined) {
+        closeFrictionSocialModal();
+      }
+    });
+
+    frictionSocialModalClose.addEventListener('click', closeFrictionSocialModal);
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeFrictionSocialModal();
+      }
+    });
 
     // Settings event listeners
     document.getElementById('settingsClose').addEventListener('click', hideSettings);
