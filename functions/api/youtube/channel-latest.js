@@ -47,7 +47,7 @@ export async function onRequestGet({ request, env }) {
     if (Number.isNaN(parsed) || parsed <= 0) {
       return json({ error: "Invalid limit parameter." }, 400);
     }
-    limit = Math.min(parsed, 50);
+    limit = Math.min(parsed, 30);
   }
 
   const channelUrl = `${YOUTUBE_API_BASE}/channels?part=contentDetails,snippet&id=${encodeURIComponent(
