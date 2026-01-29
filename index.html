@@ -2324,6 +2324,11 @@
       color: var(--text-primary);
     }
 
+    #life-view .life-btn[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     #life-view .life-list {
       display: flex;
       flex-direction: column;
@@ -2511,50 +2516,129 @@
       color: var(--text-secondary);
     }
 
-    #life-view .life-person-quick {
-      display: grid;
-      gap: 12px;
+    #life-view .life-agenda-card {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      background: var(--white);
+      box-shadow: 0 12px 24px var(--shadow);
+    }
+
+    #life-view .life-agenda-controls {
+      display: flex;
+      justify-content: flex-end;
       margin-bottom: 16px;
     }
 
-    #life-view .life-quick-card {
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
+    #life-view .life-agenda-segmented {
+      display: inline-flex;
+      gap: 6px;
+      padding: 4px;
+      border-radius: 999px;
+      background: rgba(90, 154, 148, 0.12);
+      border: 1px solid rgba(90, 154, 148, 0.2);
+    }
+
+    #life-view .life-agenda-segment {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      min-height: 36px;
+    }
+
+    #life-view .life-agenda-segment.active {
       background: var(--white);
+      color: var(--text-primary);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    #life-view .life-agenda-list {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    #life-view .life-agenda-day {
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
 
-    #life-view .life-quick-title {
+    #life-view .life-agenda-day-header {
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      color: var(--text-secondary);
       font-weight: 600;
-      font-size: 0.9rem;
-      color: var(--text-primary);
+      margin-bottom: 10px;
     }
 
-    #life-view .life-person-section {
-      border-top: 1px solid var(--border);
-      padding-top: 14px;
-      margin-top: 14px;
-    }
-
-    #life-view .life-person-section:first-of-type {
-      border-top: none;
-      padding-top: 0;
-      margin-top: 0;
-    }
-
-    #life-view .life-section-toggle {
-      width: 100%;
-      display: flex;
+    #life-view .life-agenda-item {
+      display: grid;
+      grid-template-columns: 4px 1fr auto;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.9);
+      cursor: pointer;
       align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
     }
 
-    #life-view .life-collapsible {
-      margin-top: 10px;
+    #life-view .life-agenda-item:hover {
+      box-shadow: 0 10px 20px var(--shadow);
+      transform: translateY(-1px);
+    }
+
+    #life-view .life-agenda-accent {
+      width: 4px;
+      height: 100%;
+      border-radius: 999px;
+      background: var(--teal);
+    }
+
+    #life-view .life-agenda-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+    }
+
+    #life-view .life-agenda-location {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    #life-view .life-agenda-actions {
+      margin-top: 6px;
+    }
+
+    #life-view .life-agenda-direction {
+      border: none;
+      background: none;
+      padding: 0;
+      font-size: 0.8rem;
+      color: var(--teal-dark);
+      cursor: pointer;
+    }
+
+    #life-view .life-agenda-time {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    #life-view .life-agenda-empty {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      padding: 10px 0;
     }
 
     #life-view .life-person-card:hover {
@@ -2726,6 +2810,22 @@
 
     #calendar-view .calendar-btn.secondary {
       background: rgba(255, 255, 255, 0.7);
+    }
+
+    #calendar-view .calendar-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    #calendar-view .calendar-toggle input {
+      accent-color: var(--teal);
+    }
+
+    #calendar-view .calendar-modal.person-locked .calendar-person-row {
+      display: none;
     }
 
     #calendar-view .calendar-grid {
@@ -3934,7 +4034,7 @@
   <div class="life-header">
     <div class="life-header-copy">
       <h2 class="section-title">Life</h2>
-      <p class="section-text">Keep a clear overview of the people who make up your family.</p>
+      <p class="section-text">Choose a person to manage appointments.</p>
     </div>
     <button class="life-btn life-primary-cta" id="lifeAddPersonPrimary" type="button">Add person</button>
   </div>
@@ -4005,51 +4105,18 @@
           <div class="life-person-org" id="lifePersonOrgDisplay"></div>
         </div>
       </div>
+      <button class="life-btn" id="lifePersonAddEvent" type="button">Add event</button>
     </div>
 
-    <div class="life-person-quick">
-      <div class="life-quick-card">
-        <div class="life-quick-title">Add task</div>
-        <div class="life-row">
-          <input class="life-input" id="lifePersonTaskText" type="text" placeholder="Add a task" maxlength="120" />
-          <button class="life-btn" id="lifePersonTaskAdd" type="button">Add task</button>
+    <div class="life-agenda-card">
+      <div class="life-agenda-controls">
+        <div class="life-agenda-segmented" id="lifeAgendaRange">
+          <button class="life-agenda-segment" data-range="today" type="button">Today</button>
+          <button class="life-agenda-segment active" data-range="7" type="button">7 Days</button>
+          <button class="life-agenda-segment" data-range="30" type="button">30 Days</button>
         </div>
       </div>
-      <div class="life-quick-card">
-        <div class="life-quick-title">Add appointment</div>
-        <div class="life-row">
-          <input class="life-input" id="lifePersonApptTitle" type="text" placeholder="Appointment title" maxlength="120" />
-          <input class="life-input" id="lifePersonApptStart" type="datetime-local" />
-        </div>
-        <div class="life-row">
-          <button class="life-btn" id="lifePersonApptAdd" type="button">Add appointment</button>
-        </div>
-      </div>
-      <div class="life-quick-card">
-        <div class="life-quick-title">Add short-term goal</div>
-        <div class="life-row">
-          <input class="life-input" id="lifePersonGoalText" type="text" placeholder="Short-term goal" maxlength="120" />
-          <button class="life-btn" id="lifePersonGoalAdd" type="button">Add goal</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="life-person-section">
-      <h3 class="section-subtitle">Right now</h3>
-      <div class="life-list" id="lifePersonNowList"></div>
-    </div>
-
-    <div class="life-person-section">
-      <h3 class="section-subtitle">Coming up</h3>
-      <div class="life-list" id="lifePersonComingList"></div>
-    </div>
-
-    <div class="life-person-section">
-      <button class="life-btn secondary life-section-toggle" id="lifePersonParkedToggle" type="button" aria-expanded="false">
-        <span>Parked</span>
-        <span>+</span>
-      </button>
-      <div class="life-collapsible life-list" id="lifePersonParkedList" style="display: none;"></div>
+      <div class="life-agenda-list" id="lifeAgendaList"></div>
     </div>
   </div>
 
@@ -4189,10 +4256,16 @@
         <input class="calendar-input" id="calendarEventTitleInput" type="text" placeholder="Event title" maxlength="120" required />
         <div class="calendar-form-row">
           <input class="calendar-input" id="calendarEventDate" type="date" required />
+          <label class="calendar-toggle">
+            <input type="checkbox" id="calendarEventAllDay" />
+            <span>All-day</span>
+          </label>
+        </div>
+        <div class="calendar-form-row" id="calendarEventTimeRow">
           <input class="calendar-input" id="calendarEventStart" type="time" required />
+          <input class="calendar-input" id="calendarEventEnd" type="time" placeholder="End time (optional)" />
         </div>
         <div class="calendar-form-row">
-          <input class="calendar-input" id="calendarEventEnd" type="time" placeholder="End time (optional)" />
           <input class="calendar-input" id="calendarEventLocation" type="text" placeholder="Location (optional)" maxlength="120" />
         </div>
         <button class="calendar-btn secondary" id="calendarEventDirections" type="button" style="display: none;">Directions</button>
@@ -4236,6 +4309,7 @@
       <p>Your appointment is saved.</p>
       <div class="calendar-import-actions">
         <button class="calendar-import-btn" id="calendarImportBack" type="button">Back to Calendar</button>
+        <button class="calendar-import-btn secondary" id="calendarImportBackPerson" type="button" style="display: none;">Back to Person</button>
         <button class="calendar-import-btn secondary" id="calendarImportAddAnother" type="button">Add another</button>
       </div>
     </div>
@@ -4264,10 +4338,10 @@
         <summary>Notes (optional)</summary>
         <textarea class="calendar-import-textarea" id="calendarImportNotes" maxlength="400"></textarea>
       </details>
-      <div>
-        <div class="section-subtitle">Original message</div>
+      <details class="calendar-import-notes" id="calendarImportOriginalDetails">
+        <summary>Original message</summary>
         <div class="calendar-import-preview" id="calendarImportOriginal"></div>
-      </div>
+      </details>
       <div class="calendar-import-actions">
         <button class="calendar-import-btn" id="calendarImportSave" type="submit">Save event</button>
         <button class="calendar-import-btn secondary" id="calendarImportCancel" type="button">Cancel</button>
@@ -4989,6 +5063,7 @@
 
     function isPersonAccountHolder(person) {
       if (!person) return false;
+      if (person.type === 'me') return true;
       if (person.isAccountHolder) return true;
       var holderKey = getAccountHolderKey();
       if (!holderKey) return false;
@@ -4999,19 +5074,17 @@
       var holderKey = getAccountHolderKey();
       if (!holderKey) return;
       var updated = false;
+      if (people.some(function(person) { return person.isAccountHolder || person.type === 'me'; })) {
+        return;
+      }
       people.forEach(function(person) {
         var matches = normalizeName(person.name) === holderKey;
         if (matches && !person.isAccountHolder) {
           person.isAccountHolder = true;
           updated = true;
-        } else if (!matches && person.isAccountHolder) {
-          person.isAccountHolder = false;
-          updated = true;
         }
       });
-      if (updated) {
-        savePeople();
-      }
+      if (updated) savePeople();
     }
 
     function generatePersonId() {
@@ -5109,6 +5182,7 @@
         dob: person.dob || '',
         notes: person.notes || '',
         isAccountHolder: Boolean(person.isAccountHolder),
+        type: person.type || '',
         avatarType: person.avatarType === 'photo' ? 'photo' : 'generated',
         avatarDataUrl: person.avatarDataUrl || '',
         avatarSeed: seed,
@@ -5117,22 +5191,58 @@
       };
     }
 
+    function ensureAccountHolderPerson() {
+      var hasHolder = people.some(function(person) {
+        return person && (person.isAccountHolder || person.type === 'me');
+      });
+      if (hasHolder) {
+        var updated = false;
+        people.forEach(function(person) {
+          if (person && person.type === 'me' && !person.isAccountHolder) {
+            person.isAccountHolder = true;
+            updated = true;
+          }
+        });
+        if (updated) savePeople();
+        return;
+      }
+      var now = Date.now();
+      var mePerson = normalizePerson({
+        id: 'me',
+        name: 'Me',
+        role: 'Other',
+        customRole: 'Me',
+        avatarType: 'generated',
+        avatarSeed: 'account-holder',
+        isAccountHolder: true,
+        type: 'me',
+        createdAt: now,
+        updatedAt: now
+      });
+      people.unshift(mePerson);
+      savePeople();
+    }
+
     function loadPeople() {
       var saved = localStorage.getItem(PEOPLE_KEY);
       if (!saved) {
         people = [];
+        ensureAccountHolderPerson();
         return;
       }
       try {
         var parsed = JSON.parse(saved);
         if (!Array.isArray(parsed)) {
           people = [];
+          ensureAccountHolderPerson();
           return;
         }
         people = parsed.map(normalizePerson).filter(Boolean);
         reconcileAccountHolderFlags();
+        ensureAccountHolderPerson();
       } catch (e) {
         people = [];
+        ensureAccountHolderPerson();
       }
     }
 
@@ -5218,13 +5328,21 @@
 
     function getFamilyPeople() {
       var updated = false;
-      var family = people.filter(function(person) {
-        var isHolder = isPersonAccountHolder(person);
+      var family = people.slice();
+      family.forEach(function(person) {
+        var isHolder = person && (person.type === 'me' || isPersonAccountHolder(person));
         if (isHolder && !person.isAccountHolder) {
           person.isAccountHolder = true;
+          person.type = person.type || 'me';
           updated = true;
         }
-        return !isHolder;
+      });
+      family.sort(function(a, b) {
+        var aHolder = a && (a.type === 'me' || a.isAccountHolder);
+        var bHolder = b && (b.type === 'me' || b.isAccountHolder);
+        if (aHolder && !bHolder) return -1;
+        if (!aHolder && bHolder) return 1;
+        return String(a.name || '').localeCompare(String(b.name || ''));
       });
       if (updated) {
         savePeople();
@@ -5259,6 +5377,7 @@
         card.className = 'life-person-card';
         card.tabIndex = 0;
         card.setAttribute('role', 'button');
+        var isMe = person.type === 'me' || person.isAccountHolder;
 
         var top = document.createElement('div');
         top.className = 'life-person-top';
@@ -5308,8 +5427,10 @@
         removeBtn.type = 'button';
         removeBtn.className = 'life-btn secondary';
         removeBtn.textContent = 'Remove';
+        removeBtn.disabled = isMe;
         removeBtn.addEventListener('click', function(event) {
           event.stopPropagation();
+          if (isMe) return;
           var confirmRemove = window.confirm('Remove ' + (person.name || 'this person') + '?');
           if (!confirmRemove) return;
           people = people.filter(function(item) { return item.id !== person.id; });
@@ -5485,6 +5606,186 @@
       });
     }
 
+    var lifeAgendaRangeDays = 7;
+
+    function formatAgendaDayHeader(date) {
+      var weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      var label = weekdays[date.getDay()] + ' ' + padNumber(date.getDate()) + ' ' + months[date.getMonth()];
+      return label.toUpperCase();
+    }
+
+    function formatAgendaTimeLabel(value) {
+      if (!value) return '';
+      var parts = value.split(':');
+      if (parts.length < 2) return value;
+      var hour = parseInt(parts[0], 10);
+      var minute = parts[1];
+      if (Number.isNaN(hour)) return value;
+      var meridiem = hour >= 12 ? 'PM' : 'AM';
+      var hour12 = hour % 12;
+      if (hour12 === 0) hour12 = 12;
+      return hour12 + ':' + minute + meridiem;
+    }
+
+    function buildAgendaTimeRange(event) {
+      if (!event) return '';
+      if (event.allDay) return 'all-day';
+      if (!event.startTime) return '';
+      var startLabel = formatAgendaTimeLabel(event.startTime);
+      if (event.endTime) {
+        return startLabel + '–' + formatAgendaTimeLabel(event.endTime);
+      }
+      return startLabel;
+    }
+
+    function buildAgendaOccurrences(personId, startDate, days) {
+      var occurrences = {};
+      for (var i = 0; i < days; i++) {
+        var date = new Date(startDate);
+        date.setDate(startDate.getDate() + i);
+        occurrences[toYmd(date)] = [];
+      }
+      calendarEvents.forEach(function(event) {
+        if (!event || event.personId !== personId || !event.date) return;
+        var eventStart = parseYmd(event.date);
+        if (!eventStart) return;
+        var recurrence = event.recurrence || { type: 'none' };
+        if (recurrence.type === 'none') {
+          var ymd = toYmd(eventStart);
+          if (occurrences[ymd]) {
+            occurrences[ymd].push(event);
+          }
+          return;
+        }
+        for (var i = 0; i < days; i++) {
+          var date = new Date(startDate);
+          date.setDate(startDate.getDate() + i);
+          if (date.getTime() < eventStart.getTime()) continue;
+          if (!isWithinUntil(date, recurrence.until)) continue;
+          var diffDays = Math.floor((date.getTime() - eventStart.getTime()) / 86400000);
+          var ymdKey = toYmd(date);
+          if (!occurrences[ymdKey]) continue;
+          if (recurrence.type === 'weekly' && diffDays % 7 === 0) {
+            occurrences[ymdKey].push(event);
+          }
+          if (recurrence.type === 'fortnightly' && diffDays % 14 === 0) {
+            occurrences[ymdKey].push(event);
+          }
+          if (recurrence.type === 'custom_weekdays') {
+            var weekdays = Array.isArray(recurrence.weekdays) ? recurrence.weekdays : [];
+            if (weekdays.includes(date.getDay())) {
+              occurrences[ymdKey].push(event);
+            }
+          }
+        }
+      });
+      Object.keys(occurrences).forEach(function(key) {
+        occurrences[key].sort(function(a, b) {
+          if (!!a.allDay !== !!b.allDay) {
+            return a.allDay ? -1 : 1;
+          }
+          return String(a.startTime || '').localeCompare(String(b.startTime || ''));
+        });
+      });
+      return occurrences;
+    }
+
+    function setAgendaRange(days) {
+      lifeAgendaRangeDays = days;
+      if (lifeAgendaRange) {
+        lifeAgendaRange.querySelectorAll('.life-agenda-segment').forEach(function(button) {
+          button.classList.toggle('active', parseInt(button.dataset.range, 10) === days || (days === 1 && button.dataset.range === 'today'));
+        });
+      }
+      if (activePersonId) {
+        renderPersonAgenda(activePersonId);
+      }
+    }
+
+    function renderPersonAgenda(personId) {
+      if (!lifeAgendaList) return;
+      lifeAgendaList.innerHTML = '';
+      if (!personId) return;
+      var startDate = new Date();
+      startDate.setHours(0, 0, 0, 0);
+      var rangeDays = lifeAgendaRangeDays;
+      var occurrences = buildAgendaOccurrences(personId, startDate, rangeDays);
+      var todayKey = toYmd(startDate);
+      var todayEvents = occurrences[todayKey] || [];
+
+      function appendDay(date, events, isToday) {
+        var dayWrapper = document.createElement('div');
+        dayWrapper.className = 'life-agenda-day';
+        var header = document.createElement('div');
+        header.className = 'life-agenda-day-header';
+        header.textContent = formatAgendaDayHeader(date);
+        dayWrapper.appendChild(header);
+        if (!events.length && isToday) {
+          var empty = document.createElement('div');
+          empty.className = 'life-agenda-empty';
+          empty.textContent = 'No Events Today';
+          dayWrapper.appendChild(empty);
+        } else {
+          events.forEach(function(event) {
+            var row = document.createElement('div');
+            row.className = 'life-agenda-item';
+            var accent = document.createElement('div');
+            accent.className = 'life-agenda-accent';
+            var details = document.createElement('div');
+            var title = document.createElement('div');
+            title.className = 'life-agenda-title';
+            title.textContent = event.title || 'Untitled event';
+            details.appendChild(title);
+            if (event.location) {
+              var location = document.createElement('div');
+              location.className = 'life-agenda-location';
+              location.textContent = event.location;
+              details.appendChild(location);
+              var actions = document.createElement('div');
+              actions.className = 'life-agenda-actions';
+              var directionsBtn = document.createElement('button');
+              directionsBtn.type = 'button';
+              directionsBtn.className = 'life-agenda-direction';
+              directionsBtn.textContent = 'Directions';
+              directionsBtn.addEventListener('click', function(ev) {
+                ev.stopPropagation();
+                window.open(buildDirectionsUrl(event.location), '_blank');
+              });
+              actions.appendChild(directionsBtn);
+              details.appendChild(actions);
+            }
+            var time = document.createElement('div');
+            time.className = 'life-agenda-time';
+            time.textContent = buildAgendaTimeRange(event);
+            row.appendChild(accent);
+            row.appendChild(details);
+            row.appendChild(time);
+            row.addEventListener('click', function() {
+              openEventModal(event, toYmd(date), { lockPersonId: personId });
+            });
+            dayWrapper.appendChild(row);
+          });
+        }
+        lifeAgendaList.appendChild(dayWrapper);
+      }
+
+      if (!todayEvents.length) {
+        appendDay(new Date(startDate), [], true);
+      }
+
+      for (var i = 0; i < rangeDays; i++) {
+        var date = new Date(startDate);
+        date.setDate(startDate.getDate() + i);
+        var key = toYmd(date);
+        var events = occurrences[key] || [];
+        if (!events.length) {
+          continue;
+        }
+        appendDay(date, events, key === todayKey);
+      }
+    }
+
     function openPersonView(person) {
       if (!person) return;
       activePersonId = person.id;
@@ -5498,30 +5799,7 @@
         lifePersonAvatar.src = getAvatarDataUrl(person);
         lifePersonAvatar.alt = person.name || 'Person';
       }
-      if (lifePersonTaskText) {
-        lifePersonTaskText.value = '';
-        lifePersonTaskText.placeholder = 'Add a task for ' + (person.name || 'this person');
-      }
-      if (lifePersonGoalText) {
-        lifePersonGoalText.value = '';
-        lifePersonGoalText.placeholder = 'Short-term goal for ' + (person.name || 'this person');
-      }
-      if (lifePersonApptTitle) {
-        lifePersonApptTitle.value = '';
-      }
-      if (lifePersonApptStart) {
-        lifePersonApptStart.value = '';
-      }
-      renderPersonRightNow(person.id);
-      renderPersonComingUp(person.id);
-      renderPersonParked(person.id);
-      if (lifePersonParkedToggle) {
-        lifePersonParkedToggle.setAttribute('aria-expanded', 'false');
-        lifePersonParkedToggle.lastElementChild.textContent = '+';
-      }
-      if (lifePersonParkedList) {
-        lifePersonParkedList.style.display = 'none';
-      }
+      setAgendaRange(lifeAgendaRangeDays);
       setPersonViewActive(true);
     }
 
@@ -5577,6 +5855,7 @@
     var calendarEditingEventId = null;
     var calendarOccurrences = {};
     var calendarReturnToDay = false;
+    var calendarLockedPersonId = null;
 
     function padNumber(value) {
       return value < 10 ? '0' + value : String(value);
@@ -5876,6 +6155,13 @@
       calendarEventDirections.style.display = 'inline-flex';
     }
 
+    function updateCalendarEventTimeVisibility() {
+      if (!calendarEventAllDay || !calendarEventTimeRow || !calendarEventStart) return;
+      var isAllDay = calendarEventAllDay.checked;
+      calendarEventTimeRow.style.display = isAllDay ? 'none' : '';
+      calendarEventStart.required = !isAllDay;
+    }
+
     function updateCustomRepeatVisibility() {
       if (!calendarEventRepeat || !calendarCustomWeekdays || !calendarCustomUntil) return;
       var isCustom = calendarEventRepeat.value === 'custom_weekdays';
@@ -5982,6 +6268,9 @@
           saveCalendarEvents();
           renderCalendarMonth();
           renderDayModal();
+          if (activePersonId === event.personId) {
+            renderPersonAgenda(event.personId);
+          }
         });
         actions.appendChild(deleteBtn);
         card.appendChild(actions);
@@ -5989,8 +6278,11 @@
       });
     }
 
-    function openEventModal(event, targetDate) {
+    function openEventModal(event, targetDate, options) {
       if (!calendarEventModal) return;
+      options = options || {};
+      calendarLockedPersonId = options.lockPersonId || null;
+      calendarEventModal.classList.toggle('person-locked', Boolean(calendarLockedPersonId));
       calendarReturnToDay = calendarDayModal && calendarDayModal.classList.contains('active');
       if (calendarReturnToDay) {
         hideCalendarModal(calendarDayModal);
@@ -6004,15 +6296,21 @@
       }
       renderCalendarPeopleOptions();
       if (calendarEventPerson) {
-        if (event) {
+        if (calendarLockedPersonId) {
+          calendarEventPerson.value = calendarLockedPersonId;
+        } else if (event) {
           calendarEventPerson.value = event.personId || calendarEventPerson.value || '';
         } else if (!calendarEventPerson.value && calendarEventPerson.options.length) {
           calendarEventPerson.value = calendarEventPerson.options[0].value;
         }
+        calendarEventPerson.disabled = Boolean(calendarLockedPersonId);
       }
       if (calendarEventTitleInput) calendarEventTitleInput.value = event ? event.title : '';
       if (calendarEventDate) {
         calendarEventDate.value = event ? event.date : (targetDate || toYmd(new Date()));
+      }
+      if (calendarEventAllDay) {
+        calendarEventAllDay.checked = event ? !!event.allDay : false;
       }
       if (calendarEventStart) calendarEventStart.value = event ? event.startTime : '09:00';
       if (calendarEventEnd) calendarEventEnd.value = event ? (event.endTime || '') : '';
@@ -6021,6 +6319,7 @@
       if (calendarEventRepeat) {
         calendarEventRepeat.value = event && event.recurrence ? event.recurrence.type : 'none';
       }
+      updateCalendarEventTimeVisibility();
       updateCustomRepeatVisibility();
       if (calendarCustomWeekdays) {
         var checkboxes = calendarCustomWeekdays.querySelectorAll('input[type="checkbox"]');
@@ -6044,6 +6343,13 @@
 
     function closeEventModal() {
       calendarEditingEventId = null;
+      calendarLockedPersonId = null;
+      if (calendarEventModal) {
+        calendarEventModal.classList.remove('person-locked');
+      }
+      if (calendarEventPerson) {
+        calendarEventPerson.disabled = false;
+      }
       hideCalendarModal(calendarEventModal);
       if (calendarReturnToDay && calendarSelectedDate) {
         calendarReturnToDay = false;
@@ -6083,8 +6389,9 @@
         calendarEventDate.focus();
         return;
       }
-      var startTime = calendarEventStart.value;
-      if (!startTime) {
+      var isAllDay = calendarEventAllDay && calendarEventAllDay.checked;
+      var startTime = isAllDay ? '00:00' : calendarEventStart.value;
+      if (!isAllDay && !startTime) {
         alert('Please select a start time.');
         calendarEventStart.focus();
         return;
@@ -6116,9 +6423,10 @@
         title: title,
         date: date,
         startTime: startTime,
-        endTime: calendarEventEnd ? calendarEventEnd.value : '',
+        endTime: isAllDay ? '' : (calendarEventEnd ? calendarEventEnd.value : ''),
         location: calendarEventLocation ? calendarEventLocation.value.trim() : '',
         notes: calendarEventNotes ? calendarEventNotes.value.trim() : '',
+        allDay: isAllDay,
         recurrence: recurrence,
         updatedAt: Date.now()
       };
@@ -6135,6 +6443,9 @@
       renderCalendarMonth();
       if (calendarSelectedDate) {
         renderDayModal();
+      }
+      if (activePersonId === personId) {
+        renderPersonAgenda(personId);
       }
       closeEventModal();
     }
@@ -6329,6 +6640,9 @@
       if (calendarImportNotesDetails) {
         calendarImportNotesDetails.open = false;
       }
+      if (calendarImportOriginalDetails) {
+        calendarImportOriginalDetails.open = false;
+      }
       updateCalendarImportTimeVisibility();
       updateCalendarImportDirections();
     }
@@ -6341,6 +6655,9 @@
       var decodedText = rawText.replace(/\+/g, ' ').trim();
       var parsed = parseCalendarImportText(decodedText);
       renderCalendarImportPeopleOptions(personId);
+      if (calendarImportBackPerson) {
+        calendarImportBackPerson.style.display = calendarImportPerson ? 'inline-flex' : 'none';
+      }
       calendarImportOriginal.textContent = decodedText || 'No message text received.';
       if (calendarImportNotes) calendarImportNotes.value = decodedText;
       if (calendarImportTitle) calendarImportTitle.value = parsed.title || '';
@@ -6409,7 +6726,7 @@
       saveCalendarEvents();
       renderCalendarMonth();
       if (activePersonId === personId) {
-        renderPersonComingUp(personId);
+        renderPersonAgenda(personId);
       }
       showCalendarImportSuccess();
     }
@@ -7984,6 +8301,9 @@
     const lifePersonNameDisplay = document.getElementById('lifePersonNameDisplay');
     const lifePersonRoleDisplay = document.getElementById('lifePersonRoleDisplay');
     const lifePersonOrgDisplay = document.getElementById('lifePersonOrgDisplay');
+    const lifePersonAddEvent = document.getElementById('lifePersonAddEvent');
+    const lifeAgendaRange = document.getElementById('lifeAgendaRange');
+    const lifeAgendaList = document.getElementById('lifeAgendaList');
     const lifePersonNowList = document.getElementById('lifePersonNowList');
     const lifePersonComingList = document.getElementById('lifePersonComingList');
     const lifePersonParkedList = document.getElementById('lifePersonParkedList');
@@ -8043,6 +8363,8 @@
     const calendarEventPersonAvatar = document.getElementById('calendarEventPersonAvatar');
     const calendarEventTitleInput = document.getElementById('calendarEventTitleInput');
     const calendarEventDate = document.getElementById('calendarEventDate');
+    const calendarEventAllDay = document.getElementById('calendarEventAllDay');
+    const calendarEventTimeRow = document.getElementById('calendarEventTimeRow');
     const calendarEventStart = document.getElementById('calendarEventStart');
     const calendarEventEnd = document.getElementById('calendarEventEnd');
     const calendarEventLocation = document.getElementById('calendarEventLocation');
@@ -8066,11 +8388,13 @@
     const calendarImportDirections = document.getElementById('calendarImportDirections');
     const calendarImportNotes = document.getElementById('calendarImportNotes');
     const calendarImportNotesDetails = document.getElementById('calendarImportNotesDetails');
+    const calendarImportOriginalDetails = document.getElementById('calendarImportOriginalDetails');
     const calendarImportOriginal = document.getElementById('calendarImportOriginal');
     const calendarImportSave = document.getElementById('calendarImportSave');
     const calendarImportCancel = document.getElementById('calendarImportCancel');
     const calendarImportSuccess = document.getElementById('calendarImportSuccess');
     const calendarImportBack = document.getElementById('calendarImportBack');
+    const calendarImportBackPerson = document.getElementById('calendarImportBackPerson');
     const calendarImportAddAnother = document.getElementById('calendarImportAddAnother');
     
     // Profile elements
@@ -8377,6 +8701,16 @@
       }
     }
 
+    function openPendingPersonFromStorage() {
+      var pendingId = localStorage.getItem('life_focus_person_id');
+      if (!pendingId) return;
+      var person = getPersonById(pendingId);
+      if (person) {
+        openPersonView(person);
+      }
+      localStorage.removeItem('life_focus_person_id');
+    }
+
     function setActiveView(view, pushState) {
       activeView = view;
       var showSocial = view === 'social';
@@ -8424,6 +8758,9 @@
         }
         if (showCalendarImport) {
           populateCalendarImportForm();
+        }
+        if (showLife) {
+          openPendingPersonFromStorage();
         }
       }
     }
@@ -9957,6 +10294,28 @@
       });
     }
 
+    if (lifePersonAddEvent) {
+      lifePersonAddEvent.addEventListener('click', function() {
+        if (!activePersonId) return;
+        openEventModal(null, toYmd(new Date()), { lockPersonId: activePersonId });
+      });
+    }
+
+    if (lifeAgendaRange) {
+      lifeAgendaRange.addEventListener('click', function(event) {
+        var button = event.target.closest('.life-agenda-segment');
+        if (!button) return;
+        if (button.dataset.range === 'today') {
+          setAgendaRange(1);
+          return;
+        }
+        var days = parseInt(button.dataset.range, 10);
+        if (!Number.isNaN(days)) {
+          setAgendaRange(days);
+        }
+      });
+    }
+
     if (lifePersonParkedToggle) {
       lifePersonParkedToggle.addEventListener('click', function() {
         var isExpanded = lifePersonParkedToggle.getAttribute('aria-expanded') === 'true';
@@ -9993,11 +10352,18 @@
         var notes = lifePersonNotes ? lifePersonNotes.value.trim() : '';
         var avatarType = pendingAvatarType === 'photo' && pendingAvatarDataUrl ? 'photo' : 'generated';
         var avatarSeed = pendingAvatarSeed || name || generatePersonId();
-        var accountHolderKey = getAccountHolderKey();
-        var isAccountHolder = accountHolderKey && normalizeName(name) === accountHolderKey;
         var existingPerson = editingPersonId
           ? people.find(function(person) { return person.id === editingPersonId; })
           : null;
+        var accountHolderKey = getAccountHolderKey();
+        var isAccountHolder = existingPerson ? existingPerson.isAccountHolder : false;
+        if (!isAccountHolder && accountHolderKey && normalizeName(name) === accountHolderKey) {
+          isAccountHolder = true;
+        }
+        var type = existingPerson ? existingPerson.type : '';
+        if (isAccountHolder && !type) {
+          type = 'me';
+        }
         var personRecord = {
           id: editingPersonId || generatePersonId(),
           name: name,
@@ -10007,6 +10373,7 @@
           dob: dob,
           notes: notes,
           isAccountHolder: Boolean(isAccountHolder),
+          type: type,
           avatarType: avatarType,
           avatarDataUrl: avatarType === 'photo' ? pendingAvatarDataUrl : '',
           avatarSeed: avatarSeed,
@@ -10370,6 +10737,9 @@
         if (calendarSelectedDate) {
           renderDayModal();
         }
+        if (activePersonId) {
+          renderPersonAgenda(activePersonId);
+        }
         closeEventModal();
       });
     }
@@ -10383,6 +10753,12 @@
     if (calendarEventLocation) {
       calendarEventLocation.addEventListener('input', function() {
         updateCalendarDirectionsButton();
+      });
+    }
+
+    if (calendarEventAllDay) {
+      calendarEventAllDay.addEventListener('change', function() {
+        updateCalendarEventTimeVisibility();
       });
     }
 
@@ -10456,16 +10832,17 @@
 
     if (calendarImportBack) {
       calendarImportBack.addEventListener('click', function() {
-        var personId = calendarImportPerson ? calendarImportPerson.value : '';
-        var person = getPersonById(personId);
-        if (person) {
-          history.pushState({ view: 'life' }, '', '/#life');
-          setActiveView('life', false);
-          setLifeTab('people');
-          openPersonView(person);
-          return;
-        }
         window.location.assign('/#calendar');
+      });
+    }
+
+    if (calendarImportBackPerson) {
+      calendarImportBackPerson.addEventListener('click', function() {
+        var personId = calendarImportPerson ? calendarImportPerson.value : '';
+        if (personId) {
+          localStorage.setItem('life_focus_person_id', personId);
+        }
+        window.location.assign('/#life');
       });
     }
 
