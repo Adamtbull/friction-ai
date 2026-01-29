@@ -334,6 +334,92 @@ if (url.pathname === "/api/youtube/channel-latest" && request.method === "GET") 
   );
 }
 
+// GET /api/youtube/channel-sample?channelId=<UC...>&pool=50
+if (url.pathname === "/api/youtube/channel-sample" && request.method === "GET") {
+  var channelIdSample = url.searchParams.get("channelId");
+  if (!channelIdSample || !channelIdSample.trim()) {
+    return jsonResponse({ error: "Missing channelId query parameter." }, 400);
+  }
+  if (!env.YOUTUBE_API_KEY) {
+    return jsonResponse({ error: "Server missing YOUTUBE_API_KEY." }, 500);
+  }
+
+  var poolParam = parseInt(url.searchParams.get("pool"), 10);
+  if (!poolParam || poolParam < 1) poolParam = 50;
+  if (poolParam > 50) poolParam = 50;
+
+  var channelsSampleUrl =
+    "https://www.googleapis.com/youtube/v3/channels?part=snippet,contentDetails&id=" +
+    encodeURIComponent(channelIdSample) +
+    "&key=" +
+    encodeURIComponent(env.YOUTUBE_API_KEY);
+  var channelSampleResult = await fetchJson(channelsSampleUrl);
+  if (!channelSampleResult.response.ok) {
+    return jsonResponse({ error: "YouTube API error." }, 502);
+  }
+  var channelSampleItems = Array.isArray(channelSampleResult.data.items) ? channelSampleResult.data.items : [];
+  if (channelSampleItems.length === 0) {
+    return jsonResponse({ error: "Channel not found." }, 404);
+  }
+  var channelSample = channelSampleItems[0];
+  var channelSampleTitle = channelSample && channelSample.snippet ? channelSample.snippet.title || "" : "";
+  var uploadsSampleId =
+    channelSample &&
+    channelSample.contentDetails &&
+    channelSample.contentDetails.relatedPlaylists &&
+    channelSample.contentDetails.relatedPlaylists.uploads
+      ? channelSample.contentDetails.relatedPlaylists.uploads
+      : "";
+
+  if (!uploadsSampleId) {
+    return jsonResponse({ error: "YouTube API error." }, 502);
+  }
+
+  var samplePlaylistUrl =
+    "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=" +
+    encodeURIComponent(uploadsSampleId) +
+    "&maxResults=" +
+    encodeURIComponent(poolParam) +
+    "&key=" +
+    encodeURIComponent(env.YOUTUBE_API_KEY);
+  var samplePlaylistResult = await fetchJson(samplePlaylistUrl);
+  if (!samplePlaylistResult.response.ok) {
+    return jsonResponse({ error: "YouTube API error." }, 502);
+  }
+
+  var sampleItems = Array.isArray(samplePlaylistResult.data.items) ? samplePlaylistResult.data.items : [];
+  var sampleVideos = sampleItems
+    .map(function(item) {
+      var snippet = item.snippet || {};
+      var resourceId = snippet.resourceId || {};
+      var videoId = resourceId.videoId || "";
+      if (!videoId) return null;
+      return {
+        videoId: videoId,
+        title: snippet.title || "",
+        publishedAt: snippet.publishedAt || "",
+        thumbnail: selectBestThumbnail(snippet.thumbnails || {}),
+        url: "https://www.youtube.com/watch?v=" + videoId
+      };
+    })
+    .filter(function(item) {
+      return item;
+    });
+
+  return jsonResponseWithHeaders(
+    {
+      channel: {
+        channelId: channelIdSample,
+        channelTitle: channelSampleTitle,
+        channelUrl: "https://www.youtube.com/channel/" + channelIdSample
+      },
+      videos: sampleVideos
+    },
+    200,
+    { "Cache-Control": "public, max-age=600" }
+  );
+}
+
 return new Response("Not Found", { status: 404, headers: corsHeaders() });
 
 }

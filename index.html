@@ -2081,6 +2081,18 @@
       margin-bottom: 10px;
     }
 
+    #friction-social-view .fs-shelf-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #friction-social-view .fs-refresh-btn {
+      padding: 6px 10px;
+      font-size: 0.75rem;
+      border-radius: 999px;
+    }
+
     #friction-social-view .fs-shelf-title {
       font-size: 1rem;
       font-weight: 600;
@@ -2121,6 +2133,7 @@
     #friction-social-view .fs-card {
       flex: 0 0 auto;
       width: clamp(160px, 42vw, 220px);
+      position: relative;
       background: var(--white);
       border: 1px solid var(--border);
       border-radius: 12px;
@@ -2138,6 +2151,31 @@
       height: 100px;
       object-fit: cover;
       background: var(--grey-light);
+    }
+
+    #friction-social-view .fs-card-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--white);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    #friction-social-view .fs-card-badge--latest {
+      background: var(--teal);
+    }
+
+    #friction-social-view .fs-card-badge--seen {
+      top: auto;
+      bottom: 8px;
+      background: rgba(30, 41, 59, 0.75);
+      text-transform: none;
     }
 
     #friction-social-view .fs-card-body {
@@ -3880,7 +3918,9 @@
 
     // FRICTION SOCIAL
     var FRICTION_SOCIAL_CHANNELS_KEY = 'friction_social_channels_v1';
+    var FRICTION_SOCIAL_SEEN_KEY = 'friction_social_seen_v1';
     var FRICTION_SOCIAL_CHANNEL_LIMIT = 12;
+    var FRICTION_SOCIAL_POOL_LIMIT = 50;
     var frictionSocialState = {
       shelves: [],
       query: ''
@@ -3888,6 +3928,7 @@
     var frictionSocialScrollTop = 0;
     var frictionSocialMetadataCache = {};
     var frictionSocialChannels = [];
+    var frictionSocialSeenMap = {};
 
     function getFrictionSocialDefaults() {
       return [
@@ -3906,6 +3947,25 @@
           ]
         }
       ];
+    }
+
+    function normalizeFrictionSocialChannel(channel) {
+      if (!channel || !channel.channelId) return null;
+      var latestVideo = channel.latestVideo || null;
+      var rotationVideos = Array.isArray(channel.rotationVideos) ? channel.rotationVideos : [];
+      if (!latestVideo && Array.isArray(channel.videos)) {
+        latestVideo = channel.videos[0] || null;
+        rotationVideos = channel.videos.slice(1);
+      }
+      return {
+        channelId: channel.channelId,
+        channelTitle: channel.channelTitle || 'Unknown channel',
+        channelUrl: channel.channelUrl || '',
+        addedAt: channel.addedAt || Date.now(),
+        latestVideo: latestVideo,
+        rotationVideos: rotationVideos,
+        lastRotationAt: channel.lastRotationAt || null
+      };
     }
 
     function loadFrictionSocialShelves() {
@@ -3929,7 +3989,9 @@
         try {
           var parsed = JSON.parse(saved);
           if (Array.isArray(parsed)) {
-            return parsed;
+            return parsed.map(function(channel) {
+              return normalizeFrictionSocialChannel(channel);
+            }).filter(Boolean);
           }
         } catch (e) {
           return [];
@@ -3938,12 +4000,31 @@
       return [];
     }
 
+    function loadFrictionSocialSeenMap() {
+      var saved = localStorage.getItem(FRICTION_SOCIAL_SEEN_KEY);
+      if (saved) {
+        try {
+          var parsed = JSON.parse(saved);
+          if (parsed && typeof parsed === 'object') {
+            return parsed;
+          }
+        } catch (e) {
+          return {};
+        }
+      }
+      return {};
+    }
+
     function saveFrictionSocialShelves() {
       localStorage.setItem('friction_social_shelves', JSON.stringify(frictionSocialState.shelves));
     }
 
     function saveFrictionSocialChannels() {
       localStorage.setItem(FRICTION_SOCIAL_CHANNELS_KEY, JSON.stringify(frictionSocialChannels));
+    }
+
+    function saveFrictionSocialSeenMap() {
+      localStorage.setItem(FRICTION_SOCIAL_SEEN_KEY, JSON.stringify(frictionSocialSeenMap));
     }
 
     function extractYouTubeId(value) {
@@ -3957,6 +4038,55 @@
         return trimmed;
       }
       return '';
+    }
+
+    function markFrictionSocialSeen(videoId) {
+      if (!videoId) return;
+      if (!frictionSocialSeenMap[videoId]) {
+        frictionSocialSeenMap[videoId] = Date.now();
+        saveFrictionSocialSeenMap();
+      }
+    }
+
+    function isFrictionSocialSeen(videoId) {
+      return !!(videoId && frictionSocialSeenMap[videoId]);
+    }
+
+    function addFrictionSocialSeenBadge(card) {
+      if (!card || card.querySelector('.fs-card-badge--seen')) return;
+      var seenBadge = document.createElement('span');
+      seenBadge.className = 'fs-card-badge fs-card-badge--seen';
+      seenBadge.textContent = 'Seen';
+      card.appendChild(seenBadge);
+    }
+
+    function shuffleFrictionSocialList(items) {
+      var array = items.slice();
+      for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+      }
+      return array;
+    }
+
+    function buildFrictionSocialRotation(poolVideos, latestVideoId, count) {
+      var candidates = (poolVideos || []).filter(function(video) {
+        return video && video.videoId && video.videoId !== latestVideoId;
+      });
+      var unseen = candidates.filter(function(video) {
+        return !isFrictionSocialSeen(video.videoId);
+      });
+      var seen = candidates.filter(function(video) {
+        return isFrictionSocialSeen(video.videoId);
+      });
+      var selection = shuffleFrictionSocialList(unseen).slice(0, count);
+      if (selection.length < count) {
+        var remaining = count - selection.length;
+        selection = selection.concat(shuffleFrictionSocialList(seen).slice(0, remaining));
+      }
+      return selection;
     }
 
     function getOrCreateShelf(title) {
@@ -4012,7 +4142,9 @@
           channelTitle: channelData.channelTitle || existing.channelTitle,
           channelUrl: channelData.channelUrl || existing.channelUrl,
           addedAt: existing.addedAt,
-          videos: channelData.videos || []
+          latestVideo: channelData.latestVideo || existing.latestVideo || null,
+          rotationVideos: channelData.rotationVideos || existing.rotationVideos || [],
+          lastRotationAt: channelData.lastRotationAt || existing.lastRotationAt || null
         };
       } else {
         frictionSocialChannels.unshift({
@@ -4020,7 +4152,9 @@
           channelTitle: channelData.channelTitle || 'Unknown channel',
           channelUrl: channelData.channelUrl || '',
           addedAt: Date.now(),
-          videos: channelData.videos || []
+          latestVideo: channelData.latestVideo || null,
+          rotationVideos: channelData.rotationVideos || [],
+          lastRotationAt: channelData.lastRotationAt || null
         });
       }
       saveFrictionSocialChannels();
@@ -4031,6 +4165,15 @@
       if (!response.ok) {
         var errorText = await response.text().catch(function() { return ''; });
         throw new Error(errorText || 'Failed to fetch channel videos.');
+      }
+      return response.json();
+    }
+
+    async function fetchFrictionSocialChannelSample(channelId, pool) {
+      var response = await fetch('/api/youtube/channel-sample?channelId=' + encodeURIComponent(channelId) + '&pool=' + pool);
+      if (!response.ok) {
+        var errorText = await response.text().catch(function() { return ''; });
+        throw new Error(errorText || 'Failed to fetch channel sample.');
       }
       return response.json();
     }
@@ -4048,18 +4191,68 @@
         if (!resolved || !resolved.channelId) {
           throw new Error('Channel not found.');
         }
-        var latest = await fetchFrictionSocialChannelLatest(resolved.channelId, FRICTION_SOCIAL_CHANNEL_LIMIT);
+        var latest = await fetchFrictionSocialChannelLatest(resolved.channelId, 1);
         var channelInfo = latest.channel || resolved;
-        var videos = Array.isArray(latest.videos) ? latest.videos : [];
+        var latestVideo = Array.isArray(latest.videos) ? latest.videos[0] : null;
+        var sample = await fetchFrictionSocialChannelSample(resolved.channelId, FRICTION_SOCIAL_POOL_LIMIT);
+        var poolVideos = Array.isArray(sample.videos) ? sample.videos : [];
+        var rotationVideos = buildFrictionSocialRotation(
+          poolVideos,
+          latestVideo ? latestVideo.videoId : '',
+          Math.max(FRICTION_SOCIAL_CHANNEL_LIMIT - 1, 0)
+        );
         upsertFrictionSocialChannel({
           channelId: channelInfo.channelId || resolved.channelId,
           channelTitle: channelInfo.channelTitle || resolved.channelTitle,
           channelUrl: channelInfo.channelUrl || resolved.channelUrl,
-          videos: videos
+          latestVideo: latestVideo,
+          rotationVideos: rotationVideos,
+          lastRotationAt: Date.now()
         });
         renderFrictionSocialShelves();
       } catch (err) {
         alert(err && err.message ? err.message : 'Unable to add channel.');
+      }
+    }
+
+    async function refreshFrictionSocialChannelRotation(channelId, buttonEl) {
+      var index = frictionSocialChannels.findIndex(function(channel) {
+        return channel.channelId === channelId;
+      });
+      if (index < 0) return;
+      var channel = frictionSocialChannels[index];
+      var originalLabel = buttonEl ? buttonEl.textContent : '';
+      if (buttonEl) {
+        buttonEl.disabled = true;
+        buttonEl.textContent = 'Refreshing...';
+      }
+      try {
+        var sample = await fetchFrictionSocialChannelSample(channelId, FRICTION_SOCIAL_POOL_LIMIT);
+        var poolVideos = Array.isArray(sample.videos) ? sample.videos : [];
+        var latestId = channel.latestVideo ? channel.latestVideo.videoId : '';
+        var rotationVideos = buildFrictionSocialRotation(
+          poolVideos,
+          latestId,
+          Math.max(FRICTION_SOCIAL_CHANNEL_LIMIT - 1, 0)
+        );
+        frictionSocialChannels[index] = {
+          channelId: channel.channelId,
+          channelTitle: channel.channelTitle,
+          channelUrl: channel.channelUrl,
+          addedAt: channel.addedAt,
+          latestVideo: channel.latestVideo || null,
+          rotationVideos: rotationVideos,
+          lastRotationAt: Date.now()
+        };
+        saveFrictionSocialChannels();
+        renderFrictionSocialShelves();
+      } catch (err) {
+        alert(err && err.message ? err.message : 'Unable to refresh channel rotation.');
+      } finally {
+        if (buttonEl) {
+          buttonEl.disabled = false;
+          buttonEl.textContent = originalLabel;
+        }
       }
     }
 
@@ -4076,14 +4269,24 @@
           var channel = frictionSocialChannels[i];
           if (!channel || !channel.channelId) continue;
           try {
-            var latest = await fetchFrictionSocialChannelLatest(channel.channelId, FRICTION_SOCIAL_CHANNEL_LIMIT);
+            var latest = await fetchFrictionSocialChannelLatest(channel.channelId, 1);
             var channelInfo = latest.channel || {};
+            var latestVideo = Array.isArray(latest.videos) ? latest.videos[0] : channel.latestVideo;
+            var sample = await fetchFrictionSocialChannelSample(channel.channelId, FRICTION_SOCIAL_POOL_LIMIT);
+            var poolVideos = Array.isArray(sample.videos) ? sample.videos : [];
+            var rotationVideos = buildFrictionSocialRotation(
+              poolVideos,
+              latestVideo ? latestVideo.videoId : '',
+              Math.max(FRICTION_SOCIAL_CHANNEL_LIMIT - 1, 0)
+            );
             frictionSocialChannels[i] = {
               channelId: channel.channelId,
               channelTitle: channelInfo.channelTitle || channel.channelTitle,
               channelUrl: channelInfo.channelUrl || channel.channelUrl,
               addedAt: channel.addedAt,
-              videos: Array.isArray(latest.videos) ? latest.videos : []
+              latestVideo: latestVideo || null,
+              rotationVideos: rotationVideos,
+              lastRotationAt: Date.now()
             };
           } catch (err) {
             continue;
@@ -4196,10 +4399,15 @@
       var totalMatches = 0;
 
       frictionSocialChannels.forEach(function(channel) {
-        var videos = Array.isArray(channel.videos) ? channel.videos : [];
+        var latestVideo = channel.latestVideo || null;
+        var rotationVideos = Array.isArray(channel.rotationVideos) ? channel.rotationVideos : [];
+        var latestVideoId = latestVideo ? latestVideo.videoId : '';
         var channelTitle = channel.channelTitle || 'Unknown channel';
         var channelMatch = query && channelTitle.toLowerCase().indexOf(query) >= 0;
-        var filtered = videos.filter(function(video) {
+        var allVideos = [];
+        if (latestVideo) allVideos.push(latestVideo);
+        allVideos = allVideos.concat(rotationVideos);
+        var filtered = allVideos.filter(function(video) {
           if (!query) return true;
           if (channelMatch) return true;
           var title = (video.title || '').toLowerCase();
@@ -4220,12 +4428,27 @@
         titleEl.className = 'fs-shelf-title';
         titleEl.textContent = channelTitle;
 
+        var actions = document.createElement('div');
+        actions.className = 'fs-shelf-actions';
+
         var countEl = document.createElement('div');
         countEl.className = 'fs-shelf-count';
         countEl.textContent = filtered.length + (filtered.length === 1 ? ' video' : ' videos');
 
+        var refreshBtn = document.createElement('button');
+        refreshBtn.type = 'button';
+        refreshBtn.className = 'fs-add-btn fs-secondary-btn fs-refresh-btn';
+        refreshBtn.textContent = '🎲 Refresh';
+        refreshBtn.addEventListener('click', function(event) {
+          event.stopPropagation();
+          refreshFrictionSocialChannelRotation(channel.channelId, refreshBtn);
+        });
+
+        actions.appendChild(countEl);
+        actions.appendChild(refreshBtn);
+
         header.appendChild(titleEl);
-        header.appendChild(countEl);
+        header.appendChild(actions);
 
         var row = document.createElement('div');
         row.className = 'fs-row';
@@ -4238,6 +4461,20 @@
           card.dataset.videoTitle = video.title || 'Untitled video';
           card.dataset.videoChannel = channelTitle;
           card.dataset.videoPublishedAt = video.publishedAt || '';
+
+          if (latestVideoId && video.videoId === latestVideoId) {
+            var latestBadge = document.createElement('span');
+            latestBadge.className = 'fs-card-badge fs-card-badge--latest';
+            latestBadge.textContent = 'Latest';
+            card.appendChild(latestBadge);
+          }
+
+          if (isFrictionSocialSeen(video.videoId)) {
+            var seenBadge = document.createElement('span');
+            seenBadge.className = 'fs-card-badge fs-card-badge--seen';
+            seenBadge.textContent = 'Seen';
+            card.appendChild(seenBadge);
+          }
 
           var img = document.createElement('img');
           img.src = video.thumbnail || ('https://i.ytimg.com/vi/' + video.videoId + '/hqdefault.jpg');
@@ -4310,6 +4547,13 @@
           card.dataset.videoChannel = video.channel || '';
           card.dataset.videoPublishedAt = video.publishedAt || '';
 
+          if (isFrictionSocialSeen(video.id)) {
+            var seenBadge = document.createElement('span');
+            seenBadge.className = 'fs-card-badge fs-card-badge--seen';
+            seenBadge.textContent = 'Seen';
+            card.appendChild(seenBadge);
+          }
+
           var img = document.createElement('img');
           img.src = video.thumbnail || ('https://i.ytimg.com/vi/' + video.id + '/hqdefault.jpg');
           img.alt = video.title || 'YouTube thumbnail';
@@ -4351,6 +4595,7 @@
 
     function openFrictionSocialModal(video) {
       if (!video || !video.id) return;
+      markFrictionSocialSeen(video.id);
       frictionSocialScrollTop = frictionSocialView.scrollTop;
       frictionSocialView.classList.add('modal-open');
       frictionSocialModal.classList.add('active');
@@ -4374,6 +4619,7 @@
 
     frictionSocialState.shelves = loadFrictionSocialShelves();
     frictionSocialChannels = loadFrictionSocialChannels();
+    frictionSocialSeenMap = loadFrictionSocialSeenMap();
     renderFrictionSocialShelves();
     refreshFrictionSocialMetadata();
 
@@ -4393,8 +4639,11 @@
     frictionSocialShelves.addEventListener('click', function(event) {
       var card = event.target.closest('.fs-card');
       if (!card) return;
+      var videoId = card.dataset.videoId;
+      markFrictionSocialSeen(videoId);
+      addFrictionSocialSeenBadge(card);
       openFrictionSocialModal({
-        id: card.dataset.videoId,
+        id: videoId,
         title: card.dataset.videoTitle,
         channel: card.dataset.videoChannel,
         publishedAt: card.dataset.videoPublishedAt
