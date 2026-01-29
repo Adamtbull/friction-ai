@@ -2259,6 +2259,7 @@
       background: var(--white);
       cursor: pointer;
       font-size: 0.85rem;
+      min-height: 44px;
     }
 
     #life-view .life-tab.active {
@@ -2314,6 +2315,7 @@
       font-size: 0.9rem;
       font-weight: 500;
       cursor: pointer;
+      min-height: 44px;
     }
 
     #life-view .life-btn.secondary {
@@ -2442,6 +2444,117 @@
       gap: 10px;
       cursor: pointer;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    #life-view.person-view-active .life-header,
+    #life-view.person-view-active .life-controls,
+    #life-view.person-view-active [data-tab-panel] {
+      display: none;
+    }
+
+    #life-view .life-person-view {
+      display: none;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 10px 24px var(--shadow);
+    }
+
+    #life-view.person-view-active .life-person-view {
+      display: block;
+    }
+
+    #life-view .life-person-header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    #life-view .life-person-identity {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    #life-view .life-person-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: rgba(90, 154, 148, 0.12);
+    }
+
+    #life-view .life-person-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    #life-view .life-person-role-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      border-radius: 999px;
+      background: rgba(90, 154, 148, 0.12);
+      font-size: 0.75rem;
+      color: var(--text-primary);
+    }
+
+    #life-view .life-person-org {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    #life-view .life-person-quick {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    #life-view .life-quick-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      background: var(--white);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #life-view .life-quick-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+    }
+
+    #life-view .life-person-section {
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+      margin-top: 14px;
+    }
+
+    #life-view .life-person-section:first-of-type {
+      border-top: none;
+      padding-top: 0;
+      margin-top: 0;
+    }
+
+    #life-view .life-section-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    #life-view .life-collapsible {
+      margin-top: 10px;
     }
 
     #life-view .life-person-card:hover {
@@ -3316,7 +3429,23 @@
         </div>
         <div class="life-row">
           <input class="life-input" id="lifePersonName" type="text" placeholder="Full name" maxlength="60" />
-          <input class="life-input" id="lifePersonRole" type="text" placeholder="Role (wife, son, daughter)" maxlength="40" />
+          <select class="life-select" id="lifePersonRole">
+            <option value="" disabled selected>Select role</option>
+            <option value="Wife">Wife</option>
+            <option value="Husband">Husband</option>
+            <option value="Partner">Partner</option>
+            <option value="Son">Son</option>
+            <option value="Daughter">Daughter</option>
+            <option value="Child">Child</option>
+            <option value="Mother">Mother</option>
+            <option value="Father">Father</option>
+            <option value="Sister">Sister</option>
+            <option value="Brother">Brother</option>
+            <option value="Grandmother">Grandmother</option>
+            <option value="Grandfather">Grandfather</option>
+            <option value="Other">Other</option>
+          </select>
+          <input class="life-input" id="lifePersonCustomRole" type="text" placeholder="Custom role" maxlength="40" style="display: none;" />
         </div>
         <div class="life-row">
           <input class="life-input" id="lifePersonOrg" type="text" placeholder="Job / School (optional)" maxlength="80" />
@@ -3330,6 +3459,67 @@
         </div>
       </div>
       <div class="life-people-grid" id="lifePeopleList"></div>
+    </div>
+  </div>
+
+  <div class="life-person-view" id="lifePersonView" aria-hidden="true">
+    <div class="life-person-header">
+      <button class="life-btn secondary" id="lifePersonBack" type="button">← Life</button>
+      <div class="life-person-identity">
+        <div class="life-person-avatar">
+          <img id="lifePersonAvatar" alt="Person avatar" />
+        </div>
+        <div>
+          <div class="life-person-name" id="lifePersonNameDisplay"></div>
+          <div class="life-person-role-pill" id="lifePersonRoleDisplay"></div>
+          <div class="life-person-org" id="lifePersonOrgDisplay"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="life-person-quick">
+      <div class="life-quick-card">
+        <div class="life-quick-title">Add task</div>
+        <div class="life-row">
+          <input class="life-input" id="lifePersonTaskText" type="text" placeholder="Add a task" maxlength="120" />
+          <button class="life-btn" id="lifePersonTaskAdd" type="button">Add task</button>
+        </div>
+      </div>
+      <div class="life-quick-card">
+        <div class="life-quick-title">Add appointment</div>
+        <div class="life-row">
+          <input class="life-input" id="lifePersonApptTitle" type="text" placeholder="Appointment title" maxlength="120" />
+          <input class="life-input" id="lifePersonApptStart" type="datetime-local" />
+        </div>
+        <div class="life-row">
+          <button class="life-btn" id="lifePersonApptAdd" type="button">Add appointment</button>
+        </div>
+      </div>
+      <div class="life-quick-card">
+        <div class="life-quick-title">Add short-term goal</div>
+        <div class="life-row">
+          <input class="life-input" id="lifePersonGoalText" type="text" placeholder="Short-term goal" maxlength="120" />
+          <button class="life-btn" id="lifePersonGoalAdd" type="button">Add goal</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="life-person-section">
+      <h3 class="section-subtitle">Right now</h3>
+      <div class="life-list" id="lifePersonNowList"></div>
+    </div>
+
+    <div class="life-person-section">
+      <h3 class="section-subtitle">Coming up</h3>
+      <div class="life-list" id="lifePersonComingList"></div>
+    </div>
+
+    <div class="life-person-section">
+      <button class="life-btn secondary life-section-toggle" id="lifePersonParkedToggle" type="button" aria-expanded="false">
+        <span>Parked</span>
+        <span>+</span>
+      </button>
+      <div class="life-collapsible life-list" id="lifePersonParkedList" style="display: none;"></div>
     </div>
   </div>
 
@@ -4102,11 +4292,13 @@
 
     // PEOPLE OVERVIEW
     var PEOPLE_KEY = 'friction_people_v1';
+    var PEOPLE_ROLE_OPTIONS = ['Wife', 'Husband', 'Partner', 'Son', 'Daughter', 'Child', 'Mother', 'Father', 'Sister', 'Brother', 'Grandmother', 'Grandfather', 'Other'];
     var people = [];
     var editingPersonId = null;
     var pendingAvatarType = 'generated';
     var pendingAvatarDataUrl = '';
     var pendingAvatarSeed = '';
+    var activePersonId = null;
 
     function generatePersonId() {
       return 'person_' + Date.now().toString(36) + '_' + Math.floor(Math.random() * 100000).toString(36);
@@ -4165,21 +4357,48 @@
       return buildAvatarSvg(seed, person.name);
     }
 
+    function normalizePersonRole(role, customRole) {
+      if (!role) {
+        return { role: 'Other', customRole: customRole || '' };
+      }
+      var match = PEOPLE_ROLE_OPTIONS.find(function(option) {
+        return option.toLowerCase() === String(role).toLowerCase();
+      });
+      if (match && match !== 'Other') {
+        return { role: match, customRole: '' };
+      }
+      if (match === 'Other') {
+        return { role: 'Other', customRole: customRole || '' };
+      }
+      return { role: 'Other', customRole: String(role) };
+    }
+
+    function getPersonRoleLabel(person) {
+      if (!person) return '';
+      if (person.role === 'Other') {
+        return person.customRole || 'Other';
+      }
+      return person.role || '';
+    }
+
     function normalizePerson(person) {
       if (!person || typeof person !== 'object') return null;
       var id = person.id || generatePersonId();
       var seed = person.avatarSeed || person.name || id;
+      var normalizedRole = normalizePersonRole(person.role, person.customRole);
       return {
         id: id,
         name: person.name || 'Unnamed',
-        role: person.role || 'Family',
+        role: normalizedRole.role,
+        customRole: normalizedRole.customRole,
         org: person.org || '',
         dob: person.dob || '',
         notes: person.notes || '',
         avatarType: person.avatarType === 'photo' ? 'photo' : 'generated',
         avatarDataUrl: person.avatarDataUrl || '',
         avatarSeed: seed,
-        createdAt: person.createdAt || Date.now()
+        createdAt: person.createdAt || Date.now(),
+        updatedAt: person.updatedAt || person.createdAt || Date.now()
       };
     }
 
@@ -4225,6 +4444,10 @@
       if (lifePeopleFormTitle) lifePeopleFormTitle.textContent = 'Add person';
       if (lifePersonName) lifePersonName.value = '';
       if (lifePersonRole) lifePersonRole.value = '';
+      if (lifePersonCustomRole) {
+        lifePersonCustomRole.value = '';
+        lifePersonCustomRole.style.display = 'none';
+      }
       if (lifePersonOrg) lifePersonOrg.value = '';
       if (lifePersonDob) lifePersonDob.value = '';
       if (lifePersonNotes) lifePersonNotes.value = '';
@@ -4242,6 +4465,16 @@
       lifeAvatarPreview.src = dataUrl;
     }
 
+    function updateCustomRoleVisibility() {
+      if (!lifePersonRole || !lifePersonCustomRole) return;
+      if (lifePersonRole.value === 'Other') {
+        lifePersonCustomRole.style.display = '';
+      } else {
+        lifePersonCustomRole.style.display = 'none';
+        lifePersonCustomRole.value = '';
+      }
+    }
+
     function openPeopleForm(person) {
       setPeopleFormVisible(true);
       if (!person) {
@@ -4256,6 +4489,10 @@
       if (lifePeopleFormTitle) lifePeopleFormTitle.textContent = 'Edit person';
       if (lifePersonName) lifePersonName.value = person.name || '';
       if (lifePersonRole) lifePersonRole.value = person.role || '';
+      if (lifePersonCustomRole) {
+        lifePersonCustomRole.value = person.customRole || '';
+        lifePersonCustomRole.style.display = person.role === 'Other' ? '' : 'none';
+      }
       if (lifePersonOrg) lifePersonOrg.value = person.org || '';
       if (lifePersonDob) lifePersonDob.value = person.dob || '';
       if (lifePersonNotes) lifePersonNotes.value = person.notes || '';
@@ -4269,11 +4506,11 @@
       if (!people.length) {
         var empty = document.createElement('div');
         empty.className = 'life-people-empty';
-        empty.innerHTML = '<strong>No people yet.</strong><span>Add family members to personalize your life plans.</span>';
+        empty.innerHTML = '<strong>No people added yet.</strong><span>Start with the people who matter most.</span>';
         var cta = document.createElement('button');
         cta.type = 'button';
         cta.className = 'life-btn';
-        cta.textContent = 'Add person';
+        cta.textContent = 'Add your first person';
         cta.addEventListener('click', function() {
           openPeopleForm();
         });
@@ -4304,7 +4541,7 @@
         name.textContent = person.name || 'Unnamed';
         var role = document.createElement('span');
         role.className = 'life-person-role';
-        role.textContent = person.role || 'Family';
+        role.textContent = getPersonRoleLabel(person) || 'Other';
         meta.appendChild(name);
         meta.appendChild(role);
 
@@ -4354,18 +4591,174 @@
 
         card.addEventListener('click', function(event) {
           if (event.target.closest('button')) return;
-          window.alert('Person detail view coming soon.');
+          openPersonView(person);
         });
 
         card.addEventListener('keydown', function(event) {
           if (event.key === 'Enter') {
             event.preventDefault();
-            window.alert('Person detail view coming soon.');
+            openPersonView(person);
           }
         });
 
         lifePeopleList.appendChild(card);
       });
+    }
+
+    function setPersonViewActive(isActive) {
+      if (lifeView) {
+        lifeView.classList.toggle('person-view-active', isActive);
+      }
+      if (lifePersonView) {
+        lifePersonView.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+      }
+      if (!isActive) {
+        activePersonId = null;
+      }
+    }
+
+    function renderPersonRightNow(personId) {
+      if (!lifePersonNowList) return;
+      lifePersonNowList.innerHTML = '';
+      var items = [];
+      goalsShort.forEach(function(goal) {
+        if (goal.personId === personId && !goal.done) {
+          items.push({ type: 'goal', text: goal.text, meta: 'Short-term goal', createdAt: goal.createdAt || 0 });
+        }
+      });
+      tasks.forEach(function(task) {
+        if (task.personId === personId && !task.done) {
+          items.push({ type: 'task', text: task.text, meta: formatTaskMeta(task), createdAt: task.createdAt || 0 });
+        }
+      });
+      items.sort(function(a, b) { return b.createdAt - a.createdAt; });
+      var topItems = items.slice(0, 5);
+      if (!topItems.length) {
+        var empty = document.createElement('div');
+        empty.className = 'life-meta';
+        empty.textContent = 'No active goals or tasks yet.';
+        lifePersonNowList.appendChild(empty);
+        return;
+      }
+      topItems.forEach(function(item) {
+        var row = document.createElement('div');
+        row.className = 'life-item';
+        var title = document.createElement('div');
+        title.textContent = item.text || 'Untitled';
+        var meta = document.createElement('div');
+        meta.className = 'life-meta';
+        meta.textContent = item.meta || (item.type === 'goal' ? 'Short-term goal' : 'Task');
+        row.appendChild(title);
+        row.appendChild(meta);
+        lifePersonNowList.appendChild(row);
+      });
+    }
+
+    function renderPersonComingUp(personId) {
+      if (!lifePersonComingList) return;
+      lifePersonComingList.innerHTML = '';
+      var now = Date.now();
+      var upcoming = appointments.filter(function(appt) {
+        if (appt.personId !== personId || !appt.dateTimeStart) return false;
+        var time = new Date(appt.dateTimeStart).getTime();
+        return Number.isNaN(time) ? true : time >= now;
+      });
+      upcoming.sort(function(a, b) {
+        return new Date(a.dateTimeStart) - new Date(b.dateTimeStart);
+      });
+      if (!upcoming.length) {
+        var empty = document.createElement('div');
+        empty.className = 'life-meta';
+        empty.textContent = 'No upcoming appointments yet.';
+        lifePersonComingList.appendChild(empty);
+        return;
+      }
+      upcoming.slice(0, 5).forEach(function(appt) {
+        var row = document.createElement('div');
+        row.className = 'life-item';
+        var title = document.createElement('div');
+        title.textContent = appt.title || 'Untitled appointment';
+        var meta = document.createElement('div');
+        meta.className = 'life-meta';
+        var timeLabel = appt.dateTimeStart ? new Date(appt.dateTimeStart).toLocaleString() : '';
+        meta.textContent = [timeLabel, appt.location].filter(Boolean).join(' · ');
+        row.appendChild(title);
+        if (meta.textContent) row.appendChild(meta);
+        lifePersonComingList.appendChild(row);
+      });
+    }
+
+    function renderPersonParked(personId) {
+      if (!lifePersonParkedList) return;
+      lifePersonParkedList.innerHTML = '';
+      var parkedGoals = goalsLong.filter(function(goal) {
+        return goal.personId === personId;
+      });
+      if (!parkedGoals.length) {
+        var empty = document.createElement('div');
+        empty.className = 'life-meta';
+        empty.textContent = 'No parked long-term goals yet.';
+        lifePersonParkedList.appendChild(empty);
+        return;
+      }
+      parkedGoals.forEach(function(goal) {
+        var row = document.createElement('div');
+        row.className = 'life-item';
+        var title = document.createElement('div');
+        title.textContent = goal.title || 'Untitled goal';
+        var meta = document.createElement('div');
+        meta.className = 'life-meta';
+        meta.textContent = goal.targetDate ? 'Target ' + goal.targetDate : 'Long-term goal';
+        row.appendChild(title);
+        row.appendChild(meta);
+        if (goal.note) {
+          var note = document.createElement('div');
+          note.className = 'life-meta';
+          note.textContent = goal.note;
+          row.appendChild(note);
+        }
+        lifePersonParkedList.appendChild(row);
+      });
+    }
+
+    function openPersonView(person) {
+      if (!person) return;
+      activePersonId = person.id;
+      if (lifePersonNameDisplay) lifePersonNameDisplay.textContent = person.name || 'Unnamed';
+      if (lifePersonRoleDisplay) lifePersonRoleDisplay.textContent = getPersonRoleLabel(person) || 'Other';
+      if (lifePersonOrgDisplay) {
+        lifePersonOrgDisplay.textContent = person.org || '';
+        lifePersonOrgDisplay.style.display = person.org ? '' : 'none';
+      }
+      if (lifePersonAvatar) {
+        lifePersonAvatar.src = getAvatarDataUrl(person);
+        lifePersonAvatar.alt = person.name || 'Person';
+      }
+      if (lifePersonTaskText) {
+        lifePersonTaskText.value = '';
+        lifePersonTaskText.placeholder = 'Add a task for ' + (person.name || 'this person');
+      }
+      if (lifePersonGoalText) {
+        lifePersonGoalText.value = '';
+        lifePersonGoalText.placeholder = 'Short-term goal for ' + (person.name || 'this person');
+      }
+      if (lifePersonApptTitle) {
+        lifePersonApptTitle.value = '';
+      }
+      if (lifePersonApptStart) {
+        lifePersonApptStart.value = '';
+      }
+      renderPersonRightNow(person.id);
+      renderPersonComingUp(person.id);
+      renderPersonParked(person.id);
+      if (lifePersonParkedToggle) {
+        lifePersonParkedToggle.setAttribute('aria-expanded', 'false');
+        lifePersonParkedToggle.lastElementChild.textContent = '+';
+      }
+      if (lifePersonParkedList) {
+        lifePersonParkedList.style.display = 'none';
+      }
+      setPersonViewActive(true);
     }
 
     function createImageThumbnail(file) {
@@ -4435,6 +4828,7 @@
             done: typeof goal.done === 'boolean' ? goal.done : !!goal.completed,
             areaId: areaId,
             ownerName: goal.ownerName || getAreaOwnerName(areaId) || null,
+            personId: goal.personId || null,
             createdAt: goal.createdAt || Date.now(),
             completedAt: goal.completedAt || null
           };
@@ -4461,6 +4855,7 @@
             targetDate: goal.targetDate || null,
             areaId: areaId,
             ownerName: goal.ownerName || getAreaOwnerName(areaId) || null,
+            personId: goal.personId || null,
             createdAt: goal.createdAt || Date.now(),
             updatedAt: goal.updatedAt || goal.createdAt || Date.now()
           };
@@ -4735,6 +5130,7 @@
             text: task.text || '',
             areaId: areaId,
             ownerName: task.ownerName || getAreaOwnerName(areaId) || null,
+            personId: task.personId || null,
             tags: Array.isArray(task.tags) ? task.tags : (task.tags ? String(task.tags).split(',').map(function(t) { return t.trim(); }).filter(Boolean) : []),
             needsOtherPeople: !!task.needsOtherPeople,
             needsAppointment: !!task.needsAppointment,
@@ -4763,6 +5159,7 @@
             title: appt.title || '',
             areaId: areaId,
             ownerName: appt.ownerName || getAreaOwnerName(areaId) || null,
+            personId: appt.personId || null,
             dateTimeStart: appt.dateTimeStart || '',
             dateTimeEnd: appt.dateTimeEnd || null,
             location: appt.location || '',
@@ -5172,6 +5569,9 @@
 
     function setLifeTab(nextTab) {
       lifeActiveTab = nextTab;
+      if (lifeView && lifeView.classList.contains('person-view-active')) {
+        setPersonViewActive(false);
+      }
       var tabs = document.querySelectorAll('#lifeTabs .life-tab');
       tabs.forEach(function(tab) {
         tab.classList.toggle('active', tab.dataset.tab === nextTab);
@@ -5399,6 +5799,7 @@
             done: false,
             areaId: areaId || getDefaultAreaId(),
             ownerName: getAreaOwnerName(areaId),
+            personId: activePersonId || null,
             createdAt: Date.now(),
             completedAt: null
           });
@@ -5946,6 +6347,7 @@
     const lifePeopleList = document.getElementById('lifePeopleList');
     const lifePersonName = document.getElementById('lifePersonName');
     const lifePersonRole = document.getElementById('lifePersonRole');
+    const lifePersonCustomRole = document.getElementById('lifePersonCustomRole');
     const lifePersonOrg = document.getElementById('lifePersonOrg');
     const lifePersonDob = document.getElementById('lifePersonDob');
     const lifePersonNotes = document.getElementById('lifePersonNotes');
@@ -5953,6 +6355,23 @@
     const lifeAvatarRandom = document.getElementById('lifeAvatarRandom');
     const lifeAvatarPreview = document.getElementById('lifeAvatarPreview');
     const lifeAvatarHint = document.getElementById('lifeAvatarHint');
+    const lifePersonView = document.getElementById('lifePersonView');
+    const lifePersonBack = document.getElementById('lifePersonBack');
+    const lifePersonAvatar = document.getElementById('lifePersonAvatar');
+    const lifePersonNameDisplay = document.getElementById('lifePersonNameDisplay');
+    const lifePersonRoleDisplay = document.getElementById('lifePersonRoleDisplay');
+    const lifePersonOrgDisplay = document.getElementById('lifePersonOrgDisplay');
+    const lifePersonNowList = document.getElementById('lifePersonNowList');
+    const lifePersonComingList = document.getElementById('lifePersonComingList');
+    const lifePersonParkedList = document.getElementById('lifePersonParkedList');
+    const lifePersonParkedToggle = document.getElementById('lifePersonParkedToggle');
+    const lifePersonTaskText = document.getElementById('lifePersonTaskText');
+    const lifePersonTaskAdd = document.getElementById('lifePersonTaskAdd');
+    const lifePersonApptTitle = document.getElementById('lifePersonApptTitle');
+    const lifePersonApptStart = document.getElementById('lifePersonApptStart');
+    const lifePersonApptAdd = document.getElementById('lifePersonApptAdd');
+    const lifePersonGoalText = document.getElementById('lifePersonGoalText');
+    const lifePersonGoalAdd = document.getElementById('lifePersonGoalAdd');
     const lifeTodayList = document.getElementById('lifeTodayList');
     const lifeGoalsList = document.getElementById('lifeGoalsList');
     const lifeTaskText = document.getElementById('lifeTaskText');
@@ -6391,6 +6810,8 @@
       btnLife.addEventListener('click', function() {
         closeMenu();
         setActiveView('life', true);
+        setLifeTab('people');
+        setPersonViewActive(false);
       });
     }
 
@@ -7448,6 +7869,7 @@
           done: false,
           areaId: areaId,
           ownerName: getAreaOwnerName(areaId),
+          personId: activePersonId || null,
           createdAt: Date.now(),
           completedAt: null
         });
@@ -7487,28 +7909,30 @@
         if (editingLongGoalId) {
           goalsLong = goalsLong.map(function(goal) {
             if (goal.id !== editingLongGoalId) return goal;
-            return {
-              id: goal.id,
-              title: title,
-              note: note,
-              targetDate: date || null,
-              areaId: areaId,
-              ownerName: getAreaOwnerName(areaId),
-              createdAt: goal.createdAt,
-              updatedAt: Date.now()
-            };
-          });
-        } else {
-          goalsLong.unshift({
-            id: generateGoalId('long'),
+          return {
+            id: goal.id,
             title: title,
             note: note,
             targetDate: date || null,
             areaId: areaId,
             ownerName: getAreaOwnerName(areaId),
-            createdAt: Date.now(),
+            personId: goal.personId || null,
+            createdAt: goal.createdAt,
             updatedAt: Date.now()
-          });
+          };
+        });
+      } else {
+        goalsLong.unshift({
+          id: generateGoalId('long'),
+          title: title,
+          note: note,
+          targetDate: date || null,
+          areaId: areaId,
+          ownerName: getAreaOwnerName(areaId),
+          personId: activePersonId || null,
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        });
         }
         saveGoalsViewLong();
         renderLongGoals();
@@ -7555,6 +7979,7 @@
     if (lifeAddPersonPrimary) {
       lifeAddPersonPrimary.addEventListener('click', function() {
         setLifeTab('people');
+        setPersonViewActive(false);
         openPeopleForm();
       });
     }
@@ -7563,6 +7988,24 @@
       lifePeopleFormCancel.addEventListener('click', function() {
         setPeopleFormVisible(false);
         resetPeopleForm();
+      });
+    }
+
+    if (lifePersonBack) {
+      lifePersonBack.addEventListener('click', function() {
+        setPersonViewActive(false);
+        setLifeTab('people');
+      });
+    }
+
+    if (lifePersonParkedToggle) {
+      lifePersonParkedToggle.addEventListener('click', function() {
+        var isExpanded = lifePersonParkedToggle.getAttribute('aria-expanded') === 'true';
+        lifePersonParkedToggle.setAttribute('aria-expanded', isExpanded ? 'false' : 'true');
+        lifePersonParkedToggle.lastElementChild.textContent = isExpanded ? '+' : '−';
+        if (lifePersonParkedList) {
+          lifePersonParkedList.style.display = isExpanded ? 'none' : 'block';
+        }
       });
     }
 
@@ -7575,6 +8018,17 @@
           return;
         }
         var role = lifePersonRole ? lifePersonRole.value.trim() : '';
+        if (!role) {
+          alert('Please select a role.');
+          if (lifePersonRole) lifePersonRole.focus();
+          return;
+        }
+        var customRole = lifePersonCustomRole ? lifePersonCustomRole.value.trim() : '';
+        if (role === 'Other' && !customRole) {
+          alert('Please enter a custom role.');
+          if (lifePersonCustomRole) lifePersonCustomRole.focus();
+          return;
+        }
         var org = lifePersonOrg ? lifePersonOrg.value.trim() : '';
         var dob = lifePersonDob ? lifePersonDob.value : '';
         var notes = lifePersonNotes ? lifePersonNotes.value.trim() : '';
@@ -7586,14 +8040,16 @@
         var personRecord = {
           id: editingPersonId || generatePersonId(),
           name: name,
-          role: role || 'Family',
+          role: role,
+          customRole: role === 'Other' ? customRole : '',
           org: org,
           dob: dob,
           notes: notes,
           avatarType: avatarType,
           avatarDataUrl: avatarType === 'photo' ? pendingAvatarDataUrl : '',
           avatarSeed: avatarSeed,
-          createdAt: existingPerson && existingPerson.createdAt ? existingPerson.createdAt : Date.now()
+          createdAt: existingPerson && existingPerson.createdAt ? existingPerson.createdAt : Date.now(),
+          updatedAt: Date.now()
         };
         if (editingPersonId) {
           people = people.map(function(person) {
@@ -7615,6 +8071,12 @@
         if (pendingAvatarType !== 'photo') {
           updateAvatarPreview();
         }
+      });
+    }
+
+    if (lifePersonRole) {
+      lifePersonRole.addEventListener('change', function() {
+        updateCustomRoleVisibility();
       });
     }
 
@@ -7658,6 +8120,87 @@
       });
     }
 
+    if (lifePersonTaskAdd) {
+      lifePersonTaskAdd.addEventListener('click', function() {
+        if (!activePersonId) return;
+        var text = lifePersonTaskText ? lifePersonTaskText.value.trim() : '';
+        if (!text) return;
+        var areaId = getDefaultAreaId();
+        tasks.unshift({
+          id: generateGoalId('task'),
+          text: text,
+          areaId: areaId,
+          ownerName: getAreaOwnerName(areaId),
+          personId: activePersonId,
+          tags: [],
+          needsOtherPeople: false,
+          needsAppointment: false,
+          energyType: '',
+          done: false,
+          createdAt: Date.now(),
+          dueDate: null
+        });
+        saveTasks();
+        renderLifeTasks();
+        renderLifeToday();
+        renderLinkedTaskOptions();
+        if (lifePersonTaskText) lifePersonTaskText.value = '';
+        renderPersonRightNow(activePersonId);
+      });
+    }
+
+    if (lifePersonApptAdd) {
+      lifePersonApptAdd.addEventListener('click', function() {
+        if (!activePersonId) return;
+        var title = lifePersonApptTitle ? lifePersonApptTitle.value.trim() : '';
+        var start = lifePersonApptStart ? lifePersonApptStart.value : '';
+        if (!title || !start) return;
+        var areaId = getDefaultAreaId();
+        appointments.unshift({
+          id: generateGoalId('appt'),
+          title: title,
+          areaId: areaId,
+          ownerName: getAreaOwnerName(areaId),
+          personId: activePersonId,
+          dateTimeStart: start,
+          dateTimeEnd: null,
+          location: '',
+          notes: '',
+          linkedTaskIds: [],
+          createdAt: Date.now()
+        });
+        saveAppointments();
+        renderLifeCalendar();
+        if (lifePersonApptTitle) lifePersonApptTitle.value = '';
+        if (lifePersonApptStart) lifePersonApptStart.value = '';
+        renderPersonComingUp(activePersonId);
+      });
+    }
+
+    if (lifePersonGoalAdd) {
+      lifePersonGoalAdd.addEventListener('click', function() {
+        if (!activePersonId) return;
+        var text = lifePersonGoalText ? lifePersonGoalText.value.trim() : '';
+        if (!text) return;
+        var areaId = getDefaultAreaId();
+        goalsShort.unshift({
+          id: generateGoalId('short'),
+          text: text,
+          done: false,
+          areaId: areaId,
+          ownerName: getAreaOwnerName(areaId),
+          personId: activePersonId,
+          createdAt: Date.now(),
+          completedAt: null
+        });
+        saveGoalsViewShort();
+        renderShortGoals();
+        renderLifeToday();
+        if (lifePersonGoalText) lifePersonGoalText.value = '';
+        renderPersonRightNow(activePersonId);
+      });
+    }
+
     if (lifeTaskAdd) {
       lifeTaskAdd.addEventListener('click', function() {
         var text = lifeTaskText.value.trim();
@@ -7667,34 +8210,36 @@
         if (editingTaskId) {
           tasks = tasks.map(function(task) {
             if (task.id !== editingTaskId) return task;
-            return {
-              id: task.id,
-              text: text,
-              areaId: areaId,
-              ownerName: getAreaOwnerName(areaId),
-              tags: tags,
-              needsOtherPeople: lifeTaskNeedsPeople.checked,
-              needsAppointment: lifeTaskNeedsAppt.checked,
-              energyType: lifeTaskEnergy.value || '',
-              done: task.done,
-              createdAt: task.createdAt,
-              dueDate: lifeTaskDue.value || null
-            };
-          });
-        } else {
-          tasks.unshift({
-            id: generateGoalId('task'),
+          return {
+            id: task.id,
             text: text,
             areaId: areaId,
             ownerName: getAreaOwnerName(areaId),
+            personId: task.personId || null,
             tags: tags,
             needsOtherPeople: lifeTaskNeedsPeople.checked,
             needsAppointment: lifeTaskNeedsAppt.checked,
             energyType: lifeTaskEnergy.value || '',
-            done: false,
-            createdAt: Date.now(),
+            done: task.done,
+            createdAt: task.createdAt,
             dueDate: lifeTaskDue.value || null
-          });
+          };
+        });
+      } else {
+        tasks.unshift({
+          id: generateGoalId('task'),
+          text: text,
+          areaId: areaId,
+          ownerName: getAreaOwnerName(areaId),
+          personId: activePersonId || null,
+          tags: tags,
+          needsOtherPeople: lifeTaskNeedsPeople.checked,
+          needsAppointment: lifeTaskNeedsAppt.checked,
+          energyType: lifeTaskEnergy.value || '',
+          done: false,
+          createdAt: Date.now(),
+          dueDate: lifeTaskDue.value || null
+        });
         }
         saveTasks();
         renderLifeTasks();
@@ -7735,32 +8280,34 @@
         if (editingApptId) {
           appointments = appointments.map(function(appt) {
             if (appt.id !== editingApptId) return appt;
-            return {
-              id: appt.id,
-              title: title,
-              areaId: areaId,
-              ownerName: getAreaOwnerName(areaId),
-              dateTimeStart: lifeApptStart.value,
-              dateTimeEnd: lifeApptEnd.value || null,
-              location: lifeApptLocation.value.trim(),
-              notes: lifeApptNotes.value.trim(),
-              linkedTaskIds: selectedTasks,
-              createdAt: appt.createdAt
-            };
-          });
-        } else {
-          appointments.unshift({
-            id: generateGoalId('appt'),
+          return {
+            id: appt.id,
             title: title,
             areaId: areaId,
             ownerName: getAreaOwnerName(areaId),
+            personId: appt.personId || null,
             dateTimeStart: lifeApptStart.value,
             dateTimeEnd: lifeApptEnd.value || null,
             location: lifeApptLocation.value.trim(),
             notes: lifeApptNotes.value.trim(),
             linkedTaskIds: selectedTasks,
-            createdAt: Date.now()
-          });
+            createdAt: appt.createdAt
+          };
+        });
+      } else {
+        appointments.unshift({
+          id: generateGoalId('appt'),
+          title: title,
+          areaId: areaId,
+          ownerName: getAreaOwnerName(areaId),
+          personId: activePersonId || null,
+          dateTimeStart: lifeApptStart.value,
+          dateTimeEnd: lifeApptEnd.value || null,
+          location: lifeApptLocation.value.trim(),
+          notes: lifeApptNotes.value.trim(),
+          linkedTaskIds: selectedTasks,
+          createdAt: Date.now()
+        });
         }
         saveAppointments();
         renderLifeCalendar();
