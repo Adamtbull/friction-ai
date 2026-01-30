@@ -3406,6 +3406,38 @@
       word-break: break-word;
     }
 
+    #life-view .appointments-summary-value.has-actions,
+    #appointments-view .appointments-summary-value.has-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    #life-view .appointments-summary-inline-actions,
+    #appointments-view .appointments-summary-inline-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    #life-view .appointments-summary-link,
+    #appointments-view .appointments-summary-link {
+      color: var(--text-primary);
+      text-decoration: underline;
+    }
+
+    #life-view .appointments-summary-link-btn,
+    #appointments-view .appointments-summary-link-btn {
+      border: 1px solid var(--border);
+      background: var(--white);
+      color: var(--text-primary);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      text-decoration: none;
+    }
+
     #life-view .appointments-summary-value.is-empty,
     #appointments-view .appointments-summary-value.is-empty {
       color: var(--text-secondary);
@@ -4975,6 +5007,7 @@
             <input type="file" id="lifeAppointmentScanTakeInput" accept="image/*" capture="environment" style="display: none;" />
             <input type="file" id="lifeAppointmentScanUploadInput" accept="image/*" style="display: none;" />
           </div>
+          <button class="life-btn" id="lifeAppointmentScanImageBtn" type="button" disabled>Scan image</button>
           <div class="appointments-scan-preview" id="lifeAppointmentScanPreview" style="display: none;">
             <img class="appointments-scan-image" id="lifeAppointmentScanImage" alt="Appointment image preview" />
             <p class="appointments-scan-note">This image stays in the app and isn’t saved.</p>
@@ -4984,7 +5017,7 @@
           <label for="lifeAppointmentTextInput">Paste text (recommended)</label>
           <textarea class="appointments-textarea" id="lifeAppointmentTextInput" placeholder="Paste SMS or email text here" maxlength="600"></textarea>
           <div class="appointments-parse-actions">
-            <button class="life-btn secondary" id="lifeAppointmentParseBtn" type="button">Parse</button>
+            <button class="life-btn secondary" id="lifeAppointmentParseBtn" type="button">Parse text</button>
           </div>
           <details class="appointments-text-details" id="lifeAppointmentOriginalDetails" style="display: none;">
             <summary>Original text</summary>
@@ -5003,7 +5036,7 @@
             <div class="appointments-summary-rows" id="lifeAppointmentSummaryRows"></div>
           </div>
           <div class="appointment-modal-actions appointments-summary-actions">
-            <button class="life-btn" id="lifeAppointmentSummarySave" type="button">Add appointment</button>
+            <button class="life-btn" id="lifeAppointmentSummarySave" type="button">Save appointment</button>
             <button class="life-btn secondary" id="lifeAppointmentSummaryDiscard" type="button">Discard</button>
           </div>
         </div>
@@ -9118,6 +9151,12 @@
       return value && String(value).trim() ? String(value).trim() : '';
     }
 
+    function buildDirectionsLink(address, clinicName) {
+      var query = (address || '').trim() || (clinicName || '').trim();
+      if (!query) return '';
+      return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
+    }
+
     function renderAppointmentSummary(context) {
       if (!context || !context.summaryRows || !context.draft) return;
       context.summaryRows.innerHTML = '';
@@ -9125,9 +9164,9 @@
         { key: 'title', label: 'Title', type: 'text', placeholder: 'Appointment title' },
         { key: 'date', label: 'Date', type: 'date' },
         { key: 'time', label: 'Time', type: 'time' },
-        { key: 'clinicName', label: 'Venue name', type: 'text', placeholder: 'Clinic or facility' },
+        { key: 'doctorName', label: 'Doctor', type: 'text', placeholder: 'Doctor or provider' },
+        { key: 'clinicName', label: 'Clinic/Venue', type: 'text', placeholder: 'Clinic or facility' },
         { key: 'address', label: 'Address', type: 'text', placeholder: 'Street address, Suburb NSW 2000' },
-        { key: 'doctorName', label: 'Contact name', type: 'text', placeholder: 'Doctor or provider' },
         { key: 'phone', label: 'Phone', type: 'tel', placeholder: '04xx xxx xxx or 02 xxxx xxxx' },
         { key: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Notes (optional)' }
       ];
@@ -9152,6 +9191,43 @@
           details.appendChild(summary);
           details.appendChild(notesText);
           value.appendChild(details);
+        } else if (field.key === 'address') {
+          var directionsLink = buildDirectionsLink(rawValue, context.draft.clinicName);
+          var hasDirections = !!directionsLink;
+          value.classList.add('has-actions');
+          var addressLine = document.createElement('div');
+          if (rawValue) {
+            addressLine.textContent = rawValue;
+          } else {
+            addressLine.textContent = '—';
+            if (!hasDirections) {
+              value.classList.add('is-empty');
+            }
+          }
+          value.appendChild(addressLine);
+          if (hasDirections) {
+            var actionsRow = document.createElement('div');
+            actionsRow.className = 'appointments-summary-inline-actions';
+            var directionsBtn = document.createElement('a');
+            directionsBtn.className = 'appointments-summary-link-btn';
+            directionsBtn.href = directionsLink;
+            directionsBtn.target = '_blank';
+            directionsBtn.rel = 'noopener';
+            directionsBtn.textContent = 'Directions';
+            actionsRow.appendChild(directionsBtn);
+            value.appendChild(actionsRow);
+          }
+        } else if (field.key === 'phone') {
+          if (rawValue) {
+            var phoneLink = document.createElement('a');
+            phoneLink.className = 'appointments-summary-link';
+            phoneLink.href = 'tel:' + rawValue.replace(/\s+/g, '');
+            phoneLink.textContent = rawValue;
+            value.appendChild(phoneLink);
+          } else {
+            value.textContent = '—';
+            value.classList.add('is-empty');
+          }
         } else if (rawValue) {
           value.textContent = rawValue;
         } else {
@@ -9164,7 +9240,7 @@
         var editBtn = document.createElement('button');
         editBtn.type = 'button';
         editBtn.className = 'appointments-icon-btn';
-        editBtn.textContent = '✎';
+        editBtn.textContent = '✏️';
         editBtn.setAttribute('aria-label', 'Edit ' + field.label);
         var saveBtn = document.createElement('button');
         saveBtn.type = 'button';
@@ -9271,15 +9347,84 @@
       context.originalDetails.open = false;
     }
 
+    function setAppointmentScanButtonState(context, enabled) {
+      if (!context || !context.scanImageBtn) return;
+      context.scanImageBtn.disabled = !enabled;
+    }
+
+    function readFileAsBase64(file) {
+      return new Promise(function(resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function() {
+          var result = typeof reader.result === 'string' ? reader.result : '';
+          var splitIndex = result.indexOf(',');
+          resolve(splitIndex >= 0 ? result.slice(splitIndex + 1) : result);
+        };
+        reader.onerror = function() {
+          reject(new Error('Unable to read image.'));
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function callAppointmentImageExtract(payload) {
+      var idToken = localStorage.getItem('google_id_token');
+      if (!idToken) {
+        throw new Error('Please sign in again to continue.');
+      }
+      var res = await fetch('/api/appointments/extract', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + idToken
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        var errorMsg = 'Backend API error';
+        try {
+          var error = await res.json();
+          errorMsg = error.error || errorMsg;
+        } catch (e) {}
+        if (res.status === 401) {
+          signOut();
+          throw new Error('Session expired. Please sign in again.');
+        }
+        throw new Error(errorMsg);
+      }
+      return await res.json();
+    }
+
+    function applyAppointmentExtract(context, appointment) {
+      if (!context || !appointment) return;
+      if (!context.draft) {
+        context.draft = buildAppointmentDraft(null, context.personSelect ? context.personSelect.value : '');
+      }
+      context.draft.title = appointment.title || context.draft.title || '';
+      context.draft.date = appointment.date || context.draft.date || '';
+      context.draft.time = appointment.time || context.draft.time || '';
+      context.draft.doctorName = appointment.doctorName || context.draft.doctorName || '';
+      context.draft.clinicName = appointment.clinicName || context.draft.clinicName || '';
+      context.draft.address = appointment.address || context.draft.address || '';
+      if (appointment.phone) {
+        context.draft.phone = normalizeAuPhone(appointment.phone);
+      }
+      context.draft.notes = appointment.notes || context.draft.notes || '';
+      syncAppointmentFormInputs(context);
+      renderAppointmentSummary(context);
+    }
+
     function updateAppointmentScanPreview(context, file) {
       if (!context || !context.scanPreview || !context.scanImage) return;
       if (!file) return;
       if (context.captureUrl) {
         URL.revokeObjectURL(context.captureUrl);
       }
+      context.captureFile = file;
       context.captureUrl = URL.createObjectURL(file);
       context.scanImage.src = context.captureUrl;
       context.scanPreview.style.display = '';
+      setAppointmentScanButtonState(context, true);
     }
 
     function resetAppointmentCapture(context, options) {
@@ -9292,6 +9437,8 @@
         URL.revokeObjectURL(context.captureUrl);
         context.captureUrl = null;
       }
+      context.captureFile = null;
+      setAppointmentScanButtonState(context, false);
       if (context.textInput) context.textInput.value = '';
       setAppointmentOriginalText(context, '');
       if (context.aiBtn) {
@@ -9494,10 +9641,6 @@
           var file = event.target.files && event.target.files[0];
           if (file) {
             updateAppointmentScanPreview(context, file);
-            if (context.summary) {
-              setAppointmentSummaryVisible(context, true);
-              renderAppointmentSummary(context);
-            }
           }
         });
       }
@@ -9509,10 +9652,38 @@
           var file = event.target.files && event.target.files[0];
           if (file) {
             updateAppointmentScanPreview(context, file);
+          }
+        });
+      }
+      if (context.scanImageBtn) {
+        context.scanImageBtn.addEventListener('click', async function() {
+          if (!context.captureFile) {
+            alert('Select an image to scan.');
+            return;
+          }
+          var originalLabel = context.scanImageBtn.textContent;
+          context.scanImageBtn.textContent = 'Scanning...';
+          context.scanImageBtn.disabled = true;
+          try {
+            var base64 = await readFileAsBase64(context.captureFile);
+            var locale = (navigator && navigator.language) ? navigator.language : 'en-AU';
+            var tz = (Intl && Intl.DateTimeFormat) ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'Australia/Sydney';
+            var data = await callAppointmentImageExtract({
+              imageBase64: base64,
+              locale: locale || 'en-AU',
+              tz: tz || 'Australia/Sydney'
+            });
+            var appointment = data && data.appointment ? data.appointment : {};
+            applyAppointmentExtract(context, appointment);
             if (context.summary) {
               setAppointmentSummaryVisible(context, true);
               renderAppointmentSummary(context);
             }
+          } catch (err) {
+            alert(err && err.message ? err.message : 'Unable to scan the appointment image.');
+          } finally {
+            context.scanImageBtn.textContent = originalLabel;
+            context.scanImageBtn.disabled = !context.captureFile;
           }
         });
       }
@@ -10464,6 +10635,7 @@
     const lifeAppointmentScanUpload = document.getElementById('lifeAppointmentScanUpload');
     const lifeAppointmentScanTakeInput = document.getElementById('lifeAppointmentScanTakeInput');
     const lifeAppointmentScanUploadInput = document.getElementById('lifeAppointmentScanUploadInput');
+    const lifeAppointmentScanImageBtn = document.getElementById('lifeAppointmentScanImageBtn');
     const lifeAppointmentScanPreview = document.getElementById('lifeAppointmentScanPreview');
     const lifeAppointmentScanImage = document.getElementById('lifeAppointmentScanImage');
     const lifeAppointmentTextInput = document.getElementById('lifeAppointmentTextInput');
@@ -10579,6 +10751,7 @@
         scanUploadBtn: lifeAppointmentScanUpload,
         scanTakeInput: lifeAppointmentScanTakeInput,
         scanUploadInput: lifeAppointmentScanUploadInput,
+        scanImageBtn: lifeAppointmentScanImageBtn,
         scanPreview: lifeAppointmentScanPreview,
         scanImage: lifeAppointmentScanImage,
         textInput: lifeAppointmentTextInput,
