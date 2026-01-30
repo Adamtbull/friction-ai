@@ -12,6 +12,16 @@ export default {
       return new Response(null, { headers: corsHeaders(request) });
     }
 
+    // ============ HEALTH CHECK ============
+
+    if (url.pathname === "/api/health" && request.method === "GET") {
+      return jsonResponse({
+        ok: true,
+        kvBound: Boolean(env.FRICTION_KV),
+        time: new Date().toISOString()
+      }, 200, request);
+    }
+
     // ============ ADMIN ENDPOINTS ============
 
     // GET /api/admin/stats - Get anonymized usage statistics
@@ -20,6 +30,10 @@ export default {
         var adminAuth = await verifyAdminToken(request, env);
         if (!adminAuth.valid) {
           return jsonResponse({ error: "Unauthorized" }, 401, request);
+        }
+
+        if (!env.FRICTION_KV) {
+          return jsonResponse(kvMissingError(), 503, request);
         }
 
         var stats = await getAnalyticsStats(env);
@@ -35,6 +49,10 @@ export default {
         var adminAuth = await verifyAdminToken(request, env);
         if (!adminAuth.valid) {
           return jsonResponse({ error: "Unauthorized" }, 401, request);
+        }
+
+        if (!env.FRICTION_KV) {
+          return jsonResponse(kvMissingError(), 503, request);
         }
 
         var users = await getUserList(env);
@@ -567,6 +585,12 @@ function jsonResponseWithHeaders(data, status, request, extraHeaders) {
     status: status || 200,
     headers: merged
   });
+}
+
+function kvMissingError() {
+  return {
+    error: "Analytics unavailable. Bind the KV namespace variable FRICTION_KV in Cloudflare Worker \u2192 Settings \u2192 Bindings."
+  };
 }
 
 // =====================
@@ -1240,7 +1264,7 @@ async function logAnalytics(env, data) {
 
 async function getAnalyticsStats(env) {
   if (!env.FRICTION_KV) {
-    return { error: "Analytics not configured" };
+    return kvMissingError();
   }
 
   try {
