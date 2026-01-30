@@ -1873,6 +1873,21 @@
       background: #b91c1c;
     }
 
+    .settings-action-btn {
+      padding: 12px 20px;
+      background: #0f766e;
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .settings-action-btn:hover {
+      background: #0d5f58;
+    }
+
     .settings-section-note {
       font-size: 0.85rem;
       color: #f59e0b;
@@ -6113,6 +6128,13 @@
       </label>
     </div>
 
+    <div class="settings-section">
+      <h3 class="settings-section-title">Family Data</h3>
+      <p class="settings-section-desc">Clear all saved family profiles on this device.</p>
+      <button class="settings-action-btn" id="resetFamilyDataBtn" type="button">Reset Family Data</button>
+      <p class="settings-section-note">This wipes family member bubbles immediately and on next reload.</p>
+    </div>
+
     <!-- Lock Settings -->
     <div class="settings-section settings-lock-section">
       <h3 class="settings-section-title">🔒 Lock Settings</h3>
@@ -6447,10 +6469,13 @@
 
     // PEOPLE OVERVIEW
     var LIFE_DATA_KEY = 'friction_life_data_v2';
-    var LIFE_PEOPLE_KEY = 'life_people_v1';
+    var FAMILY_MEMBERS_KEY = 'family_members_v1';
+    var LEGACY_LIFE_PEOPLE_KEY = 'life_people_v1';
     var LIFE_ACTIVE_PERSON_KEY = 'life_active_person_id_v1';
     var LIFE_UI_KEY = 'life_ui_v1';
     var LIFE_PERSON_PREFS_KEY = 'life_person_prefs_v1';
+    var DEV_SEED = typeof window !== 'undefined' && window.DEV_SEED === true;
+    var familyStorageSourceLogged = false;
     var LIFE_ROLE_OPTIONS = ['wife', 'son', 'daughter', 'mother', 'father', 'brother', 'sister', 'other'];
     var people = [];
     var activePersonId = null;
@@ -6554,6 +6579,18 @@
       console.log('[Life]', eventName, detail || '');
     }
 
+    function logFamilyStorageSource(source) {
+      if (familyStorageSourceLogged) return;
+      if (typeof console !== 'undefined' && console.log) {
+        console.log('[Life] loaded from ' + source);
+      }
+      familyStorageSourceLogged = true;
+    }
+
+    function shouldSeedFamilyData() {
+      return DEV_SEED === true;
+    }
+
     function normalizeLifeData(data) {
       var safe = data && typeof data === 'object' ? data : {};
       var normalizedPeople = Array.isArray(safe.people) ? safe.people.map(normalizePerson).filter(Boolean) : [];
@@ -6572,14 +6609,16 @@
 
     function persistLifeData() {
       if (!lifeData) return;
-      lifeData.activeDomain = lifeState.activeDomain;
-      lifeData.activePersonId = lifeState.activePersonId;
-      lifeData.people = people.slice();
-      lifeData.assets = lifeAssets.slice();
-      lifeData.appointments = lifeAppointments.slice();
-      lifeData.tasks = lifeTasks.slice();
-      lifeData.personPrefs = lifePersonPrefs;
-      localStorage.setItem(LIFE_DATA_KEY, JSON.stringify(lifeData));
+      var payload = {
+        activeDomain: lifeState.activeDomain,
+        activePersonId: lifeState.activePersonId,
+        assets: lifeAssets.slice(),
+        appointments: lifeAppointments.slice(),
+        tasks: lifeTasks.slice(),
+        personPrefs: lifePersonPrefs
+      };
+      lifeData = Object.assign({}, payload, { people: people.slice() });
+      localStorage.setItem(LIFE_DATA_KEY, JSON.stringify(payload));
     }
 
     function createDefaultFamilyPeople() {
@@ -6621,8 +6660,19 @@
         }
       }
 
+      loadPeople();
+      if (!people.length && lifeData && Array.isArray(lifeData.people) && lifeData.people.length) {
+        people = lifeData.people.map(normalizePerson).filter(Boolean);
+        if (people.length) {
+          savePeople();
+        }
+      }
+      if (!people.length && shouldSeedFamilyData()) {
+        people = createDefaultFamilyPeople();
+        savePeople();
+      }
+
       if (!lifeData) {
-        loadPeople();
         loadLifePersonPrefs();
         activePersonId = null;
         lifeAssets = [];
@@ -6631,7 +6681,7 @@
         lifeData = normalizeLifeData({
           activeDomain: 'family',
           activePersonId: null,
-          people: people,
+          people: [],
           assets: lifeAssets,
           appointments: lifeAppointments,
           tasks: lifeTasks,
@@ -6639,25 +6689,22 @@
         });
         persistLifeData();
       } else {
-        people = lifeData.people.length ? lifeData.people : createDefaultFamilyPeople();
-        if (!lifeData.people.length) {
-          lifeData.people = people.slice();
-          persistLifeData();
-        }
         lifeAssets = lifeData.assets;
         lifeAppointments = lifeData.appointments;
         lifeTasks = lifeData.tasks;
         lifePersonPrefs = lifeData.personPrefs || {};
-        if (!people.length) {
-          people = createDefaultFamilyPeople();
-        }
       }
 
+      lifeData.people = people.slice();
       activePersonId = lifeData.activePersonId || null;
       if (activePersonId && !getPersonById(activePersonId)) {
         activePersonId = null;
       }
       lifeState.activePersonId = activePersonId;
+      if (lifeData.activePersonId !== activePersonId) {
+        lifeData.activePersonId = activePersonId;
+        persistLifeData();
+      }
       var domainIds = LIFE_DOMAINS.map(function(domain) { return domain.id; });
       lifeState.activeDomain = domainIds.includes(lifeData.activeDomain) ? lifeData.activeDomain : 'family';
       if (lifeData.activeDomain !== lifeState.activeDomain) {
@@ -6667,6 +6714,29 @@
       lifeState.expandedNodeId = null;
       lifeState.editMode = false;
       localStorage.setItem(LIFE_ACTIVE_PERSON_KEY, activePersonId || '');
+    }
+
+    function resetFamilyData() {
+      if (!confirm('Reset all family profiles? This cannot be undone.')) return;
+      people = [];
+      activePersonId = null;
+      lifeState.activePersonId = null;
+      lifeUiPrefs = { groupMode: false, selectedPeopleIds: [] };
+      lifePersonPrefs = {};
+      localStorage.removeItem(FAMILY_MEMBERS_KEY);
+      localStorage.removeItem(LEGACY_LIFE_PEOPLE_KEY);
+      localStorage.removeItem(LIFE_ACTIVE_PERSON_KEY);
+      localStorage.removeItem(LIFE_UI_KEY);
+      localStorage.removeItem(LIFE_PERSON_PREFS_KEY);
+      if (lifeData) {
+        lifeData.people = [];
+        lifeData.activePersonId = null;
+        persistLifeData();
+      }
+      renderLifeView();
+      setTimeout(function() {
+        window.location.reload();
+      }, 50);
     }
 
     function hashString(value) {
@@ -6764,28 +6834,41 @@
     }
 
     function loadPeople() {
-      var saved = localStorage.getItem(LIFE_PEOPLE_KEY);
-      if (!saved) {
-        people = createDefaultFamilyPeople();
-        savePeople();
+      var saved = localStorage.getItem(FAMILY_MEMBERS_KEY);
+      if (saved) {
+        try {
+          var parsed = JSON.parse(saved);
+          people = Array.isArray(parsed) ? parsed.map(normalizePerson).filter(Boolean) : [];
+        } catch (e) {
+          people = [];
+        }
+        logFamilyStorageSource('localStorage');
         return;
       }
-      try {
-        var parsed = JSON.parse(saved);
-        if (!Array.isArray(parsed) || !parsed.length) {
-          people = createDefaultFamilyPeople();
-          savePeople();
-          return;
+
+      var legacySaved = localStorage.getItem(LEGACY_LIFE_PEOPLE_KEY);
+      if (legacySaved) {
+        try {
+          var legacyParsed = JSON.parse(legacySaved);
+          people = Array.isArray(legacyParsed) ? legacyParsed.map(normalizePerson).filter(Boolean) : [];
+        } catch (e) {
+          people = [];
         }
-        people = parsed.map(normalizePerson).filter(Boolean);
-      } catch (e) {
-        people = [];
+        logFamilyStorageSource('localStorage');
+        localStorage.removeItem(LEGACY_LIFE_PEOPLE_KEY);
+        if (people.length) {
+          savePeople();
+        }
+        return;
       }
+
+      people = [];
+      logFamilyStorageSource('localStorage');
     }
 
     function savePeople() {
       try {
-        localStorage.setItem(LIFE_PEOPLE_KEY, JSON.stringify(people));
+        localStorage.setItem(FAMILY_MEMBERS_KEY, JSON.stringify(people));
         persistLifeData();
         return true;
       } catch (e) {
@@ -6901,8 +6984,14 @@
 
     function ensureActivePerson() {
       if (!people.length) {
-        people = [createDefaultMe()];
-        savePeople();
+        activePersonId = null;
+        lifeState.activePersonId = null;
+        localStorage.setItem(LIFE_ACTIVE_PERSON_KEY, '');
+        if (lifeData) {
+          lifeData.activePersonId = null;
+          persistLifeData();
+        }
+        return;
       }
       var savedActive = localStorage.getItem(LIFE_ACTIVE_PERSON_KEY);
       var active = people.find(function(person) { return person.id === savedActive; });
@@ -8378,7 +8467,7 @@
             updatedAt: updatedAt
           });
         });
-        localStorage.setItem(LIFE_PEOPLE_KEY, JSON.stringify(people));
+        savePeople();
         console.log('saveProfile:success', activePersonId);
         setEditMode(false);
         lifeState.editMode = false;
@@ -8409,11 +8498,12 @@
         delete lifePersonPrefs[pendingRemovePersonId];
         saveLifePersonPrefs();
       }
-      if (!people.length) {
-        people = [createDefaultMe()];
-      }
       savePeople();
-      if (pendingRemovePersonId === activePersonId) {
+      if (!people.length) {
+        activePersonId = null;
+        lifeState.activePersonId = null;
+        localStorage.setItem(LIFE_ACTIVE_PERSON_KEY, '');
+      } else if (pendingRemovePersonId === activePersonId) {
         var fallback = people.find(function(person) { return person.id === 'me'; }) || people[0];
         setActivePersonId(fallback.id);
       }
@@ -16133,6 +16223,14 @@
         lockSettings();
       }
     });
+
+    var resetFamilyDataBtn = document.getElementById('resetFamilyDataBtn');
+    if (resetFamilyDataBtn) {
+      resetFamilyDataBtn.addEventListener('click', function() {
+        if (isSettingsLocked()) return;
+        resetFamilyData();
+      });
+    }
 
     // Delay cancel button
     document.getElementById('delayCancelBtn').addEventListener('click', cancelDelay);
