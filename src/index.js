@@ -228,6 +228,31 @@ export default {
       }
     }
 
+    // ============ APPOINTMENT IMAGE EXTRACT ============
+    // POST /api/appointments/extract
+    if (url.pathname === "/api/appointments/extract" && request.method === "POST") {
+      try {
+        var authResult3 = await verifyUserToken(request, env);
+        if (!authResult3.valid) {
+          return jsonResponse({ error: "Authentication required" }, 401);
+        }
+
+        var bodyExtract = await request.json().catch(function () { return {}; });
+        var imageBase64 = typeof bodyExtract.imageBase64 === "string" ? bodyExtract.imageBase64 : "";
+        var locale = typeof bodyExtract.locale === "string" ? bodyExtract.locale : "en-AU";
+        var tz = typeof bodyExtract.tz === "string" ? bodyExtract.tz : "Australia/Sydney";
+
+        if (!imageBase64.trim()) {
+          return jsonResponse({ error: "imageBase64 is required" }, 400);
+        }
+
+        var appointment = await extractAppointmentFromImageOpenAI(imageBase64, { locale: locale, tz: tz }, env);
+        return jsonResponse({ appointment: appointment }, 200);
+      } catch (err) {
+        return jsonResponse({ error: err && err.message ? err.message : "Failed to extract appointment" }, 500);
+      }
+    }
+
     // ============ YOUTUBE ENDPOINTS ============
 
     // GET /api/youtube/resolve-channel?q=<input>
@@ -670,6 +695,110 @@ async function handleGPT(messages, env) {
     data.choices[0].message.content;
   if (!out) throw new Error("No valid response text from GPT-4o.");
   return out;
+}
+
+function stripJsonFences(text) {
+  if (!text || typeof text !== "string") return "";
+  var trimmed = text.trim();
+  if (trimmed.startsWith("```")) {
+    trimmed = trimmed.replace(/^```[a-zA-Z]*\n?/, "").replace(/```$/, "").trim();
+  }
+  return trimmed;
+}
+
+function sanitizeAppointmentValue(value) {
+  if (typeof value !== "string") return "";
+  return value.trim();
+}
+
+function sanitizeAuPhone(value) {
+  if (typeof value !== "string") return "";
+  var trimmed = value.trim();
+  if (!trimmed) return "";
+  if (/\\b555\\b/.test(trimmed) && !/(\\+?61|\\b0[23478])/.test(trimmed)) {
+    return "";
+  }
+  var cleaned = trimmed.replace(/[^0-9+]/g, "");
+  if (!cleaned) return "";
+  if (cleaned.startsWith("61") && cleaned[0] !== "+") {
+    cleaned = "+" + cleaned;
+  }
+  var digits = cleaned.replace(/\\D/g, "");
+  if (digits.length < 8) return "";
+  return cleaned;
+}
+
+function normalizeAppointmentExtract(raw) {
+  var appt = raw && raw.appointment ? raw.appointment : raw || {};
+  var confidence = Number(appt.confidence);
+  if (Number.isNaN(confidence)) confidence = 0;
+  confidence = Math.max(0, Math.min(1, confidence));
+  return {
+    title: sanitizeAppointmentValue(appt.title),
+    personName: sanitizeAppointmentValue(appt.personName),
+    date: sanitizeAppointmentValue(appt.date),
+    time: sanitizeAppointmentValue(appt.time),
+    doctorName: sanitizeAppointmentValue(appt.doctorName),
+    clinicName: sanitizeAppointmentValue(appt.clinicName),
+    address: sanitizeAppointmentValue(appt.address),
+    phone: sanitizeAuPhone(appt.phone),
+    notes: sanitizeAppointmentValue(appt.notes),
+    confidence: confidence
+  };
+}
+
+async function extractAppointmentFromImageOpenAI(imageBase64, options, env) {
+  var apiKey = env.OPENAI_API_KEY;
+  if (!apiKey) throw new Error("OpenAI API key not configured");
+  var locale = options && options.locale ? options.locale : "en-AU";
+  var tz = options && options.tz ? options.tz : "Australia/Sydney";
+  var prompt = [
+    "Extract appointment details from this image.",
+    "Return JSON only with schema:",
+    '{"appointment":{"title":"","personName":"","date":"YYYY-MM-DD","time":"HH:MM","doctorName":"","clinicName":"","address":"","phone":"","notes":"","confidence":0}}',
+    "Use locale " + locale + " and timezone " + tz + " to interpret dates/times.",
+    "If a field is missing, use an empty string. confidence should be 0-1.",
+    "Phone numbers must be AU-friendly (keep +61 or 04...); do not invent placeholders."
+  ].join("\\n");
+
+  var res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + apiKey
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      temperature: 0.2,
+      max_tokens: 600,
+      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: "You are a precise assistant that returns JSON only." },
+        {
+          role: "user",
+          content: [
+            { type: "text", text: prompt },
+            { type: "image_url", image_url: { url: "data:image/jpeg;base64," + imageBase64 } }
+          ]
+        }
+      ]
+    })
+  });
+
+  var data = await res.json().catch(function () { return {}; });
+  if (!res.ok) {
+    throw new Error("OpenAI API error: " + JSON.stringify(data));
+  }
+
+  var content =
+    data &&
+    data.choices &&
+    data.choices[0] &&
+    data.choices[0].message &&
+    data.choices[0].message.content;
+  if (!content) throw new Error("No valid response from OpenAI vision.");
+  var parsed = JSON.parse(stripJsonFences(content));
+  return normalizeAppointmentExtract(parsed);
 }
 
 async function handleGrok(messages, env) {
