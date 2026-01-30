@@ -337,6 +337,38 @@ export default {
       }
     }
 
+    // ============ APPOINTMENT IMAGE SCAN ============
+    // POST /api/appointments/scan
+    if (url.pathname === "/api/appointments/scan" && request.method === "POST") {
+      try {
+        var authResultScan = await verifyUserToken(request, env);
+        if (!authResultScan.valid) {
+          return jsonResponse({ error: "Authentication required" }, 401, request);
+        }
+
+        var formData = await request.formData();
+        var imageFile = formData.get("image");
+        if (!imageFile || typeof imageFile.arrayBuffer !== "function") {
+          return jsonResponse({ error: "image file is required" }, 400, request);
+        }
+
+        var scanRate = await enforceRateLimit(env, "appointments:scan:" + hashEmail(authResultScan.email), 15, 600);
+        if (!scanRate.allowed) {
+          return jsonResponseWithHeaders(
+            { error: "Rate limit exceeded. Please wait and try again." },
+            429,
+            request,
+            { "Retry-After": String(scanRate.retryAfter) }
+          );
+        }
+
+        var appointmentScan = await extractAppointmentFromImageResponses(imageFile, env);
+        return jsonResponse(appointmentScan, 200, request);
+      } catch (err) {
+        return jsonResponse({ error: err && err.message ? err.message : "Failed to scan appointment" }, 500, request);
+      }
+    }
+
     // ============ YOUTUBE ENDPOINTS ============
 
     // GET /api/youtube/resolve-channel?q=<input>
@@ -847,6 +879,100 @@ function normalizeAppointmentExtract(raw) {
     notes: sanitizeAppointmentValue(appt.notes),
     confidence: confidence
   };
+}
+
+function normalizeAppointmentScan(raw) {
+  var appt = raw || {};
+  return {
+    title: sanitizeAppointmentValue(appt.title),
+    provider: sanitizeAppointmentValue(appt.provider),
+    date: sanitizeAppointmentValue(appt.date),
+    time: sanitizeAppointmentValue(appt.time),
+    location: sanitizeAppointmentValue(appt.location),
+    phone: sanitizeAuPhone(appt.phone),
+    notes: sanitizeAppointmentValue(appt.notes)
+  };
+}
+
+function arrayBufferToBase64(buffer) {
+  var bytes = new Uint8Array(buffer);
+  var binary = "";
+  for (var i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+async function extractAppointmentFromImageResponses(imageFile, env) {
+  var apiKey = env.OPENAI_API_KEY;
+  if (!apiKey) throw new Error("OpenAI API key not configured");
+
+  var buffer = await imageFile.arrayBuffer();
+  var base64 = arrayBufferToBase64(buffer);
+  var mimeType = imageFile.type || "image/jpeg";
+  var dataUrl = "data:" + mimeType + ";base64," + base64;
+  var prompt = [
+    "Extract appointment details from this image.",
+    "Return JSON with keys: title, provider, date, time, location, phone, notes.",
+    "Date must be YYYY-MM-DD and time must be HH:mm in 24h format.",
+    "Use empty strings for unknown values. No markdown."
+  ].join("\\n");
+
+  var res = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + apiKey
+    },
+    body: JSON.stringify({
+      model: "gpt-4.1-mini",
+      input: [
+        {
+          role: "user",
+          content: [
+            { type: "input_text", text: prompt },
+            { type: "input_image", image_url: dataUrl }
+          ]
+        }
+      ],
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "appointment_scan",
+          schema: {
+            type: "object",
+            additionalProperties: false,
+            properties: {
+              title: { type: "string" },
+              provider: { type: "string" },
+              date: { type: "string" },
+              time: { type: "string" },
+              location: { type: "string" },
+              phone: { type: "string" },
+              notes: { type: "string" }
+            },
+            required: ["title", "provider", "date", "time", "location", "phone", "notes"]
+          }
+        }
+      }
+    })
+  });
+
+  var data = await res.json().catch(function () { return {}; });
+  if (!res.ok) {
+    throw new Error("OpenAI API error: " + JSON.stringify(data));
+  }
+
+  var content =
+    data &&
+    data.output &&
+    data.output[0] &&
+    data.output[0].content &&
+    data.output[0].content[0] &&
+    data.output[0].content[0].text;
+  if (!content) throw new Error("No valid response from OpenAI vision.");
+  var parsed = JSON.parse(stripJsonFences(content));
+  return normalizeAppointmentScan(parsed);
 }
 
 async function extractAppointmentFromImageOpenAI(imageBase64, options, env) {

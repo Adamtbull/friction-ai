@@ -11657,6 +11657,12 @@
       context.scanImageBtn.disabled = !enabled;
     }
 
+    function setAppointmentScanStatus(context, message) {
+      if (!context || !context.scanStatus) return;
+      context.scanStatus.textContent = message || '';
+      context.scanStatus.style.display = message ? '' : 'none';
+    }
+
     function readFileAsBase64(file) {
       return new Promise(function(resolve, reject) {
         var reader = new FileReader();
@@ -11670,6 +11676,35 @@
         };
         reader.readAsDataURL(file);
       });
+    }
+
+    async function callAppointmentScan(file) {
+      var idToken = localStorage.getItem('google_id_token');
+      if (!idToken) {
+        throw new Error('Please sign in again to continue.');
+      }
+      var formData = new FormData();
+      formData.append('image', file, file.name || 'appointment.jpg');
+      var res = await fetch('/api/appointments/scan', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + idToken
+        },
+        body: formData
+      });
+      if (!res.ok) {
+        var errorMsg = 'Backend API error';
+        try {
+          var error = await res.json();
+          errorMsg = error.error || errorMsg;
+        } catch (e) {}
+        if (res.status === 401) {
+          signOut();
+          throw new Error('Session expired. Please sign in again.');
+        }
+        throw new Error(errorMsg);
+      }
+      return await res.json();
     }
 
     async function callAppointmentImageExtract(payload) {
@@ -11719,6 +11754,24 @@
       renderAppointmentSummary(context);
     }
 
+    function applyAppointmentScanFields(context, appointment) {
+      if (!context || !appointment) return;
+      if (!context.draft) {
+        context.draft = buildAppointmentDraft(null, context.personSelect ? context.personSelect.value : '');
+      }
+      context.draft.title = appointment.title || context.draft.title || '';
+      context.draft.date = appointment.date || context.draft.date || '';
+      context.draft.time = appointment.time || context.draft.time || '';
+      context.draft.clinicName = appointment.provider || context.draft.clinicName || '';
+      context.draft.address = appointment.location || context.draft.address || '';
+      if (appointment.phone) {
+        context.draft.phone = normalizeAuPhone(appointment.phone);
+      }
+      context.draft.notes = appointment.notes || context.draft.notes || '';
+      syncAppointmentFormInputs(context);
+      renderAppointmentSummary(context);
+    }
+
     function updateAppointmentScanPreview(context, file) {
       if (!context || !context.scanPreview || !context.scanImage) return;
       if (!file) return;
@@ -11730,6 +11783,7 @@
       context.scanImage.src = context.captureUrl;
       context.scanPreview.style.display = '';
       setAppointmentScanButtonState(context, true);
+      setAppointmentScanStatus(context, '');
     }
 
     function resetAppointmentCapture(context, options) {
@@ -11744,6 +11798,7 @@
       }
       context.captureFile = null;
       setAppointmentScanButtonState(context, false);
+      setAppointmentScanStatus(context, '');
       if (context.textInput) context.textInput.value = '';
       setAppointmentOriginalText(context, '');
       if (context.aiBtn) {
@@ -11905,6 +11960,29 @@
 
     function setupAppointmentModal(context) {
       if (!context || !context.modal) return;
+      if (context.scanTakeInput) {
+        context.scanTakeInput.accept = 'image/*';
+      }
+      if (context.scanUploadInput) {
+        context.scanUploadInput.accept = 'image/*';
+      }
+      if (context.scanImageBtn) {
+        context.scanImageBtn.textContent = 'Scan image';
+      }
+      if (!context.scanStatus && context.scanImageBtn) {
+        var scanWrap = context.scanImageBtn.closest('.appointments-scan') || context.scanImageBtn.parentElement;
+        if (scanWrap) {
+          var status = scanWrap.querySelector('.appointments-scan-note[data-role="scan-status"]');
+          if (!status) {
+            status = document.createElement('div');
+            status.className = 'appointments-scan-note';
+            status.dataset.role = 'scan-status';
+            status.style.display = 'none';
+            scanWrap.appendChild(status);
+          }
+          context.scanStatus = status;
+        }
+      }
       context.modal.addEventListener('click', function(event) {
         if (event.target.dataset.close !== undefined) {
           closeAppointmentModal(context);
@@ -11968,26 +12046,23 @@
           }
           var originalLabel = context.scanImageBtn.textContent;
           context.scanImageBtn.textContent = 'Scanning...';
+          setAppointmentScanStatus(context, 'Scanning...');
           context.scanImageBtn.disabled = true;
           try {
-            var base64 = await readFileAsBase64(context.captureFile);
-            var locale = (navigator && navigator.language) ? navigator.language : 'en-AU';
-            var tz = (Intl && Intl.DateTimeFormat) ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'Australia/Sydney';
-            var data = await callAppointmentImageExtract({
-              imageBase64: base64,
-              locale: locale || 'en-AU',
-              tz: tz || 'Australia/Sydney'
-            });
-            var appointment = data && data.appointment ? data.appointment : {};
-            applyAppointmentExtract(context, appointment);
+            var appointment = await callAppointmentScan(context.captureFile);
+            applyAppointmentScanFields(context, appointment);
             if (context.summary) {
               setAppointmentSummaryVisible(context, true);
               renderAppointmentSummary(context);
             }
+            setAppointmentScanStatus(context, 'Filled ✓');
           } catch (err) {
-            alert(err && err.message ? err.message : 'Unable to scan the appointment image.');
+            setAppointmentScanStatus(
+              context,
+              err && err.message ? err.message : 'Unable to scan the appointment image.'
+            );
           } finally {
-            context.scanImageBtn.textContent = originalLabel;
+            context.scanImageBtn.textContent = originalLabel || 'Scan image';
             context.scanImageBtn.disabled = !context.captureFile;
           }
         });
