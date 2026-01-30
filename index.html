@@ -6477,7 +6477,8 @@
     var DEV_SEED = typeof window !== 'undefined' && window.DEV_SEED === true;
     var familyStorageSourceLogged = false;
     var LIFE_ROLE_OPTIONS = ['wife', 'son', 'daughter', 'mother', 'father', 'brother', 'sister', 'other'];
-    var people = [];
+    var familyMembers = [];
+    var people = familyMembers;
     var activePersonId = null;
     var lifeUiPrefs = { groupMode: false, selectedPeopleIds: [] };
     var lifePersonPrefs = {};
@@ -6629,6 +6630,7 @@
           id: generatePersonId(),
           name: 'Claire',
           role: 'wife',
+          roleType: 'adult',
           dob: null,
           avatarType: 'generated',
           avatarDataUrl: null,
@@ -6640,6 +6642,7 @@
           id: generatePersonId(),
           name: 'Lachlan',
           role: 'son',
+          roleType: 'child',
           dob: null,
           avatarType: 'generated',
           avatarDataUrl: null,
@@ -6662,13 +6665,13 @@
 
       loadPeople();
       if (!people.length && lifeData && Array.isArray(lifeData.people) && lifeData.people.length) {
-        people = lifeData.people.map(normalizePerson).filter(Boolean);
+        setFamilyMembers(lifeData.people.map(normalizePerson).filter(Boolean));
         if (people.length) {
           savePeople();
         }
       }
       if (!people.length && shouldSeedFamilyData()) {
-        people = createDefaultFamilyPeople();
+        setFamilyMembers(createDefaultFamilyPeople());
         savePeople();
       }
 
@@ -6718,7 +6721,7 @@
 
     function resetFamilyData() {
       if (!confirm('Reset all family profiles? This cannot be undone.')) return;
-      people = [];
+      setFamilyMembers([]);
       activePersonId = null;
       lifeState.activePersonId = null;
       lifeUiPrefs = { groupMode: false, selectedPeopleIds: [] };
@@ -6809,6 +6812,7 @@
         id: person.id || generatePersonId(),
         name: person.name || 'Unnamed',
         role: person.role || 'other',
+        roleType: deriveRoleType(person.role, person.roleType),
         dob: person.dob || null,
         avatarType: person.avatarType === 'photo' ? 'photo' : person.avatarType === 'initials' ? 'initials' : 'generated',
         avatarDataUrl: person.avatarDataUrl || null,
@@ -6824,6 +6828,7 @@
         id: 'me',
         name: 'Me',
         role: 'me',
+        roleType: 'adult',
         dob: null,
         avatarType: 'generated',
         avatarDataUrl: null,
@@ -6838,9 +6843,9 @@
       if (saved) {
         try {
           var parsed = JSON.parse(saved);
-          people = Array.isArray(parsed) ? parsed.map(normalizePerson).filter(Boolean) : [];
+          setFamilyMembers(Array.isArray(parsed) ? parsed.map(normalizePerson).filter(Boolean) : []);
         } catch (e) {
-          people = [];
+          setFamilyMembers([]);
         }
         logFamilyStorageSource('localStorage');
         return;
@@ -6850,9 +6855,9 @@
       if (legacySaved) {
         try {
           var legacyParsed = JSON.parse(legacySaved);
-          people = Array.isArray(legacyParsed) ? legacyParsed.map(normalizePerson).filter(Boolean) : [];
+          setFamilyMembers(Array.isArray(legacyParsed) ? legacyParsed.map(normalizePerson).filter(Boolean) : []);
         } catch (e) {
-          people = [];
+          setFamilyMembers([]);
         }
         logFamilyStorageSource('localStorage');
         localStorage.removeItem(LEGACY_LIFE_PEOPLE_KEY);
@@ -6862,18 +6867,48 @@
         return;
       }
 
-      people = [];
+      setFamilyMembers([]);
       logFamilyStorageSource('localStorage');
     }
 
     function savePeople() {
       try {
-        localStorage.setItem(FAMILY_MEMBERS_KEY, JSON.stringify(people));
+        syncFamilyMemberRoleTypes();
+        localStorage.setItem(FAMILY_MEMBERS_KEY, JSON.stringify(familyMembers));
         persistLifeData();
         return true;
       } catch (e) {
         return false;
       }
+    }
+
+    function deriveRoleType(role, roleType) {
+      if (roleType === 'adult' || roleType === 'child') return roleType;
+      var value = String(role || '').toLowerCase();
+      if (value.includes('son') || value.includes('daughter') || value.includes('child') || value.includes('kid')) {
+        return 'child';
+      }
+      return 'adult';
+    }
+
+    function ensureFamilyMemberRoleType(member) {
+      if (!member || typeof member !== 'object') return;
+      var nextRoleType = deriveRoleType(member.role, member.roleType);
+      if (member.roleType !== nextRoleType) {
+        member.roleType = nextRoleType;
+      }
+    }
+
+    function syncFamilyMemberRoleTypes() {
+      familyMembers.forEach(function(member) {
+        ensureFamilyMemberRoleType(member);
+      });
+    }
+
+    function setFamilyMembers(nextMembers) {
+      familyMembers = Array.isArray(nextMembers) ? nextMembers : [];
+      syncFamilyMemberRoleTypes();
+      people = familyMembers;
     }
 
     function loadLifeUiPrefs() {
@@ -7339,8 +7374,9 @@
     function renderBubbleStrip() {
       if (!lifeBubbleStrip) return;
       lifeBubbleStrip.innerHTML = '';
-      var familyPeople = getFamilyPeople();
-      familyPeople.forEach(function(person) {
+      syncFamilyMemberRoleTypes();
+      console.log('BUBBLES RENDERED: ' + familyMembers.length);
+      familyMembers.forEach(function(person) {
         var bubble = document.createElement('div');
         bubble.className = 'life-bubble';
         bubble.setAttribute('role', 'listitem');
@@ -7375,22 +7411,6 @@
         bubble.appendChild(name);
         lifeBubbleStrip.appendChild(bubble);
       });
-
-      var addBubble = document.createElement('div');
-      addBubble.className = 'life-bubble';
-      addBubble.setAttribute('role', 'listitem');
-      var addButton = document.createElement('button');
-      addButton.type = 'button';
-      addButton.className = 'life-bubble-btn life-bubble-add';
-      addButton.id = 'lifeAddPersonBubble';
-      addButton.setAttribute('aria-label', 'Add person');
-      addButton.textContent = '+';
-      var addLabel = document.createElement('div');
-      addLabel.className = 'life-bubble-name';
-      addLabel.textContent = 'Add';
-      addBubble.appendChild(addButton);
-      addBubble.appendChild(addLabel);
-      lifeBubbleStrip.appendChild(addBubble);
     }
 
     function renderActivePanel() {
@@ -7636,16 +7656,17 @@
           roleSelect.focus();
           return;
         }
-        people = people.map(function(entry) {
+        setFamilyMembers(people.map(function(entry) {
           if (entry.id !== person.id) return entry;
           return Object.assign({}, entry, {
             name: name,
             role: role,
+            roleType: deriveRoleType(role, entry.roleType),
             dob: dobInput.value || null,
             notes: notesInput.value.trim() || null,
             updatedAt: Date.now()
           });
-        });
+        }));
         savePeople();
         setActivePersonId(person.id);
         lifeState.editMode = false;
@@ -8410,6 +8431,7 @@
         id: generatePersonId(),
         name: name,
         role: role,
+        roleType: deriveRoleType(role),
         dob: lifePersonDobInput ? lifePersonDobInput.value || null : null,
         avatarType: pendingAvatarDataUrl ? 'photo' : 'generated',
         avatarDataUrl: pendingAvatarDataUrl || null,
@@ -8457,16 +8479,17 @@
         var updatedAt = Date.now();
         var dob = lifeEditDob ? lifeEditDob.value || null : null;
         var notes = lifeEditNotes ? lifeEditNotes.value.trim() || null : null;
-        people = people.map(function(entry) {
+        setFamilyMembers(people.map(function(entry) {
           if (entry.id !== activePersonId) return entry;
           return Object.assign({}, entry, {
             name: name,
             role: role,
+            roleType: deriveRoleType(role, entry.roleType),
             dob: dob,
             notes: notes,
             updatedAt: updatedAt
           });
-        });
+        }));
         savePeople();
         console.log('saveProfile:success', activePersonId);
         setEditMode(false);
@@ -8493,7 +8516,7 @@
 
     function confirmRemovePerson() {
       if (!pendingRemovePersonId) return;
-      people = people.filter(function(person) { return person.id !== pendingRemovePersonId; });
+      setFamilyMembers(people.filter(function(person) { return person.id !== pendingRemovePersonId; }));
       if (lifePersonPrefs && lifePersonPrefs[pendingRemovePersonId]) {
         delete lifePersonPrefs[pendingRemovePersonId];
         saveLifePersonPrefs();
@@ -15657,6 +15680,7 @@
           id: editingPersonId || generatePersonId(),
           name: name,
           role: role,
+          roleType: deriveRoleType(role, existingPerson ? existingPerson.roleType : null),
           customRole: role === 'Other' ? customRole : '',
           org: org,
           dob: dob,
@@ -15670,10 +15694,10 @@
           updatedAt: Date.now()
         };
         if (editingPersonId) {
-          people = people.map(function(person) {
+          setFamilyMembers(people.map(function(person) {
             if (person.id !== editingPersonId) return person;
             return personRecord;
-          });
+          }));
         } else {
           people.unshift(personRecord);
         }
