@@ -269,6 +269,110 @@
       margin-top: 16px;
     }
 
+    .legal-links {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 12px;
+      font-size: 0.8rem;
+    }
+
+    .legal-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+
+    .legal-links a:hover {
+      color: var(--teal);
+    }
+
+    .legal-links--menu {
+      justify-content: flex-start;
+      padding: 12px 20px 20px;
+      border-top: 1px solid var(--border);
+      margin-top: 0;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    #privacy-view,
+    #terms-view,
+    #disclaimer-view {
+      display: none;
+      min-height: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 60px 24px;
+    }
+
+    #privacy-view.active,
+    #terms-view.active,
+    #disclaimer-view.active {
+      display: block;
+    }
+
+    #privacy-view h1,
+    #terms-view h1,
+    #disclaimer-view h1 {
+      font-size: 2rem;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    #privacy-view h2,
+    #terms-view h2,
+    #disclaimer-view h2 {
+      font-size: 1.1rem;
+      margin-top: 24px;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    #privacy-view p,
+    #terms-view p,
+    #disclaimer-view p,
+    #privacy-view li,
+    #terms-view li,
+    #disclaimer-view li {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+    }
+
+    #privacy-view ul,
+    #terms-view ul,
+    #disclaimer-view ul {
+      padding-left: 20px;
+      margin: 0 0 12px;
+    }
+
+    #privacy-view .legal-meta,
+    #terms-view .legal-meta,
+    #disclaimer-view .legal-meta {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    #privacy-view .legal-back,
+    #terms-view .legal-back,
+    #disclaimer-view .legal-back {
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+    }
+
+    #privacy-view .legal-back a,
+    #terms-view .legal-back a,
+    #disclaimer-view .legal-back a {
+      color: var(--teal);
+      text-decoration: none;
+    }
+
+    #privacy-view .legal-back a:hover,
+    #terms-view .legal-back a:hover,
+    #disclaimer-view .legal-back a:hover {
+      color: var(--teal-dark);
+    }
+
     /* =================== */
     /* CHAT APP STYLES     */
     /* =================== */
@@ -4636,8 +4740,120 @@
   <div id="googleButtonHidden" style="position: absolute; opacity: 0; pointer-events: none; height: 0; overflow: hidden;"></div>
 
   <p class="footer-note">Works best in your browser. Home-screen optional.</p>
+  <div class="legal-links">
+    <a href="/privacy">Privacy</a>
+    <a href="/terms">Terms</a>
+    <a href="/disclaimer">Disclaimer</a>
+  </div>
 </div>
 
+  </div>
+
+  <div id="privacy-view" aria-hidden="true">
+    <div class="legal-back"><a href="/">← Back to Friction AI</a></div>
+    <h1>Privacy Policy — Friction AI (Draft)</h1>
+    <p class="legal-meta">Last updated: 2026-01-30</p>
+
+    <h2>Overview</h2>
+    <p>Friction AI is designed with a privacy-first approach. Our goal is to minimize the amount of personal data collected and avoid storing sensitive user content on our servers wherever possible.</p>
+    <p>This Privacy Policy explains what data is collected, how it is used, and your choices.</p>
+
+    <h2>Information We Collect</h2>
+    <p><strong>Account Sign-In Information</strong></p>
+    <p>If you sign in using Google, we receive:</p>
+    <ul>
+      <li>Your email address</li>
+      <li>Your display name (if provided by Google)</li>
+      <li>A Google identity token used for authentication</li>
+    </ul>
+    <p>We use this only to verify identity, control access to features, and apply security protections. We do not receive your Google password.</p>
+
+    <p><strong>User Content and Saved Data</strong></p>
+    <p>Friction AI is designed so that user-saved data is stored locally on your device (browser storage). This includes appointments, tasks, goals, family profiles, settings, and notes.</p>
+    <p>We do not store this personal content on our servers unless explicitly stated for a specific feature.</p>
+    <p>If you clear your browser data or switch devices, this locally stored data may be lost.</p>
+
+    <p><strong>AI Requests</strong></p>
+    <p>When you use AI features, your messages and prompts are sent to the selected third-party AI provider to generate a response. Providers may include OpenAI, Anthropic, Google (Gemini), Perplexity, and xAI (Grok).</p>
+    <p>We do not store your message history on our servers unless you explicitly enable a future server-save feature. AI providers may process request content under their own policies.</p>
+    <p>Avoid submitting highly sensitive personal, medical, or financial information to AI tools.</p>
+
+    <p><strong>Usage &amp; Security Analytics</strong></p>
+    <p>We may collect limited anonymized usage data for security and abuse prevention (e.g., counts of messages, feature usage totals, signup counts, rate limit events). This data does not include message content.</p>
+
+    <h2>What We Do Not Collect</h2>
+    <p>We do not intentionally collect or store your private task/goal content server-side, your chat history server-side (unless a future opt-in exists), contacts, precise location, or Google passwords.</p>
+
+    <h2>Data Storage Model</h2>
+    <p>Friction AI primarily uses local browser storage for saved content, Cloudflare infrastructure for API processing, and third-party AI providers for response generation.</p>
+
+    <h2>Data Retention</h2>
+    <p>Local data stays on your device until you delete it. Anonymized analytics may be retained for a limited time for monitoring and abuse prevention.</p>
+
+    <h2>Your Choices and Controls</h2>
+    <p>You can clear your local data via browser settings and stop using the service at any time. Future versions may include export/delete tools.</p>
+
+    <h2>Security</h2>
+    <p>We use reasonable technical measures (HTTPS, token auth, rate limiting, environment secret storage). No system can guarantee absolute security.</p>
+
+    <h2>Third-Party Services</h2>
+    <p>Authentication and AI processing rely on third parties that operate under their own policies.</p>
+
+    <h2>Children’s Privacy</h2>
+    <p>Not intended for children under 13.</p>
+
+    <h2>Beta Status Disclaimer</h2>
+    <p>Early-stage product. Features may change, break, or be removed. Do not rely on it as your sole system for critical information.</p>
+
+    <h2>Changes to This Policy</h2>
+    <p>Updates will be posted with a new “Last updated” date.</p>
+
+    <h2>Contact</h2>
+    <p>[insert contact email]</p>
+  </div>
+
+  <div id="terms-view" aria-hidden="true">
+    <div class="legal-back"><a href="/">← Back to Friction AI</a></div>
+    <h1>Terms of Use — Friction AI (Draft)</h1>
+    <p class="legal-meta">Last updated: 2026-01-30</p>
+    <ul>
+      <li>Friction AI is provided “as is” without warranties.</li>
+      <li>You are responsible for how you use the tool and for verifying important information.</li>
+      <li>Friction AI does not provide medical, legal, or professional advice.</li>
+      <li>Do not upload or submit content you do not have the rights to use.</li>
+      <li>We may limit or block access to prevent abuse, protect the service, or comply with law.</li>
+      <li>Features may change or be removed at any time, especially during beta.</li>
+      <li>Local-only storage means clearing browser data may remove your saved content.</li>
+    </ul>
+    <h2>Contact</h2>
+    <p>[insert contact email]</p>
+  </div>
+
+  <div id="disclaimer-view" aria-hidden="true">
+    <div class="legal-back"><a href="/">← Back to Friction AI</a></div>
+    <h1>Disclaimer — Friction AI (Draft)</h1>
+    <p class="legal-meta">Last updated: 2026-01-30</p>
+
+    <h2>AI Disclaimer</h2>
+    <ul>
+      <li>AI outputs may be inaccurate or incomplete.</li>
+      <li>Always verify important details independently.</li>
+    </ul>
+
+    <h2>Not Medical Advice</h2>
+    <ul>
+      <li>Friction AI is not a medical device and does not provide medical advice.</li>
+      <li>For health concerns, consult qualified professionals.</li>
+    </ul>
+
+    <h2>Beta Disclaimer</h2>
+    <ul>
+      <li>This is an early/beta product. Data may be lost, features may break, and behavior may change.</li>
+      <li>Do not rely on Friction AI as your only system for critical reminders or recordkeeping.</li>
+    </ul>
+
+    <h2>Contact</h2>
+    <p>[insert contact email]</p>
   </div>
 
   <!-- CHAT APPLICATION -->
@@ -5201,6 +5417,11 @@
     <span>Sign Out</span>
   </button>
 </div>
+<div class="legal-links legal-links--menu">
+  <a href="/privacy">Privacy</a>
+  <a href="/terms">Terms</a>
+  <a href="/disclaimer">Disclaimer</a>
+</div>
 
   </div>
 
@@ -5509,7 +5730,7 @@
       // Also save to history
       saveCurrentChatToHistory();
 
-      // Sync to server (debounced)
+      // Local-only storage (no server sync)
       saveUserDataToServer();
     }
 
@@ -10310,9 +10531,6 @@
       // Register user with backend (for analytics)
       registerUser(response.credential);
 
-      // Load user data from server (restores chat history, settings, etc.)
-      await loadUserDataFromServer();
-
       // Now update UI with restored data
       updateModelAccess();
       updateProfileDisplay();
@@ -10335,92 +10553,11 @@
 
     // SERVER DATA SYNC
     async function loadUserDataFromServer() {
-      var idToken = localStorage.getItem('google_id_token');
-      if (!idToken) return false;
-
-      try {
-        var response = await fetch('/api/user/data', {
-          method: 'GET',
-          headers: {
-            'Authorization': 'Bearer ' + idToken
-          }
-        });
-
-        if (!response.ok) return false;
-
-        var result = await response.json();
-        if (result.data) {
-          // Restore chat history
-          if (result.data.chat) {
-            localStorage.setItem('friction_chat', JSON.stringify(result.data.chat));
-          }
-          // Restore goals
-          if (result.data.goals) {
-            localStorage.setItem('friction_goals', JSON.stringify(result.data.goals));
-          }
-          // Restore settings
-          if (result.data.settings) {
-            localStorage.setItem('friction_settings', JSON.stringify(result.data.settings));
-          }
-          // Restore chat history list
-          if (result.data.history) {
-            localStorage.setItem('friction_history', JSON.stringify(result.data.history));
-          }
-          // Restore friction state
-          if (result.data.frictionState) {
-            localStorage.setItem('friction_state', JSON.stringify(result.data.frictionState));
-          }
-          console.log('User data loaded from server');
-          return true;
-        }
-        return false;
-      } catch (err) {
-        console.log('Failed to load user data from server:', err);
-        return false;
-      }
+      return false;
     }
 
     function saveUserDataToServer() {
-      var idToken = localStorage.getItem('google_id_token');
-      if (!idToken) return;
-
-      // Debounce saves to avoid too many requests
-      if (window.saveDataTimeout) {
-        clearTimeout(window.saveDataTimeout);
-      }
-
-      window.saveDataTimeout = setTimeout(function() {
-        var data = {};
-
-        // Collect all data from localStorage
-        var chat = localStorage.getItem('friction_chat');
-        if (chat) data.chat = JSON.parse(chat);
-
-        var goals = localStorage.getItem('friction_goals');
-        if (goals) data.goals = JSON.parse(goals);
-
-        var settings = localStorage.getItem('friction_settings');
-        if (settings) data.settings = JSON.parse(settings);
-
-        var history = localStorage.getItem('friction_history');
-        if (history) data.history = JSON.parse(history);
-
-        var frictionState = localStorage.getItem('friction_state');
-        if (frictionState) data.frictionState = JSON.parse(frictionState);
-
-        fetch('/api/user/data', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + idToken
-          },
-          body: JSON.stringify(data)
-        }).then(function() {
-          console.log('User data saved to server');
-        }).catch(function(err) {
-          console.log('Failed to save user data to server:', err);
-        });
-      }, 2000); // Wait 2 seconds before saving to debounce
+      return;
     }
 
     function signOut() {
@@ -10459,7 +10596,46 @@
       }
     }
 
+    function getLegalViewFromLocation() {
+      var path = window.location.pathname;
+      if (path === '/privacy') return 'privacy';
+      if (path === '/terms') return 'terms';
+      if (path === '/disclaimer') return 'disclaimer';
+      return '';
+    }
+
+    function handleLegalRoute() {
+      var legalView = getLegalViewFromLocation();
+      if (!legalView) return false;
+
+      var homepageEl = document.getElementById('homepage');
+      var chatAppEl = document.getElementById('chatApp');
+      var privacyView = document.getElementById('privacy-view');
+      var termsView = document.getElementById('terms-view');
+      var disclaimerView = document.getElementById('disclaimer-view');
+
+      if (homepageEl) homepageEl.classList.add('hidden');
+      if (chatAppEl) chatAppEl.classList.remove('active');
+
+      if (privacyView) {
+        privacyView.classList.toggle('active', legalView === 'privacy');
+        privacyView.setAttribute('aria-hidden', legalView === 'privacy' ? 'false' : 'true');
+      }
+      if (termsView) {
+        termsView.classList.toggle('active', legalView === 'terms');
+        termsView.setAttribute('aria-hidden', legalView === 'terms' ? 'false' : 'true');
+      }
+      if (disclaimerView) {
+        disclaimerView.classList.toggle('active', legalView === 'disclaimer');
+        disclaimerView.setAttribute('aria-hidden', legalView === 'disclaimer' ? 'false' : 'true');
+      }
+
+      document.body.classList.add('ready');
+      return true;
+    }
+
     function initGoogleSignIn() {
+      if (legalRouteActive) return;
       if (typeof google !== 'undefined' && google.accounts) {
         google.accounts.id.initialize({
           client_id: GOOGLE_CLIENT_ID,
@@ -10490,15 +10666,21 @@
       }
     }
 
+    var legalRouteActive = handleLegalRoute();
+
     // Fallback: reveal UI after timeout in case Google script fails
     setTimeout(function() {
-      document.body.classList.add('ready');
-      if (isCalendarImportRoute() && chatApp && !chatApp.classList.contains('active')) {
-        showChat();
+      if (!legalRouteActive) {
+        document.body.classList.add('ready');
+        if (isCalendarImportRoute() && chatApp && !chatApp.classList.contains('active')) {
+          showChat();
+        }
       }
     }, 1000);
 
-    initGoogleSignIn();
+    if (!legalRouteActive) {
+      initGoogleSignIn();
+    }
 
     // DOM ELEMENTS
     const homepage = document.getElementById('homepage');

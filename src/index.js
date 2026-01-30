@@ -9,7 +9,7 @@ export default {
 
     // CORS preflight
     if (request.method === "OPTIONS") {
-      return new Response(null, { headers: corsHeaders() });
+      return new Response(null, { headers: corsHeaders(request) });
     }
 
     // ============ ADMIN ENDPOINTS ============
@@ -19,13 +19,13 @@ export default {
       try {
         var adminAuth = await verifyAdminToken(request, env);
         if (!adminAuth.valid) {
-          return jsonResponse({ error: "Unauthorized" }, 401);
+          return jsonResponse({ error: "Unauthorized" }, 401, request);
         }
 
         var stats = await getAnalyticsStats(env);
-        return jsonResponse(stats, 200);
+        return jsonResponse(stats, 200, request);
       } catch (err) {
-        return jsonResponse({ error: err.message || "Failed to get stats" }, 500);
+        return jsonResponse({ error: err.message || "Failed to get stats" }, 500, request);
       }
     }
 
@@ -34,13 +34,13 @@ export default {
       try {
         var adminAuth = await verifyAdminToken(request, env);
         if (!adminAuth.valid) {
-          return jsonResponse({ error: "Unauthorized" }, 401);
+          return jsonResponse({ error: "Unauthorized" }, 401, request);
         }
 
         var users = await getUserList(env);
-        return jsonResponse({ users: users }, 200);
+        return jsonResponse({ users: users }, 200, request);
       } catch (err) {
-        return jsonResponse({ error: err.message || "Failed to get users" }, 500);
+        return jsonResponse({ error: err.message || "Failed to get users" }, 500, request);
       }
     }
 
@@ -51,7 +51,7 @@ export default {
         // Verify user authentication (bot protection)
         var authResult = await verifyUserToken(request, env);
         if (!authResult.valid) {
-          return jsonResponse({ error: "Authentication required. Please sign in." }, 401);
+          return jsonResponse({ error: "Authentication required. Please sign in." }, 401, request);
         }
 
         var userEmail = authResult.email;
@@ -64,11 +64,11 @@ export default {
         var isAdmin = userEmail === env.ADMIN_EMAIL;
 
         if (paidModels.indexOf(model) >= 0 && !isAdmin) {
-          return jsonResponse({ error: "This model requires admin access." }, 403);
+          return jsonResponse({ error: "This model requires admin access." }, 403, request);
         }
 
         if (!messages.length) {
-          return jsonResponse({ error: "No messages provided" }, 400);
+          return jsonResponse({ error: "No messages provided" }, 400, request);
         }
 
         // Clean/normalize messages
@@ -84,14 +84,26 @@ export default {
         if (!cleaned.length) {
           return jsonResponse(
             { response: "Hey! Looks like your message didn't come through. Try sending something again?" },
-            200
+            200,
+            request
           );
         }
 
         if (cleaned[cleaned.length - 1].role !== "user") {
           return jsonResponse(
             { error: "Last message must be from user. Try again." },
-            400
+            400,
+            request
+          );
+        }
+
+        var rateLimit = await enforceRateLimit(env, "chat:" + hashEmail(userEmail), 60, 600);
+        if (!rateLimit.allowed) {
+          return jsonResponseWithHeaders(
+            { error: "Rate limit exceeded. Please wait and try again." },
+            429,
+            request,
+            { "Retry-After": String(rateLimit.retryAfter) }
           );
         }
 
@@ -122,13 +134,13 @@ export default {
             responseText = await handlePerplexity(cleaned, env);
             break;
           default:
-            return jsonResponse({ error: "Unknown model: " + model }, 400);
+            return jsonResponse({ error: "Unknown model: " + model }, 400, request);
         }
 
-        return jsonResponse({ response: responseText }, 200);
+        return jsonResponse({ response: responseText }, 200, request);
       } catch (err) {
         var errMsg = err && err.message ? err.message : "Server error";
-        return jsonResponse({ error: errMsg }, 500);
+        return jsonResponse({ error: errMsg }, 500, request);
       }
     }
 
@@ -139,7 +151,7 @@ export default {
       try {
         var authResult = await verifyUserToken(request, env);
         if (!authResult.valid) {
-          return jsonResponse({ error: "Invalid token" }, 401);
+          return jsonResponse({ error: "Invalid token" }, 401, request);
         }
 
         await logAnalytics(env, {
@@ -151,9 +163,9 @@ export default {
         // Store user in KV (just email + signup date, no content)
         await storeUser(env, authResult.email);
 
-        return jsonResponse({ success: true }, 200);
+        return jsonResponse({ success: true }, 200, request);
       } catch (err) {
-        return jsonResponse({ error: err.message || "Registration failed" }, 500);
+        return jsonResponse({ error: err.message || "Registration failed" }, 500, request);
       }
     }
 
@@ -164,13 +176,12 @@ export default {
       try {
         var authResult = await verifyUserToken(request, env);
         if (!authResult.valid) {
-          return jsonResponse({ error: "Authentication required" }, 401);
+          return jsonResponse({ error: "Authentication required" }, 401, request);
         }
 
-        var userData = await getUserData(env, authResult.email);
-        return jsonResponse({ data: userData }, 200);
+        return jsonResponse({ data: null }, 200, request);
       } catch (err) {
-        return jsonResponse({ error: err.message || "Failed to load data" }, 500);
+        return jsonResponse({ error: err.message || "Failed to load data" }, 500, request);
       }
     }
 
@@ -179,14 +190,12 @@ export default {
       try {
         var authResult = await verifyUserToken(request, env);
         if (!authResult.valid) {
-          return jsonResponse({ error: "Authentication required" }, 401);
+          return jsonResponse({ error: "Authentication required" }, 401, request);
         }
 
-        var body = await request.json().catch(function () { return {}; });
-        await saveUserData(env, authResult.email, body);
-        return jsonResponse({ success: true }, 200);
+        return jsonResponse({ success: true }, 200, request);
       } catch (err) {
-        return jsonResponse({ error: err.message || "Failed to save data" }, 500);
+        return jsonResponse({ error: err.message || "Failed to save data" }, 500, request);
       }
     }
 
@@ -198,7 +207,7 @@ export default {
         // Require sign-in (same as /api/chat)
         var authResult2 = await verifyUserToken(request, env);
         if (!authResult2.valid) {
-          return jsonResponse({ error: "Authentication required" }, 401);
+          return jsonResponse({ error: "Authentication required" }, 401, request);
         }
 
         var body = await request.json().catch(function () { return {}; });
@@ -209,11 +218,21 @@ export default {
         var mode = body.mode === "fix" ? "fix" : "parse";
 
         if (!rawText.trim()) {
-          return jsonResponse({ error: "rawText is required" }, 400);
+          return jsonResponse({ error: "rawText is required" }, 400, request);
+        }
+
+        var apptRate = await enforceRateLimit(env, "appointments:structure:" + hashEmail(authResult2.email), 20, 600);
+        if (!apptRate.allowed) {
+          return jsonResponseWithHeaders(
+            { error: "Rate limit exceeded. Please wait and try again." },
+            429,
+            request,
+            { "Retry-After": String(apptRate.retryAfter) }
+          );
         }
 
         var appt = await handlePerplexityAppointment(rawText, fixesText, mode, env);
-        return jsonResponse(appt, 200);
+        return jsonResponse(appt, 200, request);
       } catch (err) {
         var fallback = heuristicAppointment(
           typeof bodyForFallback.rawText === "string" ? bodyForFallback.rawText : ""
@@ -223,7 +242,8 @@ export default {
             ...fallback,
             error: err && err.message ? err.message : "Failed to parse appointment"
           },
-          200
+          200,
+          request
         );
       }
     }
@@ -234,7 +254,7 @@ export default {
       try {
         var authResult3 = await verifyUserToken(request, env);
         if (!authResult3.valid) {
-          return jsonResponse({ error: "Authentication required" }, 401);
+          return jsonResponse({ error: "Authentication required" }, 401, request);
         }
 
         var bodyExtract = await request.json().catch(function () { return {}; });
@@ -243,13 +263,23 @@ export default {
         var tz = typeof bodyExtract.tz === "string" ? bodyExtract.tz : "Australia/Sydney";
 
         if (!imageBase64.trim()) {
-          return jsonResponse({ error: "imageBase64 is required" }, 400);
+          return jsonResponse({ error: "imageBase64 is required" }, 400, request);
+        }
+
+        var extractRate = await enforceRateLimit(env, "appointments:extract:" + hashEmail(authResult3.email), 15, 600);
+        if (!extractRate.allowed) {
+          return jsonResponseWithHeaders(
+            { error: "Rate limit exceeded. Please wait and try again." },
+            429,
+            request,
+            { "Retry-After": String(extractRate.retryAfter) }
+          );
         }
 
         var appointment = await extractAppointmentFromImageOpenAI(imageBase64, { locale: locale, tz: tz }, env);
-        return jsonResponse({ appointment: appointment }, 200);
+        return jsonResponse({ appointment: appointment }, 200, request);
       } catch (err) {
-        return jsonResponse({ error: err && err.message ? err.message : "Failed to extract appointment" }, 500);
+        return jsonResponse({ error: err && err.message ? err.message : "Failed to extract appointment" }, 500, request);
       }
     }
 
@@ -259,10 +289,10 @@ export default {
     if (url.pathname === "/api/youtube/resolve-channel" && request.method === "GET") {
       var q = url.searchParams.get("q");
       if (!q || !q.trim()) {
-        return jsonResponse({ error: "Missing q query parameter." }, 400);
+        return jsonResponse({ error: "Missing q query parameter." }, 400, request);
       }
       if (!env.YOUTUBE_API_KEY) {
-        return jsonResponse({ error: "Server missing YOUTUBE_API_KEY." }, 500);
+        return jsonResponse({ error: "Server missing YOUTUBE_API_KEY." }, 500, request);
       }
 
       var trimmedQuery = q.trim();
@@ -275,6 +305,7 @@ export default {
             channelUrl: "https://www.youtube.com/channel/" + directMatch[1]
           },
           200,
+          request,
           { "Cache-Control": "public, max-age=600" }
         );
       }
@@ -287,11 +318,11 @@ export default {
         encodeURIComponent(env.YOUTUBE_API_KEY);
       var searchResult = await fetchJson(searchUrl);
       if (!searchResult.response.ok) {
-        return jsonResponse({ error: "YouTube API error." }, 502);
+        return jsonResponse({ error: "YouTube API error." }, 502, request);
       }
       var items = Array.isArray(searchResult.data.items) ? searchResult.data.items : [];
       if (items.length === 0) {
-        return jsonResponse({ error: "Channel not found." }, 404);
+        return jsonResponse({ error: "Channel not found." }, 404, request);
       }
       var item = items[0];
       var channelId = item && item.id ? item.id.channelId : "";
@@ -307,6 +338,7 @@ export default {
           channelUrl: channelUrl
         },
         200,
+        request,
         { "Cache-Control": "public, max-age=600" }
       );
     }
@@ -315,10 +347,10 @@ export default {
     if (url.pathname === "/api/youtube/channel-latest" && request.method === "GET") {
       var channelIdParam = url.searchParams.get("channelId");
       if (!channelIdParam || !channelIdParam.trim()) {
-        return jsonResponse({ error: "Missing channelId query parameter." }, 400);
+        return jsonResponse({ error: "Missing channelId query parameter." }, 400, request);
       }
       if (!env.YOUTUBE_API_KEY) {
-        return jsonResponse({ error: "Server missing YOUTUBE_API_KEY." }, 500);
+        return jsonResponse({ error: "Server missing YOUTUBE_API_KEY." }, 500, request);
       }
 
       var limitParam = parseInt(url.searchParams.get("limit"), 10);
@@ -332,11 +364,11 @@ export default {
         encodeURIComponent(env.YOUTUBE_API_KEY);
       var channelResult = await fetchJson(channelsUrl);
       if (!channelResult.response.ok) {
-        return jsonResponse({ error: "YouTube API error." }, 502);
+        return jsonResponse({ error: "YouTube API error." }, 502, request);
       }
       var channelItems = Array.isArray(channelResult.data.items) ? channelResult.data.items : [];
       if (channelItems.length === 0) {
-        return jsonResponse({ error: "Channel not found." }, 404);
+        return jsonResponse({ error: "Channel not found." }, 404, request);
       }
       var channel = channelItems[0];
       var channelTitle = channel && channel.snippet ? channel.snippet.title || "" : "";
@@ -349,7 +381,7 @@ export default {
           : "";
 
       if (!uploadsId) {
-        return jsonResponse({ error: "YouTube API error." }, 502);
+        return jsonResponse({ error: "YouTube API error." }, 502, request);
       }
 
       var playlistUrl =
@@ -361,7 +393,7 @@ export default {
         encodeURIComponent(env.YOUTUBE_API_KEY);
       var playlistResult = await fetchJson(playlistUrl);
       if (!playlistResult.response.ok) {
-        return jsonResponse({ error: "YouTube API error." }, 502);
+        return jsonResponse({ error: "YouTube API error." }, 502, request);
       }
 
       var playlistItems = Array.isArray(playlistResult.data.items) ? playlistResult.data.items : [];
@@ -393,6 +425,7 @@ export default {
           videos: videos
         },
         200,
+        request,
         { "Cache-Control": "public, max-age=600" }
       );
     }
@@ -401,10 +434,10 @@ export default {
     if (url.pathname === "/api/youtube/channel-sample" && request.method === "GET") {
       var channelIdSample = url.searchParams.get("channelId");
       if (!channelIdSample || !channelIdSample.trim()) {
-        return jsonResponse({ error: "Missing channelId query parameter." }, 400);
+        return jsonResponse({ error: "Missing channelId query parameter." }, 400, request);
       }
       if (!env.YOUTUBE_API_KEY) {
-        return jsonResponse({ error: "Server missing YOUTUBE_API_KEY." }, 500);
+        return jsonResponse({ error: "Server missing YOUTUBE_API_KEY." }, 500, request);
       }
 
       var poolParam = parseInt(url.searchParams.get("pool"), 10);
@@ -418,11 +451,11 @@ export default {
         encodeURIComponent(env.YOUTUBE_API_KEY);
       var channelSampleResult = await fetchJson(channelsSampleUrl);
       if (!channelSampleResult.response.ok) {
-        return jsonResponse({ error: "YouTube API error." }, 502);
+        return jsonResponse({ error: "YouTube API error." }, 502, request);
       }
       var channelSampleItems = Array.isArray(channelSampleResult.data.items) ? channelSampleResult.data.items : [];
       if (channelSampleItems.length === 0) {
-        return jsonResponse({ error: "Channel not found." }, 404);
+        return jsonResponse({ error: "Channel not found." }, 404, request);
       }
       var channelSample = channelSampleItems[0];
       var channelSampleTitle = channelSample && channelSample.snippet ? channelSample.snippet.title || "" : "";
@@ -435,7 +468,7 @@ export default {
           : "";
 
       if (!uploadsSampleId) {
-        return jsonResponse({ error: "YouTube API error." }, 502);
+        return jsonResponse({ error: "YouTube API error." }, 502, request);
       }
 
       var samplePlaylistUrl =
@@ -447,7 +480,7 @@ export default {
         encodeURIComponent(env.YOUTUBE_API_KEY);
       var samplePlaylistResult = await fetchJson(samplePlaylistUrl);
       if (!samplePlaylistResult.response.ok) {
-        return jsonResponse({ error: "YouTube API error." }, 502);
+        return jsonResponse({ error: "YouTube API error." }, 502, request);
       }
 
       var sampleItems = Array.isArray(samplePlaylistResult.data.items) ? samplePlaylistResult.data.items : [];
@@ -479,11 +512,12 @@ export default {
           videos: sampleVideos
         },
         200,
+        request,
         { "Cache-Control": "public, max-age=600" }
       );
     }
 
-    return new Response("Not Found", { status: 404, headers: corsHeaders() });
+    return new Response("Not Found", { status: 404, headers: corsHeaders(request) });
   }
 };
 
@@ -491,35 +525,43 @@ export default {
 // CORS + RESPONSES
 // =====================
 
-function corsHeaders() {
+function corsHeaders(request) {
+  var origin = "";
+  var allowOrigin = "null";
+  if (request && request.headers) {
+    origin = request.headers.get("Origin") || "";
+    try {
+      var requestUrl = new URL(request.url);
+      if (origin && origin === requestUrl.origin) {
+        allowOrigin = origin;
+      }
+    } catch (err) { }
+  }
   return {
-    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Origin": allowOrigin,
     "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization"
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Vary": "Origin"
   };
 }
 
-function jsonResponse(data, status) {
+function jsonResponse(data, status, request) {
   if (!status) status = 200;
-  var headers = {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization"
-  };
+  var headers = Object.assign(
+    { "Content-Type": "application/json" },
+    corsHeaders(request)
+  );
   return new Response(JSON.stringify(data), {
     status: status,
     headers: headers
   });
 }
 
-function jsonResponseWithHeaders(data, status, extraHeaders) {
-  var headers = {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization"
-  };
+function jsonResponseWithHeaders(data, status, request, extraHeaders) {
+  var headers = Object.assign(
+    { "Content-Type": "application/json" },
+    corsHeaders(request)
+  );
   var merged = Object.assign({}, headers, extraHeaders || {});
   return new Response(JSON.stringify(data), {
     status: status || 200,
@@ -1101,33 +1143,43 @@ async function verifyUserToken(request, env) {
   var token = authHeader.substring(7);
 
   try {
-    // Decode JWT without verification first to get the payload
-    var parts = token.split(".");
-    if (parts.length !== 3) {
-      return { valid: false, error: "Invalid token format" };
+    var verified = await verifyGoogleToken(token, env);
+    if (!verified.valid) {
+      return verified;
     }
-
-    var payload = JSON.parse(atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")));
-
-    // Check expiration
-    if (payload.exp && payload.exp * 1000 < Date.now()) {
-      return { valid: false, error: "Token expired" };
-    }
-
-    // Check issuer (Google)
-    if (payload.iss !== "https://accounts.google.com" && payload.iss !== "accounts.google.com") {
-      return { valid: false, error: "Invalid issuer" };
-    }
-
-    // Check audience (your client ID)
-    if (payload.aud !== env.GOOGLE_CLIENT_ID) {
-      return { valid: false, error: "Invalid audience" };
-    }
-
-    return { valid: true, email: payload.email, name: payload.name };
+    return { valid: true, email: verified.email, name: verified.name };
   } catch (err) {
     return { valid: false, error: "Token verification failed" };
   }
+}
+
+async function verifyGoogleToken(token, env) {
+  if (!env.GOOGLE_CLIENT_ID) {
+    return { valid: false, error: "Server missing Google client ID" };
+  }
+
+  var url = "https://oauth2.googleapis.com/tokeninfo?id_token=" + encodeURIComponent(token);
+  var res = await fetch(url);
+  if (!res.ok) {
+    return { valid: false, error: "Token verification failed" };
+  }
+
+  var data = await res.json().catch(function () { return {}; });
+  if (data.aud !== env.GOOGLE_CLIENT_ID) {
+    return { valid: false, error: "Invalid audience" };
+  }
+  if (data.iss !== "https://accounts.google.com" && data.iss !== "accounts.google.com") {
+    return { valid: false, error: "Invalid issuer" };
+  }
+  var exp = Number(data.exp || 0);
+  if (exp && exp * 1000 < Date.now()) {
+    return { valid: false, error: "Token expired" };
+  }
+  if (!data.email) {
+    return { valid: false, error: "Email missing" };
+  }
+
+  return { valid: true, email: data.email, name: data.name };
 }
 
 async function verifyAdminToken(request, env) {
@@ -1290,43 +1342,32 @@ async function getUserList(env) {
 // =====================
 
 async function getUserData(env, email) {
-  if (!env.FRICTION_KV) return null;
-
-  try {
-    var key = "userdata:" + hashEmail(email);
-    var data = await env.FRICTION_KV.get(key);
-    return data ? JSON.parse(data) : null;
-  } catch (err) {
-    console.error("Get user data error:", err);
-    return null;
-  }
+  return null;
 }
 
 async function saveUserData(env, email, data) {
-  if (!env.FRICTION_KV) return;
+  return;
+}
 
-  try {
-    var key = "userdata:" + hashEmail(email);
-
-    // Merge with existing data to avoid overwriting
-    var existing = await env.FRICTION_KV.get(key);
-    var merged = existing ? JSON.parse(existing) : {};
-
-    // Update only provided fields
-    if (data.chat !== undefined) merged.chat = data.chat;
-    if (data.goals !== undefined) merged.goals = data.goals;
-    if (data.settings !== undefined) merged.settings = data.settings;
-    if (data.history !== undefined) merged.history = data.history;
-    if (data.frictionState !== undefined) merged.frictionState = data.frictionState;
-
-    merged.lastUpdated = new Date().toISOString();
-
-    // Store with 1 year expiration
-    await env.FRICTION_KV.put(key, JSON.stringify(merged), {
-      expirationTtl: 365 * 24 * 60 * 60
-    });
-  } catch (err) {
-    console.error("Save user data error:", err);
-    throw err;
+async function enforceRateLimit(env, key, limit, windowSeconds) {
+  if (!env.FRICTION_KV) {
+    return { allowed: true, retryAfter: 0 };
   }
+
+  var now = Date.now();
+  var bucket = Math.floor(now / (windowSeconds * 1000));
+  var storageKey = "rate:" + key + ":" + bucket;
+  var existing = await env.FRICTION_KV.get(storageKey);
+  var count = existing ? parseInt(existing, 10) : 0;
+
+  if (count >= limit) {
+    var elapsed = Math.floor((now / 1000) % windowSeconds);
+    return { allowed: false, retryAfter: Math.max(1, windowSeconds - elapsed) };
+  }
+
+  await env.FRICTION_KV.put(storageKey, String(count + 1), {
+    expirationTtl: windowSeconds
+  });
+
+  return { allowed: true, retryAfter: 0 };
 }
