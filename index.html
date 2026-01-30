@@ -13636,6 +13636,13 @@
       });
     }
 
+    if (lifeEditSave) {
+      lifeEditSave.addEventListener('click', function(event) {
+        event.preventDefault();
+        saveActivePersonEdits();
+      });
+    }
+
     if (lifeEditCancel) {
       lifeEditCancel.addEventListener('click', function() {
         setEditMode(false);
