@@ -3995,6 +3995,8 @@
       cursor: pointer;
       box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
       transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      touch-action: none;
+      -webkit-touch-callout: none;
     }
 
     #life-view .life-bubble-btn:active {
@@ -4051,6 +4053,54 @@
       color: var(--teal);
       font-size: 1.4rem;
       font-weight: 600;
+    }
+
+    #life-view .life-bubble-menu-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      z-index: 1100;
+    }
+
+    #life-view .life-bubble-menu-overlay.active {
+      display: block;
+    }
+
+    #life-view .life-bubble-menu {
+      position: absolute;
+      min-width: 180px;
+      padding: 8px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.18);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    #life-view .life-bubble-menu-item {
+      border: none;
+      background: transparent;
+      text-align: left;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    #life-view .life-bubble-menu-item:hover {
+      background: var(--teal-lighter);
+    }
+
+    #life-view .life-bubble-menu-item.danger {
+      color: #b91c1c;
+    }
+
+    #life-view .life-bubble-menu-item.danger:hover {
+      background: #fee2e2;
     }
 
     #life-view .life-active-panel {
@@ -5829,6 +5879,13 @@
       </div>
     </div>
   </div>
+
+  <div class="life-bubble-menu-overlay" id="lifeBubbleMenuOverlay" aria-hidden="true">
+    <div class="life-bubble-menu" id="lifeBubbleMenu" role="menu" aria-label="Member actions">
+      <button class="life-bubble-menu-item" type="button" data-action="details">View details</button>
+      <button class="life-bubble-menu-item danger" type="button" data-action="remove">Remove</button>
+    </div>
+  </div>
 </section>
 
 <div class="chat-input-area">
@@ -7213,6 +7270,103 @@
       if (!lifeMemberPanel || !lifeMemberPanel.classList.contains('active')) return;
       setMemberPanelVisible(false);
       console.log('CLOSE MEMBER PANEL');
+    }
+
+    var bubbleMenuState = {
+      isOpen: false,
+      personId: '',
+      anchorEl: null,
+      longPressTimer: null,
+      longPressTriggered: false,
+      startPoint: null
+    };
+
+    function getPointerPoint(event) {
+      if (event.touches && event.touches[0]) {
+        return { x: event.touches[0].clientX, y: event.touches[0].clientY };
+      }
+      if (event.changedTouches && event.changedTouches[0]) {
+        return { x: event.changedTouches[0].clientX, y: event.changedTouches[0].clientY };
+      }
+      return { x: event.clientX || 0, y: event.clientY || 0 };
+    }
+
+    function positionBubbleMenu(anchorEl) {
+      if (!lifeBubbleMenu || !anchorEl) return;
+      var rect = anchorEl.getBoundingClientRect();
+      var menuWidth = lifeBubbleMenu.offsetWidth;
+      var menuHeight = lifeBubbleMenu.offsetHeight;
+      var top = rect.bottom + 10;
+      var left = rect.left + (rect.width / 2) - (menuWidth / 2);
+      var padding = 12;
+      if (left < padding) left = padding;
+      if (left + menuWidth > window.innerWidth - padding) {
+        left = window.innerWidth - menuWidth - padding;
+      }
+      if (top + menuHeight > window.innerHeight - padding) {
+        top = rect.top - menuHeight - 10;
+      }
+      if (top < padding) {
+        top = padding;
+      }
+      lifeBubbleMenu.style.top = top + 'px';
+      lifeBubbleMenu.style.left = left + 'px';
+    }
+
+    function openBubbleMenu(personId, anchorEl) {
+      if (!lifeBubbleMenuOverlay || !lifeBubbleMenu) return;
+      if (bubbleMenuState.isOpen) {
+        closeBubbleMenu();
+      }
+      bubbleMenuState.isOpen = true;
+      bubbleMenuState.personId = personId;
+      bubbleMenuState.anchorEl = anchorEl;
+      lifeBubbleMenuOverlay.classList.add('active');
+      lifeBubbleMenuOverlay.setAttribute('aria-hidden', 'false');
+      requestAnimationFrame(function() {
+        positionBubbleMenu(anchorEl);
+      });
+      console.log('OPEN BUBBLE MENU: ' + personId);
+    }
+
+    function closeBubbleMenu() {
+      if (!bubbleMenuState.isOpen) return;
+      bubbleMenuState.isOpen = false;
+      bubbleMenuState.personId = '';
+      bubbleMenuState.anchorEl = null;
+      bubbleMenuState.longPressTriggered = false;
+      if (lifeBubbleMenuOverlay) {
+        lifeBubbleMenuOverlay.classList.remove('active');
+        lifeBubbleMenuOverlay.setAttribute('aria-hidden', 'true');
+      }
+      console.log('CLOSE BUBBLE MENU');
+    }
+
+    function startBubbleLongPress(button, event) {
+      if (!button || !button.dataset.personId || button.id === 'lifeAddPersonBubble') return;
+      bubbleMenuState.longPressTriggered = false;
+      bubbleMenuState.startPoint = getPointerPoint(event);
+      clearTimeout(bubbleMenuState.longPressTimer);
+      bubbleMenuState.longPressTimer = setTimeout(function() {
+        bubbleMenuState.longPressTriggered = true;
+        openBubbleMenu(button.dataset.personId, button);
+      }, 400);
+    }
+
+    function cancelBubbleLongPress() {
+      clearTimeout(bubbleMenuState.longPressTimer);
+      bubbleMenuState.longPressTimer = null;
+      bubbleMenuState.startPoint = null;
+    }
+
+    function handleBubbleMove(event) {
+      if (!bubbleMenuState.longPressTimer || !bubbleMenuState.startPoint) return;
+      var point = getPointerPoint(event);
+      var dx = point.x - bubbleMenuState.startPoint.x;
+      var dy = point.y - bubbleMenuState.startPoint.y;
+      if (Math.hypot(dx, dy) > 10) {
+        cancelBubbleLongPress();
+      }
     }
 
     function updateRoleCustomVisibility(selectEl, customEl) {
@@ -13250,6 +13404,8 @@
     const lifeMemberPanelClose = document.getElementById('lifeMemberPanelClose');
     const lifeMemberName = document.getElementById('lifeMemberName');
     const lifeMemberRoleType = document.getElementById('lifeMemberRoleType');
+    const lifeBubbleMenuOverlay = document.getElementById('lifeBubbleMenuOverlay');
+    const lifeBubbleMenu = document.getElementById('lifeBubbleMenu');
     const lifeAgendaRange = document.getElementById('lifeAgendaRange');
     const lifeAgendaList = document.getElementById('lifeAgendaList');
     const lifePersonNowList = document.getElementById('lifePersonNowList');
@@ -15192,6 +15348,7 @@
         closeAppointmentModal(appointmentModalContexts.life);
         closeAppointmentModal(appointmentModalContexts.calendar);
         closeLifeModals();
+        closeBubbleMenu();
       }
     });
 
@@ -15282,7 +15439,58 @@
     }
 
     if (lifeBubbleStrip) {
+      lifeBubbleStrip.addEventListener('touchstart', function(event) {
+        var button = event.target.closest('.life-bubble-btn');
+        if (!button) return;
+        event.preventDefault();
+        startBubbleLongPress(button, event);
+      }, { passive: false });
+
+      lifeBubbleStrip.addEventListener('touchmove', function(event) {
+        if (bubbleMenuState.longPressTimer) {
+          event.preventDefault();
+        }
+        handleBubbleMove(event);
+      }, { passive: false });
+
+      lifeBubbleStrip.addEventListener('touchend', function() {
+        cancelBubbleLongPress();
+      });
+
+      lifeBubbleStrip.addEventListener('touchcancel', function() {
+        cancelBubbleLongPress();
+      });
+
+      lifeBubbleStrip.addEventListener('mousedown', function(event) {
+        if (event.button !== 0) return;
+        var button = event.target.closest('.life-bubble-btn');
+        if (!button) return;
+        startBubbleLongPress(button, event);
+      });
+
+      lifeBubbleStrip.addEventListener('mousemove', function(event) {
+        handleBubbleMove(event);
+      });
+
+      lifeBubbleStrip.addEventListener('mouseup', function() {
+        cancelBubbleLongPress();
+      });
+
+      lifeBubbleStrip.addEventListener('mouseleave', function() {
+        cancelBubbleLongPress();
+      });
+
+      lifeBubbleStrip.addEventListener('contextmenu', function(event) {
+        var button = event.target.closest('.life-bubble-btn');
+        if (!button) return;
+        event.preventDefault();
+      });
+
       lifeBubbleStrip.addEventListener('click', function(event) {
+        if (bubbleMenuState.longPressTriggered) {
+          bubbleMenuState.longPressTriggered = false;
+          return;
+        }
         var button = event.target.closest('.life-bubble-btn');
         if (!button) return;
         if (button.id === 'lifeAddPersonBubble') {
@@ -15302,6 +15510,39 @@
         }
       });
     }
+
+    if (lifeBubbleMenuOverlay) {
+      lifeBubbleMenuOverlay.addEventListener('click', function(event) {
+        if (event.target === lifeBubbleMenuOverlay) {
+          closeBubbleMenu();
+        }
+      });
+    }
+
+    if (lifeBubbleMenu) {
+      lifeBubbleMenu.addEventListener('click', function(event) {
+        var actionButton = event.target.closest('[data-action]');
+        if (!actionButton) return;
+        var personId = bubbleMenuState.personId;
+        if (!personId) return;
+        var action = actionButton.dataset.action;
+        closeBubbleMenu();
+        if (action === 'details') {
+          setActivePersonId(personId);
+          openMemberPanel(personId);
+        }
+        if (action === 'remove') {
+          setActivePersonId(personId);
+          openRemoveModal();
+        }
+      });
+    }
+
+    window.addEventListener('resize', function() {
+      if (bubbleMenuState.isOpen) {
+        positionBubbleMenu(bubbleMenuState.anchorEl);
+      }
+    });
 
     if (lifePersonRoleInput) {
       lifePersonRoleInput.addEventListener('change', function() {
