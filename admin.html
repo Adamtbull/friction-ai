@@ -243,6 +243,13 @@ body {
   margin-bottom: 20px;
 }
 
+.error-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .privacy-notice {
   background: #f0fdf4;
   border: 1px solid #bbf7d0;
@@ -298,6 +305,11 @@ body {
   background: #3b7a77;
 }
 
+.refresh-btn.refresh-small {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+}
+
 .time-range-tabs {
   display: flex;
   gap: 8px;
@@ -339,6 +351,13 @@ body {
 
   .stats-grid {
     grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .error-banner {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
 ```
@@ -446,6 +465,7 @@ body {
     let currentUser = null;
     let stats = null;
     let currentRange = 'today';
+    const analyticsUnavailableMessage = 'Analytics unavailable. Bind the KV namespace variable FRICTION_KV in Cloudflare Worker \u2192 Settings \u2192 Bindings.';
 
     // Check auth
     function checkAuth() {
@@ -473,6 +493,8 @@ body {
     // Load stats from API
     async function loadStats() {
       const idToken = localStorage.getItem('google_id_token');
+      const errorContainer = document.getElementById('errorContainer');
+      errorContainer.innerHTML = '';
       
       try {
         const response = await fetch('/api/admin/stats', {
@@ -482,10 +504,19 @@ body {
         });
         
         if (!response.ok) {
+          const errorPayload = await response.json().catch(() => null);
+          if (errorPayload && errorPayload.error) {
+            showAnalyticsUnavailable();
+            return;
+          }
           throw new Error('Failed to load stats');
         }
         
         stats = await response.json();
+        if (stats && stats.error) {
+          showAnalyticsUnavailable();
+          return;
+        }
         updateDisplay();
         
         // Load users
@@ -495,19 +526,31 @@ body {
           }
         });
         
-        if (usersResponse.ok) {
+        if (!usersResponse.ok) {
+          const usersError = await usersResponse.json().catch(() => null);
+          if (usersError && usersError.error) {
+            showAnalyticsUnavailable();
+            return;
+          }
+        } else {
           const usersData = await usersResponse.json();
           renderUserTable(usersData.users || []);
         }
         
       } catch (error) {
         console.error('Error loading stats:', error);
-        document.getElementById('errorContainer').innerHTML = `
-          <div class="error-message">
-            Failed to load analytics. Make sure the ANALYTICS KV namespace is configured.
-          </div>
-        `;
+        showAnalyticsUnavailable();
       }
+    }
+
+    function showAnalyticsUnavailable() {
+      stats = null;
+      document.getElementById('errorContainer').innerHTML = `
+        <div class="error-message error-banner">
+          <span>${analyticsUnavailableMessage}</span>
+          <button class="refresh-btn refresh-small" type="button" onclick="loadStats()">Refresh</button>
+        </div>
+      `;
     }
 
     function updateDisplay() {
