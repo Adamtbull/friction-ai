@@ -5489,7 +5489,7 @@
       </div>
       <form class="life-modal-body" id="lifePersonForm">
         <input class="life-input" id="lifePersonNameInput" type="text" placeholder="Full name" maxlength="60" required />
-        <select class="life-select" id="lifePersonRoleInput" required>
+        <select class="life-select" id="lifePersonRoleInput">
           <option value="" disabled selected>Select role</option>
           <option value="wife">Wife</option>
           <option value="son">Son</option>
@@ -5511,6 +5511,7 @@
           </div>
         </div>
         <textarea class="life-textarea" id="lifePersonNotesInput" placeholder="Notes (optional)" maxlength="200"></textarea>
+        <div class="life-meta" id="lifePersonError" role="alert" style="display: none;"></div>
         <div class="life-modal-actions">
           <button class="life-btn" id="lifePersonSave" type="submit">Save person</button>
           <button class="life-btn secondary" id="lifePersonCancel" type="button">Cancel</button>
@@ -6230,9 +6231,18 @@
     var pendingAvatarDataUrl = '';
     var pendingRemovePersonId = null;
     var isEditingActivePerson = false;
+    var lifePeopleLastActiveId = null;
 
     function generatePersonId() {
-      return 'person_' + Date.now().toString(36) + '_' + Math.floor(Math.random() * 100000).toString(36);
+      if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+        return window.crypto.randomUUID();
+      }
+      return Date.now().toString(36) + '_' + Math.random().toString(16).slice(2);
+    }
+
+    function logLifeDebug(eventName, detail) {
+      if (typeof console === 'undefined' || !console.log) return;
+      console.log('[Life]', eventName, detail || '');
     }
 
     function hashString(value) {
@@ -6345,13 +6355,17 @@
         }
         people = parsed.map(normalizePerson).filter(Boolean);
       } catch (e) {
-        people = [createDefaultMe()];
-        savePeople();
+        people = [];
       }
     }
 
     function savePeople() {
-      localStorage.setItem(LIFE_PEOPLE_KEY, JSON.stringify(people));
+      try {
+        localStorage.setItem(LIFE_PEOPLE_KEY, JSON.stringify(people));
+        return true;
+      } catch (e) {
+        return false;
+      }
     }
 
     function loadLifeUiPrefs() {
@@ -6396,6 +6410,10 @@
       isEditingActivePerson = false;
       if (lifeActiveEdit) {
         lifeActiveEdit.hidden = true;
+      }
+      if (lifePeopleLastActiveId !== personId) {
+        logLifeDebug('activePersonId change', personId);
+        lifePeopleLastActiveId = personId;
       }
       if (!lifeUiPrefs.groupMode) {
         lifeUiPrefs.selectedPeopleIds = [];
@@ -6484,6 +6502,10 @@
       if (lifePersonDobInput) lifePersonDobInput.value = '';
       if (lifePersonNotesInput) lifePersonNotesInput.value = '';
       if (lifePersonPhotoInput) lifePersonPhotoInput.value = '';
+      if (lifePersonError) {
+        lifePersonError.textContent = '';
+        lifePersonError.style.display = 'none';
+      }
       if (lifePersonPhotoPreview) {
         lifePersonPhotoPreview.src = buildAvatarSvg('new', 'New');
       }
@@ -6575,6 +6597,7 @@
       }
       if (!isEditingActivePerson && lifeActiveEdit) {
         lifeActiveEdit.hidden = true;
+        syncActiveEditForm(person);
       }
     }
 
@@ -6614,22 +6637,27 @@
       if (isEditing) {
         var person = getPersonById(activePersonId);
         if (!person) return;
-        if (lifeEditName) lifeEditName.value = person.name || '';
-        if (lifeEditRole) {
-          var roleValue = LIFE_ROLE_OPTIONS.indexOf(person.role) >= 0 ? person.role : 'other';
-          lifeEditRole.value = roleValue;
-        }
-        if (lifeEditRoleCustom) {
-          if (LIFE_ROLE_OPTIONS.indexOf(person.role) === -1 && person.role) {
-            lifeEditRoleCustom.value = person.role;
-          } else {
-            lifeEditRoleCustom.value = '';
-          }
-        }
-        updateRoleCustomVisibility(lifeEditRole, lifeEditRoleCustom);
-        if (lifeEditDob) lifeEditDob.value = person.dob || '';
-        if (lifeEditNotes) lifeEditNotes.value = person.notes || '';
+        syncActiveEditForm(person);
       }
+    }
+
+    function syncActiveEditForm(person) {
+      if (!person) return;
+      if (lifeEditName) lifeEditName.value = person.name || '';
+      if (lifeEditRole) {
+        var roleValue = LIFE_ROLE_OPTIONS.indexOf(person.role) >= 0 ? person.role : 'other';
+        lifeEditRole.value = roleValue;
+      }
+      if (lifeEditRoleCustom) {
+        if (LIFE_ROLE_OPTIONS.indexOf(person.role) === -1 && person.role) {
+          lifeEditRoleCustom.value = person.role;
+        } else {
+          lifeEditRoleCustom.value = '';
+        }
+      }
+      updateRoleCustomVisibility(lifeEditRole, lifeEditRoleCustom);
+      if (lifeEditDob) lifeEditDob.value = person.dob || '';
+      if (lifeEditNotes) lifeEditNotes.value = person.notes || '';
     }
 
     function updateGroupSelection(personId) {
@@ -6682,15 +6710,16 @@
 
     function saveNewPerson() {
       var name = lifePersonNameInput ? lifePersonNameInput.value.trim() : '';
+      logLifeDebug('addPerson submit start', name);
       if (!name) {
         if (lifePersonNameInput) lifePersonNameInput.focus();
         return;
       }
-      var role = getRoleValue(lifePersonRoleInput, lifePersonRoleCustomInput);
-      if (!role) {
-        if (lifePersonRoleInput) lifePersonRoleInput.focus();
-        return;
+      if (lifePersonError) {
+        lifePersonError.textContent = '';
+        lifePersonError.style.display = 'none';
       }
+      var role = getRoleValue(lifePersonRoleInput, lifePersonRoleCustomInput) || 'other';
       var now = Date.now();
       var person = {
         id: generatePersonId(),
@@ -6704,10 +6733,19 @@
         updatedAt: now
       };
       people.push(person);
-      savePeople();
+      if (!savePeople()) {
+        if (lifePersonError) {
+          lifePersonError.textContent = 'Could not save. Please try again.';
+          lifePersonError.style.display = 'block';
+        }
+        return;
+      }
       setActivePersonId(person.id);
       setPeopleModalVisible(false);
+      resetPeopleForm();
       renderLifeView();
+      logLifeDebug('addPerson submit end', person.id);
+      logLifeDebug('people length', people.length);
     }
 
     function saveActivePersonEdits() {
@@ -11287,6 +11325,7 @@
     const lifePersonNotesInput = document.getElementById('lifePersonNotesInput');
     const lifePersonPhotoInput = document.getElementById('lifePersonPhotoInput');
     const lifePersonPhotoPreview = document.getElementById('lifePersonPhotoPreview');
+    const lifePersonError = document.getElementById('lifePersonError');
     const lifePersonCancel = document.getElementById('lifePersonCancel');
     const lifeRemoveModal = document.getElementById('lifeRemoveModal');
     const lifeRemoveModalClose = document.getElementById('lifeRemoveModalClose');
@@ -13285,6 +13324,7 @@
         var personId = button.dataset.personId;
         if (!personId) return;
         if (lifeUiPrefs.groupMode) {
+          setActivePersonId(personId);
           updateGroupSelection(personId);
         } else {
           setActivePersonId(personId);
