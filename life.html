@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Friction AI - Family OS</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* --- 1. THEME & BASE STYLES (Matches Admin) --- */
+    * { box-sizing: border-box; outline: none; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    /* --- 2. HEADER --- */
+    .app-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: white;
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .app-title h1 { margin: 0; font-size: 1.25rem; font-weight: 700; }
+    .app-title p { margin: 2px 0 0 0; font-size: 0.85rem; opacity: 0.7; }
+    .back-link { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.9rem; }
+    .back-link:hover { color: white; }
+
+    /* --- 3. MAIN CONTAINER --- */
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+
+    /* --- 4. BUBBLE INTERFACE --- */
+    .bubble-dock {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin: 20px 0 40px 0;
+      position: relative;
+    }
+
+    .bubble-wrapper { position: relative; }
+
+    .bubble {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 2px solid transparent;
+      z-index: 10;
+      position: relative;
+    }
+    .bubble:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
+    
+    .bubble.household { color: #4f9d9a; border-color: #4f9d9a; }
+    .bubble.adult { color: #3b82f6; border-color: #3b82f6; }
+    .bubble.child { color: #f59e0b; border-color: #f59e0b; }
+
+    .bubble-icon { font-size: 1.8rem; }
+    .bubble-label {
+      position: absolute;
+      bottom: -28px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #64748b;
+      width: 120px;
+      text-align: center;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* --- 5. POP-OUT MENUS --- */
+    .bubble-menu {
+      position: absolute;
+      top: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05);
+      padding: 6px;
+      width: 180px;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .bubble-menu.hidden { 
+      opacity: 0; 
+      visibility: hidden; 
+      transform: translateX(-50%) translateY(-10px);
+      pointer-events: none;
+    }
+    .bubble-menu button {
+      background: none;
+      border: none;
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 0.9rem;
+      color: #334155;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+    }
+    .bubble-menu button:hover { background: #f1f5f9; color: #0f172a; }
+
+    /* --- 6. INPUT ZONE --- */
+    .input-zone {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      margin-bottom: 30px;
+      animation: slideDown 0.3s ease-out;
+    }
+    .input-zone.hidden { display: none; }
+    
+    .input-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .context-badge {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    .bg-adult { background: #dbeafe; color: #1e40af; }
+    .bg-child { background: #fef3c7; color: #92400e; }
+    .bg-household { background: #ccfbf1; color: #115e59; }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0;
+    }
+    .close-btn:hover { color: #64748b; }
+
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      resize: vertical;
+      margin-bottom: 16px;
+    }
+    textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+
+    .action-btn {
+      width: 100%;
+      background: #0f172a;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .action-btn:hover { background: #1e293b; }
+
+    /* --- 7. ACTIVITY FEED --- */
+    .feed-section h3 {
+      font-size: 0.9rem;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+
+    .feed-list { display: flex; flex-direction: column; gap: 16px; }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border-left: 5px solid #e2e8f0;
+      transition: transform 0.2s;
+    }
+    .card:hover { transform: translateY(-1px); }
+    
+    .card.task { border-left-color: #3b82f6; }
+    .card.event { border-left-color: #4f9d9a; }
+    .card.milestone { border-left-color: #f59e0b; }
+
+    .card-title { font-weight: 600; font-size: 1rem; margin-bottom: 8px; color: #0f172a; }
+    .card-body { font-size: 0.95rem; color: #475569; line-height: 1.5; white-space: pre-wrap; }
+    
+    /* ADHD Micro-steps styling */
+    .micro-step { display: flex; align-items: flex-start; gap: 10px; margin-top: 8px; }
+    .micro-step input { margin-top: 5px; }
+    .timer-tag { 
+      font-size: 0.75rem; 
+      background: #f1f5f9; 
+      color: #64748b; 
+      padding: 2px 6px; 
+      border-radius: 4px; 
+      font-weight: 500;
+      margin-left: 8px;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="app-title">
+      <h1>Family OS</h1>
+      <p>Operations & Logistics</p>
+    </div>
+    <a href="/" class="back-link">← Home</a>
+  </header>
+
+  <div class="container">
+
+    <div class="bubble-dock">
+      
+      <div class="bubble-wrapper">
+        <div class="bubble household" onclick="toggleMenu('menu-household')">
+          <span class="bubble-icon">🏠</span>
+          <span class="bubble-label">Household</span>
+        </div>
+        <div id="menu-household" class="bubble-menu hidden">
+          <button onclick="openInput('household', 'Shared Task')">📦 Shared Task</button>
+          <button onclick="openInput('household', 'Event')">🎉 Family Event</button>
+          <button onclick="openInput('household', 'Weekly Plan')">📝 Generate Plan</button>
+        </div>
+      </div>
+
+      <div class="bubble-wrapper">
+        <div class="bubble adult" onclick="toggleMenu('menu-adult')">
+          <span class="bubble-icon">👨‍⚕️</span>
+          <span class="bubble-label">You</span>
+        </div>
+        <div id="menu-adult" class="bubble-menu hidden">
+          <button onclick="openInput('adult', 'Roster')">📋 Add Roster</button>
+          <button onclick="openInput('adult', 'Appointment')">🩺 Appointment</button>
+          <button onclick="openInput('adult', 'Task')">✅ ADHD Task</button>
+          <button onclick="openInput('adult', 'Goal')">🎯 Goal</button>
+        </div>
+      </div>
+
+      <div class="bubble-wrapper">
+        <div class="bubble child" onclick="toggleMenu('menu-child')">
+          <span class="bubble-icon">👶</span>
+          <span class="bubble-label">Bubby</span>
+        </div>
+        <div id="menu-child" class="bubble-menu hidden">
+          <button onclick="openInput('child', 'Milestone')">⭐ Milestone</button>
+          <button onclick="openInput('child', 'Appointment')">🩺 Appointment</button>
+          <button onclick="openInput('child', 'Needs')">🍼 Needs / Log</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="input-zone" class="input-zone hidden">
+      <div class="input-header">
+        <span id="context-badge" class="context-badge bg-adult">Adding Roster</span>
+        <button class="close-btn" onclick="closeInput()">×</button>
+      </div>
+      <textarea id="user-input" placeholder="Type details here... (e.g., 'Working 0700-1530 Mon and Tue, need to prep dinner')"></textarea>
+      <button class="action-btn" onclick="submitAction()">Process Action</button>
+    </div>
+
+    <div class="feed-section">
+      <h3>Live Feed</h3>
+      <div id="feed-list" class="feed-list">
+        
+        <div class="card event">
+          <div class="card-title">👋 Welcome to Friction AI Life</div>
+          <div class="card-body">Select a bubble above to add rosters, appointments, or tasks. I'll break them down into micro-steps for you.</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // --- STATE MANAGEMENT ---
+    let currentContext = '';
+    let currentAction = '';
+
+    // --- TOGGLE MENUS ---
+    function toggleMenu(menuId) {
+      // Close others
+      document.querySelectorAll('.bubble-menu').forEach(el => {
+        if (el.id !== menuId) el.classList.add('hidden');
+      });
+      // Toggle target
+      document.getElementById(menuId).classList.toggle('hidden');
+    }
+
+    // --- OPEN INPUT ZONE ---
+    function openInput(context, action) {
+      currentContext = context;
+      currentAction = action;
+
+      // Close menus
+      document.querySelectorAll('.bubble-menu').forEach(el => el.classList.add('hidden'));
+
+      // Setup UI
+      const badge = document.getElementById('context-badge');
+      badge.textContent = `${action} (${context === 'adult' ? 'You' : context === 'child' ? 'Bubby' : 'Home'})`;
+      
+      // Remove old color classes
+      badge.classList.remove('bg-adult', 'bg-child', 'bg-household');
+      // Add new color class
+      badge.classList.add(`bg-${context}`);
+
+      // Clear and Focus
+      const input = document.getElementById('user-input');
+      input.value = '';
+      input.placeholder = getPlaceholder(action);
+      
+      document.getElementById('input-zone').classList.remove('hidden');
+      input.focus();
+    }
+
+    function closeInput() {
+      document.getElementById('input-zone').classList.add('hidden');
+    }
+
+    function getPlaceholder(action) {
+      if (action.includes('Roster')) return "Paste shift details here (e.g. 'Mon 0700-1530, Tue 1300-2130')...";
+      if (action.includes('Appointment')) return "Who, when, where? (e.g. 'Dr Smith at 2pm next Tuesday')...";
+      if (action.includes('Task')) return "What needs doing? I'll break it down into steps...";
+      return "Type details here...";
+    }
+
+    // --- SUBMIT ACTION TO API ---
+    async function submitAction() {
+      const inputField = document.getElementById('user-input');
+      const text = inputField.value.trim();
+      if (!text) return;
+
+      // 1. Optimistic Update (Show 'Processing...')
+      const feed = document.getElementById('feed-list');
+      const tempId = Date.now();
+      
+      const tempCard = document.createElement('div');
+      tempCard.className = 'card';
+      tempCard.id = tempId;
+      tempCard.innerHTML = `
+        <div class="card-title">Processing ${currentAction}...</div>
+        <div class="card-body" style="opacity: 0.7">${text}</div>
+      `;
+      feed.insertBefore(tempCard, feed.firstChild);
+      
+      closeInput();
+
+      try {
+        // 2. Auth Check
+        const idToken = localStorage.getItem('google_id_token');
+        if (!idToken) {
+          alert("Please sign in on the home page first.");
+          return;
+        }
+
+        // 3. API Call
+        // We construct a specific prompt to trigger the 'Family OS' system prompt in your backend
+        const messagePayload = {
+          model: 'gemini', // Using Gemini for speed/cost
+          messages: [
+            { 
+              role: 'user', 
+              content: `[CONTEXT: ${currentContext}] [ACTION: ${currentAction}] ${text}` 
+            }
+          ]
+        };
+
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`
+          },
+          body: JSON.stringify(messagePayload)
+        });
+
+        const data = await response.json();
+
+        // 4. Update UI with Real Response
+        const finalCard = document.getElementById(tempId);
+        if (data.response) {
+          // Determine card style based on action
+          let typeClass = 'task';
+          if (currentAction.includes('Event')) typeClass = 'event';
+          if (currentAction.includes('Milestone')) typeClass = 'milestone';
+
+          finalCard.className = `card ${typeClass}`;
+          finalCard.innerHTML = `
+            <div class="card-title">${currentAction} Added</div>
+            <div class="card-body">${formatAIResponse(data.response)}</div>
+          `;
+        } else {
+          finalCard.innerHTML = `<div class="card-body" style="color:red">Error: ${data.error || 'Failed to save'}</div>`;
+        }
+
+      } catch (err) {
+        console.error(err);
+        const card = document.getElementById(tempId);
+        if(card) card.innerHTML = `<div class="card-body" style="color:red">Network Error</div>`;
+      }
+    }
+
+    // Simple formatter to make AI text look nice (converting markdown bullets to HTML)
+    function formatAIResponse(text) {
+      // Convert **bold** to <b>
+      let html = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+      // Convert bullets
+      html = html.replace(/^\* (.*$)/gm, '<div class="micro-step"><input type="checkbox"> <span>$1</span></div>');
+      // Convert timers [TIMER:5]
+      html = html.replace(/\[TIMER:(\d+)\]/g, '<span class="timer-tag">⏱ $1m</span>');
+      // Newlines
+      return html.replace(/\n/g, '<br>');
+    }
+
+    // Close menus when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.bubble-wrapper')) {
+        document.querySelectorAll('.bubble-menu').forEach(el => el.classList.add('hidden'));
+      }
+    });
+
+  </script>
+</body>
+</html>
