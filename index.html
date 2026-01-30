@@ -4240,6 +4240,40 @@
       flex-wrap: wrap;
     }
 
+    #life-view .life-member-panel .life-modal-card {
+      max-width: 360px;
+    }
+
+    #life-view .life-member-panel-body {
+      display: grid;
+      gap: 10px;
+    }
+
+    #life-view .life-member-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: var(--teal-lighter);
+      border: 1px solid rgba(90, 154, 148, 0.2);
+    }
+
+    #life-view .life-member-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    #life-view .life-member-value {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
     #appointments-view .appointments-btn.is-loading .appointments-ai-label {
       opacity: 0.6;
     }
@@ -5775,6 +5809,26 @@
       </form>
     </div>
   </div>
+
+  <div class="life-modal life-member-panel" id="lifeMemberPanel" aria-hidden="true">
+    <div class="life-modal-backdrop" data-close></div>
+    <div class="life-modal-card" role="dialog" aria-modal="true" aria-labelledby="lifeMemberPanelTitle">
+      <div class="life-modal-header">
+        <h3 class="section-subtitle" id="lifeMemberPanelTitle">Member details</h3>
+        <button class="life-btn secondary" id="lifeMemberPanelClose" type="button">Close</button>
+      </div>
+      <div class="life-member-panel-body">
+        <div class="life-member-row">
+          <span class="life-member-label">Name</span>
+          <span class="life-member-value" id="lifeMemberName">—</span>
+        </div>
+        <div class="life-member-row">
+          <span class="life-member-label">Role type</span>
+          <span class="life-member-value" id="lifeMemberRoleType">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <div class="chat-input-area">
@@ -7128,6 +7182,37 @@
       } else {
         unlockBodyScroll();
       }
+    }
+
+    function setMemberPanelVisible(isVisible) {
+      if (!lifeMemberPanel) return;
+      lifeMemberPanel.classList.toggle('active', isVisible);
+      lifeMemberPanel.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
+      if (isVisible) {
+        lockBodyScroll();
+      } else {
+        unlockBodyScroll();
+      }
+    }
+
+    function openMemberPanel(personId) {
+      var person = getPersonById(personId);
+      if (!person) return;
+      if (lifeMemberName) {
+        lifeMemberName.textContent = person.name || 'Unnamed';
+      }
+      if (lifeMemberRoleType) {
+        var roleType = person.roleType || deriveRoleType(person.role, 'adult');
+        lifeMemberRoleType.textContent = (roleType || 'adult').toLowerCase();
+      }
+      setMemberPanelVisible(true);
+      console.log('OPEN MEMBER PANEL: ' + personId);
+    }
+
+    function closeMemberPanel() {
+      if (!lifeMemberPanel || !lifeMemberPanel.classList.contains('active')) return;
+      setMemberPanelVisible(false);
+      console.log('CLOSE MEMBER PANEL');
     }
 
     function updateRoleCustomVisibility(selectEl, customEl) {
@@ -8546,6 +8631,7 @@
       setPeopleModalVisible(false);
       setRemoveModalVisible(false);
       setLifePrefsModalVisible(false);
+      closeMemberPanel();
     }
 
     function renderPersonRightNow(personId) {
@@ -13160,6 +13246,10 @@
     const lifePrefsModalClose = document.getElementById('lifePrefsModalClose');
     const lifePrefsForm = document.getElementById('lifePrefsForm');
     const lifePrefsCancel = document.getElementById('lifePrefsCancel');
+    const lifeMemberPanel = document.getElementById('lifeMemberPanel');
+    const lifeMemberPanelClose = document.getElementById('lifeMemberPanelClose');
+    const lifeMemberName = document.getElementById('lifeMemberName');
+    const lifeMemberRoleType = document.getElementById('lifeMemberRoleType');
     const lifeAgendaRange = document.getElementById('lifeAgendaRange');
     const lifeAgendaList = document.getElementById('lifeAgendaList');
     const lifePersonNowList = document.getElementById('lifePersonNowList');
@@ -15204,9 +15294,11 @@
         if (lifeUiPrefs.groupMode) {
           setActivePersonId(personId);
           updateGroupSelection(personId);
+          openMemberPanel(personId);
         } else {
           setActivePersonId(personId);
           renderLifeView();
+          openMemberPanel(personId);
         }
       });
     }
@@ -15255,6 +15347,20 @@
     if (lifePersonModalClose) {
       lifePersonModalClose.addEventListener('click', function() {
         setPeopleModalVisible(false);
+      });
+    }
+
+    if (lifeMemberPanel) {
+      lifeMemberPanel.addEventListener('click', function(event) {
+        if (event.target.dataset.close !== undefined) {
+          closeMemberPanel();
+        }
+      });
+    }
+
+    if (lifeMemberPanelClose) {
+      lifeMemberPanelClose.addEventListener('click', function() {
+        closeMemberPanel();
       });
     }
 
