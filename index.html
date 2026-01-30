@@ -2389,6 +2389,230 @@
       margin-bottom: 10px;
     }
 
+    #life-view .life-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    #life-view .life-topbar-copy {
+      max-width: 680px;
+    }
+
+    #life-view .life-topbar-profile {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--white);
+      box-shadow: 0 8px 18px var(--shadow);
+    }
+
+    #life-view .life-profile-pic {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid rgba(90, 154, 148, 0.3);
+      background: rgba(90, 154, 148, 0.1);
+    }
+
+    #life-view .life-profile-email {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    #life-view .life-domain-strip {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    #life-view .life-domain-btn {
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--white);
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 40px;
+      transition: all 0.2s ease;
+    }
+
+    #life-view .life-domain-btn.active {
+      border-color: rgba(90, 154, 148, 0.6);
+      background: var(--teal-lighter);
+      color: var(--teal-dark);
+      box-shadow: 0 8px 18px rgba(69, 152, 145, 0.15);
+    }
+
+    #life-view .life-domain-web {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    #life-view .life-node-strip {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      padding: 6px 4px 12px;
+      scroll-snap-type: x proximity;
+    }
+
+    #life-view .life-node-bubble {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      min-width: 78px;
+      scroll-snap-align: start;
+    }
+
+    #life-view .life-node-btn {
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      background: var(--white);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--teal-dark);
+    }
+
+    #life-view .life-node-btn:active {
+      transform: scale(0.97);
+    }
+
+    #life-view .life-node-btn img {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    #life-view .life-node-btn.is-active {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 4px rgba(90, 154, 148, 0.2);
+    }
+
+    #life-view .life-node-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-align: center;
+      max-width: 90px;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+
+    #life-view .life-node-add {
+      border-style: dashed;
+      color: var(--teal);
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+
+    #life-view .life-domain-panel {
+      background: var(--white);
+      border-radius: 20px;
+      border: 1px solid rgba(90, 154, 148, 0.2);
+      padding: 18px;
+      box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 140px;
+    }
+
+    #life-view .life-panel-empty {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    #life-view .life-domain-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    #life-view .life-domain-summary {
+      display: grid;
+      gap: 6px;
+      font-size: 0.95rem;
+    }
+
+    #life-view .life-domain-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    #life-view .life-domain-label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    #life-view .life-domain-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    #life-view .life-domain-form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      align-items: center;
+    }
+
+    #life-view .life-domain-subitem {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      background: rgba(248, 250, 252, 0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    #life-view .life-domain-subitem-title {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    #life-view .life-domain-subitem-meta {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    #life-view .life-domain-task-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      background: var(--white);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
     #life-view .life-input,
     #life-view .life-select,
     #life-view .life-textarea {
@@ -5426,79 +5650,22 @@
 </section>
 
 <section id="life-view" class="view" aria-hidden="true">
-  <div class="life-bubbles-header">
-    <div class="life-bubbles-copy">
+  <div class="life-topbar">
+    <div class="life-topbar-copy">
       <h2 class="section-title">Life</h2>
-      <p class="section-text">Your family profiles, ready for appointments and care moments.</p>
+      <p class="section-text">A bubble web of the people, assets, and tasks that shape your week.</p>
     </div>
-    <button class="life-group-toggle" id="lifeGroupToggle" type="button" aria-pressed="false">
-      <span>Group</span>
-      <span class="life-group-dot" aria-hidden="true"></span>
-    </button>
-  </div>
-
-  <div class="life-bubble-strip" id="lifeBubbleStrip" role="list" aria-label="Family members"></div>
-
-  <div class="life-active-panel" id="lifeActivePanel">
-    <div class="life-active-card">
-      <div class="life-active-top">
-        <div class="life-active-avatar">
-          <img id="lifeActiveAvatar" alt="Active person avatar" />
-        </div>
-        <div class="life-active-details">
-          <div class="life-active-name" id="lifeActiveName"></div>
-          <div class="life-active-role" id="lifeActiveRole"></div>
-          <div class="life-active-dob" id="lifeActiveDob"></div>
-        </div>
-        <button class="life-icon-btn" id="lifeEditToggle" type="button" aria-label="Edit profile">✎</button>
-      </div>
-      <div class="life-active-notes" id="lifeActiveNotes"></div>
-      <div class="life-active-actions">
-        <button class="life-btn secondary" id="lifeEditButton" type="button">Edit profile</button>
-        <button class="life-btn secondary" id="lifeCustomizeButton" type="button">Customize ⚙️</button>
-        <button class="life-btn secondary" id="lifeRemoveButton" type="button">Remove person</button>
-      </div>
-      <div class="life-active-edit" id="lifeActiveEdit" hidden>
-        <form id="lifeEditForm">
-          <input class="life-input" id="lifeEditName" type="text" placeholder="Full name" maxlength="60" />
-          <select class="life-select" id="lifeEditRole">
-            <option value="" disabled>Select role</option>
-            <option value="wife">Wife</option>
-            <option value="son">Son</option>
-            <option value="daughter">Daughter</option>
-            <option value="mother">Mother</option>
-            <option value="father">Father</option>
-            <option value="brother">Brother</option>
-            <option value="sister">Sister</option>
-            <option value="other">Other</option>
-          </select>
-          <input class="life-input" id="lifeEditRoleCustom" type="text" placeholder="Custom role" maxlength="40" style="display: none;" />
-          <input class="life-input" id="lifeEditDob" type="date" />
-          <textarea class="life-textarea" id="lifeEditNotes" placeholder="Notes (optional)" maxlength="200"></textarea>
-          <div class="life-meta" id="lifeEditError" role="alert" style="display: none;"></div>
-          <div class="life-edit-actions">
-            <button class="life-btn" id="lifeEditSave" type="submit">Save changes</button>
-            <button class="life-btn secondary" id="lifeEditCancel" type="button">Cancel</button>
-          </div>
-        </form>
-      </div>
+    <div class="life-topbar-profile">
+      <img class="life-profile-pic" id="lifeProfilePic" alt="Profile photo" />
+      <span class="life-profile-email" id="lifeProfileEmail"></span>
     </div>
   </div>
 
-  <div class="life-group-panel" id="lifeGroupPanel" aria-hidden="true">
-    <div class="life-group-card">
-      <h3 class="section-subtitle">Group view coming next</h3>
-      <p class="section-text">Weekly summary, conflicts, shared reminders.</p>
-    </div>
-  </div>
+  <div class="life-domain-strip" id="lifeDomainStrip" role="list" aria-label="Life domains"></div>
 
-  <div class="life-placeholder-grid">
-    <div class="life-placeholder-card" data-life-section="appointments">Appointments (coming next)</div>
-    <div class="life-placeholder-card" data-life-section="tasks">Tasks (coming next)</div>
-    <div class="life-placeholder-card" data-life-section="documents">Documents (coming next)</div>
-    <div class="life-placeholder-card" data-life-section="milestones">Milestones (coming next)</div>
-    <div class="life-placeholder-card" data-life-section="assets">Assets (coming next)</div>
-    <div class="life-placeholder-card" data-life-section="bills">Bills (coming next)</div>
+  <div class="life-domain-web">
+    <div class="life-node-strip" id="lifeNodeStrip" role="list" aria-label="Life nodes"></div>
+    <div class="life-domain-panel" id="lifeDomainPanel" aria-live="polite"></div>
   </div>
 
   <div class="life-modal" id="lifePersonModal" aria-hidden="true">
@@ -5582,12 +5749,8 @@
             <span>Milestones</span>
           </label>
           <label class="life-prefs-option">
-            <input type="checkbox" name="lifePrefsSection" value="assets" />
-            <span>Assets</span>
-          </label>
-          <label class="life-prefs-option">
-            <input type="checkbox" name="lifePrefsSection" value="bills" />
-            <span>Bills</span>
+            <input type="checkbox" name="lifePrefsSection" value="assetsBills" />
+            <span>Assets &amp; Bills</span>
           </label>
         </div>
         <div class="life-modal-actions">
@@ -6283,6 +6446,7 @@
     }
 
     // PEOPLE OVERVIEW
+    var LIFE_DATA_KEY = 'friction_life_data_v2';
     var LIFE_PEOPLE_KEY = 'life_people_v1';
     var LIFE_ACTIVE_PERSON_KEY = 'life_active_person_id_v1';
     var LIFE_UI_KEY = 'life_ui_v1';
@@ -6292,6 +6456,22 @@
     var activePersonId = null;
     var lifeUiPrefs = { groupMode: false, selectedPeopleIds: [] };
     var lifePersonPrefs = {};
+    var lifeAssets = [];
+    var lifeAppointments = [];
+    var lifeTasks = [];
+    var lifeData = null;
+    var lifeState = {
+      activeDomain: 'family',
+      activePersonId: null,
+      expandedNodeId: null,
+      editMode: false
+    };
+    var LIFE_DOMAINS = [
+      { id: 'family', label: 'Family' },
+      { id: 'assets', label: 'Assets & Bills' },
+      { id: 'appointments', label: 'Appointments' },
+      { id: 'tasks', label: 'Tasks' }
+    ];
     var pendingAvatarType = 'generated';
     var pendingAvatarDataUrl = '';
     var pendingRemovePersonId = null;
@@ -6305,9 +6485,188 @@
       return Date.now().toString(36) + '_' + Math.random().toString(16).slice(2);
     }
 
+    function generateLifeAssetId() {
+      return 'asset_' + Date.now().toString(36) + '_' + Math.floor(Math.random() * 100000).toString(36);
+    }
+
+    function generateLifeAppointmentId() {
+      return 'appt_' + Date.now().toString(36) + '_' + Math.floor(Math.random() * 100000).toString(36);
+    }
+
+    function generateLifeTaskId() {
+      return 'task_' + Date.now().toString(36) + '_' + Math.floor(Math.random() * 100000).toString(36);
+    }
+
+    function normalizeLifeAsset(asset) {
+      if (!asset || typeof asset !== 'object') return null;
+      return {
+        id: asset.id || generateLifeAssetId(),
+        label: asset.label || 'Untitled asset',
+        ownerPersonId: asset.ownerPersonId || '',
+        regoDue: asset.regoDue || '',
+        serviceInterval: asset.serviceInterval || '',
+        serviceDue: asset.serviceDue || '',
+        insuranceRenewal: asset.insuranceRenewal || '',
+        createdAt: asset.createdAt || Date.now(),
+        updatedAt: asset.updatedAt || asset.createdAt || Date.now()
+      };
+    }
+
+    function normalizeLifeAppointment(appt) {
+      if (!appt || typeof appt !== 'object') return null;
+      return {
+        id: appt.id || generateLifeAppointmentId(),
+        title: appt.title || 'Untitled appointment',
+        date: appt.date || '',
+        time: appt.time || '',
+        location: appt.location || '',
+        notes: appt.notes || '',
+        personId: appt.personId || '',
+        createdAt: appt.createdAt || Date.now(),
+        updatedAt: appt.updatedAt || appt.createdAt || Date.now()
+      };
+    }
+
+    function normalizeLifeTask(task) {
+      if (!task || typeof task !== 'object') return null;
+      var checklist = Array.isArray(task.checklist) ? task.checklist : [];
+      return {
+        id: task.id || generateLifeTaskId(),
+        title: task.title || 'Untitled task',
+        ownerPersonId: task.ownerPersonId || '',
+        assetId: task.assetId || '',
+        done: !!task.done,
+        checklist: checklist.map(function(item) {
+          if (!item || typeof item !== 'object') return null;
+          return {
+            id: item.id || generateLifeTaskId(),
+            text: item.text || 'Checklist item',
+            done: !!item.done
+          };
+        }).filter(Boolean),
+        createdAt: task.createdAt || Date.now(),
+        updatedAt: task.updatedAt || task.createdAt || Date.now()
+      };
+    }
+
     function logLifeDebug(eventName, detail) {
       if (typeof console === 'undefined' || !console.log) return;
       console.log('[Life]', eventName, detail || '');
+    }
+
+    function normalizeLifeData(data) {
+      var safe = data && typeof data === 'object' ? data : {};
+      var normalizedPeople = Array.isArray(safe.people) ? safe.people.map(normalizePerson).filter(Boolean) : [];
+      return {
+        activeDomain: safe.activeDomain || 'family',
+        activePersonId: safe.activePersonId || null,
+        people: normalizedPeople,
+        assets: Array.isArray(safe.assets) ? safe.assets.map(normalizeLifeAsset).filter(Boolean) : [],
+        appointments: Array.isArray(safe.appointments)
+          ? safe.appointments.map(normalizeLifeAppointment).filter(Boolean)
+          : [],
+        tasks: Array.isArray(safe.tasks) ? safe.tasks.map(normalizeLifeTask).filter(Boolean) : [],
+        personPrefs: safe.personPrefs && typeof safe.personPrefs === 'object' ? safe.personPrefs : {}
+      };
+    }
+
+    function persistLifeData() {
+      if (!lifeData) return;
+      lifeData.activeDomain = lifeState.activeDomain;
+      lifeData.activePersonId = lifeState.activePersonId;
+      lifeData.people = people.slice();
+      lifeData.assets = lifeAssets.slice();
+      lifeData.appointments = lifeAppointments.slice();
+      lifeData.tasks = lifeTasks.slice();
+      lifeData.personPrefs = lifePersonPrefs;
+      localStorage.setItem(LIFE_DATA_KEY, JSON.stringify(lifeData));
+    }
+
+    function createDefaultFamilyPeople() {
+      var now = Date.now();
+      return [
+        createDefaultMe(),
+        {
+          id: generatePersonId(),
+          name: 'Claire',
+          role: 'wife',
+          dob: null,
+          avatarType: 'generated',
+          avatarDataUrl: null,
+          notes: null,
+          createdAt: now,
+          updatedAt: now
+        },
+        {
+          id: generatePersonId(),
+          name: 'Lachlan',
+          role: 'son',
+          dob: null,
+          avatarType: 'generated',
+          avatarDataUrl: null,
+          notes: null,
+          createdAt: now,
+          updatedAt: now
+        }
+      ];
+    }
+
+    function loadLifeData() {
+      var saved = localStorage.getItem(LIFE_DATA_KEY);
+      if (saved) {
+        try {
+          lifeData = normalizeLifeData(JSON.parse(saved));
+        } catch (e) {
+          lifeData = normalizeLifeData(null);
+        }
+      }
+
+      if (!lifeData) {
+        loadPeople();
+        loadLifePersonPrefs();
+        activePersonId = null;
+        lifeAssets = [];
+        lifeAppointments = [];
+        lifeTasks = [];
+        lifeData = normalizeLifeData({
+          activeDomain: 'family',
+          activePersonId: null,
+          people: people,
+          assets: lifeAssets,
+          appointments: lifeAppointments,
+          tasks: lifeTasks,
+          personPrefs: lifePersonPrefs
+        });
+        persistLifeData();
+      } else {
+        people = lifeData.people.length ? lifeData.people : createDefaultFamilyPeople();
+        if (!lifeData.people.length) {
+          lifeData.people = people.slice();
+          persistLifeData();
+        }
+        lifeAssets = lifeData.assets;
+        lifeAppointments = lifeData.appointments;
+        lifeTasks = lifeData.tasks;
+        lifePersonPrefs = lifeData.personPrefs || {};
+        if (!people.length) {
+          people = createDefaultFamilyPeople();
+        }
+      }
+
+      activePersonId = lifeData.activePersonId || null;
+      if (activePersonId && !getPersonById(activePersonId)) {
+        activePersonId = null;
+      }
+      lifeState.activePersonId = activePersonId;
+      var domainIds = LIFE_DOMAINS.map(function(domain) { return domain.id; });
+      lifeState.activeDomain = domainIds.includes(lifeData.activeDomain) ? lifeData.activeDomain : 'family';
+      if (lifeData.activeDomain !== lifeState.activeDomain) {
+        lifeData.activeDomain = lifeState.activeDomain;
+        persistLifeData();
+      }
+      lifeState.expandedNodeId = null;
+      lifeState.editMode = false;
+      localStorage.setItem(LIFE_ACTIVE_PERSON_KEY, activePersonId || '');
     }
 
     function hashString(value) {
@@ -6407,14 +6766,14 @@
     function loadPeople() {
       var saved = localStorage.getItem(LIFE_PEOPLE_KEY);
       if (!saved) {
-        people = [createDefaultMe()];
+        people = createDefaultFamilyPeople();
         savePeople();
         return;
       }
       try {
         var parsed = JSON.parse(saved);
         if (!Array.isArray(parsed) || !parsed.length) {
-          people = [createDefaultMe()];
+          people = createDefaultFamilyPeople();
           savePeople();
           return;
         }
@@ -6427,6 +6786,7 @@
     function savePeople() {
       try {
         localStorage.setItem(LIFE_PEOPLE_KEY, JSON.stringify(people));
+        persistLifeData();
         return true;
       } catch (e) {
         return false;
@@ -6470,6 +6830,7 @@
 
     function saveLifePersonPrefs() {
       localStorage.setItem(LIFE_PERSON_PREFS_KEY, JSON.stringify(lifePersonPrefs));
+      persistLifeData();
     }
 
     function getAgeInMonths(dob) {
@@ -6487,24 +6848,15 @@
     function getDefaultSectionPrefs(person) {
       var role = person && person.role ? String(person.role).toLowerCase() : '';
       var ageMonths = person && person.dob ? getAgeInMonths(person.dob) : null;
-      var isToddler = role.includes('son') || (typeof ageMonths === 'number' && ageMonths < 16);
-      if (isToddler) {
-        return {
-          appointments: true,
-          tasks: true,
-          documents: true,
-          milestones: true,
-          assets: false,
-          bills: false
-        };
-      }
+      var isChildRole = role.includes('son') || role.includes('daughter') || role.includes('child');
+      var isYoungChild = typeof ageMonths === 'number' && ageMonths < 24;
+      var assetsBillsEnabled = !(isChildRole || isYoungChild);
       return {
         appointments: true,
         tasks: true,
         documents: true,
-        milestones: false,
-        assets: true,
-        bills: true
+        milestones: true,
+        assetsBills: assetsBillsEnabled
       };
     }
 
@@ -6518,6 +6870,17 @@
         lifePersonPrefs[personId] = prefs;
         saveLifePersonPrefs();
       }
+      if (prefs && prefs.enabledSections) {
+        if (prefs.enabledSections.assets !== undefined || prefs.enabledSections.bills !== undefined) {
+          var assetsEnabled = prefs.enabledSections.assets !== false;
+          var billsEnabled = prefs.enabledSections.bills !== false;
+          prefs.enabledSections.assetsBills = assetsEnabled && billsEnabled;
+          delete prefs.enabledSections.assets;
+          delete prefs.enabledSections.bills;
+          lifePersonPrefs[personId] = prefs;
+          saveLifePersonPrefs();
+        }
+      }
       return prefs;
     }
 
@@ -6529,6 +6892,9 @@
       sections.forEach(function(section) {
         var key = section.dataset.lifeSection;
         var enabled = prefs.enabledSections[key];
+        if (key === 'assets' || key === 'bills') {
+          enabled = prefs.enabledSections.assetsBills;
+        }
         section.style.display = enabled === false ? 'none' : '';
       });
     }
@@ -6550,7 +6916,12 @@
 
     function setActivePersonId(personId) {
       activePersonId = personId;
-      localStorage.setItem(LIFE_ACTIVE_PERSON_KEY, personId);
+      lifeState.activePersonId = personId || null;
+      localStorage.setItem(LIFE_ACTIVE_PERSON_KEY, personId || '');
+      if (lifeData) {
+        lifeData.activePersonId = personId || null;
+        persistLifeData();
+      }
       isEditingActivePerson = false;
       if (lifeActiveEdit) {
         lifeActiveEdit.hidden = true;
@@ -6687,7 +7058,193 @@
       lifePersonPrefs[activePersonId] = { enabledSections: enabledSections };
       saveLifePersonPrefs();
       setLifePrefsModalVisible(false);
+      lifeState.editMode = false;
+      lifeState.expandedNodeId = null;
+      persistLifeData();
       renderLifeView();
+    }
+
+    function setLifeActiveDomain(domainId) {
+      lifeState.activeDomain = domainId;
+      if (lifeData) {
+        lifeData.activeDomain = domainId;
+      }
+      lifeState.expandedNodeId = null;
+      lifeState.editMode = false;
+      persistLifeData();
+      renderLifeView();
+    }
+
+    function setLifeExpandedNode(nodeId) {
+      if (lifeState.expandedNodeId === nodeId) {
+        lifeState.expandedNodeId = null;
+        lifeState.editMode = false;
+      } else {
+        lifeState.expandedNodeId = nodeId;
+        lifeState.editMode = false;
+      }
+      renderLifeView();
+    }
+
+    function openLifeEditorFor(nodeId) {
+      lifeState.expandedNodeId = nodeId;
+      lifeState.editMode = true;
+      renderLifeView();
+    }
+
+    function getFilteredLifeAssets() {
+      if (!lifeState.activePersonId) return lifeAssets.slice();
+      return lifeAssets.filter(function(asset) {
+        return asset.ownerPersonId === lifeState.activePersonId;
+      });
+    }
+
+    function getFilteredLifeAppointments() {
+      if (!lifeState.activePersonId) return lifeAppointments.slice();
+      return lifeAppointments.filter(function(appt) {
+        return appt.personId === lifeState.activePersonId;
+      });
+    }
+
+    function getFilteredLifeTasks() {
+      if (!lifeState.activePersonId) return lifeTasks.slice();
+      return lifeTasks.filter(function(task) {
+        return task.ownerPersonId === lifeState.activePersonId;
+      });
+    }
+
+    function renderLifeDomainStrip() {
+      if (!lifeDomainStrip) return;
+      lifeDomainStrip.innerHTML = '';
+      LIFE_DOMAINS.forEach(function(domain) {
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'life-domain-btn';
+        button.textContent = domain.label;
+        button.dataset.domainId = domain.id;
+        button.setAttribute('role', 'listitem');
+        if (domain.id === lifeState.activeDomain) {
+          button.classList.add('active');
+        }
+        lifeDomainStrip.appendChild(button);
+      });
+    }
+
+    function createLifeNodeBubble(options) {
+      var bubble = document.createElement('div');
+      bubble.className = 'life-node-bubble';
+      bubble.setAttribute('role', 'listitem');
+
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'life-node-btn';
+      if (options.isActive) {
+        button.classList.add('is-active');
+      }
+      if (options.isAdd) {
+        button.classList.add('life-node-add');
+        button.textContent = '+';
+      }
+      if (options.nodeId) {
+        button.dataset.nodeId = options.nodeId;
+      }
+      if (options.action) {
+        button.dataset.nodeAction = options.action;
+      }
+      if (options.nodeType) {
+        button.dataset.nodeType = options.nodeType;
+      }
+      button.setAttribute('aria-label', options.label || 'Life node');
+
+      if (options.imageUrl) {
+        var img = document.createElement('img');
+        img.alt = options.label || 'Life node';
+        img.src = options.imageUrl;
+        button.appendChild(img);
+      } else if (!options.isAdd) {
+        button.textContent = options.label ? options.label.charAt(0).toUpperCase() : '•';
+      }
+
+      var label = document.createElement('div');
+      label.className = 'life-node-label';
+      label.textContent = options.label || '';
+
+      bubble.appendChild(button);
+      bubble.appendChild(label);
+      return bubble;
+    }
+
+    function renderLifeNodeStrip() {
+      if (!lifeNodeStrip) return;
+      lifeNodeStrip.innerHTML = '';
+      if (lifeState.activeDomain === 'family') {
+        getFamilyPeople().forEach(function(person) {
+          lifeNodeStrip.appendChild(createLifeNodeBubble({
+            nodeId: person.id,
+            nodeType: 'person',
+            label: person.name || 'Unnamed',
+            imageUrl: getAvatarDataUrl(person),
+            isActive: lifeState.expandedNodeId === person.id
+          }));
+        });
+        lifeNodeStrip.appendChild(createLifeNodeBubble({
+          action: 'add-person',
+          label: 'Add',
+          isAdd: true
+        }));
+        return;
+      }
+
+      if (lifeState.activeDomain === 'assets') {
+        var assets = getFilteredLifeAssets();
+        assets.forEach(function(asset) {
+          lifeNodeStrip.appendChild(createLifeNodeBubble({
+            nodeId: asset.id,
+            nodeType: 'asset',
+            label: asset.label,
+            isActive: lifeState.expandedNodeId === asset.id
+          }));
+        });
+        lifeNodeStrip.appendChild(createLifeNodeBubble({
+          action: 'add-asset',
+          label: '+ Add Asset',
+          isAdd: true
+        }));
+        return;
+      }
+
+      if (lifeState.activeDomain === 'appointments') {
+        var appts = getFilteredLifeAppointments();
+        appts.forEach(function(appt) {
+          lifeNodeStrip.appendChild(createLifeNodeBubble({
+            nodeId: appt.id,
+            nodeType: 'appointment',
+            label: appt.title,
+            isActive: lifeState.expandedNodeId === appt.id
+          }));
+        });
+        lifeNodeStrip.appendChild(createLifeNodeBubble({
+          action: 'add-appointment',
+          label: '+ Add Appointment',
+          isAdd: true
+        }));
+        return;
+      }
+
+      var tasksList = getFilteredLifeTasks();
+      tasksList.forEach(function(task) {
+        lifeNodeStrip.appendChild(createLifeNodeBubble({
+          nodeId: task.id,
+          nodeType: 'task',
+          label: task.title,
+          isActive: lifeState.expandedNodeId === task.id
+        }));
+      });
+      lifeNodeStrip.appendChild(createLifeNodeBubble({
+        action: 'add-task',
+        label: '+ Add Task',
+        isAdd: true
+      }));
     }
 
     function renderBubbleStrip() {
@@ -6783,21 +7340,866 @@
       }
     }
 
+    function renderLifeDomainPanel() {
+      if (!lifeDomainPanel) return;
+      lifeDomainPanel.innerHTML = '';
+      if (lifeState.activeDomain === 'family') {
+        renderFamilyPanel();
+        return;
+      }
+      if (lifeState.activeDomain === 'assets') {
+        renderAssetsPanel();
+        return;
+      }
+      if (lifeState.activeDomain === 'appointments') {
+        renderAppointmentsPanel();
+        return;
+      }
+      renderTasksPanel();
+    }
+
+    function renderPanelEmpty(message) {
+      if (!lifeDomainPanel) return;
+      var empty = document.createElement('div');
+      empty.className = 'life-panel-empty';
+      empty.textContent = message;
+      lifeDomainPanel.appendChild(empty);
+    }
+
+    function renderFamilyPanel() {
+      if (!lifeDomainPanel) return;
+      var personId = lifeState.expandedNodeId;
+      if (!personId) {
+        renderPanelEmpty('Select a person bubble to see their details.');
+        return;
+      }
+      var person = getPersonById(personId);
+      if (!person) {
+        renderPanelEmpty('Person not found.');
+        return;
+      }
+      if (lifeState.editMode) {
+        renderPersonEditForm(person);
+        return;
+      }
+
+      var summary = document.createElement('div');
+      summary.className = 'life-domain-summary';
+      var nameRow = document.createElement('div');
+      nameRow.className = 'life-domain-row';
+      var nameLabel = document.createElement('span');
+      nameLabel.className = 'life-domain-label';
+      nameLabel.textContent = 'Name';
+      var nameValue = document.createElement('span');
+      nameValue.textContent = person.name || 'Unnamed';
+      nameRow.appendChild(nameLabel);
+      nameRow.appendChild(nameValue);
+
+      var roleRow = document.createElement('div');
+      roleRow.className = 'life-domain-row';
+      var roleLabel = document.createElement('span');
+      roleLabel.className = 'life-domain-label';
+      roleLabel.textContent = 'Role';
+      var roleValue = document.createElement('span');
+      roleValue.textContent = getPersonRoleLabel(person) || '—';
+      roleRow.appendChild(roleLabel);
+      roleRow.appendChild(roleValue);
+
+      var dobRow = document.createElement('div');
+      dobRow.className = 'life-domain-row';
+      var dobLabel = document.createElement('span');
+      dobLabel.className = 'life-domain-label';
+      dobLabel.textContent = 'DOB';
+      var dobValue = document.createElement('span');
+      dobValue.textContent = person.dob ? formatDob(person.dob) : '—';
+      dobRow.appendChild(dobLabel);
+      dobRow.appendChild(dobValue);
+
+      summary.appendChild(nameRow);
+      summary.appendChild(roleRow);
+      summary.appendChild(dobRow);
+      lifeDomainPanel.appendChild(summary);
+
+      var actions = document.createElement('div');
+      actions.className = 'life-domain-actions';
+      var editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'life-btn secondary';
+      editBtn.textContent = 'Edit profile';
+      editBtn.addEventListener('click', function() {
+        lifeState.editMode = true;
+        renderLifeView();
+      });
+      var customizeBtn = document.createElement('button');
+      customizeBtn.type = 'button';
+      customizeBtn.className = 'life-btn secondary';
+      customizeBtn.textContent = 'Customize sections';
+      customizeBtn.addEventListener('click', function() {
+        setActivePersonId(person.id);
+        openLifePrefsModal();
+      });
+      var removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'life-btn secondary';
+      removeBtn.textContent = 'Remove';
+      removeBtn.disabled = person.id === 'me';
+      removeBtn.addEventListener('click', function() {
+        setActivePersonId(person.id);
+        openRemoveModal();
+      });
+      actions.appendChild(editBtn);
+      actions.appendChild(customizeBtn);
+      actions.appendChild(removeBtn);
+      lifeDomainPanel.appendChild(actions);
+    }
+
+    function renderPersonEditForm(person) {
+      var form = document.createElement('form');
+      form.className = 'life-domain-form';
+      var row = document.createElement('div');
+      row.className = 'life-domain-form-row';
+      var nameInput = document.createElement('input');
+      nameInput.className = 'life-input';
+      nameInput.type = 'text';
+      nameInput.placeholder = 'Full name';
+      nameInput.value = person.name || '';
+      nameInput.required = true;
+      var roleSelect = document.createElement('select');
+      roleSelect.className = 'life-select';
+      var roleOptions = ['wife', 'son', 'daughter', 'mother', 'father', 'brother', 'sister', 'other'];
+      var emptyOption = document.createElement('option');
+      emptyOption.value = '';
+      emptyOption.textContent = 'Select role';
+      emptyOption.disabled = true;
+      roleSelect.appendChild(emptyOption);
+      roleOptions.forEach(function(role) {
+        var option = document.createElement('option');
+        option.value = role;
+        option.textContent = role.charAt(0).toUpperCase() + role.slice(1);
+        roleSelect.appendChild(option);
+      });
+      roleSelect.value = LIFE_ROLE_OPTIONS.indexOf(person.role) >= 0 ? person.role : 'other';
+      var customRole = document.createElement('input');
+      customRole.className = 'life-input';
+      customRole.type = 'text';
+      customRole.placeholder = 'Custom role';
+      customRole.value = LIFE_ROLE_OPTIONS.indexOf(person.role) === -1 ? person.role : '';
+      updateRoleCustomVisibility(roleSelect, customRole);
+      roleSelect.addEventListener('change', function() {
+        updateRoleCustomVisibility(roleSelect, customRole);
+      });
+
+      row.appendChild(nameInput);
+      row.appendChild(roleSelect);
+      row.appendChild(customRole);
+      form.appendChild(row);
+
+      var row2 = document.createElement('div');
+      row2.className = 'life-domain-form-row';
+      var dobInput = document.createElement('input');
+      dobInput.className = 'life-input';
+      dobInput.type = 'date';
+      dobInput.value = person.dob || '';
+      var notesInput = document.createElement('textarea');
+      notesInput.className = 'life-textarea';
+      notesInput.placeholder = 'Notes (optional)';
+      notesInput.value = person.notes || '';
+      row2.appendChild(dobInput);
+      row2.appendChild(notesInput);
+      form.appendChild(row2);
+
+      var error = document.createElement('div');
+      error.className = 'life-meta';
+      error.style.display = 'none';
+      form.appendChild(error);
+
+      var actions = document.createElement('div');
+      actions.className = 'life-domain-actions';
+      var saveBtn = document.createElement('button');
+      saveBtn.type = 'submit';
+      saveBtn.className = 'life-btn';
+      saveBtn.textContent = 'Save';
+      var cancelBtn = document.createElement('button');
+      cancelBtn.type = 'button';
+      cancelBtn.className = 'life-btn secondary';
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.addEventListener('click', function() {
+        lifeState.editMode = false;
+        renderLifeView();
+      });
+      actions.appendChild(saveBtn);
+      actions.appendChild(cancelBtn);
+      form.appendChild(actions);
+
+      form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        var name = nameInput.value.trim();
+        if (!name) {
+          error.textContent = 'Name is required.';
+          error.style.display = 'block';
+          nameInput.focus();
+          return;
+        }
+        var role = getRoleValue(roleSelect, customRole);
+        if (!role) {
+          error.textContent = 'Role is required.';
+          error.style.display = 'block';
+          roleSelect.focus();
+          return;
+        }
+        people = people.map(function(entry) {
+          if (entry.id !== person.id) return entry;
+          return Object.assign({}, entry, {
+            name: name,
+            role: role,
+            dob: dobInput.value || null,
+            notes: notesInput.value.trim() || null,
+            updatedAt: Date.now()
+          });
+        });
+        savePeople();
+        setActivePersonId(person.id);
+        lifeState.editMode = false;
+        lifeState.expandedNodeId = null;
+        renderLifeView();
+      });
+
+      lifeDomainPanel.appendChild(form);
+    }
+
+    function renderAssetsPanel() {
+      if (!lifeDomainPanel) return;
+      if (lifeState.expandedNodeId === 'asset:new') {
+        renderAssetForm(null);
+        return;
+      }
+      var asset = lifeAssets.find(function(item) { return item.id === lifeState.expandedNodeId; });
+      if (!asset) {
+        renderPanelEmpty('Select an asset to see its reminders.');
+        return;
+      }
+
+      if (lifeState.editMode) {
+        renderAssetForm(asset);
+        return;
+      }
+
+      var summary = document.createElement('div');
+      summary.className = 'life-domain-summary';
+      var owner = getPersonById(asset.ownerPersonId);
+      summary.appendChild(buildDomainRow('Asset', asset.label));
+      summary.appendChild(buildDomainRow('Owner', owner ? owner.name : 'Unassigned'));
+      lifeDomainPanel.appendChild(summary);
+
+      var actions = document.createElement('div');
+      actions.className = 'life-domain-actions';
+      var editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'life-btn secondary';
+      editBtn.textContent = 'Edit asset';
+      editBtn.addEventListener('click', function() {
+        lifeState.editMode = true;
+        renderLifeView();
+      });
+      actions.appendChild(editBtn);
+      lifeDomainPanel.appendChild(actions);
+
+      var serviceMetaParts = [];
+      if (asset.serviceInterval) serviceMetaParts.push(asset.serviceInterval);
+      if (asset.serviceDue) serviceMetaParts.push('Next due ' + asset.serviceDue);
+      lifeDomainPanel.appendChild(buildAssetSubItem(asset, 'rego', 'Rego', asset.regoDue));
+      lifeDomainPanel.appendChild(buildAssetSubItem(
+        asset,
+        'service',
+        'Service',
+        serviceMetaParts.join(' · ')
+      ));
+      lifeDomainPanel.appendChild(buildAssetSubItem(asset, 'insurance', 'Insurance', asset.insuranceRenewal));
+    }
+
+    function buildDomainRow(label, value) {
+      var row = document.createElement('div');
+      row.className = 'life-domain-row';
+      var labelEl = document.createElement('span');
+      labelEl.className = 'life-domain-label';
+      labelEl.textContent = label;
+      var valueEl = document.createElement('span');
+      valueEl.textContent = value || '—';
+      row.appendChild(labelEl);
+      row.appendChild(valueEl);
+      return row;
+    }
+
+    function buildAssetSubItem(asset, type, title, metaValue) {
+      var block = document.createElement('div');
+      block.className = 'life-domain-subitem';
+      var header = document.createElement('div');
+      header.className = 'life-domain-subitem-title';
+      header.textContent = title;
+      var meta = document.createElement('div');
+      meta.className = 'life-domain-subitem-meta';
+      meta.textContent = metaValue ? metaValue : 'No reminder set yet.';
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'life-btn secondary';
+      button.textContent = 'Add reminder/task';
+      button.addEventListener('click', function() {
+        createTaskFromAsset(asset, type);
+      });
+      block.appendChild(header);
+      block.appendChild(meta);
+      block.appendChild(button);
+      return block;
+    }
+
+    function renderAssetForm(asset) {
+      var isEditing = !!asset;
+      var form = document.createElement('form');
+      form.className = 'life-domain-form';
+
+      var row = document.createElement('div');
+      row.className = 'life-domain-form-row';
+      var labelInput = document.createElement('input');
+      labelInput.className = 'life-input';
+      labelInput.type = 'text';
+      labelInput.placeholder = 'Asset label (e.g. Car: Mazda CX-5)';
+      labelInput.value = asset ? asset.label : '';
+      labelInput.required = true;
+      var ownerSelect = buildPersonSelect(asset ? asset.ownerPersonId : lifeState.activePersonId);
+      row.appendChild(labelInput);
+      row.appendChild(ownerSelect);
+      form.appendChild(row);
+
+      var row2 = document.createElement('div');
+      row2.className = 'life-domain-form-row';
+      var regoInput = document.createElement('input');
+      regoInput.className = 'life-input';
+      regoInput.type = 'date';
+      regoInput.value = asset ? asset.regoDue : '';
+      regoInput.placeholder = 'Rego due';
+      var serviceInterval = document.createElement('input');
+      serviceInterval.className = 'life-input';
+      serviceInterval.type = 'text';
+      serviceInterval.placeholder = 'Service interval (e.g. 10,000km)';
+      serviceInterval.value = asset ? asset.serviceInterval : '';
+      row2.appendChild(regoInput);
+      row2.appendChild(serviceInterval);
+      form.appendChild(row2);
+
+      var row3 = document.createElement('div');
+      row3.className = 'life-domain-form-row';
+      var serviceDue = document.createElement('input');
+      serviceDue.className = 'life-input';
+      serviceDue.type = 'text';
+      serviceDue.placeholder = 'Service next due';
+      serviceDue.value = asset ? asset.serviceDue : '';
+      var insuranceInput = document.createElement('input');
+      insuranceInput.className = 'life-input';
+      insuranceInput.type = 'date';
+      insuranceInput.placeholder = 'Insurance renewal';
+      insuranceInput.value = asset ? asset.insuranceRenewal : '';
+      row3.appendChild(serviceDue);
+      row3.appendChild(insuranceInput);
+      form.appendChild(row3);
+
+      var error = document.createElement('div');
+      error.className = 'life-meta';
+      error.style.display = 'none';
+      form.appendChild(error);
+
+      var actions = document.createElement('div');
+      actions.className = 'life-domain-actions';
+      var saveBtn = document.createElement('button');
+      saveBtn.type = 'submit';
+      saveBtn.className = 'life-btn';
+      saveBtn.textContent = 'Save';
+      var cancelBtn = document.createElement('button');
+      cancelBtn.type = 'button';
+      cancelBtn.className = 'life-btn secondary';
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.addEventListener('click', function() {
+        lifeState.editMode = false;
+        lifeState.expandedNodeId = null;
+        renderLifeView();
+      });
+      actions.appendChild(saveBtn);
+      actions.appendChild(cancelBtn);
+      form.appendChild(actions);
+
+      form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        var label = labelInput.value.trim();
+        if (!label) {
+          error.textContent = 'Asset label is required.';
+          error.style.display = 'block';
+          labelInput.focus();
+          return;
+        }
+        var ownerId = ownerSelect.value || '';
+        if (isEditing) {
+          lifeAssets = lifeAssets.map(function(item) {
+            if (item.id !== asset.id) return item;
+            return Object.assign({}, item, {
+              label: label,
+              ownerPersonId: ownerId,
+              regoDue: regoInput.value || '',
+              serviceInterval: serviceInterval.value.trim(),
+              serviceDue: serviceDue.value.trim(),
+              insuranceRenewal: insuranceInput.value || '',
+              updatedAt: Date.now()
+            });
+          });
+        } else {
+          lifeAssets.push(normalizeLifeAsset({
+            id: generateLifeAssetId(),
+            label: label,
+            ownerPersonId: ownerId,
+            regoDue: regoInput.value || '',
+            serviceInterval: serviceInterval.value.trim(),
+            serviceDue: serviceDue.value.trim(),
+            insuranceRenewal: insuranceInput.value || '',
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+          }));
+        }
+        persistLifeData();
+        lifeState.editMode = false;
+        lifeState.expandedNodeId = null;
+        renderLifeView();
+      });
+
+      lifeDomainPanel.appendChild(form);
+    }
+
+    function renderAppointmentsPanel() {
+      if (!lifeDomainPanel) return;
+      if (lifeState.expandedNodeId === 'appointment:new') {
+        renderAppointmentForm(null);
+        return;
+      }
+      var appt = lifeAppointments.find(function(item) { return item.id === lifeState.expandedNodeId; });
+      if (!appt) {
+        renderPanelEmpty('Select an appointment to view details.');
+        return;
+      }
+      if (lifeState.editMode) {
+        renderAppointmentForm(appt);
+        return;
+      }
+      var summary = document.createElement('div');
+      summary.className = 'life-domain-summary';
+      summary.appendChild(buildDomainRow('Title', appt.title));
+      summary.appendChild(buildDomainRow('Date', appt.date || '—'));
+      summary.appendChild(buildDomainRow('Time', appt.time || '—'));
+      summary.appendChild(buildDomainRow('Location', appt.location || '—'));
+      lifeDomainPanel.appendChild(summary);
+
+      var actions = document.createElement('div');
+      actions.className = 'life-domain-actions';
+      var editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'life-btn secondary';
+      editBtn.textContent = 'Edit appointment';
+      editBtn.addEventListener('click', function() {
+        lifeState.editMode = true;
+        renderLifeView();
+      });
+      actions.appendChild(editBtn);
+      lifeDomainPanel.appendChild(actions);
+    }
+
+    function renderAppointmentForm(appt) {
+      var isEditing = !!appt;
+      var form = document.createElement('form');
+      form.className = 'life-domain-form';
+      var row = document.createElement('div');
+      row.className = 'life-domain-form-row';
+      var titleInput = document.createElement('input');
+      titleInput.className = 'life-input';
+      titleInput.type = 'text';
+      titleInput.placeholder = 'Appointment title';
+      titleInput.value = appt ? appt.title : '';
+      titleInput.required = true;
+      var personSelect = buildPersonSelect(appt ? appt.personId : lifeState.activePersonId);
+      row.appendChild(titleInput);
+      row.appendChild(personSelect);
+      form.appendChild(row);
+
+      var row2 = document.createElement('div');
+      row2.className = 'life-domain-form-row';
+      var dateInput = document.createElement('input');
+      dateInput.className = 'life-input';
+      dateInput.type = 'date';
+      dateInput.value = appt ? appt.date : '';
+      var timeInput = document.createElement('input');
+      timeInput.className = 'life-input';
+      timeInput.type = 'time';
+      timeInput.value = appt ? appt.time : '';
+      row2.appendChild(dateInput);
+      row2.appendChild(timeInput);
+      form.appendChild(row2);
+
+      var row3 = document.createElement('div');
+      row3.className = 'life-domain-form-row';
+      var locationInput = document.createElement('input');
+      locationInput.className = 'life-input';
+      locationInput.type = 'text';
+      locationInput.placeholder = 'Location';
+      locationInput.value = appt ? appt.location : '';
+      var notesInput = document.createElement('textarea');
+      notesInput.className = 'life-textarea';
+      notesInput.placeholder = 'Notes (optional)';
+      notesInput.value = appt ? appt.notes : '';
+      row3.appendChild(locationInput);
+      row3.appendChild(notesInput);
+      form.appendChild(row3);
+
+      var error = document.createElement('div');
+      error.className = 'life-meta';
+      error.style.display = 'none';
+      form.appendChild(error);
+
+      var actions = document.createElement('div');
+      actions.className = 'life-domain-actions';
+      var saveBtn = document.createElement('button');
+      saveBtn.type = 'submit';
+      saveBtn.className = 'life-btn';
+      saveBtn.textContent = 'Save';
+      var cancelBtn = document.createElement('button');
+      cancelBtn.type = 'button';
+      cancelBtn.className = 'life-btn secondary';
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.addEventListener('click', function() {
+        lifeState.editMode = false;
+        lifeState.expandedNodeId = null;
+        renderLifeView();
+      });
+      actions.appendChild(saveBtn);
+      actions.appendChild(cancelBtn);
+      form.appendChild(actions);
+
+      form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        var title = titleInput.value.trim();
+        if (!title) {
+          error.textContent = 'Appointment title is required.';
+          error.style.display = 'block';
+          titleInput.focus();
+          return;
+        }
+        var personId = personSelect.value || '';
+        if (isEditing) {
+          lifeAppointments = lifeAppointments.map(function(item) {
+            if (item.id !== appt.id) return item;
+            return Object.assign({}, item, {
+              title: title,
+              personId: personId,
+              date: dateInput.value || '',
+              time: timeInput.value || '',
+              location: locationInput.value.trim(),
+              notes: notesInput.value.trim(),
+              updatedAt: Date.now()
+            });
+          });
+        } else {
+          lifeAppointments.push(normalizeLifeAppointment({
+            id: generateLifeAppointmentId(),
+            title: title,
+            personId: personId,
+            date: dateInput.value || '',
+            time: timeInput.value || '',
+            location: locationInput.value.trim(),
+            notes: notesInput.value.trim(),
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+          }));
+        }
+        persistLifeData();
+        lifeState.editMode = false;
+        lifeState.expandedNodeId = null;
+        renderLifeView();
+      });
+
+      lifeDomainPanel.appendChild(form);
+    }
+
+    function renderTasksPanel() {
+      if (!lifeDomainPanel) return;
+      if (lifeState.expandedNodeId === 'task:new') {
+        renderTaskForm(null);
+        return;
+      }
+      var task = lifeTasks.find(function(item) { return item.id === lifeState.expandedNodeId; });
+      if (!task) {
+        renderPanelEmpty('Select a task to see its checklist.');
+        return;
+      }
+      if (lifeState.editMode) {
+        renderTaskForm(task);
+        return;
+      }
+
+      var card = document.createElement('div');
+      card.className = 'life-task-card expanded';
+      var header = document.createElement('div');
+      header.className = 'life-task-header';
+      var headerTop = document.createElement('div');
+      headerTop.className = 'life-task-header-top';
+      var titleBtn = document.createElement('button');
+      titleBtn.type = 'button';
+      titleBtn.className = 'life-task-title';
+      titleBtn.textContent = task.title;
+      var chevron = document.createElement('span');
+      chevron.className = 'life-task-chevron';
+      chevron.textContent = '▾';
+      headerTop.appendChild(titleBtn);
+      headerTop.appendChild(chevron);
+      header.appendChild(headerTop);
+      card.appendChild(header);
+
+      var body = document.createElement('div');
+      body.className = 'life-task-body';
+      if (!task.checklist.length) {
+        var empty = document.createElement('div');
+        empty.className = 'life-meta';
+        empty.textContent = 'No checklist items yet.';
+        body.appendChild(empty);
+      } else {
+        var list = document.createElement('ul');
+        list.className = 'life-task-checklist';
+        task.checklist.forEach(function(item) {
+          var li = document.createElement('li');
+          li.className = item.done ? 'life-task-step completed' : 'life-task-step';
+          var checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.checked = item.done;
+          checkbox.addEventListener('change', function() {
+            updateTaskChecklistItem(task.id, item.id, checkbox.checked);
+          });
+          var text = document.createElement('span');
+          text.textContent = item.text;
+          li.appendChild(checkbox);
+          li.appendChild(text);
+          list.appendChild(li);
+        });
+        body.appendChild(list);
+      }
+      card.appendChild(body);
+
+      header.addEventListener('click', function() {
+        var isExpanded = card.classList.contains('expanded');
+        card.classList.toggle('expanded', !isExpanded);
+      });
+
+      var actions = document.createElement('div');
+      actions.className = 'life-domain-actions';
+      var editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'life-btn secondary';
+      editBtn.textContent = 'Edit task';
+      editBtn.addEventListener('click', function() {
+        lifeState.editMode = true;
+        renderLifeView();
+      });
+      actions.appendChild(editBtn);
+
+      lifeDomainPanel.appendChild(card);
+      lifeDomainPanel.appendChild(actions);
+    }
+
+    function renderTaskForm(task) {
+      var isEditing = !!task;
+      var form = document.createElement('form');
+      form.className = 'life-domain-form';
+      var row = document.createElement('div');
+      row.className = 'life-domain-form-row';
+      var titleInput = document.createElement('input');
+      titleInput.className = 'life-input';
+      titleInput.type = 'text';
+      titleInput.placeholder = 'Task title';
+      titleInput.value = task ? task.title : '';
+      titleInput.required = true;
+      var personSelect = buildPersonSelect(task ? task.ownerPersonId : lifeState.activePersonId);
+      row.appendChild(titleInput);
+      row.appendChild(personSelect);
+      form.appendChild(row);
+
+      var checklistInput = document.createElement('textarea');
+      checklistInput.className = 'life-textarea';
+      checklistInput.placeholder = 'Checklist items (one per line)';
+      checklistInput.value = task && task.checklist.length
+        ? task.checklist.map(function(item) { return item.text; }).join('\n')
+        : '';
+      form.appendChild(checklistInput);
+
+      var clarification = document.createElement('div');
+      clarification.className = 'life-task-clarification';
+      clarification.style.display = 'none';
+      form.appendChild(clarification);
+
+      var actions = document.createElement('div');
+      actions.className = 'life-domain-actions';
+      var suggestBtn = document.createElement('button');
+      suggestBtn.type = 'button';
+      suggestBtn.className = 'life-btn secondary';
+      suggestBtn.textContent = 'Suggest breakdown';
+      suggestBtn.addEventListener('click', function() {
+        var suggestion = buildTaskBreakdown(titleInput.value.trim());
+        if (suggestion.question) {
+          clarification.textContent = suggestion.question;
+          clarification.style.display = 'block';
+          return;
+        }
+        clarification.style.display = 'none';
+        checklistInput.value = suggestion.steps.join('\n');
+      });
+      var saveBtn = document.createElement('button');
+      saveBtn.type = 'submit';
+      saveBtn.className = 'life-btn';
+      saveBtn.textContent = 'Save';
+      var cancelBtn = document.createElement('button');
+      cancelBtn.type = 'button';
+      cancelBtn.className = 'life-btn secondary';
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.addEventListener('click', function() {
+        lifeState.editMode = false;
+        lifeState.expandedNodeId = null;
+        renderLifeView();
+      });
+      actions.appendChild(suggestBtn);
+      actions.appendChild(saveBtn);
+      actions.appendChild(cancelBtn);
+      form.appendChild(actions);
+
+      form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        var title = titleInput.value.trim();
+        if (!title) {
+          clarification.textContent = 'Task title is required.';
+          clarification.style.display = 'block';
+          titleInput.focus();
+          return;
+        }
+        var personId = personSelect.value || '';
+        var checklistItems = checklistInput.value
+          .split('\n')
+          .map(function(line) { return line.trim(); })
+          .filter(Boolean)
+          .map(function(text) {
+            return { id: generateLifeTaskId(), text: text, done: false };
+          });
+        if (isEditing) {
+          lifeTasks = lifeTasks.map(function(item) {
+            if (item.id !== task.id) return item;
+            return Object.assign({}, item, {
+              title: title,
+              ownerPersonId: personId,
+              checklist: checklistItems,
+              updatedAt: Date.now()
+            });
+          });
+        } else {
+          lifeTasks.push(normalizeLifeTask({
+            id: generateLifeTaskId(),
+            title: title,
+            ownerPersonId: personId,
+            checklist: checklistItems,
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+          }));
+        }
+        persistLifeData();
+        lifeState.editMode = false;
+        lifeState.expandedNodeId = null;
+        renderLifeView();
+      });
+
+      lifeDomainPanel.appendChild(form);
+    }
+
+    function buildPersonSelect(selectedId) {
+      var select = document.createElement('select');
+      select.className = 'life-select';
+      var empty = document.createElement('option');
+      empty.value = '';
+      empty.textContent = 'Unassigned';
+      select.appendChild(empty);
+      getFamilyPeople().forEach(function(person) {
+        var option = document.createElement('option');
+        option.value = person.id;
+        option.textContent = person.name || 'Unnamed';
+        select.appendChild(option);
+      });
+      if (selectedId) {
+        select.value = selectedId;
+      }
+      return select;
+    }
+
+    function updateTaskChecklistItem(taskId, itemId, isDone) {
+      lifeTasks = lifeTasks.map(function(task) {
+        if (task.id !== taskId) return task;
+        var updatedChecklist = task.checklist.map(function(item) {
+          if (item.id !== itemId) return item;
+          return Object.assign({}, item, { done: isDone });
+        });
+        return Object.assign({}, task, {
+          checklist: updatedChecklist,
+          updatedAt: Date.now()
+        });
+      });
+      persistLifeData();
+      renderLifeView();
+    }
+
+    function buildTaskBreakdown(text) {
+      var lower = (text || '').toLowerCase();
+      var ambiguousTerms = ['pad', 'bank', 'charge'];
+      var ambiguous = ambiguousTerms.find(function(term) {
+        return lower.includes(term);
+      });
+      if (ambiguous) {
+        return {
+          question: 'Quick clarification: what does "' + ambiguous + '" mean in this task?'
+        };
+      }
+      if (!text) {
+        return {
+          steps: ['Clarify the task details', 'List needed materials', 'Complete the task', 'Confirm it is done']
+        };
+      }
+      var parts = text.split(/,| and | then /i).map(function(part) { return part.trim(); }).filter(Boolean);
+      var steps = parts.length > 1
+        ? parts.map(function(part) { return 'Handle: ' + part; })
+        : ['Prep for "' + text + '"', 'Complete "' + text + '"', 'Review the result'];
+      return { steps: steps };
+    }
+
+    function createTaskFromAsset(asset, type) {
+      if (!asset) return;
+      var label = asset.label || 'Asset';
+      var titles = {
+        rego: 'Rego reminder for ' + label,
+        service: 'Service reminder for ' + label,
+        insurance: 'Insurance renewal for ' + label
+      };
+      lifeTasks.push(normalizeLifeTask({
+        id: generateLifeTaskId(),
+        title: titles[type] || ('Reminder for ' + label),
+        ownerPersonId: asset.ownerPersonId || lifeState.activePersonId || '',
+        assetId: asset.id,
+        checklist: [],
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      }));
+      persistLifeData();
+      renderLifeView();
+    }
+
     function renderLifeView() {
-      renderBubbleStrip();
-      renderActivePanel();
-      if (activePersonId) {
-        applyPersonSectionPrefs(activePersonId);
-      }
-      if (lifeGroupToggle) {
-        lifeGroupToggle.setAttribute('aria-pressed', lifeUiPrefs.groupMode ? 'true' : 'false');
-      }
-      if (lifeView) {
-        lifeView.classList.toggle('group-mode-active', lifeUiPrefs.groupMode);
-      }
-      if (lifeGroupPanel) {
-        lifeGroupPanel.setAttribute('aria-hidden', lifeUiPrefs.groupMode ? 'false' : 'true');
-      }
+      renderLifeDomainStrip();
+      renderLifeNodeStrip();
+      renderLifeDomainPanel();
       if (typeof renderCalendarPeopleOptions === 'function') {
         renderCalendarPeopleOptions();
       }
@@ -6937,6 +8339,9 @@
       setActivePersonId(person.id);
       setPeopleModalVisible(false);
       resetPeopleForm();
+      lifeState.editMode = false;
+      lifeState.expandedNodeId = null;
+      persistLifeData();
       renderLifeView();
       logLifeDebug('addPerson submit end', person.id);
       logLifeDebug('people length', people.length);
@@ -6976,6 +8381,9 @@
         localStorage.setItem(LIFE_PEOPLE_KEY, JSON.stringify(people));
         console.log('saveProfile:success', activePersonId);
         setEditMode(false);
+        lifeState.editMode = false;
+        lifeState.expandedNodeId = null;
+        persistLifeData();
         renderLifeView();
       } catch (err) {
         console.error('saveProfile:error', err);
@@ -7015,6 +8423,9 @@
       saveLifeUiPrefs();
       pendingRemovePersonId = null;
       setRemoveModalVisible(false);
+      lifeState.editMode = false;
+      lifeState.expandedNodeId = null;
+      persistLifeData();
       renderLifeView();
     }
 
@@ -11418,6 +12829,11 @@
     const frictionSocialPauseInputs = document.querySelectorAll('input[name="fsPauseSeconds"]');
     const goalsView = document.getElementById('goals-view');
     const lifeView = document.getElementById('life-view');
+    const lifeProfilePic = document.getElementById('lifeProfilePic');
+    const lifeProfileEmail = document.getElementById('lifeProfileEmail');
+    const lifeDomainStrip = document.getElementById('lifeDomainStrip');
+    const lifeNodeStrip = document.getElementById('lifeNodeStrip');
+    const lifeDomainPanel = document.getElementById('lifeDomainPanel');
     const calendarView = document.getElementById('calendar-view');
     const calendarImportView = document.getElementById('calendar-import-view');
     const goalsAreaFilter = document.getElementById('goalsAreaFilter');
@@ -11879,6 +13295,13 @@
         profilePic.style.display = currentUser.picture ? 'block' : 'none';
         profileName.textContent = currentUser.name || 'User';
         profileEmail.textContent = currentUser.email || '';
+        if (lifeProfilePic) {
+          lifeProfilePic.src = currentUser.picture || '';
+          lifeProfilePic.style.display = currentUser.picture ? 'block' : 'none';
+        }
+        if (lifeProfileEmail) {
+          lifeProfileEmail.textContent = currentUser.email || '';
+        }
         renderPeopleOverview();
         if (typeof renderCalendarPeopleOptions === 'function') {
           renderCalendarPeopleOptions();
@@ -13495,10 +14918,8 @@
     });
 
     loadLifeAreas();
-    loadPeople();
     loadLifeUiPrefs();
-    loadLifePersonPrefs();
-    ensureActivePerson();
+    loadLifeData();
     setGroupMode(lifeUiPrefs.groupMode);
     loadCalendarEvents();
     renderAreaSelects();
@@ -13535,6 +14956,50 @@
     if (lifeGroupToggle) {
       lifeGroupToggle.addEventListener('click', function() {
         setGroupMode(!lifeUiPrefs.groupMode);
+      });
+    }
+
+    if (lifeDomainStrip) {
+      lifeDomainStrip.addEventListener('click', function(event) {
+        var button = event.target.closest('[data-domain-id]');
+        if (!button) return;
+        var domainId = button.dataset.domainId;
+        if (!domainId) return;
+        setLifeActiveDomain(domainId);
+      });
+    }
+
+    if (lifeNodeStrip) {
+      lifeNodeStrip.addEventListener('click', function(event) {
+        var button = event.target.closest('.life-node-btn');
+        if (!button) return;
+        var action = button.dataset.nodeAction;
+        if (action === 'add-person') {
+          openPeopleForm();
+          return;
+        }
+        if (action === 'add-asset') {
+          openLifeEditorFor('asset:new');
+          return;
+        }
+        if (action === 'add-appointment') {
+          openLifeEditorFor('appointment:new');
+          return;
+        }
+        if (action === 'add-task') {
+          openLifeEditorFor('task:new');
+          return;
+        }
+        var nodeId = button.dataset.nodeId;
+        var nodeType = button.dataset.nodeType;
+        if (nodeType === 'person') {
+          setActivePersonId(nodeId);
+          setLifeExpandedNode(nodeId);
+          return;
+        }
+        if (nodeId) {
+          setLifeExpandedNode(nodeId);
+        }
       });
     }
 
