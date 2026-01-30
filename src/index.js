@@ -1,939 +1,1203 @@
 export default {
-async fetch(request, env) {
-var url = new URL(request.url);
+  async fetch(request, env) {
+    var url = new URL(request.url);
 
-// Only respond to /api/*
-if (!url.pathname.startsWith("/api/")) {
-  return new Response("Not Found", { status: 404 });
-}
-
-// CORS preflight
-if (request.method === "OPTIONS") {
-  return new Response(null, { headers: corsHeaders() });
-}
-
-// ============ ADMIN ENDPOINTS ============
-
-// GET /api/admin/stats - Get anonymized usage statistics
-if (url.pathname === "/api/admin/stats" && request.method === "GET") {
-  try {
-    var adminAuth = await verifyAdminToken(request, env);
-    if (!adminAuth.valid) {
-      return jsonResponse({ error: "Unauthorized" }, 401);
-    }
-    
-    var stats = await getAnalyticsStats(env);
-    return jsonResponse(stats, 200);
-  } catch (err) {
-    return jsonResponse({ error: err.message || "Failed to get stats" }, 500);
-  }
-}
-
-// GET /api/admin/users - Get user list (emails only, no content)
-if (url.pathname === "/api/admin/users" && request.method === "GET") {
-  try {
-    var adminAuth = await verifyAdminToken(request, env);
-    if (!adminAuth.valid) {
-      return jsonResponse({ error: "Unauthorized" }, 401);
-    }
-    
-    var users = await getUserList(env);
-    return jsonResponse({ users: users }, 200);
-  } catch (err) {
-    return jsonResponse({ error: err.message || "Failed to get users" }, 500);
-  }
-}
-
-// ============ CHAT ENDPOINT ============
-
-if (url.pathname === "/api/chat" && request.method === "POST") {
-  try {
-    // Verify user authentication (bot protection)
-    var authResult = await verifyUserToken(request, env);
-    if (!authResult.valid) {
-      return jsonResponse({ error: "Authentication required. Please sign in." }, 401);
-    }
-    
-    var userEmail = authResult.email;
-    var body = await request.json().catch(function() { return {}; });
-    var model = body.model;
-    var messages = Array.isArray(body.messages) ? body.messages : [];
-
-    // Check model access
-    var paidModels = ["claude", "gpt", "grok", "perplexity"];
-    var isAdmin = userEmail === env.ADMIN_EMAIL;
-    
-    if (paidModels.indexOf(model) >= 0 && !isAdmin) {
-      return jsonResponse({ error: "This model requires admin access." }, 403);
+    // Only respond to /api/*
+    if (!url.pathname.startsWith("/api/")) {
+      return new Response("Not Found", { status: 404 });
     }
 
-    if (!messages.length) {
-      return jsonResponse({ error: "No messages provided" }, 400);
+    // CORS preflight
+    if (request.method === "OPTIONS") {
+      return new Response(null, { headers: corsHeaders() });
     }
 
-    // Clean/normalize messages
-    var cleaned = messages
-      .filter(function(m) { return m && typeof m.content === "string" && m.content.trim().length > 0; })
-      .map(function(m) {
-        return {
-          role: m.role === "assistant" ? "assistant" : "user",
-          content: m.content.trim()
-        };
-      });
+    // ============ ADMIN ENDPOINTS ============
 
-    if (!cleaned.length) {
-      return jsonResponse(
-        { response: "Hey! Looks like your message didn't come through. Try sending something again?" },
-        200
+    // GET /api/admin/stats - Get anonymized usage statistics
+    if (url.pathname === "/api/admin/stats" && request.method === "GET") {
+      try {
+        var adminAuth = await verifyAdminToken(request, env);
+        if (!adminAuth.valid) {
+          return jsonResponse({ error: "Unauthorized" }, 401);
+        }
+
+        var stats = await getAnalyticsStats(env);
+        return jsonResponse(stats, 200);
+      } catch (err) {
+        return jsonResponse({ error: err.message || "Failed to get stats" }, 500);
+      }
+    }
+
+    // GET /api/admin/users - Get user list (emails only, no content)
+    if (url.pathname === "/api/admin/users" && request.method === "GET") {
+      try {
+        var adminAuth = await verifyAdminToken(request, env);
+        if (!adminAuth.valid) {
+          return jsonResponse({ error: "Unauthorized" }, 401);
+        }
+
+        var users = await getUserList(env);
+        return jsonResponse({ users: users }, 200);
+      } catch (err) {
+        return jsonResponse({ error: err.message || "Failed to get users" }, 500);
+      }
+    }
+
+    // ============ CHAT ENDPOINT ============
+
+    if (url.pathname === "/api/chat" && request.method === "POST") {
+      try {
+        // Verify user authentication (bot protection)
+        var authResult = await verifyUserToken(request, env);
+        if (!authResult.valid) {
+          return jsonResponse({ error: "Authentication required. Please sign in." }, 401);
+        }
+
+        var userEmail = authResult.email;
+        var body = await request.json().catch(function () { return {}; });
+        var model = body.model;
+        var messages = Array.isArray(body.messages) ? body.messages : [];
+
+        // Check model access
+        var paidModels = ["claude", "gpt", "grok", "perplexity"];
+        var isAdmin = userEmail === env.ADMIN_EMAIL;
+
+        if (paidModels.indexOf(model) >= 0 && !isAdmin) {
+          return jsonResponse({ error: "This model requires admin access." }, 403);
+        }
+
+        if (!messages.length) {
+          return jsonResponse({ error: "No messages provided" }, 400);
+        }
+
+        // Clean/normalize messages
+        var cleaned = messages
+          .filter(function (m) { return m && typeof m.content === "string" && m.content.trim().length > 0; })
+          .map(function (m) {
+            return {
+              role: m.role === "assistant" ? "assistant" : "user",
+              content: m.content.trim()
+            };
+          });
+
+        if (!cleaned.length) {
+          return jsonResponse(
+            { response: "Hey! Looks like your message didn't come through. Try sending something again?" },
+            200
+          );
+        }
+
+        if (cleaned[cleaned.length - 1].role !== "user") {
+          return jsonResponse(
+            { error: "Last message must be from user. Try again." },
+            400
+          );
+        }
+
+        // Log analytics (anonymized - no message content)
+        await logAnalytics(env, {
+          type: "message",
+          userHash: hashEmail(userEmail),
+          model: model,
+          timestamp: Date.now()
+        });
+
+        var responseText;
+
+        switch (model) {
+          case "gemini":
+            responseText = await handleGemini(cleaned, env);
+            break;
+          case "claude":
+            responseText = await handleClaude(cleaned, env);
+            break;
+          case "gpt":
+            responseText = await handleGPT(cleaned, env);
+            break;
+          case "grok":
+            responseText = await handleGrok(cleaned, env);
+            break;
+          case "perplexity":
+            responseText = await handlePerplexity(cleaned, env);
+            break;
+          default:
+            return jsonResponse({ error: "Unknown model: " + model }, 400);
+        }
+
+        return jsonResponse({ response: responseText }, 200);
+      } catch (err) {
+        var errMsg = err && err.message ? err.message : "Server error";
+        return jsonResponse({ error: errMsg }, 500);
+      }
+    }
+
+    // ============ USER REGISTRATION ============
+
+    // POST /api/auth/register - Track user signup
+    if (url.pathname === "/api/auth/register" && request.method === "POST") {
+      try {
+        var authResult = await verifyUserToken(request, env);
+        if (!authResult.valid) {
+          return jsonResponse({ error: "Invalid token" }, 401);
+        }
+
+        await logAnalytics(env, {
+          type: "signup",
+          userHash: hashEmail(authResult.email),
+          timestamp: Date.now()
+        });
+
+        // Store user in KV (just email + signup date, no content)
+        await storeUser(env, authResult.email);
+
+        return jsonResponse({ success: true }, 200);
+      } catch (err) {
+        return jsonResponse({ error: err.message || "Registration failed" }, 500);
+      }
+    }
+
+    // ============ USER DATA PERSISTENCE ============
+
+    // GET /api/user/data - Load user's saved data (chat history, settings, goals)
+    if (url.pathname === "/api/user/data" && request.method === "GET") {
+      try {
+        var authResult = await verifyUserToken(request, env);
+        if (!authResult.valid) {
+          return jsonResponse({ error: "Authentication required" }, 401);
+        }
+
+        var userData = await getUserData(env, authResult.email);
+        return jsonResponse({ data: userData }, 200);
+      } catch (err) {
+        return jsonResponse({ error: err.message || "Failed to load data" }, 500);
+      }
+    }
+
+    // POST /api/user/data - Save user's data
+    if (url.pathname === "/api/user/data" && request.method === "POST") {
+      try {
+        var authResult = await verifyUserToken(request, env);
+        if (!authResult.valid) {
+          return jsonResponse({ error: "Authentication required" }, 401);
+        }
+
+        var body = await request.json().catch(function () { return {}; });
+        await saveUserData(env, authResult.email, body);
+        return jsonResponse({ success: true }, 200);
+      } catch (err) {
+        return jsonResponse({ error: err.message || "Failed to save data" }, 500);
+      }
+    }
+
+    // ============ APPOINTMENT PARSE ENDPOINT ============
+    // POST /api/appointments/structure
+    if (url.pathname === "/api/appointments/structure" && request.method === "POST") {
+      var bodyForFallback = {};
+      try {
+        // Require sign-in (same as /api/chat)
+        var authResult2 = await verifyUserToken(request, env);
+        if (!authResult2.valid) {
+          return jsonResponse({ error: "Authentication required" }, 401);
+        }
+
+        var body = await request.json().catch(function () { return {}; });
+        bodyForFallback = body || {};
+
+        var rawText = typeof body.rawText === "string" ? body.rawText : "";
+        var fixesText = typeof body.fixesText === "string" ? body.fixesText : "";
+        var mode = body.mode === "fix" ? "fix" : "parse";
+
+        if (!rawText.trim()) {
+          return jsonResponse({ error: "rawText is required" }, 400);
+        }
+
+        var appt = await handlePerplexityAppointment(rawText, fixesText, mode, env);
+        return jsonResponse(appt, 200);
+      } catch (err) {
+        var fallback = heuristicAppointment(
+          typeof bodyForFallback.rawText === "string" ? bodyForFallback.rawText : ""
+        );
+        return jsonResponse(
+          {
+            ...fallback,
+            error: err && err.message ? err.message : "Failed to parse appointment"
+          },
+          200
+        );
+      }
+    }
+
+    // ============ YOUTUBE ENDPOINTS ============
+
+    // GET /api/youtube/resolve-channel?q=<input>
+    if (url.pathname === "/api/youtube/resolve-channel" && request.method === "GET") {
+      var q = url.searchParams.get("q");
+      if (!q || !q.trim()) {
+        return jsonResponse({ error: "Missing q query parameter." }, 400);
+      }
+      if (!env.YOUTUBE_API_KEY) {
+        return jsonResponse({ error: "Server missing YOUTUBE_API_KEY." }, 500);
+      }
+
+      var trimmedQuery = q.trim();
+      var directMatch = trimmedQuery.match(/\/channel\/(UC[a-zA-Z0-9_-]{20,})/);
+      if (directMatch) {
+        return jsonResponseWithHeaders(
+          {
+            channelId: directMatch[1],
+            channelTitle: "",
+            channelUrl: "https://www.youtube.com/channel/" + directMatch[1]
+          },
+          200,
+          { "Cache-Control": "public, max-age=600" }
+        );
+      }
+
+      var normalized = normalizeChannelQuery(trimmedQuery);
+      var searchUrl =
+        "https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&maxResults=1&q=" +
+        encodeURIComponent(normalized.query) +
+        "&key=" +
+        encodeURIComponent(env.YOUTUBE_API_KEY);
+      var searchResult = await fetchJson(searchUrl);
+      if (!searchResult.response.ok) {
+        return jsonResponse({ error: "YouTube API error." }, 502);
+      }
+      var items = Array.isArray(searchResult.data.items) ? searchResult.data.items : [];
+      if (items.length === 0) {
+        return jsonResponse({ error: "Channel not found." }, 404);
+      }
+      var item = items[0];
+      var channelId = item && item.id ? item.id.channelId : "";
+      var channelTitle = item && item.snippet ? item.snippet.title || "" : "";
+      var channelUrl = normalized.handle
+        ? "https://www.youtube.com/@" + normalized.handle
+        : "https://www.youtube.com/channel/" + channelId;
+
+      return jsonResponseWithHeaders(
+        {
+          channelId: channelId,
+          channelTitle: channelTitle,
+          channelUrl: channelUrl
+        },
+        200,
+        { "Cache-Control": "public, max-age=600" }
       );
     }
 
-    if (cleaned[cleaned.length - 1].role !== "user") {
-      return jsonResponse(
-        { error: "Last message must be from user. Try again." },
-        400
+    // GET /api/youtube/channel-latest?channelId=<UC...>&limit=12
+    if (url.pathname === "/api/youtube/channel-latest" && request.method === "GET") {
+      var channelIdParam = url.searchParams.get("channelId");
+      if (!channelIdParam || !channelIdParam.trim()) {
+        return jsonResponse({ error: "Missing channelId query parameter." }, 400);
+      }
+      if (!env.YOUTUBE_API_KEY) {
+        return jsonResponse({ error: "Server missing YOUTUBE_API_KEY." }, 500);
+      }
+
+      var limitParam = parseInt(url.searchParams.get("limit"), 10);
+      if (!limitParam || limitParam < 1) limitParam = 12;
+      if (limitParam > 30) limitParam = 30;
+
+      var channelsUrl =
+        "https://www.googleapis.com/youtube/v3/channels?part=snippet,contentDetails&id=" +
+        encodeURIComponent(channelIdParam) +
+        "&key=" +
+        encodeURIComponent(env.YOUTUBE_API_KEY);
+      var channelResult = await fetchJson(channelsUrl);
+      if (!channelResult.response.ok) {
+        return jsonResponse({ error: "YouTube API error." }, 502);
+      }
+      var channelItems = Array.isArray(channelResult.data.items) ? channelResult.data.items : [];
+      if (channelItems.length === 0) {
+        return jsonResponse({ error: "Channel not found." }, 404);
+      }
+      var channel = channelItems[0];
+      var channelTitle = channel && channel.snippet ? channel.snippet.title || "" : "";
+      var uploadsId =
+        channel &&
+        channel.contentDetails &&
+        channel.contentDetails.relatedPlaylists &&
+        channel.contentDetails.relatedPlaylists.uploads
+          ? channel.contentDetails.relatedPlaylists.uploads
+          : "";
+
+      if (!uploadsId) {
+        return jsonResponse({ error: "YouTube API error." }, 502);
+      }
+
+      var playlistUrl =
+        "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=" +
+        encodeURIComponent(uploadsId) +
+        "&maxResults=" +
+        encodeURIComponent(limitParam) +
+        "&key=" +
+        encodeURIComponent(env.YOUTUBE_API_KEY);
+      var playlistResult = await fetchJson(playlistUrl);
+      if (!playlistResult.response.ok) {
+        return jsonResponse({ error: "YouTube API error." }, 502);
+      }
+
+      var playlistItems = Array.isArray(playlistResult.data.items) ? playlistResult.data.items : [];
+      var videos = playlistItems
+        .map(function (item) {
+          var snippet = item.snippet || {};
+          var resourceId = snippet.resourceId || {};
+          var videoId = resourceId.videoId || "";
+          if (!videoId) return null;
+          return {
+            videoId: videoId,
+            title: snippet.title || "",
+            publishedAt: snippet.publishedAt || "",
+            thumbnail: selectBestThumbnail(snippet.thumbnails || {}),
+            url: "https://www.youtube.com/watch?v=" + videoId
+          };
+        })
+        .filter(function (item) {
+          return item;
+        });
+
+      return jsonResponseWithHeaders(
+        {
+          channel: {
+            channelId: channelIdParam,
+            channelTitle: channelTitle,
+            channelUrl: "https://www.youtube.com/channel/" + channelIdParam
+          },
+          videos: videos
+        },
+        200,
+        { "Cache-Control": "public, max-age=600" }
       );
     }
 
-    // Log analytics (anonymized - no message content)
-    await logAnalytics(env, {
-      type: "message",
-      userHash: hashEmail(userEmail),
-      model: model,
-      timestamp: Date.now()
-    });
+    // GET /api/youtube/channel-sample?channelId=<UC...>&pool=50
+    if (url.pathname === "/api/youtube/channel-sample" && request.method === "GET") {
+      var channelIdSample = url.searchParams.get("channelId");
+      if (!channelIdSample || !channelIdSample.trim()) {
+        return jsonResponse({ error: "Missing channelId query parameter." }, 400);
+      }
+      if (!env.YOUTUBE_API_KEY) {
+        return jsonResponse({ error: "Server missing YOUTUBE_API_KEY." }, 500);
+      }
 
-    var responseText;
+      var poolParam = parseInt(url.searchParams.get("pool"), 10);
+      if (!poolParam || poolParam < 1) poolParam = 50;
+      if (poolParam > 50) poolParam = 50;
 
-    switch (model) {
-      case "gemini":
-        responseText = await handleGemini(cleaned, env);
-        break;
-      case "claude":
-        responseText = await handleClaude(cleaned, env);
-        break;
-      case "gpt":
-        responseText = await handleGPT(cleaned, env);
-        break;
-      case "grok":
-        responseText = await handleGrok(cleaned, env);
-        break;
-      case "perplexity":
-        responseText = await handlePerplexity(cleaned, env);
-        break;
-      default:
-        return jsonResponse({ error: "Unknown model: " + model }, 400);
+      var channelsSampleUrl =
+        "https://www.googleapis.com/youtube/v3/channels?part=snippet,contentDetails&id=" +
+        encodeURIComponent(channelIdSample) +
+        "&key=" +
+        encodeURIComponent(env.YOUTUBE_API_KEY);
+      var channelSampleResult = await fetchJson(channelsSampleUrl);
+      if (!channelSampleResult.response.ok) {
+        return jsonResponse({ error: "YouTube API error." }, 502);
+      }
+      var channelSampleItems = Array.isArray(channelSampleResult.data.items) ? channelSampleResult.data.items : [];
+      if (channelSampleItems.length === 0) {
+        return jsonResponse({ error: "Channel not found." }, 404);
+      }
+      var channelSample = channelSampleItems[0];
+      var channelSampleTitle = channelSample && channelSample.snippet ? channelSample.snippet.title || "" : "";
+      var uploadsSampleId =
+        channelSample &&
+        channelSample.contentDetails &&
+        channelSample.contentDetails.relatedPlaylists &&
+        channelSample.contentDetails.relatedPlaylists.uploads
+          ? channelSample.contentDetails.relatedPlaylists.uploads
+          : "";
+
+      if (!uploadsSampleId) {
+        return jsonResponse({ error: "YouTube API error." }, 502);
+      }
+
+      var samplePlaylistUrl =
+        "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=" +
+        encodeURIComponent(uploadsSampleId) +
+        "&maxResults=" +
+        encodeURIComponent(poolParam) +
+        "&key=" +
+        encodeURIComponent(env.YOUTUBE_API_KEY);
+      var samplePlaylistResult = await fetchJson(samplePlaylistUrl);
+      if (!samplePlaylistResult.response.ok) {
+        return jsonResponse({ error: "YouTube API error." }, 502);
+      }
+
+      var sampleItems = Array.isArray(samplePlaylistResult.data.items) ? samplePlaylistResult.data.items : [];
+      var sampleVideos = sampleItems
+        .map(function (item) {
+          var snippet = item.snippet || {};
+          var resourceId = snippet.resourceId || {};
+          var videoId = resourceId.videoId || "";
+          if (!videoId) return null;
+          return {
+            videoId: videoId,
+            title: snippet.title || "",
+            publishedAt: snippet.publishedAt || "",
+            thumbnail: selectBestThumbnail(snippet.thumbnails || {}),
+            url: "https://www.youtube.com/watch?v=" + videoId
+          };
+        })
+        .filter(function (item) {
+          return item;
+        });
+
+      return jsonResponseWithHeaders(
+        {
+          channel: {
+            channelId: channelIdSample,
+            channelTitle: channelSampleTitle,
+            channelUrl: "https://www.youtube.com/channel/" + channelIdSample
+          },
+          videos: sampleVideos
+        },
+        200,
+        { "Cache-Control": "public, max-age=600" }
+      );
     }
 
-    return jsonResponse({ response: responseText }, 200);
-  } catch (err) {
-    var errMsg = err && err.message ? err.message : "Server error";
-    return jsonResponse({ error: errMsg }, 500);
+    return new Response("Not Found", { status: 404, headers: corsHeaders() });
   }
-}
-
-// ============ USER REGISTRATION ============
-
-// POST /api/auth/register - Track user signup
-if (url.pathname === "/api/auth/register" && request.method === "POST") {
-  try {
-    var authResult = await verifyUserToken(request, env);
-    if (!authResult.valid) {
-      return jsonResponse({ error: "Invalid token" }, 401);
-    }
-
-    await logAnalytics(env, {
-      type: "signup",
-      userHash: hashEmail(authResult.email),
-      timestamp: Date.now()
-    });
-
-    // Store user in KV (just email + signup date, no content)
-    await storeUser(env, authResult.email);
-
-    return jsonResponse({ success: true }, 200);
-  } catch (err) {
-    return jsonResponse({ error: err.message || "Registration failed" }, 500);
-  }
-}
-
-// ============ USER DATA PERSISTENCE ============
-
-// GET /api/user/data - Load user's saved data (chat history, settings, goals)
-if (url.pathname === "/api/user/data" && request.method === "GET") {
-  try {
-    var authResult = await verifyUserToken(request, env);
-    if (!authResult.valid) {
-      return jsonResponse({ error: "Authentication required" }, 401);
-    }
-
-    var userData = await getUserData(env, authResult.email);
-    return jsonResponse({ data: userData }, 200);
-  } catch (err) {
-    return jsonResponse({ error: err.message || "Failed to load data" }, 500);
-  }
-}
-
-// POST /api/user/data - Save user's data
-if (url.pathname === "/api/user/data" && request.method === "POST") {
-  try {
-    var authResult = await verifyUserToken(request, env);
-    if (!authResult.valid) {
-      return jsonResponse({ error: "Authentication required" }, 401);
-    }
-
-    var body = await request.json().catch(function() { return {}; });
-    await saveUserData(env, authResult.email, body);
-    return jsonResponse({ success: true }, 200);
-  } catch (err) {
-    return jsonResponse({ error: err.message || "Failed to save data" }, 500);
-  }
-}
-
-// ============ YOUTUBE ENDPOINTS ============
-
-// GET /api/youtube/resolve-channel?q=<input>
-if (url.pathname === "/api/youtube/resolve-channel" && request.method === "GET") {
-  var q = url.searchParams.get("q");
-  if (!q || !q.trim()) {
-    return jsonResponse({ error: "Missing q query parameter." }, 400);
-  }
-  if (!env.YOUTUBE_API_KEY) {
-    return jsonResponse({ error: "Server missing YOUTUBE_API_KEY." }, 500);
-  }
-
-  var trimmedQuery = q.trim();
-  var directMatch = trimmedQuery.match(/\/channel\/(UC[a-zA-Z0-9_-]{20,})/);
-  if (directMatch) {
-    return jsonResponseWithHeaders(
-      {
-        channelId: directMatch[1],
-        channelTitle: "",
-        channelUrl: "https://www.youtube.com/channel/" + directMatch[1]
-      },
-      200,
-      { "Cache-Control": "public, max-age=600" }
-    );
-  }
-
-  var normalized = normalizeChannelQuery(trimmedQuery);
-  var searchUrl =
-    "https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&maxResults=1&q=" +
-    encodeURIComponent(normalized.query) +
-    "&key=" +
-    encodeURIComponent(env.YOUTUBE_API_KEY);
-  var searchResult = await fetchJson(searchUrl);
-  if (!searchResult.response.ok) {
-    return jsonResponse({ error: "YouTube API error." }, 502);
-  }
-  var items = Array.isArray(searchResult.data.items) ? searchResult.data.items : [];
-  if (items.length === 0) {
-    return jsonResponse({ error: "Channel not found." }, 404);
-  }
-  var item = items[0];
-  var channelId = item && item.id ? item.id.channelId : "";
-  var channelTitle = item && item.snippet ? item.snippet.title || "" : "";
-  var channelUrl = normalized.handle
-    ? "https://www.youtube.com/@" + normalized.handle
-    : "https://www.youtube.com/channel/" + channelId;
-
-  return jsonResponseWithHeaders(
-    {
-      channelId: channelId,
-      channelTitle: channelTitle,
-      channelUrl: channelUrl
-    },
-    200,
-    { "Cache-Control": "public, max-age=600" }
-  );
-}
-
-// GET /api/youtube/channel-latest?channelId=<UC...>&limit=12
-if (url.pathname === "/api/youtube/channel-latest" && request.method === "GET") {
-  var channelIdParam = url.searchParams.get("channelId");
-  if (!channelIdParam || !channelIdParam.trim()) {
-    return jsonResponse({ error: "Missing channelId query parameter." }, 400);
-  }
-  if (!env.YOUTUBE_API_KEY) {
-    return jsonResponse({ error: "Server missing YOUTUBE_API_KEY." }, 500);
-  }
-
-  var limitParam = parseInt(url.searchParams.get("limit"), 10);
-  if (!limitParam || limitParam < 1) limitParam = 12;
-  if (limitParam > 30) limitParam = 30;
-
-  var channelsUrl =
-    "https://www.googleapis.com/youtube/v3/channels?part=snippet,contentDetails&id=" +
-    encodeURIComponent(channelIdParam) +
-    "&key=" +
-    encodeURIComponent(env.YOUTUBE_API_KEY);
-  var channelResult = await fetchJson(channelsUrl);
-  if (!channelResult.response.ok) {
-    return jsonResponse({ error: "YouTube API error." }, 502);
-  }
-  var channelItems = Array.isArray(channelResult.data.items) ? channelResult.data.items : [];
-  if (channelItems.length === 0) {
-    return jsonResponse({ error: "Channel not found." }, 404);
-  }
-  var channel = channelItems[0];
-  var channelTitle = channel && channel.snippet ? channel.snippet.title || "" : "";
-  var uploadsId =
-    channel &&
-    channel.contentDetails &&
-    channel.contentDetails.relatedPlaylists &&
-    channel.contentDetails.relatedPlaylists.uploads
-      ? channel.contentDetails.relatedPlaylists.uploads
-      : "";
-
-  if (!uploadsId) {
-    return jsonResponse({ error: "YouTube API error." }, 502);
-  }
-
-  var playlistUrl =
-    "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=" +
-    encodeURIComponent(uploadsId) +
-    "&maxResults=" +
-    encodeURIComponent(limitParam) +
-    "&key=" +
-    encodeURIComponent(env.YOUTUBE_API_KEY);
-  var playlistResult = await fetchJson(playlistUrl);
-  if (!playlistResult.response.ok) {
-    return jsonResponse({ error: "YouTube API error." }, 502);
-  }
-
-  var playlistItems = Array.isArray(playlistResult.data.items) ? playlistResult.data.items : [];
-  var videos = playlistItems
-    .map(function(item) {
-      var snippet = item.snippet || {};
-      var resourceId = snippet.resourceId || {};
-      var videoId = resourceId.videoId || "";
-      if (!videoId) return null;
-      return {
-        videoId: videoId,
-        title: snippet.title || "",
-        publishedAt: snippet.publishedAt || "",
-        thumbnail: selectBestThumbnail(snippet.thumbnails || {}),
-        url: "https://www.youtube.com/watch?v=" + videoId
-      };
-    })
-    .filter(function(item) {
-      return item;
-    });
-
-  return jsonResponseWithHeaders(
-    {
-      channel: {
-        channelId: channelIdParam,
-        channelTitle: channelTitle,
-        channelUrl: "https://www.youtube.com/channel/" + channelIdParam
-      },
-      videos: videos
-    },
-    200,
-    { "Cache-Control": "public, max-age=600" }
-  );
-}
-
-// GET /api/youtube/channel-sample?channelId=<UC...>&pool=50
-if (url.pathname === "/api/youtube/channel-sample" && request.method === "GET") {
-  var channelIdSample = url.searchParams.get("channelId");
-  if (!channelIdSample || !channelIdSample.trim()) {
-    return jsonResponse({ error: "Missing channelId query parameter." }, 400);
-  }
-  if (!env.YOUTUBE_API_KEY) {
-    return jsonResponse({ error: "Server missing YOUTUBE_API_KEY." }, 500);
-  }
-
-  var poolParam = parseInt(url.searchParams.get("pool"), 10);
-  if (!poolParam || poolParam < 1) poolParam = 50;
-  if (poolParam > 50) poolParam = 50;
-
-  var channelsSampleUrl =
-    "https://www.googleapis.com/youtube/v3/channels?part=snippet,contentDetails&id=" +
-    encodeURIComponent(channelIdSample) +
-    "&key=" +
-    encodeURIComponent(env.YOUTUBE_API_KEY);
-  var channelSampleResult = await fetchJson(channelsSampleUrl);
-  if (!channelSampleResult.response.ok) {
-    return jsonResponse({ error: "YouTube API error." }, 502);
-  }
-  var channelSampleItems = Array.isArray(channelSampleResult.data.items) ? channelSampleResult.data.items : [];
-  if (channelSampleItems.length === 0) {
-    return jsonResponse({ error: "Channel not found." }, 404);
-  }
-  var channelSample = channelSampleItems[0];
-  var channelSampleTitle = channelSample && channelSample.snippet ? channelSample.snippet.title || "" : "";
-  var uploadsSampleId =
-    channelSample &&
-    channelSample.contentDetails &&
-    channelSample.contentDetails.relatedPlaylists &&
-    channelSample.contentDetails.relatedPlaylists.uploads
-      ? channelSample.contentDetails.relatedPlaylists.uploads
-      : "";
-
-  if (!uploadsSampleId) {
-    return jsonResponse({ error: "YouTube API error." }, 502);
-  }
-
-  var samplePlaylistUrl =
-    "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=" +
-    encodeURIComponent(uploadsSampleId) +
-    "&maxResults=" +
-    encodeURIComponent(poolParam) +
-    "&key=" +
-    encodeURIComponent(env.YOUTUBE_API_KEY);
-  var samplePlaylistResult = await fetchJson(samplePlaylistUrl);
-  if (!samplePlaylistResult.response.ok) {
-    return jsonResponse({ error: "YouTube API error." }, 502);
-  }
-
-  var sampleItems = Array.isArray(samplePlaylistResult.data.items) ? samplePlaylistResult.data.items : [];
-  var sampleVideos = sampleItems
-    .map(function(item) {
-      var snippet = item.snippet || {};
-      var resourceId = snippet.resourceId || {};
-      var videoId = resourceId.videoId || "";
-      if (!videoId) return null;
-      return {
-        videoId: videoId,
-        title: snippet.title || "",
-        publishedAt: snippet.publishedAt || "",
-        thumbnail: selectBestThumbnail(snippet.thumbnails || {}),
-        url: "https://www.youtube.com/watch?v=" + videoId
-      };
-    })
-    .filter(function(item) {
-      return item;
-    });
-
-  return jsonResponseWithHeaders(
-    {
-      channel: {
-        channelId: channelIdSample,
-        channelTitle: channelSampleTitle,
-        channelUrl: "https://www.youtube.com/channel/" + channelIdSample
-      },
-      videos: sampleVideos
-    },
-    200,
-    { "Cache-Control": "public, max-age=600" }
-  );
-}
-
-return new Response("Not Found", { status: 404, headers: corsHeaders() });
-
-}
 };
+
+// =====================
+// CORS + RESPONSES
+// =====================
 
 function corsHeaders() {
-return {
-"Access-Control-Allow-Origin": "*",
-"Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-"Access-Control-Allow-Headers": "Content-Type, Authorization"
-};
+  return {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization"
+  };
 }
 
 function jsonResponse(data, status) {
-if (!status) status = 200;
-var headers = {
-"Content-Type": "application/json",
-"Access-Control-Allow-Origin": "*",
-"Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-"Access-Control-Allow-Headers": "Content-Type, Authorization"
-};
-return new Response(JSON.stringify(data), {
-status: status,
-headers: headers
-});
+  if (!status) status = 200;
+  var headers = {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization"
+  };
+  return new Response(JSON.stringify(data), {
+    status: status,
+    headers: headers
+  });
 }
 
 function jsonResponseWithHeaders(data, status, extraHeaders) {
-var headers = {
-"Content-Type": "application/json",
-"Access-Control-Allow-Origin": "*",
-"Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-"Access-Control-Allow-Headers": "Content-Type, Authorization"
-};
-var merged = Object.assign({}, headers, extraHeaders || {});
-return new Response(JSON.stringify(data), {
-status: status || 200,
-headers: merged
-});
+  var headers = {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization"
+  };
+  var merged = Object.assign({}, headers, extraHeaders || {});
+  return new Response(JSON.stringify(data), {
+    status: status || 200,
+    headers: merged
+  });
 }
+
+// =====================
+// YOUTUBE HELPERS
+// =====================
 
 function normalizeChannelQuery(input) {
-var trimmed = input.trim();
-var handle = "";
-var query = trimmed;
+  var trimmed = input.trim();
+  var handle = "";
+  var query = trimmed;
 
-if (trimmed.startsWith("@")) {
-handle = trimmed.slice(1);
-}
+  if (trimmed.startsWith("@")) {
+    handle = trimmed.slice(1);
+  }
 
-if (!handle && /^https?:\/\//i.test(trimmed)) {
-try {
-var parsed = new URL(trimmed);
-var path = (parsed.pathname || "").replace(/\/+$/, "");
-if (path) {
-var segments = path.split("/").filter(function(segment) {
-return segment;
-});
-if (segments.length > 0) {
-var last = segments[segments.length - 1];
-query = last;
-if (last.startsWith("@")) {
-handle = last.slice(1);
-}
-}
-}
-} catch (err) {
-query = trimmed;
-}
-}
+  if (!handle && /^https?:\/\//i.test(trimmed)) {
+    try {
+      var parsed = new URL(trimmed);
+      var path = (parsed.pathname || "").replace(/\/+$/, "");
+      if (path) {
+        var segments = path.split("/").filter(function (segment) {
+          return segment;
+        });
+        if (segments.length > 0) {
+          var last = segments[segments.length - 1];
+          query = last;
+          if (last.startsWith("@")) {
+            handle = last.slice(1);
+          }
+        }
+      }
+    } catch (err) {
+      query = trimmed;
+    }
+  }
 
-if (handle) {
-return { handle: handle, query: handle };
-}
+  if (handle) {
+    return { handle: handle, query: handle };
+  }
 
-return { handle: "", query: query.replace(/^@/, "") };
+  return { handle: "", query: query.replace(/^@/, "") };
 }
 
 function selectBestThumbnail(thumbnails) {
-if (thumbnails.maxres && thumbnails.maxres.url) return thumbnails.maxres.url;
-if (thumbnails.standard && thumbnails.standard.url) return thumbnails.standard.url;
-if (thumbnails.high && thumbnails.high.url) return thumbnails.high.url;
-if (thumbnails.medium && thumbnails.medium.url) return thumbnails.medium.url;
-if (thumbnails.default && thumbnails.default.url) return thumbnails.default.url;
-return "";
+  if (thumbnails.maxres && thumbnails.maxres.url) return thumbnails.maxres.url;
+  if (thumbnails.standard && thumbnails.standard.url) return thumbnails.standard.url;
+  if (thumbnails.high && thumbnails.high.url) return thumbnails.high.url;
+  if (thumbnails.medium && thumbnails.medium.url) return thumbnails.medium.url;
+  if (thumbnails.default && thumbnails.default.url) return thumbnails.default.url;
+  return "";
 }
 
 async function fetchJson(url) {
-var response = await fetch(url);
-var data = await response.json().catch(function() { return {}; });
-return { response: response, data: data };
+  var response = await fetch(url);
+  var data = await response.json().catch(function () { return {}; });
+  return { response: response, data: data };
 }
 
-// ============ MODEL HANDLERS ============
+// =====================
+// MODEL HANDLERS
+// =====================
 
 async function handleGemini(messages, env) {
-var apiKey = env.GEMINI_API_KEY;
-if (!apiKey) throw new Error("Gemini API key not configured");
+  var apiKey = env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error("Gemini API key not configured");
 
-var contents = messages.map(function(m) {
-return {
-role: m.role === "assistant" ? "model" : "user",
-parts: [{ text: m.content }]
-};
-});
+  var contents = messages.map(function (m) {
+    return {
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }]
+    };
+  });
 
-var endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + encodeURIComponent(apiKey);
+  var endpoint =
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" +
+    encodeURIComponent(apiKey);
 
-var res = await fetch(endpoint, {
-method: "POST",
-headers: { "Content-Type": "application/json" },
-body: JSON.stringify({
-contents: contents,
-generationConfig: {
-temperature: 0.9,
-topP: 0.95,
-maxOutputTokens: 2048
-}
-})
-});
+  var res = await fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: contents,
+      generationConfig: {
+        temperature: 0.9,
+        topP: 0.95,
+        maxOutputTokens: 2048
+      }
+    })
+  });
 
-var text = await res.text();
-if (!res.ok) {
-throw new Error("Gemini API error: " + text);
-}
+  var text = await res.text();
+  if (!res.ok) {
+    throw new Error("Gemini API error: " + text);
+  }
 
-var data = JSON.parse(text);
-var out = data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
-if (!out) throw new Error("No valid response text from Gemini.");
-return out;
+  var data = JSON.parse(text);
+  var out =
+    data &&
+    data.candidates &&
+    data.candidates[0] &&
+    data.candidates[0].content &&
+    data.candidates[0].content.parts &&
+    data.candidates[0].content.parts[0] &&
+    data.candidates[0].content.parts[0].text;
+  if (!out) throw new Error("No valid response text from Gemini.");
+  return out;
 }
 
 async function handleClaude(messages, env) {
-var apiKey = env.ANTHROPIC_API_KEY;
-if (!apiKey) throw new Error("Claude API key not configured");
+  var apiKey = env.ANTHROPIC_API_KEY;
+  if (!apiKey) throw new Error("Claude API key not configured");
 
-var res = await fetch("https://api.anthropic.com/v1/messages", {
-method: "POST",
-headers: {
-"Content-Type": "application/json",
-"x-api-key": apiKey,
-"anthropic-version": "2023-06-01"
-},
-body: JSON.stringify({
-model: "claude-sonnet-4-20250514",
-max_tokens: 2048,
-messages: messages.map(function(m) {
-return { role: m.role, content: m.content };
-})
-})
-});
+  var res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01"
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 2048,
+      messages: messages.map(function (m) {
+        return { role: m.role, content: m.content };
+      })
+    })
+  });
 
-var data = await res.json().catch(function() { return {}; });
-if (!res.ok) {
-throw new Error("Claude API error: " + JSON.stringify(data));
-}
+  var data = await res.json().catch(function () { return {}; });
+  if (!res.ok) {
+    throw new Error("Claude API error: " + JSON.stringify(data));
+  }
 
-var out = data && data.content && data.content[0] && data.content[0].text;
-if (!out) throw new Error("No valid response text from Claude.");
-return out;
+  var out = data && data.content && data.content[0] && data.content[0].text;
+  if (!out) throw new Error("No valid response text from Claude.");
+  return out;
 }
 
 async function handleGPT(messages, env) {
-var apiKey = env.OPENAI_API_KEY;
-if (!apiKey) throw new Error("OpenAI API key not configured");
+  var apiKey = env.OPENAI_API_KEY;
+  if (!apiKey) throw new Error("OpenAI API key not configured");
 
-var res = await fetch("https://api.openai.com/v1/chat/completions", {
-method: "POST",
-headers: {
-"Content-Type": "application/json",
-"Authorization": "Bearer " + apiKey
-},
-body: JSON.stringify({
-model: "gpt-4o",
-temperature: 0.7,
-messages: messages.map(function(m) {
-return { role: m.role, content: m.content };
-})
-})
-});
+  var res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + apiKey
+    },
+    body: JSON.stringify({
+      model: "gpt-4o",
+      temperature: 0.7,
+      messages: messages.map(function (m) {
+        return { role: m.role, content: m.content };
+      })
+    })
+  });
 
-var data = await res.json().catch(function() { return {}; });
-if (!res.ok) {
-throw new Error("OpenAI API error: " + JSON.stringify(data));
-}
+  var data = await res.json().catch(function () { return {}; });
+  if (!res.ok) {
+    throw new Error("OpenAI API error: " + JSON.stringify(data));
+  }
 
-var out = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
-if (!out) throw new Error("No valid response text from GPT-4o.");
-return out;
+  var out =
+    data &&
+    data.choices &&
+    data.choices[0] &&
+    data.choices[0].message &&
+    data.choices[0].message.content;
+  if (!out) throw new Error("No valid response text from GPT-4o.");
+  return out;
 }
 
 async function handleGrok(messages, env) {
-var apiKey = env.XAI_API_KEY;
-if (!apiKey) throw new Error("Grok API key not configured");
+  var apiKey = env.XAI_API_KEY;
+  if (!apiKey) throw new Error("Grok API key not configured");
 
-var res = await fetch("https://api.x.ai/v1/chat/completions", {
-method: "POST",
-headers: {
-"Content-Type": "application/json",
-"Authorization": "Bearer " + apiKey
-},
-body: JSON.stringify({
-model: "grok-3",
-temperature: 0.7,
-messages: messages.map(function(m) {
-return { role: m.role, content: m.content };
-})
-})
-});
+  var res = await fetch("https://api.x.ai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + apiKey
+    },
+    body: JSON.stringify({
+      model: "grok-3",
+      temperature: 0.7,
+      messages: messages.map(function (m) {
+        return { role: m.role, content: m.content };
+      })
+    })
+  });
 
-var data = await res.json().catch(function() { return {}; });
-if (!res.ok) {
-throw new Error("Grok API error: " + JSON.stringify(data));
-}
+  var data = await res.json().catch(function () { return {}; });
+  if (!res.ok) {
+    throw new Error("Grok API error: " + JSON.stringify(data));
+  }
 
-var out = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
-if (!out) throw new Error("No valid response text from Grok.");
-return out;
+  var out =
+    data &&
+    data.choices &&
+    data.choices[0] &&
+    data.choices[0].message &&
+    data.choices[0].message.content;
+  if (!out) throw new Error("No valid response text from Grok.");
+  return out;
 }
 
 async function handlePerplexity(messages, env) {
-var apiKey = env.PERPLEXITY_API_KEY;
-if (!apiKey) throw new Error("Perplexity API key not configured");
+  var apiKey = env.PERPLEXITY_API_KEY;
+  if (!apiKey) throw new Error("Perplexity API key not configured");
 
-// Perplexity requires strict alternation: user, assistant, user, assistant
-// Merge consecutive same-role messages
-var alternating = [];
-for (var i = 0; i < messages.length; i++) {
-var msg = messages[i];
-if (alternating.length === 0) {
-alternating.push({ role: msg.role, content: msg.content });
-} else {
-var last = alternating[alternating.length - 1];
-if (last.role === msg.role) {
-// Merge consecutive same-role messages
-last.content += "\n\n" + msg.content;
-} else {
-alternating.push({ role: msg.role, content: msg.content });
-}
-}
-}
-
-// Add system message to request full URLs in response
-var messagesWithSystem = [
-{
-role: "system",
-content: "You are a helpful assistant. Always include a 'Sources:' section at the end of your response with the full URLs of the websites you referenced, numbered to match your citations."
-}
-].concat(alternating);
-
-var res = await fetch("https://api.perplexity.ai/chat/completions", {
-method: "POST",
-headers: {
-"Content-Type": "application/json",
-"Authorization": "Bearer " + apiKey
-},
-body: JSON.stringify({
-model: "sonar",
-messages: messagesWithSystem
-})
-});
-
-var data = await res.json().catch(function() { return {}; });
-if (!res.ok) {
-throw new Error("Perplexity API error: " + JSON.stringify(data));
-}
-
-var out = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
-if (!out) throw new Error("No valid response text from Perplexity.");
-
-// Also try to append citations from API response if available
-var citations = data.citations;
-if (citations && citations.length > 0 && out.indexOf("Sources:") === -1) {
-out += "\n\nSources:";
-for (var j = 0; j < citations.length; j++) {
-out += "\n[" + (j + 1) + "] " + citations[j];
-}
-}
-
-return out;
-}
-
-// ============ AUTH FUNCTIONS ============
-
-async function verifyUserToken(request, env) {
-var authHeader = request.headers.get("Authorization");
-if (!authHeader || !authHeader.startsWith("Bearer ")) {
-return { valid: false, error: "No token provided" };
-}
-
-var token = authHeader.substring(7);
-
-try {
-// Decode JWT without verification first to get the payload
-var parts = token.split(".");
-if (parts.length !== 3) {
-return { valid: false, error: "Invalid token format" };
-}
-
-var payload = JSON.parse(atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")));
-
-// Check expiration
-if (payload.exp && payload.exp * 1000 < Date.now()) {
-  return { valid: false, error: "Token expired" };
-}
-
-// Check issuer (Google)
-if (payload.iss !== "https://accounts.google.com" && payload.iss !== "accounts.google.com") {
-  return { valid: false, error: "Invalid issuer" };
-}
-
-// Check audience (your client ID)
-if (payload.aud !== env.GOOGLE_CLIENT_ID) {
-  return { valid: false, error: "Invalid audience" };
-}
-
-return { valid: true, email: payload.email, name: payload.name };
-
-} catch (err) {
-return { valid: false, error: "Token verification failed" };
-}
-}
-
-async function verifyAdminToken(request, env) {
-var userAuth = await verifyUserToken(request, env);
-if (!userAuth.valid) {
-return userAuth;
-}
-
-if (userAuth.email !== env.ADMIN_EMAIL) {
-return { valid: false, error: "Admin access required" };
-}
-
-return userAuth;
-}
-
-// ============ ANALYTICS FUNCTIONS ============
-
-function hashEmail(email) {
-// Simple hash for anonymization - not cryptographically secure but good enough for analytics
-var hash = 0;
-for (var i = 0; i < email.length; i++) {
-var char = email.charCodeAt(i);
-hash = ((hash << 5) - hash) + char;
-hash = hash & hash;
-}
-return "user_" + Math.abs(hash).toString(36);
-}
-
-async function logAnalytics(env, data) {
-if (!env.FRICTION_KV) return; // KV namespace not configured
-
-try {
-var today = new Date().toISOString().split("T")[0];
-var key = "analytics:" + today;
-
-var existing = await env.FRICTION_KV.get(key);
-var dayData = existing ? JSON.parse(existing) : { messages: 0, users: {}, models: {}, signups: 0 };
-
-if (data.type === "message") {
-  dayData.messages++;
-  dayData.users[data.userHash] = (dayData.users[data.userHash] || 0) + 1;
-  dayData.models[data.model] = (dayData.models[data.model] || 0) + 1;
-} else if (data.type === "signup") {
-  dayData.signups++;
-}
-
-await env.FRICTION_KV.put(key, JSON.stringify(dayData), { expirationTtl: 90 * 24 * 60 * 60 }); // 90 days
-
-} catch (err) {
-console.error("Analytics error:", err);
-}
-}
-
-async function getAnalyticsStats(env) {
-if (!env.FRICTION_KV) {
-return { error: "Analytics not configured" };
-}
-
-try {
-var stats = {
-today: null,
-last7Days: { messages: 0, uniqueUsers: 0, signups: 0, models: {} },
-last30Days: { messages: 0, uniqueUsers: 0, signups: 0, models: {} }
-};
-
-var allUsers7 = {};
-var allUsers30 = {};
-
-for (var i = 0; i < 30; i++) {
-  var date = new Date();
-  date.setDate(date.getDate() - i);
-  var key = "analytics:" + date.toISOString().split("T")[0];
-  
-  var dayData = await env.FRICTION_KV.get(key);
-  if (dayData) {
-    var parsed = JSON.parse(dayData);
-    
-    if (i === 0) {
-      stats.today = {
-        messages: parsed.messages,
-        uniqueUsers: Object.keys(parsed.users).length,
-        signups: parsed.signups,
-        models: parsed.models
-      };
-    }
-    
-    if (i < 7) {
-      stats.last7Days.messages += parsed.messages;
-      stats.last7Days.signups += parsed.signups;
-      Object.assign(allUsers7, parsed.users);
-      for (var model in parsed.models) {
-        stats.last7Days.models[model] = (stats.last7Days.models[model] || 0) + parsed.models[model];
+  // Perplexity requires strict alternation: user, assistant, user, assistant
+  // Merge consecutive same-role messages
+  var alternating = [];
+  for (var i = 0; i < messages.length; i++) {
+    var msg = messages[i];
+    if (alternating.length === 0) {
+      alternating.push({ role: msg.role, content: msg.content });
+    } else {
+      var last = alternating[alternating.length - 1];
+      if (last.role === msg.role) {
+        // Merge consecutive same-role messages
+        last.content += "\n\n" + msg.content;
+      } else {
+        alternating.push({ role: msg.role, content: msg.content });
       }
     }
-    
-    stats.last30Days.messages += parsed.messages;
-    stats.last30Days.signups += parsed.signups;
-    Object.assign(allUsers30, parsed.users);
-    for (var model in parsed.models) {
-      stats.last30Days.models[model] = (stats.last30Days.models[model] || 0) + parsed.models[model];
+  }
+
+  // Add system message to request full URLs in response
+  var messagesWithSystem = [
+    {
+      role: "system",
+      content:
+        "You are a helpful assistant. Always include a 'Sources:' section at the end of your response with the full URLs of the websites you referenced, numbered to match your citations."
     }
+  ].concat(alternating);
+
+  var res = await fetch("https://api.perplexity.ai/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + apiKey
+    },
+    body: JSON.stringify({
+      model: "sonar",
+      messages: messagesWithSystem
+    })
+  });
+
+  var data = await res.json().catch(function () { return {}; });
+  if (!res.ok) {
+    throw new Error("Perplexity API error: " + JSON.stringify(data));
+  }
+
+  var out =
+    data &&
+    data.choices &&
+    data.choices[0] &&
+    data.choices[0].message &&
+    data.choices[0].message.content;
+  if (!out) throw new Error("No valid response text from Perplexity.");
+
+  // Also try to append citations from API response if available
+  var citations = data.citations;
+  if (citations && citations.length > 0 && out.indexOf("Sources:") === -1) {
+    out += "\n\nSources:";
+    for (var j = 0; j < citations.length; j++) {
+      out += "\n[" + (j + 1) + "] " + citations[j];
+    }
+  }
+
+  return out;
+}
+
+// =====================
+// APPOINTMENT PARSING (Perplexity → strict JSON)
+// =====================
+
+function clampStr(s, maxLen) {
+  if (typeof s !== "string") return "";
+  var t = s.trim();
+  return t.length > maxLen ? t.slice(0, maxLen) : t;
+}
+
+function hasMedicalKeywords(text) {
+  return /\b(dr|doctor|gp|clinic|hospital|medical|specialist|paediatric|appointment)\b/i.test(text || "");
+}
+
+function extractJsonObject(text) {
+  if (typeof text !== "string") return null;
+  var trimmed = text.trim();
+
+  // Already JSON?
+  if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+    try { return JSON.parse(trimmed); } catch (e) { }
+  }
+
+  // Find first {...} block
+  var start = trimmed.indexOf("{");
+  var end = trimmed.lastIndexOf("}");
+  if (start !== -1 && end !== -1 && end > start) {
+    var maybe = trimmed.slice(start, end + 1);
+    try { return JSON.parse(maybe); } catch (e) { }
+  }
+
+  return null;
+}
+
+function normalizeAppointmentFields(obj, rawText) {
+  var rt = (rawText || "").trim();
+
+  var out = {
+    title: clampStr(obj && obj.title, 60),
+    date: clampStr(obj && obj.date, 10), // YYYY-MM-DD
+    time: clampStr(obj && obj.time, 5),  // HH:MM
+    venueName: clampStr(obj && obj.venueName, 80),
+    address: clampStr(obj && obj.address, 140),
+    contactName: clampStr(obj && obj.contactName, 60),
+    phone: clampStr(obj && obj.phone, 30),
+    notes: clampStr(obj && obj.notes, 2000),
+    confidence: obj && obj.confidence ? obj.confidence : { source: "perplexity", score: 0.7 }
+  };
+
+  // Prevent the “whole SMS becomes title/clinic” bug
+  if (out.title && rt && out.title.toLowerCase() === rt.toLowerCase()) out.title = "";
+  if (out.venueName && rt && out.venueName.toLowerCase() === rt.toLowerCase()) out.venueName = "";
+
+  // Default title
+  if (!out.title) out.title = hasMedicalKeywords(rt) ? "Doctor appointment" : "Appointment";
+
+  // Notes must include original raw text
+  if (rt && (!out.notes || out.notes.indexOf(rt) === -1)) {
+    out.notes = out.notes ? out.notes + "\n\nOriginal:\n" + rt : rt;
+  }
+
+  // If venueName looks like a paragraph, drop it
+  if (out.venueName && out.venueName.length > 60 && /[.?!]/.test(out.venueName)) {
+    out.venueName = "";
+  }
+
+  return out;
+}
+
+function heuristicAppointment(rawText) {
+  var t = (rawText || "").trim();
+  var title = hasMedicalKeywords(t) ? "Doctor appointment" : "Appointment";
+
+  // AU-ish phone extraction
+  var phoneMatch =
+    t.match(/(\+61\s?\d{1,2}\s?\d{3,4}\s?\d{3,4})/i) ||
+    t.match(/\b0\d\s?\d{4}\s?\d{4}\b/) ||
+    t.match(/\b04\d{2}\s?\d{3}\s?\d{3}\b/);
+
+  var phone = phoneMatch ? phoneMatch[0].replace(/\s+/g, " ").trim() : "";
+
+  // Date DD/MM/YYYY
+  var dateMatch = t.match(/\b(\d{1,2})\/(\d{1,2})\/(\d{2,4})\b/);
+  var date = "";
+  if (dateMatch) {
+    var dd = parseInt(dateMatch[1], 10);
+    var mo = parseInt(dateMatch[2], 10);
+    var yy = parseInt(dateMatch[3], 10);
+    if (yy < 100) yy += 2000;
+    if (dd >= 1 && dd <= 31 && mo >= 1 && mo <= 12) {
+      date =
+        String(yy).padStart(4, "0") +
+        "-" +
+        String(mo).padStart(2, "0") +
+        "-" +
+        String(dd).padStart(2, "0");
+    }
+  }
+
+  // Time
+  var timeMatch = t.match(/\b(\d{1,2})[:.](\d{2})\s*(am|pm)?\b/i);
+  var time = "";
+  if (timeMatch) {
+    var hh = parseInt(timeMatch[1], 10);
+    var mm = parseInt(timeMatch[2], 10);
+    var ampm = (timeMatch[3] || "").toLowerCase();
+    if (!isNaN(hh) && !isNaN(mm) && mm >= 0 && mm < 60) {
+      if (ampm === "pm" && hh < 12) hh += 12;
+      if (ampm === "am" && hh === 12) hh = 0;
+      time = String(hh).padStart(2, "0") + ":" + String(mm).padStart(2, "0");
+    }
+  }
+
+  return {
+    title: title,
+    date: date,
+    time: time,
+    venueName: "",
+    address: "",
+    contactName: "",
+    phone: phone,
+    notes: t,
+    confidence: { source: "heuristic", score: 0.35 }
+  };
+}
+
+async function handlePerplexityAppointment(rawText, fixesText, mode, env) {
+  var apiKey = env.PERPLEXITY_API_KEY;
+  if (!apiKey) throw new Error("Perplexity API key not configured");
+
+  var system = {
+    role: "system",
+    content:
+      "You extract appointment details. Output STRICT JSON only. No markdown, no commentary, no Sources. " +
+      "Do NOT place the entire raw text into title or venueName. Keep fields short. " +
+      "If uncertain, use empty strings. " +
+      "Return date as YYYY-MM-DD and time as HH:MM (24h) if possible. " +
+      "Always include notes with the original raw text."
+  };
+
+  var user = {
+    role: "user",
+    content:
+      "RAW TEXT:\n" + rawText + "\n\n" +
+      (fixesText && fixesText.trim()
+        ? "USER CORRECTIONS (apply only these; do not overwrite unrelated fields):\n" + fixesText + "\n\n"
+        : "") +
+      "Return JSON with keys: title, date, time, venueName, address, contactName, phone, notes.\n" +
+      "Mode: " + mode
+  };
+
+  var res = await fetch("https://api.perplexity.ai/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + apiKey
+    },
+    body: JSON.stringify({
+      model: "sonar",
+      temperature: 0.2,
+      messages: [system, user]
+    })
+  });
+
+  var data = await res.json().catch(function () { return {}; });
+  if (!res.ok) throw new Error("Perplexity API error: " + JSON.stringify(data));
+
+  var content =
+    data &&
+    data.choices &&
+    data.choices[0] &&
+    data.choices[0].message &&
+    data.choices[0].message.content;
+
+  var obj = extractJsonObject(content || "");
+  if (!obj) {
+    // AI didn't obey JSON-only. Use heuristic.
+    return Object.assign({}, heuristicAppointment(rawText), {
+      confidence: { source: "heuristic_after_ai_nonjson", score: 0.3 }
+    });
+  }
+
+  return normalizeAppointmentFields(obj, rawText);
+}
+
+// =====================
+// AUTH FUNCTIONS
+// =====================
+
+async function verifyUserToken(request, env) {
+  var authHeader = request.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return { valid: false, error: "No token provided" };
+  }
+
+  var token = authHeader.substring(7);
+
+  try {
+    // Decode JWT without verification first to get the payload
+    var parts = token.split(".");
+    if (parts.length !== 3) {
+      return { valid: false, error: "Invalid token format" };
+    }
+
+    var payload = JSON.parse(atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")));
+
+    // Check expiration
+    if (payload.exp && payload.exp * 1000 < Date.now()) {
+      return { valid: false, error: "Token expired" };
+    }
+
+    // Check issuer (Google)
+    if (payload.iss !== "https://accounts.google.com" && payload.iss !== "accounts.google.com") {
+      return { valid: false, error: "Invalid issuer" };
+    }
+
+    // Check audience (your client ID)
+    if (payload.aud !== env.GOOGLE_CLIENT_ID) {
+      return { valid: false, error: "Invalid audience" };
+    }
+
+    return { valid: true, email: payload.email, name: payload.name };
+  } catch (err) {
+    return { valid: false, error: "Token verification failed" };
   }
 }
 
-stats.last7Days.uniqueUsers = Object.keys(allUsers7).length;
-stats.last30Days.uniqueUsers = Object.keys(allUsers30).length;
+async function verifyAdminToken(request, env) {
+  var userAuth = await verifyUserToken(request, env);
+  if (!userAuth.valid) {
+    return userAuth;
+  }
 
-// Get total user count
-var userList = await env.FRICTION_KV.get("users:list");
-stats.totalUsers = userList ? JSON.parse(userList).length : 0;
+  if (userAuth.email !== env.ADMIN_EMAIL) {
+    return { valid: false, error: "Admin access required" };
+  }
 
-return stats;
-
-} catch (err) {
-return { error: err.message };
+  return userAuth;
 }
+
+// =====================
+// ANALYTICS FUNCTIONS
+// =====================
+
+function hashEmail(email) {
+  // Simple hash for anonymization - not cryptographically secure but good enough for analytics
+  var hash = 0;
+  for (var i = 0; i < email.length; i++) {
+    var char = email.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return "user_" + Math.abs(hash).toString(36);
+}
+
+async function logAnalytics(env, data) {
+  if (!env.FRICTION_KV) return; // KV namespace not configured
+
+  try {
+    var today = new Date().toISOString().split("T")[0];
+    var key = "analytics:" + today;
+
+    var existing = await env.FRICTION_KV.get(key);
+    var dayData = existing
+      ? JSON.parse(existing)
+      : { messages: 0, users: {}, models: {}, signups: 0 };
+
+    if (data.type === "message") {
+      dayData.messages++;
+      dayData.users[data.userHash] = (dayData.users[data.userHash] || 0) + 1;
+      dayData.models[data.model] = (dayData.models[data.model] || 0) + 1;
+    } else if (data.type === "signup") {
+      dayData.signups++;
+    }
+
+    await env.FRICTION_KV.put(key, JSON.stringify(dayData), {
+      expirationTtl: 90 * 24 * 60 * 60
+    }); // 90 days
+  } catch (err) {
+    console.error("Analytics error:", err);
+  }
+}
+
+async function getAnalyticsStats(env) {
+  if (!env.FRICTION_KV) {
+    return { error: "Analytics not configured" };
+  }
+
+  try {
+    var stats = {
+      today: null,
+      last7Days: { messages: 0, uniqueUsers: 0, signups: 0, models: {} },
+      last30Days: { messages: 0, uniqueUsers: 0, signups: 0, models: {} }
+    };
+
+    var allUsers7 = {};
+    var allUsers30 = {};
+
+    for (var i = 0; i < 30; i++) {
+      var date = new Date();
+      date.setDate(date.getDate() - i);
+      var key = "analytics:" + date.toISOString().split("T")[0];
+
+      var dayData = await env.FRICTION_KV.get(key);
+      if (dayData) {
+        var parsed = JSON.parse(dayData);
+
+        if (i === 0) {
+          stats.today = {
+            messages: parsed.messages,
+            uniqueUsers: Object.keys(parsed.users).length,
+            signups: parsed.signups,
+            models: parsed.models
+          };
+        }
+
+        if (i < 7) {
+          stats.last7Days.messages += parsed.messages;
+          stats.last7Days.signups += parsed.signups;
+          Object.assign(allUsers7, parsed.users);
+          for (var model in parsed.models) {
+            stats.last7Days.models[model] = (stats.last7Days.models[model] || 0) + parsed.models[model];
+          }
+        }
+
+        stats.last30Days.messages += parsed.messages;
+        stats.last30Days.signups += parsed.signups;
+        Object.assign(allUsers30, parsed.users);
+        for (var model2 in parsed.models) {
+          stats.last30Days.models[model2] = (stats.last30Days.models[model2] || 0) + parsed.models[model2];
+        }
+      }
+    }
+
+    stats.last7Days.uniqueUsers = Object.keys(allUsers7).length;
+    stats.last30Days.uniqueUsers = Object.keys(allUsers30).length;
+
+    // Get total user count
+    var userList = await env.FRICTION_KV.get("users:list");
+    stats.totalUsers = userList ? JSON.parse(userList).length : 0;
+
+    return stats;
+  } catch (err) {
+    return { error: err.message };
+  }
 }
 
 async function storeUser(env, email) {
-if (!env.FRICTION_KV) return;
+  if (!env.FRICTION_KV) return;
 
-try {
-var userList = await env.FRICTION_KV.get("users:list");
-var users = userList ? JSON.parse(userList) : [];
+  try {
+    var userList = await env.FRICTION_KV.get("users:list");
+    var users = userList ? JSON.parse(userList) : [];
 
-var existing = users.find(function(u) { return u.email === email; });
-if (!existing) {
-  users.push({
-    email: email,
-    signupDate: new Date().toISOString(),
-    lastActive: new Date().toISOString()
-  });
-  await env.FRICTION_KV.put("users:list", JSON.stringify(users));
-} else {
-  existing.lastActive = new Date().toISOString();
-  await env.FRICTION_KV.put("users:list", JSON.stringify(users));
-}
-
-} catch (err) {
-console.error("Store user error:", err);
-}
+    var existing = users.find(function (u) { return u.email === email; });
+    if (!existing) {
+      users.push({
+        email: email,
+        signupDate: new Date().toISOString(),
+        lastActive: new Date().toISOString()
+      });
+      await env.FRICTION_KV.put("users:list", JSON.stringify(users));
+    } else {
+      existing.lastActive = new Date().toISOString();
+      await env.FRICTION_KV.put("users:list", JSON.stringify(users));
+    }
+  } catch (err) {
+    console.error("Store user error:", err);
+  }
 }
 
 async function getUserList(env) {
-if (!env.FRICTION_KV) return [];
+  if (!env.FRICTION_KV) return [];
 
-try {
-var userList = await env.FRICTION_KV.get("users:list");
-return userList ? JSON.parse(userList) : [];
-} catch (err) {
-return [];
-}
+  try {
+    var userList = await env.FRICTION_KV.get("users:list");
+    return userList ? JSON.parse(userList) : [];
+  } catch (err) {
+    return [];
+  }
 }
 
-// ============ USER DATA PERSISTENCE ============
+// =====================
+// USER DATA PERSISTENCE
+// =====================
 
 async function getUserData(env, email) {
-if (!env.FRICTION_KV) return null;
+  if (!env.FRICTION_KV) return null;
 
-try {
-var key = "userdata:" + hashEmail(email);
-var data = await env.FRICTION_KV.get(key);
-return data ? JSON.parse(data) : null;
-} catch (err) {
-console.error("Get user data error:", err);
-return null;
-}
+  try {
+    var key = "userdata:" + hashEmail(email);
+    var data = await env.FRICTION_KV.get(key);
+    return data ? JSON.parse(data) : null;
+  } catch (err) {
+    console.error("Get user data error:", err);
+    return null;
+  }
 }
 
 async function saveUserData(env, email, data) {
-if (!env.FRICTION_KV) return;
+  if (!env.FRICTION_KV) return;
 
-try {
-var key = "userdata:" + hashEmail(email);
+  try {
+    var key = "userdata:" + hashEmail(email);
 
-// Merge with existing data to avoid overwriting
-var existing = await env.FRICTION_KV.get(key);
-var merged = existing ? JSON.parse(existing) : {};
+    // Merge with existing data to avoid overwriting
+    var existing = await env.FRICTION_KV.get(key);
+    var merged = existing ? JSON.parse(existing) : {};
 
-// Update only provided fields
-if (data.chat !== undefined) merged.chat = data.chat;
-if (data.goals !== undefined) merged.goals = data.goals;
-if (data.settings !== undefined) merged.settings = data.settings;
-if (data.history !== undefined) merged.history = data.history;
-if (data.frictionState !== undefined) merged.frictionState = data.frictionState;
+    // Update only provided fields
+    if (data.chat !== undefined) merged.chat = data.chat;
+    if (data.goals !== undefined) merged.goals = data.goals;
+    if (data.settings !== undefined) merged.settings = data.settings;
+    if (data.history !== undefined) merged.history = data.history;
+    if (data.frictionState !== undefined) merged.frictionState = data.frictionState;
 
-merged.lastUpdated = new Date().toISOString();
+    merged.lastUpdated = new Date().toISOString();
 
-// Store with 1 year expiration
-await env.FRICTION_KV.put(key, JSON.stringify(merged), { expirationTtl: 365 * 24 * 60 * 60 });
-
-} catch (err) {
-console.error("Save user data error:", err);
-throw err;
-}
+    // Store with 1 year expiration
+    await env.FRICTION_KV.put(key, JSON.stringify(merged), {
+      expirationTtl: 365 * 24 * 60 * 60
+    });
+  } catch (err) {
+    console.error("Save user data error:", err);
+    throw err;
+  }
 }
