@@ -3912,6 +3912,20 @@
       font-weight: 500;
     }
 
+    #life-view .life-prefs-list {
+      display: grid;
+      gap: 10px;
+      margin: 6px 0 10px;
+    }
+
+    #life-view .life-prefs-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+    }
+
     #life-view .life-group-panel {
       display: none;
     }
@@ -5441,28 +5455,32 @@
       <div class="life-active-notes" id="lifeActiveNotes"></div>
       <div class="life-active-actions">
         <button class="life-btn secondary" id="lifeEditButton" type="button">Edit profile</button>
+        <button class="life-btn secondary" id="lifeCustomizeButton" type="button">Customize ⚙️</button>
         <button class="life-btn secondary" id="lifeRemoveButton" type="button">Remove person</button>
       </div>
       <div class="life-active-edit" id="lifeActiveEdit" hidden>
-        <input class="life-input" id="lifeEditName" type="text" placeholder="Full name" maxlength="60" />
-        <select class="life-select" id="lifeEditRole">
-          <option value="" disabled>Select role</option>
-          <option value="wife">Wife</option>
-          <option value="son">Son</option>
-          <option value="daughter">Daughter</option>
-          <option value="mother">Mother</option>
-          <option value="father">Father</option>
-          <option value="brother">Brother</option>
-          <option value="sister">Sister</option>
-          <option value="other">Other</option>
-        </select>
-        <input class="life-input" id="lifeEditRoleCustom" type="text" placeholder="Custom role" maxlength="40" style="display: none;" />
-        <input class="life-input" id="lifeEditDob" type="date" />
-        <textarea class="life-textarea" id="lifeEditNotes" placeholder="Notes (optional)" maxlength="200"></textarea>
-        <div class="life-edit-actions">
-          <button class="life-btn" id="lifeEditSave" type="button">Save changes</button>
-          <button class="life-btn secondary" id="lifeEditCancel" type="button">Cancel</button>
-        </div>
+        <form id="lifeEditForm">
+          <input class="life-input" id="lifeEditName" type="text" placeholder="Full name" maxlength="60" />
+          <select class="life-select" id="lifeEditRole">
+            <option value="" disabled>Select role</option>
+            <option value="wife">Wife</option>
+            <option value="son">Son</option>
+            <option value="daughter">Daughter</option>
+            <option value="mother">Mother</option>
+            <option value="father">Father</option>
+            <option value="brother">Brother</option>
+            <option value="sister">Sister</option>
+            <option value="other">Other</option>
+          </select>
+          <input class="life-input" id="lifeEditRoleCustom" type="text" placeholder="Custom role" maxlength="40" style="display: none;" />
+          <input class="life-input" id="lifeEditDob" type="date" />
+          <textarea class="life-textarea" id="lifeEditNotes" placeholder="Notes (optional)" maxlength="200"></textarea>
+          <div class="life-meta" id="lifeEditError" role="alert" style="display: none;"></div>
+          <div class="life-edit-actions">
+            <button class="life-btn" id="lifeEditSave" type="submit">Save changes</button>
+            <button class="life-btn secondary" id="lifeEditCancel" type="button">Cancel</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -5475,9 +5493,12 @@
   </div>
 
   <div class="life-placeholder-grid">
-    <div class="life-placeholder-card">Appointments (coming next)</div>
-    <div class="life-placeholder-card">Tasks (coming next)</div>
-    <div class="life-placeholder-card">Filing Cabinet (coming next)</div>
+    <div class="life-placeholder-card" data-life-section="appointments">Appointments (coming next)</div>
+    <div class="life-placeholder-card" data-life-section="tasks">Tasks (coming next)</div>
+    <div class="life-placeholder-card" data-life-section="documents">Documents (coming next)</div>
+    <div class="life-placeholder-card" data-life-section="milestones">Milestones (coming next)</div>
+    <div class="life-placeholder-card" data-life-section="assets">Assets (coming next)</div>
+    <div class="life-placeholder-card" data-life-section="bills">Bills (coming next)</div>
   </div>
 
   <div class="life-modal" id="lifePersonModal" aria-hidden="true">
@@ -5532,6 +5553,48 @@
         <button class="life-btn" id="lifeRemoveConfirm" type="button">Remove</button>
         <button class="life-btn secondary" id="lifeRemoveCancel" type="button">Cancel</button>
       </div>
+    </div>
+  </div>
+
+  <div class="life-modal" id="lifePrefsModal" aria-hidden="true">
+    <div class="life-modal-backdrop" data-close></div>
+    <div class="life-modal-card" role="dialog" aria-modal="true" aria-labelledby="lifePrefsModalTitle">
+      <div class="life-modal-header">
+        <h3 class="section-subtitle" id="lifePrefsModalTitle">Customize sections</h3>
+        <button class="life-btn secondary" id="lifePrefsModalClose" type="button">Close</button>
+      </div>
+      <form class="life-modal-body" id="lifePrefsForm">
+        <div class="life-prefs-list">
+          <label class="life-prefs-option">
+            <input type="checkbox" name="lifePrefsSection" value="appointments" />
+            <span>Appointments</span>
+          </label>
+          <label class="life-prefs-option">
+            <input type="checkbox" name="lifePrefsSection" value="tasks" />
+            <span>Tasks</span>
+          </label>
+          <label class="life-prefs-option">
+            <input type="checkbox" name="lifePrefsSection" value="documents" />
+            <span>Documents</span>
+          </label>
+          <label class="life-prefs-option">
+            <input type="checkbox" name="lifePrefsSection" value="milestones" />
+            <span>Milestones</span>
+          </label>
+          <label class="life-prefs-option">
+            <input type="checkbox" name="lifePrefsSection" value="assets" />
+            <span>Assets</span>
+          </label>
+          <label class="life-prefs-option">
+            <input type="checkbox" name="lifePrefsSection" value="bills" />
+            <span>Bills</span>
+          </label>
+        </div>
+        <div class="life-modal-actions">
+          <button class="life-btn" id="lifePrefsSave" type="submit">Save</button>
+          <button class="life-btn secondary" id="lifePrefsCancel" type="button">Cancel</button>
+        </div>
+      </form>
     </div>
   </div>
 </section>
@@ -6223,10 +6286,12 @@
     var LIFE_PEOPLE_KEY = 'life_people_v1';
     var LIFE_ACTIVE_PERSON_KEY = 'life_active_person_id_v1';
     var LIFE_UI_KEY = 'life_ui_v1';
+    var LIFE_PERSON_PREFS_KEY = 'life_person_prefs_v1';
     var LIFE_ROLE_OPTIONS = ['wife', 'son', 'daughter', 'mother', 'father', 'brother', 'sister', 'other'];
     var people = [];
     var activePersonId = null;
     var lifeUiPrefs = { groupMode: false, selectedPeopleIds: [] };
+    var lifePersonPrefs = {};
     var pendingAvatarType = 'generated';
     var pendingAvatarDataUrl = '';
     var pendingRemovePersonId = null;
@@ -6389,6 +6454,85 @@
       localStorage.setItem(LIFE_UI_KEY, JSON.stringify(lifeUiPrefs));
     }
 
+    function loadLifePersonPrefs() {
+      var saved = localStorage.getItem(LIFE_PERSON_PREFS_KEY);
+      if (!saved) {
+        lifePersonPrefs = {};
+        return;
+      }
+      try {
+        var parsed = JSON.parse(saved);
+        lifePersonPrefs = parsed && typeof parsed === 'object' ? parsed : {};
+      } catch (e) {
+        lifePersonPrefs = {};
+      }
+    }
+
+    function saveLifePersonPrefs() {
+      localStorage.setItem(LIFE_PERSON_PREFS_KEY, JSON.stringify(lifePersonPrefs));
+    }
+
+    function getAgeInMonths(dob) {
+      if (!dob) return null;
+      var date = new Date(dob);
+      if (Number.isNaN(date.getTime())) return null;
+      var now = new Date();
+      var months = (now.getFullYear() - date.getFullYear()) * 12 + (now.getMonth() - date.getMonth());
+      if (now.getDate() < date.getDate()) {
+        months -= 1;
+      }
+      return months;
+    }
+
+    function getDefaultSectionPrefs(person) {
+      var role = person && person.role ? String(person.role).toLowerCase() : '';
+      var ageMonths = person && person.dob ? getAgeInMonths(person.dob) : null;
+      var isToddler = role.includes('son') || (typeof ageMonths === 'number' && ageMonths < 16);
+      if (isToddler) {
+        return {
+          appointments: true,
+          tasks: true,
+          documents: true,
+          milestones: true,
+          assets: false,
+          bills: false
+        };
+      }
+      return {
+        appointments: true,
+        tasks: true,
+        documents: true,
+        milestones: false,
+        assets: true,
+        bills: true
+      };
+    }
+
+    function getPersonPrefs(personId) {
+      if (!personId) return null;
+      var person = getPersonById(personId);
+      if (!person) return null;
+      var prefs = lifePersonPrefs[personId];
+      if (!prefs || !prefs.enabledSections) {
+        prefs = { enabledSections: getDefaultSectionPrefs(person) };
+        lifePersonPrefs[personId] = prefs;
+        saveLifePersonPrefs();
+      }
+      return prefs;
+    }
+
+    function applyPersonSectionPrefs(personId) {
+      if (!lifeView || !personId) return;
+      var prefs = getPersonPrefs(personId);
+      if (!prefs || !prefs.enabledSections) return;
+      var sections = lifeView.querySelectorAll('[data-life-section]');
+      sections.forEach(function(section) {
+        var key = section.dataset.lifeSection;
+        var enabled = prefs.enabledSections[key];
+        section.style.display = enabled === false ? 'none' : '';
+      });
+    }
+
     function ensureActivePerson() {
       if (!people.length) {
         people = [createDefaultMe()];
@@ -6480,6 +6624,17 @@
       }
     }
 
+    function setLifePrefsModalVisible(isVisible) {
+      if (!lifePrefsModal) return;
+      lifePrefsModal.classList.toggle('active', isVisible);
+      lifePrefsModal.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
+      if (isVisible) {
+        lockBodyScroll();
+      } else {
+        unlockBodyScroll();
+      }
+    }
+
     function updateRoleCustomVisibility(selectEl, customEl) {
       if (!selectEl || !customEl) return;
       if (selectEl.value === 'other') {
@@ -6509,6 +6664,30 @@
       if (lifePersonPhotoPreview) {
         lifePersonPhotoPreview.src = buildAvatarSvg('new', 'New');
       }
+    }
+
+    function openLifePrefsModal() {
+      if (!activePersonId || !lifePrefsForm) return;
+      var prefs = getPersonPrefs(activePersonId);
+      if (!prefs || !prefs.enabledSections) return;
+      var inputs = lifePrefsForm.querySelectorAll('input[name="lifePrefsSection"]');
+      inputs.forEach(function(input) {
+        input.checked = prefs.enabledSections[input.value] !== false;
+      });
+      setLifePrefsModalVisible(true);
+    }
+
+    function saveLifePrefsFromForm() {
+      if (!activePersonId || !lifePrefsForm) return;
+      var enabledSections = {};
+      var inputs = lifePrefsForm.querySelectorAll('input[name="lifePrefsSection"]');
+      inputs.forEach(function(input) {
+        enabledSections[input.value] = !!input.checked;
+      });
+      lifePersonPrefs[activePersonId] = { enabledSections: enabledSections };
+      saveLifePersonPrefs();
+      setLifePrefsModalVisible(false);
+      renderLifeView();
     }
 
     function renderBubbleStrip() {
@@ -6599,11 +6778,17 @@
         lifeActiveEdit.hidden = true;
         syncActiveEditForm(person);
       }
+      if (person) {
+        applyPersonSectionPrefs(person.id);
+      }
     }
 
     function renderLifeView() {
       renderBubbleStrip();
       renderActivePanel();
+      if (activePersonId) {
+        applyPersonSectionPrefs(activePersonId);
+      }
       if (lifeGroupToggle) {
         lifeGroupToggle.setAttribute('aria-pressed', lifeUiPrefs.groupMode ? 'true' : 'false');
       }
@@ -6635,6 +6820,9 @@
       if (!lifeActiveEdit) return;
       lifeActiveEdit.hidden = !isEditing;
       if (isEditing) {
+        setActiveEditError('');
+      }
+      if (isEditing) {
         var person = getPersonById(activePersonId);
         if (!person) return;
         syncActiveEditForm(person);
@@ -6658,6 +6846,12 @@
       updateRoleCustomVisibility(lifeEditRole, lifeEditRoleCustom);
       if (lifeEditDob) lifeEditDob.value = person.dob || '';
       if (lifeEditNotes) lifeEditNotes.value = person.notes || '';
+    }
+
+    function setActiveEditError(message) {
+      if (!lifeEditError) return;
+      lifeEditError.textContent = message || '';
+      lifeEditError.style.display = message ? 'block' : 'none';
     }
 
     function updateGroupSelection(personId) {
@@ -6749,26 +6943,44 @@
     }
 
     function saveActivePersonEdits() {
-      var person = getPersonById(activePersonId);
-      if (!person) return;
-      var name = lifeEditName ? lifeEditName.value.trim() : '';
-      if (!name) {
-        if (lifeEditName) lifeEditName.focus();
-        return;
+      console.log('saveProfile:start', activePersonId);
+      setActiveEditError('');
+      try {
+        var person = getPersonById(activePersonId);
+        if (!person) return;
+        var name = lifeEditName ? lifeEditName.value.trim() : '';
+        if (!name) {
+          setActiveEditError('Name is required.');
+          if (lifeEditName) lifeEditName.focus();
+          return;
+        }
+        var role = getRoleValue(lifeEditRole, lifeEditRoleCustom);
+        if (!role) {
+          setActiveEditError('Role is required.');
+          if (lifeEditRole) lifeEditRole.focus();
+          return;
+        }
+        var updatedAt = Date.now();
+        var dob = lifeEditDob ? lifeEditDob.value || null : null;
+        var notes = lifeEditNotes ? lifeEditNotes.value.trim() || null : null;
+        people = people.map(function(entry) {
+          if (entry.id !== activePersonId) return entry;
+          return Object.assign({}, entry, {
+            name: name,
+            role: role,
+            dob: dob,
+            notes: notes,
+            updatedAt: updatedAt
+          });
+        });
+        localStorage.setItem(LIFE_PEOPLE_KEY, JSON.stringify(people));
+        console.log('saveProfile:success', activePersonId);
+        setEditMode(false);
+        renderLifeView();
+      } catch (err) {
+        console.error('saveProfile:error', err);
+        setActiveEditError('Could not save. Please try again.');
       }
-      var role = getRoleValue(lifeEditRole, lifeEditRoleCustom);
-      if (!role) {
-        if (lifeEditRole) lifeEditRole.focus();
-        return;
-      }
-      person.name = name;
-      person.role = role;
-      person.dob = lifeEditDob ? lifeEditDob.value || null : null;
-      person.notes = lifeEditNotes ? lifeEditNotes.value.trim() || null : null;
-      person.updatedAt = Date.now();
-      savePeople();
-      setEditMode(false);
-      renderLifeView();
     }
 
     function openRemoveModal() {
@@ -6785,6 +6997,10 @@
     function confirmRemovePerson() {
       if (!pendingRemovePersonId) return;
       people = people.filter(function(person) { return person.id !== pendingRemovePersonId; });
+      if (lifePersonPrefs && lifePersonPrefs[pendingRemovePersonId]) {
+        delete lifePersonPrefs[pendingRemovePersonId];
+        saveLifePersonPrefs();
+      }
       if (!people.length) {
         people = [createDefaultMe()];
       }
@@ -6805,6 +7021,7 @@
     function closeLifeModals() {
       setPeopleModalVisible(false);
       setRemoveModalVisible(false);
+      setLifePrefsModalVisible(false);
     }
 
     function renderPersonRightNow(personId) {
@@ -11306,13 +11523,16 @@
     const lifeActiveNotes = document.getElementById('lifeActiveNotes');
     const lifeEditToggle = document.getElementById('lifeEditToggle');
     const lifeEditButton = document.getElementById('lifeEditButton');
+    const lifeCustomizeButton = document.getElementById('lifeCustomizeButton');
     const lifeRemoveButton = document.getElementById('lifeRemoveButton');
     const lifeActiveEdit = document.getElementById('lifeActiveEdit');
+    const lifeEditForm = document.getElementById('lifeEditForm');
     const lifeEditName = document.getElementById('lifeEditName');
     const lifeEditRole = document.getElementById('lifeEditRole');
     const lifeEditRoleCustom = document.getElementById('lifeEditRoleCustom');
     const lifeEditDob = document.getElementById('lifeEditDob');
     const lifeEditNotes = document.getElementById('lifeEditNotes');
+    const lifeEditError = document.getElementById('lifeEditError');
     const lifeEditSave = document.getElementById('lifeEditSave');
     const lifeEditCancel = document.getElementById('lifeEditCancel');
     const lifePersonModal = document.getElementById('lifePersonModal');
@@ -11332,6 +11552,10 @@
     const lifeRemoveModalText = document.getElementById('lifeRemoveModalText');
     const lifeRemoveConfirm = document.getElementById('lifeRemoveConfirm');
     const lifeRemoveCancel = document.getElementById('lifeRemoveCancel');
+    const lifePrefsModal = document.getElementById('lifePrefsModal');
+    const lifePrefsModalClose = document.getElementById('lifePrefsModalClose');
+    const lifePrefsForm = document.getElementById('lifePrefsForm');
+    const lifePrefsCancel = document.getElementById('lifePrefsCancel');
     const lifeAgendaRange = document.getElementById('lifeAgendaRange');
     const lifeAgendaList = document.getElementById('lifeAgendaList');
     const lifePersonNowList = document.getElementById('lifePersonNowList');
@@ -13273,6 +13497,7 @@
     loadLifeAreas();
     loadPeople();
     loadLifeUiPrefs();
+    loadLifePersonPrefs();
     ensureActivePerson();
     setGroupMode(lifeUiPrefs.groupMode);
     loadCalendarEvents();
@@ -13404,14 +13629,23 @@
       });
     }
 
-    if (lifeEditSave) {
-      lifeEditSave.addEventListener('click', saveActivePersonEdits);
+    if (lifeEditForm) {
+      lifeEditForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        saveActivePersonEdits();
+      });
     }
 
     if (lifeEditCancel) {
       lifeEditCancel.addEventListener('click', function() {
         setEditMode(false);
         renderActivePanel();
+      });
+    }
+
+    if (lifeCustomizeButton) {
+      lifeCustomizeButton.addEventListener('click', function() {
+        openLifePrefsModal();
       });
     }
 
@@ -13441,6 +13675,33 @@
 
     if (lifeRemoveConfirm) {
       lifeRemoveConfirm.addEventListener('click', confirmRemovePerson);
+    }
+
+    if (lifePrefsModal) {
+      lifePrefsModal.addEventListener('click', function(event) {
+        if (event.target.dataset.close !== undefined) {
+          setLifePrefsModalVisible(false);
+        }
+      });
+    }
+
+    if (lifePrefsModalClose) {
+      lifePrefsModalClose.addEventListener('click', function() {
+        setLifePrefsModalVisible(false);
+      });
+    }
+
+    if (lifePrefsCancel) {
+      lifePrefsCancel.addEventListener('click', function() {
+        setLifePrefsModalVisible(false);
+      });
+    }
+
+    if (lifePrefsForm) {
+      lifePrefsForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        saveLifePrefsFromForm();
+      });
     }
 
     if (shortGoalAdd) {
