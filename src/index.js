@@ -172,18 +172,54 @@ export default {
           return jsonResponse({ error: "Invalid token" }, 401, request);
         }
 
-        await logAnalytics(env, {
-          type: "signup",
-          userHash: hashEmail(authResult.email),
-          timestamp: Date.now()
-        });
-
-        // Store user in KV (just email + signup date, no content)
-        await storeUser(env, authResult.email);
+        // BUGFIX: only count signups when a brand-new user is created (previously counted every register call).
+        var storeResult = await storeUser(env, authResult.email);
+        if (storeResult && storeResult.isNew) {
+          await logAnalytics(env, {
+            type: "signup",
+            userHash: hashEmail(authResult.email),
+            timestamp: Date.now()
+          });
+        }
 
         return jsonResponse({ success: true }, 200, request);
       } catch (err) {
         return jsonResponse({ error: err.message || "Registration failed" }, 500, request);
+      }
+    }
+
+    // ============ ANALYTICS EVENT ENDPOINT ============
+    // POST /api/analytics/event
+    if (url.pathname === "/api/analytics/event" && request.method === "POST") {
+      try {
+        var analyticsAuth = await verifyUserToken(request, env);
+        if (!analyticsAuth.valid) {
+          return jsonResponse({ error: "Authentication required" }, 401, request);
+        }
+
+        if (!env.FRICTION_KV) {
+          return jsonResponse(kvMissingError(), 503, request);
+        }
+
+        var eventBody = await request.json().catch(function () { return {}; });
+        var eventName = typeof eventBody.event === "string" ? eventBody.event.trim() : "";
+        var durationMs = eventBody.durationMs;
+
+        if (!eventName || eventName.length > 64 || !/^[a-zA-Z0-9_\-:]+$/.test(eventName)) {
+          return jsonResponse({ error: "Invalid event name" }, 400, request);
+        }
+
+        if (durationMs !== undefined) {
+          if (typeof durationMs !== "number" || !Number.isFinite(durationMs) || durationMs < 0 || durationMs > 600000) {
+            return jsonResponse({ error: "Invalid durationMs" }, 400, request);
+          }
+        }
+
+        await trackEvent(env, hashEmail(analyticsAuth.email), eventName, durationMs);
+
+        return jsonResponse({ success: true }, 200, request);
+      } catch (err) {
+        return jsonResponse({ error: err.message || "Failed to track event" }, 500, request);
       }
     }
 
@@ -1251,6 +1287,7 @@ async function logAnalytics(env, data) {
       dayData.users[data.userHash] = (dayData.users[data.userHash] || 0) + 1;
       dayData.models[data.model] = (dayData.models[data.model] || 0) + 1;
     } else if (data.type === "signup") {
+      // Signups represent brand-new user records created that day.
       dayData.signups++;
     }
 
@@ -1259,6 +1296,47 @@ async function logAnalytics(env, data) {
     }); // 90 days
   } catch (err) {
     console.error("Analytics error:", err);
+  }
+}
+
+async function trackEvent(env, userHash, eventName, durationMs) {
+  if (!env.FRICTION_KV) return;
+
+  try {
+    var today = new Date().toISOString().split("T")[0];
+    await updateEventAggregate(env, "analytics:events:" + today, 90 * 24 * 60 * 60, userHash, eventName, durationMs);
+    await updateEventAggregate(env, "analytics:events:total", 365 * 24 * 60 * 60, userHash, eventName, durationMs);
+  } catch (err) {
+    console.error("Event analytics error:", err);
+  }
+}
+
+async function updateEventAggregate(env, key, ttlSeconds, userHash, eventName, durationMs) {
+  var existing = await env.FRICTION_KV.get(key);
+  var aggregate = existing ? JSON.parse(existing) : { events: {}, sums: {}, users: {} };
+
+  aggregate.events = aggregate.events || {};
+  aggregate.sums = aggregate.sums || {};
+  aggregate.users = aggregate.users || {};
+
+  aggregate.events[eventName] = (aggregate.events[eventName] || 0) + 1;
+  if (durationMs !== undefined) {
+    var sumKey = eventName + ":durationMs";
+    aggregate.sums[sumKey] = (aggregate.sums[sumKey] || 0) + durationMs;
+  }
+  if (userHash) {
+    aggregate.users[userHash] = 1;
+  }
+
+  await env.FRICTION_KV.put(key, JSON.stringify(aggregate), {
+    expirationTtl: ttlSeconds
+  });
+}
+
+function mergeCountMaps(target, source) {
+  if (!source) return;
+  for (var key in source) {
+    target[key] = (target[key] || 0) + source[key];
   }
 }
 
@@ -1271,16 +1349,28 @@ async function getAnalyticsStats(env) {
     var stats = {
       today: null,
       last7Days: { messages: 0, uniqueUsers: 0, signups: 0, models: {} },
-      last30Days: { messages: 0, uniqueUsers: 0, signups: 0, models: {} }
+      last30Days: { messages: 0, uniqueUsers: 0, signups: 0, models: {} },
+      eventsToday: {},
+      eventsLast7Days: {},
+      eventsLast30Days: {},
+      durationSumsToday: {},
+      durationSumsLast7Days: {},
+      durationSumsLast30Days: {},
+      uniqueUsersToday: 0,
+      uniqueUsersLast7Days: 0,
+      uniqueUsersLast30Days: 0
     };
 
     var allUsers7 = {};
     var allUsers30 = {};
+    var eventUsers7 = {};
+    var eventUsers30 = {};
 
     for (var i = 0; i < 30; i++) {
       var date = new Date();
       date.setDate(date.getDate() - i);
       var key = "analytics:" + date.toISOString().split("T")[0];
+      var eventKey = "analytics:events:" + date.toISOString().split("T")[0];
 
       var dayData = await env.FRICTION_KV.get(key);
       if (dayData) {
@@ -1311,10 +1401,36 @@ async function getAnalyticsStats(env) {
           stats.last30Days.models[model2] = (stats.last30Days.models[model2] || 0) + parsed.models[model2];
         }
       }
+
+      var eventData = await env.FRICTION_KV.get(eventKey);
+      if (eventData) {
+        var parsedEvent = JSON.parse(eventData);
+        var eventCounts = parsedEvent.events || {};
+        var durationSums = parsedEvent.sums || {};
+        var usersMap = parsedEvent.users || {};
+
+        if (i === 0) {
+          stats.eventsToday = eventCounts;
+          stats.durationSumsToday = durationSums;
+          stats.uniqueUsersToday = Object.keys(usersMap).length;
+        }
+
+        if (i < 7) {
+          mergeCountMaps(stats.eventsLast7Days, eventCounts);
+          mergeCountMaps(stats.durationSumsLast7Days, durationSums);
+          Object.assign(eventUsers7, usersMap);
+        }
+
+        mergeCountMaps(stats.eventsLast30Days, eventCounts);
+        mergeCountMaps(stats.durationSumsLast30Days, durationSums);
+        Object.assign(eventUsers30, usersMap);
+      }
     }
 
     stats.last7Days.uniqueUsers = Object.keys(allUsers7).length;
     stats.last30Days.uniqueUsers = Object.keys(allUsers30).length;
+    stats.uniqueUsersLast7Days = Object.keys(eventUsers7).length;
+    stats.uniqueUsersLast30Days = Object.keys(eventUsers30).length;
 
     // Get total user count
     var userList = await env.FRICTION_KV.get("users:list");
@@ -1327,7 +1443,7 @@ async function getAnalyticsStats(env) {
 }
 
 async function storeUser(env, email) {
-  if (!env.FRICTION_KV) return;
+  if (!env.FRICTION_KV) return { isNew: false };
 
   try {
     var userList = await env.FRICTION_KV.get("users:list");
@@ -1341,12 +1457,15 @@ async function storeUser(env, email) {
         lastActive: new Date().toISOString()
       });
       await env.FRICTION_KV.put("users:list", JSON.stringify(users));
-    } else {
-      existing.lastActive = new Date().toISOString();
-      await env.FRICTION_KV.put("users:list", JSON.stringify(users));
+      return { isNew: true };
     }
+
+    existing.lastActive = new Date().toISOString();
+    await env.FRICTION_KV.put("users:list", JSON.stringify(users));
+    return { isNew: false };
   } catch (err) {
     console.error("Store user error:", err);
+    return { isNew: false };
   }
 }
 
