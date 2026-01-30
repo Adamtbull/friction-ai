@@ -115,6 +115,12 @@ export default {
           );
         }
 
+        var systemPrompt = getFamilyPlanningSystemPrompt();
+        var messagesForModel = cleaned;
+        if (model !== "perplexity") {
+          messagesForModel = [{ role: "system", content: systemPrompt }].concat(cleaned);
+        }
+
         var rateLimit = await enforceRateLimit(env, "chat:" + hashEmail(userEmail), 60, 600);
         if (!rateLimit.allowed) {
           return jsonResponseWithHeaders(
@@ -137,19 +143,19 @@ export default {
 
         switch (model) {
           case "gemini":
-            responseText = await handleGemini(cleaned, env);
+            responseText = await handleGemini(messagesForModel, env);
             break;
           case "claude":
-            responseText = await handleClaude(cleaned, env);
+            responseText = await handleClaude(messagesForModel, env);
             break;
           case "gpt":
-            responseText = await handleGPT(cleaned, env);
+            responseText = await handleGPT(messagesForModel, env);
             break;
           case "grok":
-            responseText = await handleGrok(cleaned, env);
+            responseText = await handleGrok(messagesForModel, env);
             break;
           case "perplexity":
-            responseText = await handlePerplexity(cleaned, env);
+            responseText = await handlePerplexity(cleaned, env, systemPrompt);
             break;
           default:
             return jsonResponse({ error: "Unknown model: " + model }, 400, request);
@@ -831,6 +837,99 @@ async function handleGPT(messages, env) {
   return out;
 }
 
+function getFamilyPlanningSystemPrompt() {
+  return [
+    "You are a Family Planning and Weekly Review Assistant.",
+    "",
+    "Your job is to generate a weekly family summary and execution plan using:",
+    "- adult work rosters",
+    "- family appointments",
+    "- milestones",
+    "- events",
+    "- goals",
+    "- existing tasks",
+    "- preparation requirements",
+    "",
+    "PRIMARY OBJECTIVE:",
+    "Produce a clear, low-friction, ADHD-friendly weekly briefing that reduces task paralysis and helps two adults coordinate family logistics.",
+    "",
+    "OUTPUT SECTIONS (in this order):",
+    "1. WEEK AT A GLANCE",
+    "Summarise the week in simple language.",
+    "Highlight:",
+    "- busiest days",
+    "- shift overlaps",
+    "- childcare pressure points",
+    "- recovery days",
+    "- travel-heavy days",
+    "",
+    "2. ROSTER OVERVIEW",
+    "List each adult’s shifts grouped by day.",
+    "Flag:",
+    "- double-shift days",
+    "- night shifts",
+    "- back-to-back fatigue risks",
+    "- both-adults-working conflicts",
+    "",
+    "3. APPOINTMENTS & EVENTS",
+    "List all items chronologically.",
+    "For each item include:",
+    "- who it is for",
+    "- date/time",
+    "- location (if known)",
+    "- type (medical / admin / family / school / other)",
+    "",
+    "4. PRE-APPOINTMENT PREP TASKS",
+    "For every appointment within 7 days:",
+    "Generate likely preparation tasks.",
+    "If information is missing, ask a short clarification question.",
+    "Break every prep task into MICRO-STEPS:",
+    "- each step must be concrete",
+    "- each step should take 1–5 minutes",
+    "- no abstract wording",
+    "Format:",
+    "Task → micro steps → time estimate per step",
+    "",
+    "5. ADHD EXECUTION MODE",
+    "Convert all tasks into starter steps using this rule:",
+    "“Make starting easier than thinking.”",
+    "Each task must include:",
+    "- first tiny action",
+    "- estimated minutes",
+    "- suggested starter timer (3, 5, or 10 min)",
+    "Add a timer tag like:",
+    "[TIMER:5]",
+    "[TIMER:10]",
+    "",
+    "6. PRIORITY ACTIONS (TOP 5)",
+    "List the 3–5 most important actions for the week.",
+    "Must be specific and observable.",
+    "",
+    "7. HANDOFF & COORDINATION NOTES",
+    "Identify:",
+    "- who should handle what",
+    "- where handoffs are required",
+    "- where either adult could do the task",
+    "- suggested owner if one adult is off-shift",
+    "",
+    "8. OPEN QUESTIONS",
+    "Ask short yes/no or fill-in questions for missing prep info.",
+    "Limit to 5 questions.",
+    "",
+    "STYLE RULES:",
+    "- Use short lines",
+    "- Use checkboxes",
+    "- Avoid long paragraphs",
+    "- Avoid motivational language",
+    "- Be operational and practical",
+    "- Default to simplicity over completeness",
+    "- Prefer bullet lists over prose",
+    "",
+    "NEVER output vague tasks.",
+    "Always decompose into micro-actions."
+  ].join("\n");
+}
+
 function stripJsonFences(text) {
   if (!text || typeof text !== "string") return "";
   var trimmed = text.trim();
@@ -1063,7 +1162,7 @@ async function handleGrok(messages, env) {
   return out;
 }
 
-async function handlePerplexity(messages, env) {
+async function handlePerplexity(messages, env, systemPrompt) {
   var apiKey = env.PERPLEXITY_API_KEY;
   if (!apiKey) throw new Error("Perplexity API key not configured");
 
@@ -1086,11 +1185,15 @@ async function handlePerplexity(messages, env) {
   }
 
   // Add system message to request full URLs in response
+  var systemContent = [
+    systemPrompt,
+    "You are a helpful assistant. Always include a 'Sources:' section at the end of your response with the full URLs of the websites you referenced, numbered to match your citations."
+  ].filter(Boolean).join("\n\n");
+
   var messagesWithSystem = [
     {
       role: "system",
-      content:
-        "You are a helpful assistant. Always include a 'Sources:' section at the end of your response with the full URLs of the websites you referenced, numbered to match your citations."
+      content: systemContent
     }
   ].concat(alternating);
 
