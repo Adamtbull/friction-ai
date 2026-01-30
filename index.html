@@ -2973,7 +2973,8 @@
     #life-view .life-task-header {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
+      cursor: pointer;
     }
 
     #life-view .life-task-header-top {
@@ -2992,6 +2993,11 @@
       text-align: left;
       padding: 4px 0;
       cursor: pointer;
+    }
+
+    #life-view .life-task-progress {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
     }
 
     #life-view .life-task-chip {
@@ -3026,6 +3032,14 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+    }
+
+    #life-view .life-task-chevron {
+      transition: transform 0.2s ease;
+    }
+
+    #life-view .life-task-card:not(.expanded) .life-task-chevron {
+      transform: rotate(-90deg);
     }
 
     #life-view .life-task-body {
@@ -3076,6 +3090,52 @@
 
     #life-view .life-task-plan-list input {
       margin-top: 2px;
+    }
+
+    #life-view .life-task-checklist {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    #life-view .life-task-checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    #life-view .life-task-checklist input {
+      margin-top: 2px;
+    }
+
+    #life-view .life-task-step.completed span {
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
+
+    #life-view .life-task-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    #life-view .life-task-controls .life-btn,
+    #life-view .life-task-controls .life-btn.secondary,
+    #life-view .life-task-controls .life-task-icon {
+      min-height: 32px;
+      font-size: 0.8rem;
+      padding: 6px 10px;
+    }
+
+    #life-view .life-task-clarification {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: var(--text-primary);
     }
 
     #life-view .life-task-plan-actions {
@@ -8015,7 +8075,6 @@
     var appointmentsPastExpanded = false;
     var lifeAreaFilterValue = 'all';
     var lifeActiveTab = 'people';
-    var personTaskExpanded = {};
     var personTaskEditingId = null;
     var personTasksCompletedExpanded = false;
     var personTaskErrors = {};
@@ -8052,6 +8111,20 @@
       }
     }
 
+    function normalizeTaskSteps(steps) {
+      if (!Array.isArray(steps)) return [];
+      return steps.map(function(step) {
+        if (!step) return null;
+        var text = typeof step === 'string' ? step : (step.text || '');
+        if (!text) return null;
+        return {
+          id: step.id || generateGoalId('step'),
+          text: text,
+          done: !!step.done
+        };
+      }).filter(Boolean);
+    }
+
     function normalizeTask(task) {
       if (!task || typeof task !== 'object') return null;
       var isLegacyText = typeof task.text === 'string' && task.text.trim().length > 0;
@@ -8061,6 +8134,13 @@
       var status = task.status === 'done' || task.done ? 'done' : 'open';
       var barrier = TASK_BARRIERS.indexOf(task.barrier) >= 0 ? task.barrier : '';
       var createdAt = task.createdAt || Date.now();
+      var steps = normalizeTaskSteps(task.steps);
+      if (steps.length === 0 && task.aiPlan && Array.isArray(task.aiPlan.steps)) {
+        steps = normalizeTaskSteps(task.aiPlan.steps.map(function(step) {
+          return { text: step };
+        }));
+      }
+      var ui = task.ui && typeof task.ui === 'object' ? task.ui : {};
       return {
         id: task.id || generateGoalId('task'),
         title: title,
@@ -8080,7 +8160,13 @@
         needsAppointment: !!task.needsAppointment,
         energyType: task.energyType || '',
         done: status === 'done',
-        dueDate: task.dueDate || null
+        dueDate: task.dueDate || null,
+        steps: steps,
+        ui: {
+          collapsed: !!ui.collapsed,
+          hideCompleted: !!ui.hideCompleted,
+          clarification: ui.clarification || null
+        }
       };
     }
 
@@ -8564,46 +8650,36 @@
       return trimmed.slice(0, maxLength).trim();
     }
 
-    function buildFallbackTaskPlan() {
-      return {
-        generatedAt: Date.now(),
-        summary: 'Let’s do a 10-minute start.',
-        first_step_2min: 'Set a 10-minute timer and open what you’ll work on.',
-        steps: [
-          'Open the file, doc, or workspace you’ll use.',
-          'Write a 1-sentence goal for the 10-minute block.',
-          'Do the smallest first action you can finish in 2 minutes.',
-          'Keep going until the timer ends.'
-        ],
-        if_stuck: ['Shrink the task to a single sentence you can start.'],
-        timebox_minutes: 10
-      };
+    function buildFallbackTaskSteps() {
+      return [
+        'Open the workspace or files you need.',
+        'List the key materials to gather.',
+        'Define the immediate goal for this task.',
+        'Complete the smallest first action.'
+      ];
     }
 
-    function sanitizeTaskPlan(raw) {
+    function sanitizeTaskBreakdown(raw) {
       if (!raw || typeof raw !== 'object') return null;
-      var summary = clampText(raw.summary, 140);
-      var firstStep = clampText(raw.first_step_2min, 120);
+      if (raw.clarification && typeof raw.clarification === 'object') {
+        var question = clampText(raw.clarification.question, 140);
+        var options = Array.isArray(raw.clarification.options) ? raw.clarification.options : [];
+        var cleanedOptions = options.map(function(option) {
+          return clampText(option, 60);
+        }).filter(Boolean).slice(0, 4);
+        if (question && cleanedOptions.length >= 2) {
+          return { clarification: { question: question, options: cleanedOptions } };
+        }
+      }
       var steps = Array.isArray(raw.steps) ? raw.steps : [];
       var cleanedSteps = steps.map(function(step) {
-        return clampText(step, 120);
+        if (typeof step === 'string') return clampText(step, 120);
+        if (step && typeof step.text === 'string') return clampText(step.text, 120);
+        return '';
       }).filter(Boolean);
-      if (cleanedSteps.length < 3) return null;
-      if (cleanedSteps.length > 7) cleanedSteps = cleanedSteps.slice(0, 7);
-      var ifStuck = Array.isArray(raw.if_stuck) ? raw.if_stuck : [];
-      var cleanedStuck = ifStuck.map(function(step) {
-        return clampText(step, 120);
-      }).filter(Boolean).slice(0, 2);
-      var timebox = [5, 10, 15].indexOf(raw.timebox_minutes) >= 0 ? raw.timebox_minutes : 10;
-      if (!summary || !firstStep) return null;
-      return {
-        generatedAt: Date.now(),
-        summary: summary,
-        first_step_2min: firstStep,
-        steps: cleanedSteps,
-        if_stuck: cleanedStuck,
-        timebox_minutes: timebox
-      };
+      if (cleanedSteps.length < 1) return null;
+      if (cleanedSteps.length > 10) cleanedSteps = cleanedSteps.slice(0, 10);
+      return { steps: cleanedSteps };
     }
 
     function getBarrierLabel(value) {
@@ -8616,83 +8692,31 @@
       });
     }
 
-    function buildTaskPrompt(task, person) {
+    function buildTaskPrompt(task, person, clarificationAnswer) {
       var personName = person && person.name ? person.name : '';
       var role = person && getPersonRoleLabel(person) ? getPersonRoleLabel(person) : '';
       return [
         'Output JSON only. No markdown. No extra text.',
         'Schema:',
-        '{"summary":"string <=140 chars","first_step_2min":"string <=120 chars","steps":["string <=120 chars"],"if_stuck":["string <=120 chars"],"timebox_minutes":5|10|15}',
+        '{"clarification":{"question":"string","options":["string"]}} OR {"steps":["string <=120 chars"]}',
         'Rules:',
-        '- 3 to 7 steps, short, concrete verbs.',
-        '- Include a 2-minute first step.',
-        '- No motivational speech.',
+        '- If a task contains ambiguous terms (example: pad, charge, bank, box, pick up, drop off), ask ONE short clarification multiple-choice question before generating steps. Do not generate the checklist until clarified. If context already makes meaning clear, proceed without asking.',
+        '- Return concise checklist steps only. Max 8–10 steps. Each step short and actionable.',
+        '- No motivational speech or extra commentary.',
         'Task:',
         'Title: ' + (task.title || ''),
         'Notes: ' + (task.notes || ''),
         'Barrier: ' + (getBarrierLabel(task.barrier) || ''),
         'Person: ' + (personName || ''),
-        'Role: ' + (role || '')
+        'Role: ' + (role || ''),
+        clarificationAnswer ? ('Clarification answer: ' + clarificationAnswer) : ''
       ].join('\n');
     }
 
-    async function requestTaskPlan(task) {
-      var response = await callUnstuckAssistant(buildTaskPrompt(task, getPersonById(task.personId)));
+    async function requestTaskPlan(task, clarificationAnswer) {
+      var response = await callUnstuckAssistant(buildTaskPrompt(task, getPersonById(task.personId), clarificationAnswer));
       var parsed = JSON.parse(stripJsonFences(response));
-      return sanitizeTaskPlan(parsed);
-    }
-
-    function renderTaskPlan(container, plan) {
-      var planWrap = document.createElement('div');
-      planWrap.className = 'life-task-plan';
-
-      var summary = document.createElement('div');
-      summary.className = 'life-task-plan-title';
-      summary.textContent = plan.summary;
-      planWrap.appendChild(summary);
-
-      var firstStep = document.createElement('div');
-      firstStep.textContent = 'First 2 minutes: ' + plan.first_step_2min;
-      planWrap.appendChild(firstStep);
-
-      var list = document.createElement('ul');
-      list.className = 'life-task-plan-list';
-      plan.steps.forEach(function(step) {
-        var item = document.createElement('li');
-        var checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.disabled = true;
-        var label = document.createElement('span');
-        label.textContent = step;
-        item.appendChild(checkbox);
-        item.appendChild(label);
-        list.appendChild(item);
-      });
-      planWrap.appendChild(list);
-
-      if (plan.if_stuck && plan.if_stuck.length) {
-        var stuckLabel = document.createElement('div');
-        stuckLabel.className = 'life-task-plan-title';
-        stuckLabel.textContent = 'If stuck';
-        planWrap.appendChild(stuckLabel);
-
-        var stuckList = document.createElement('ul');
-        stuckList.className = 'life-task-plan-list';
-        plan.if_stuck.forEach(function(step) {
-          var item = document.createElement('li');
-          var checkbox = document.createElement('input');
-          checkbox.type = 'checkbox';
-          checkbox.disabled = true;
-          var label = document.createElement('span');
-          label.textContent = step;
-          item.appendChild(checkbox);
-          item.appendChild(label);
-          stuckList.appendChild(item);
-        });
-        planWrap.appendChild(stuckList);
-      }
-
-      container.appendChild(planWrap);
+      return sanitizeTaskBreakdown(parsed);
     }
 
     function renderPersonTasks(personId) {
@@ -8737,7 +8761,15 @@
 
     function buildPersonTaskCard(task) {
       var card = document.createElement('div');
-      card.className = 'life-task-card' + (personTaskExpanded[task.id] ? ' expanded' : '');
+      var isCollapsed = task.ui && task.ui.collapsed;
+      card.className = 'life-task-card' + (isCollapsed ? '' : ' expanded');
+
+      function toggleCollapse() {
+        if (!task.ui) task.ui = { collapsed: false, hideCompleted: false };
+        task.ui.collapsed = !task.ui.collapsed;
+        saveTasks();
+        renderPersonTasks(activePersonId);
+      }
 
       var header = document.createElement('div');
       header.className = 'life-task-header';
@@ -8750,8 +8782,7 @@
       titleBtn.className = 'life-task-title';
       titleBtn.textContent = task.title || 'Untitled task';
       titleBtn.addEventListener('click', function() {
-        personTaskExpanded[task.id] = !personTaskExpanded[task.id];
-        renderPersonTasks(activePersonId);
+        toggleCollapse();
       });
       headerTop.appendChild(titleBtn);
 
@@ -8762,6 +8793,24 @@
         headerTop.appendChild(chip);
       }
 
+      var progress = document.createElement('div');
+      progress.className = 'life-task-progress';
+      var totalSteps = Array.isArray(task.steps) ? task.steps.length : 0;
+      var doneSteps = Array.isArray(task.steps) ? task.steps.filter(function(step) { return step.done; }).length : 0;
+      progress.textContent = doneSteps + ' / ' + totalSteps + ' done';
+      headerTop.appendChild(progress);
+
+      var chevron = document.createElement('button');
+      chevron.type = 'button';
+      chevron.className = 'life-task-icon life-task-chevron';
+      chevron.textContent = '▾';
+      chevron.setAttribute('aria-label', 'Toggle task details');
+      chevron.addEventListener('click', function(event) {
+        event.stopPropagation();
+        toggleCollapse();
+      });
+      headerTop.appendChild(chevron);
+
       header.appendChild(headerTop);
 
       var actions = document.createElement('div');
@@ -8770,7 +8819,7 @@
       var helpBtn = document.createElement('button');
       helpBtn.type = 'button';
       helpBtn.className = 'life-btn secondary';
-      helpBtn.textContent = personTaskLoading[task.id] ? 'Working...' : 'Help me start (30s)';
+      helpBtn.textContent = personTaskLoading[task.id] ? 'Working...' : 'AI breakdown';
       helpBtn.disabled = !!personTaskLoading[task.id];
       helpBtn.addEventListener('click', function() {
         generateTaskPlan(task);
@@ -8805,6 +8854,17 @@
       header.appendChild(actions);
       card.appendChild(header);
 
+      header.addEventListener('click', function(event) {
+        if (event.target.closest('button') || event.target.closest('input')) return;
+        toggleCollapse();
+      });
+
+      [helpBtn, doneBtn, editBtn].forEach(function(button) {
+        button.addEventListener('click', function(event) {
+          event.stopPropagation();
+        });
+      });
+
       var body = document.createElement('div');
       body.className = 'life-task-body';
 
@@ -8815,8 +8875,26 @@
         body.appendChild(notes);
       }
 
-      if (task.aiPlan) {
-        renderTaskPlan(body, task.aiPlan);
+      if (task.ui && task.ui.clarification) {
+        var clarification = document.createElement('div');
+        clarification.className = 'life-task-clarification';
+        var question = document.createElement('div');
+        question.textContent = task.ui.clarification.question;
+        clarification.appendChild(question);
+        task.ui.clarification.options.forEach(function(option) {
+          var optionBtn = document.createElement('button');
+          optionBtn.type = 'button';
+          optionBtn.className = 'life-btn secondary';
+          optionBtn.textContent = option;
+          optionBtn.addEventListener('click', function(event) {
+            event.stopPropagation();
+            task.ui.clarification = null;
+            saveTasks();
+            generateTaskPlan(task, true, option);
+          });
+          clarification.appendChild(optionBtn);
+        });
+        body.appendChild(clarification);
       }
 
       if (personTaskErrors[task.id]) {
@@ -8826,33 +8904,82 @@
         body.appendChild(status);
       }
 
-      var planActions = document.createElement('div');
-      planActions.className = 'life-task-plan-actions';
-      var regenBtn = document.createElement('button');
-      regenBtn.type = 'button';
-      regenBtn.className = 'life-btn secondary';
-      regenBtn.textContent = 'Regenerate plan';
-      regenBtn.addEventListener('click', function() {
-        generateTaskPlan(task, true);
+      var controls = document.createElement('div');
+      controls.className = 'life-task-controls';
+
+      var toggleCompleted = document.createElement('button');
+      toggleCompleted.type = 'button';
+      toggleCompleted.className = 'life-btn secondary';
+      toggleCompleted.textContent = task.ui && task.ui.hideCompleted ? 'Show completed' : 'Hide completed';
+      toggleCompleted.addEventListener('click', function(event) {
+        event.stopPropagation();
+        if (!task.ui) task.ui = { collapsed: false, hideCompleted: false };
+        task.ui.hideCompleted = !task.ui.hideCompleted;
+        saveTasks();
+        renderPersonTasks(activePersonId);
       });
-      var copyBtn = document.createElement('button');
-      copyBtn.type = 'button';
-      copyBtn.className = 'life-btn secondary';
-      copyBtn.textContent = 'Copy first step';
-      copyBtn.disabled = !task.aiPlan;
-      copyBtn.addEventListener('click', function() {
-        if (!task.aiPlan) return;
-        var firstStep = task.aiPlan.first_step_2min || '';
-        if (!firstStep) return;
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(firstStep);
+      controls.appendChild(toggleCompleted);
+
+      var markAllDone = document.createElement('button');
+      markAllDone.type = 'button';
+      markAllDone.className = 'life-btn secondary';
+      markAllDone.textContent = 'Mark all done';
+      markAllDone.addEventListener('click', function(event) {
+        event.stopPropagation();
+        (task.steps || []).forEach(function(step) { step.done = true; });
+        saveTasks();
+        renderPersonTasks(activePersonId);
+      });
+      controls.appendChild(markAllDone);
+
+      var resetSteps = document.createElement('button');
+      resetSteps.type = 'button';
+      resetSteps.className = 'life-btn secondary';
+      resetSteps.textContent = 'Reset';
+      resetSteps.addEventListener('click', function(event) {
+        event.stopPropagation();
+        (task.steps || []).forEach(function(step) { step.done = false; });
+        saveTasks();
+        renderPersonTasks(activePersonId);
+      });
+      controls.appendChild(resetSteps);
+
+      if (!task.ui || !task.ui.clarification) {
+        var checklist = document.createElement('ul');
+        checklist.className = 'life-task-checklist';
+        var visibleSteps = (task.steps || []).filter(function(step) {
+          return !(task.ui && task.ui.hideCompleted && step.done);
+        });
+        if (visibleSteps.length === 0) {
+          var empty = document.createElement('div');
+          empty.className = 'life-meta';
+          empty.textContent = task.steps && task.steps.length ? 'No steps to show.' : 'No checklist yet.';
+          body.appendChild(empty);
         } else {
-          window.prompt('Copy first step:', firstStep);
+          visibleSteps.forEach(function(step) {
+            var item = document.createElement('li');
+            item.className = 'life-task-step' + (step.done ? ' completed' : '');
+            var checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = !!step.done;
+            checkbox.addEventListener('click', function(event) {
+              event.stopPropagation();
+            });
+            checkbox.addEventListener('change', function() {
+              step.done = this.checked;
+              saveTasks();
+              renderPersonTasks(activePersonId);
+            });
+            var label = document.createElement('span');
+            label.textContent = step.text;
+            item.appendChild(checkbox);
+            item.appendChild(label);
+            checklist.appendChild(item);
+          });
+          body.appendChild(checklist);
         }
-      });
-      planActions.appendChild(regenBtn);
-      planActions.appendChild(copyBtn);
-      body.appendChild(planActions);
+        body.appendChild(controls);
+      }
 
       card.appendChild(body);
       return card;
@@ -8879,25 +9006,36 @@
       if (lifeTasksSave) lifeTasksSave.textContent = 'Save task';
     }
 
-    async function generateTaskPlan(task, isRegenerate) {
+    async function generateTaskPlan(task, isRegenerate, clarificationAnswer) {
       if (!task) return;
       personTaskLoading[task.id] = true;
       personTaskErrors[task.id] = '';
+      if (!task.ui) task.ui = { collapsed: false, hideCompleted: false };
       renderPersonTasks(activePersonId);
       var plan = null;
       try {
-        plan = await requestTaskPlan(task);
+        plan = await requestTaskPlan(task, clarificationAnswer);
         if (!plan) {
           throw new Error('AI response was too long or incomplete.');
         }
-        task.aiPlan = plan;
+        if (plan.clarification) {
+          task.ui.clarification = plan.clarification;
+        } else if (plan.steps) {
+          task.ui.clarification = null;
+          task.steps = plan.steps.map(function(step) {
+            return { id: generateGoalId('step'), text: step, done: false };
+          });
+          task.ui.collapsed = false;
+        }
       } catch (err) {
-        task.aiPlan = buildFallbackTaskPlan();
+        task.ui.clarification = null;
+        task.steps = buildFallbackTaskSteps().map(function(step) {
+          return { id: generateGoalId('step'), text: step, done: false };
+        });
         var message = err && err.message ? err.message : 'AI request failed.';
         personTaskErrors[task.id] = message + ' Using a fallback plan.';
       } finally {
         task.updatedAt = Date.now();
-        personTaskExpanded[task.id] = true;
         personTaskLoading[task.id] = false;
         saveTasks();
         renderPersonTasks(activePersonId);
@@ -13043,7 +13181,9 @@
             status: 'open',
             done: false,
             aiPlan: null,
-            scope: 'person'
+            scope: 'person',
+            steps: [],
+            ui: { collapsed: false, hideCompleted: false, clarification: null }
           });
         }
         saveTasks();
@@ -13229,7 +13369,9 @@
           createdAt: Date.now(),
           updatedAt: Date.now(),
           dueDate: null,
-          scope: 'person'
+          scope: 'person',
+          steps: [],
+          ui: { collapsed: false, hideCompleted: false, clarification: null }
         });
         saveTasks();
         renderLifeTasks();
@@ -13334,7 +13476,9 @@
             createdAt: Date.now(),
             updatedAt: Date.now(),
             dueDate: lifeTaskDue.value || null,
-            scope: 'life'
+            scope: 'life',
+            steps: [],
+            ui: { collapsed: false, hideCompleted: false, clarification: null }
           });
         }
         saveTasks();
