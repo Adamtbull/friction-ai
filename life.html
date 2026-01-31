@@ -7212,17 +7212,47 @@
             </div>
           `;
         } else {
-          grid.innerHTML = `
-            <div class="meal-ideas-empty" style="color: #e74c3c;">
-              <div class="meal-ideas-empty-icon">⚠️</div>
-              <p><strong>AI Generation Failed</strong></p>
-              <p style="font-size: 0.85rem; margin-top: 8px;">${error.message}</p>
-              <p style="font-size: 0.8rem; margin-top: 12px; color: var(--text-muted);">Check browser console (F12) for details.</p>
-              <button class="smart-meal-btn primary" onclick="generateMealIdeas()" style="margin-top: 16px;">Try Again</button>
-            </div>
-          `;
+          // API failed - fall back to offline meals
+          console.log('API failed, using offline meals');
+          useOfflineMeals();
         }
       }
+    }
+
+    function useOfflineMeals() {
+      const fallbackMeals = FALLBACK_MEALS[currentMealType] || FALLBACK_MEALS.dinner;
+
+      // Filter by dislikes
+      let filteredMeals = fallbackMeals.filter(meal => {
+        const mealText = (meal.name + ' ' + meal.ingredients.map(i => i.name).join(' ')).toLowerCase();
+        return !mealPreferences.dislikes.some(dislike =>
+          mealText.includes(dislike.toLowerCase())
+        );
+      });
+
+      // Filter by diet
+      if (mealPreferences.diet === 'vegetarian' || mealPreferences.diet === 'vegan') {
+        const meatKeywords = ['chicken', 'beef', 'pork', 'lamb', 'fish', 'salmon', 'tuna', 'prawn', 'bacon', 'ham', 'mince', 'steak'];
+        filteredMeals = filteredMeals.filter(meal => {
+          const mealText = (meal.name + ' ' + meal.ingredients.map(i => i.name).join(' ')).toLowerCase();
+          return !meatKeywords.some(meat => mealText.includes(meat));
+        });
+      }
+
+      // Shuffle and take 20
+      filteredMeals = filteredMeals.sort(() => Math.random() - 0.5).slice(0, 20);
+
+      // Add unique IDs
+      mealIdeas = filteredMeals.map((meal, index) => ({
+        ...meal,
+        id: Date.now() + index
+      }));
+
+      selectedMealIds.clear();
+      renderMealIdeasGrid();
+
+      // Show toast that we're using offline meals
+      showToast('Using offline meals (AI unavailable)', 'info');
     }
 
     function renderMealIdeasGrid() {
