@@ -4801,13 +4801,17 @@
     // MODAL MANAGEMENT
     // ========================================
     function openModal(sheetId) {
+      // Close all other modals first
+      document.querySelectorAll('.modal-sheet, .bottom-sheet').forEach(sheet => {
+        sheet.classList.remove('open');
+      });
       document.getElementById('modalOverlay').classList.add('open');
       document.getElementById(sheetId).classList.add('open');
     }
 
     function closeAllModals() {
       document.getElementById('modalOverlay').classList.remove('open');
-      document.querySelectorAll('.bottom-sheet').forEach(sheet => {
+      document.querySelectorAll('.modal-sheet, .bottom-sheet').forEach(sheet => {
         sheet.classList.remove('open');
       });
       closeFabMenu();
@@ -5816,46 +5820,22 @@
         }
       }
 
-      try {
-        // Try to use AI if available
-        const idToken = localStorage.getItem('google_id_token');
-        let steps = [];
-
-        if (idToken) {
-          // Try API call for AI breakdown
-          try {
-            const response = await fetch('/api/tasks/breakdown', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${idToken}`
-              },
-              body: JSON.stringify({ task: context })
-            });
-
-            if (response.ok) {
-              const data = await response.json();
-              steps = data.steps || [];
-            }
-          } catch (e) {
-            console.log('AI breakdown not available, using fallback');
-          }
+      // Small delay for UX, then use local breakdown
+      // (AI API can be added later if endpoint exists)
+      setTimeout(() => {
+        try {
+          const steps = generateLocalBreakdown(currentBreakdownTask, clarificationAnswers);
+          showBreakdownResult(steps);
+        } catch (error) {
+          console.error('Breakdown error:', error);
+          showBreakdownResult([
+            'Start by gathering what you need',
+            'Do the first small thing you can think of',
+            'Take it one step at a time',
+            'You\'ve got this!'
+          ]);
         }
-
-        // Fallback: Generate steps locally
-        if (steps.length === 0) {
-          steps = generateLocalBreakdown(currentBreakdownTask, clarificationAnswers);
-        }
-
-        // Show results
-        showBreakdownResult(steps);
-
-      } catch (error) {
-        console.error('Breakdown error:', error);
-        // Use local fallback
-        const steps = generateLocalBreakdown(currentBreakdownTask, clarificationAnswers);
-        showBreakdownResult(steps);
-      }
+      }, 800);
     }
 
     function generateLocalBreakdown(task, clarifications) {
