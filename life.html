@@ -6597,10 +6597,17 @@
         return;
       }
 
-      // Get just the product names (strip quantities like "500g")
+      // Get product names with brands
       const productNames = items.map(i => {
         // Remove quantity patterns like "500g", "2 cups", etc at the start
-        return i.name.replace(/^\d+\s*(g|kg|ml|L|cups?|tbsp|tsp|bunch|head|cloves?)\s+/i, '').trim();
+        let name = i.name.replace(/^\d+\s*(g|kg|ml|L|cups?|tbsp|tsp|bunch|head|cloves?)\s+/i, '').trim();
+
+        // If we have brand info from pricing, include it
+        if (i.brand && !name.toLowerCase().includes(i.brand.toLowerCase())) {
+          name = i.brand + ' ' + name;
+        }
+
+        return name;
       });
 
       // Join all items for search (space-separated works for most stores)
