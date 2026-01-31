@@ -92,6 +92,7 @@
       color: var(--primary);
     }
 
+    .back-btn,
     .settings-btn {
       width: 40px;
       height: 40px;
@@ -103,6 +104,18 @@
       justify-content: center;
       font-size: 1.25rem;
       cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .back-btn:hover,
+    .settings-btn:hover {
+      background: var(--border);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
     /* ========================================
@@ -291,17 +304,30 @@
       text-align: center;
       padding: 60px 20px;
       color: var(--text-muted);
+      animation: slideUp 0.4s ease-out;
     }
 
     .feed-empty-icon {
-      font-size: 3rem;
+      font-size: 3.5rem;
       margin-bottom: 16px;
-      opacity: 0.5;
+      animation: bounce 2s ease-in-out infinite;
     }
 
     .feed-empty-text {
       font-size: 0.95rem;
-      line-height: 1.6;
+      line-height: 1.7;
+      max-width: 280px;
+      margin: 0 auto;
+    }
+
+    .feed-empty-hint {
+      margin-top: 20px;
+      padding: 12px 16px;
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      display: inline-block;
+      font-size: 0.85rem;
+      box-shadow: var(--shadow-sm);
     }
 
     /* ========================================
@@ -320,6 +346,16 @@
     @keyframes slideUp {
       from { opacity: 0; transform: translateY(12px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
     }
 
     .feed-card.pinned {
@@ -792,6 +828,60 @@
       flex: 1;
     }
 
+    .screenshot-import-placeholder {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border: 2px dashed var(--adult);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      margin-bottom: 16px;
+      transition: all 0.2s;
+    }
+
+    .screenshot-import-placeholder:hover {
+      background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+    }
+
+    .screenshot-icon {
+      font-size: 1.5rem;
+    }
+
+    .screenshot-text {
+      flex: 1;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .screenshot-badge {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      background: var(--adult);
+      color: white;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .form-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .form-divider::before,
+    .form-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
     .btn {
       padding: 14px 24px;
       border-radius: var(--radius-sm);
@@ -940,6 +1030,88 @@
     }
 
     /* ========================================
+       TIMER MODAL
+       ======================================== */
+    .timer-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.95);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .timer-modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .timer-content {
+      text-align: center;
+      color: white;
+    }
+
+    .timer-display {
+      font-size: 5rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -2px;
+      margin-bottom: 8px;
+    }
+
+    .timer-label {
+      font-size: 1.1rem;
+      opacity: 0.7;
+      margin-bottom: 32px;
+    }
+
+    .timer-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+
+    .timer-btn {
+      padding: 14px 32px;
+      border-radius: var(--radius-md);
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+
+    .timer-btn:active {
+      transform: scale(0.95);
+    }
+
+    .timer-btn.pause {
+      background: white;
+      color: var(--primary);
+    }
+
+    .timer-btn.stop {
+      background: var(--success);
+      color: white;
+    }
+
+    .timer-ios-hint {
+      margin-top: 32px;
+      font-size: 0.85rem;
+      opacity: 0.5;
+    }
+
+    .timer-ios-hint a {
+      color: var(--adult);
+      text-decoration: underline;
+    }
+
+    /* ========================================
        UTILITIES
        ======================================== */
     .text-danger { color: var(--danger); }
@@ -965,11 +1137,14 @@
 </head>
 <body>
   <!-- BUILD TAG -->
-  <div class="build-tag">BUILD v1.1</div>
+  <div class="build-tag">BUILD v1.2</div>
 
   <!-- HEADER -->
   <header class="app-header">
-    <div class="app-title">Life</div>
+    <div class="header-left">
+      <button class="back-btn" onclick="window.location.href='/'" title="Back to Home">←</button>
+      <div class="app-title">Life</div>
+    </div>
     <button class="settings-btn" onclick="openSettings()">⚙️</button>
   </header>
 
@@ -1089,6 +1264,55 @@
     </div>
     <div class="sheet-actions">
       <button class="btn btn-secondary" onclick="closeSettings()">Close</button>
+    </div>
+  </div>
+
+  <!-- TIMER MODAL -->
+  <div class="timer-modal" id="timerModal">
+    <div class="timer-content">
+      <div class="timer-display" id="timerDisplay">5:00</div>
+      <div class="timer-label" id="timerLabel">Focus Time</div>
+      <div class="timer-actions">
+        <button class="timer-btn pause" id="timerPauseBtn" onclick="toggleTimer()">Pause</button>
+        <button class="timer-btn stop" onclick="stopTimer()">Done</button>
+      </div>
+      <div class="timer-ios-hint">
+        On iPhone? <a href="#" id="timerIOSLink">Open in Shortcuts</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHARE TASK SHEET -->
+  <div class="bottom-sheet" id="shareTaskSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 class="sheet-title">Share Task</h3>
+      <p class="sheet-subtitle" id="shareTaskSubtitle">Assign to another adult</p>
+    </div>
+    <div class="sheet-content">
+      <div class="form-group">
+        <label class="form-label">Task Description *</label>
+        <input type="text" class="form-input" id="shareTaskTitle" placeholder="e.g., Pick up kids at 3pm">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Assign To *</label>
+        <select class="form-select" id="shareTaskAssignee"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Priority</label>
+        <select class="form-select" id="shareTaskPriority">
+          <option value="normal">Normal</option>
+          <option value="urgent">Urgent - Needs action today</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea class="form-textarea" id="shareTaskNotes" placeholder="Any extra details..."></textarea>
+      </div>
+    </div>
+    <div class="sheet-actions">
+      <button class="btn btn-secondary" onclick="closeShareTaskSheet()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitShareTask()">Share</button>
     </div>
   </div>
 
@@ -1222,9 +1446,66 @@
       return familyMembers.find(m => m.id === id);
     }
 
+    // Timer state
+    let timerInterval = null;
+    let timerSeconds = 0;
+    let timerPaused = false;
+    let timerMinutes = 5;
+
     function startTimer(minutes) {
-      const url = `shortcuts://run-shortcut?name=Start%20Focus%20Timer&input=${minutes}`;
-      window.location.href = url;
+      timerMinutes = minutes;
+      const iosUrl = `shortcuts://run-shortcut?name=Start%20Focus%20Timer&input=${minutes}`;
+
+      // Check if likely iOS (for the hint link)
+      document.getElementById('timerIOSLink').href = iosUrl;
+
+      // Start web-based timer
+      timerSeconds = minutes * 60;
+      timerPaused = false;
+      updateTimerDisplay();
+      document.getElementById('timerPauseBtn').textContent = 'Pause';
+      document.getElementById('timerModal').classList.add('active');
+
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(tickTimer, 1000);
+    }
+
+    function tickTimer() {
+      if (timerPaused) return;
+
+      timerSeconds--;
+      updateTimerDisplay();
+
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        document.getElementById('timerDisplay').textContent = "Done!";
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+      }
+    }
+
+    function updateTimerDisplay() {
+      const mins = Math.floor(timerSeconds / 60);
+      const secs = timerSeconds % 60;
+      document.getElementById('timerDisplay').textContent =
+        `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function toggleTimer() {
+      timerPaused = !timerPaused;
+      document.getElementById('timerPauseBtn').textContent = timerPaused ? 'Resume' : 'Pause';
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      document.getElementById('timerModal').classList.remove('active');
+    }
+
+    function showScreenshotHint() {
+      alert('Screenshot import is coming soon! For now, please enter your roster details manually below.');
     }
 
     // ========================================
@@ -1288,8 +1569,7 @@
           if (opt.action === 'weekly') {
             generateWeeklyPlan();
           } else if (opt.action === 'share') {
-            // Share task - open assignment modal
-            alert('Share Task feature coming soon!');
+            openShareTaskSheet(member.id);
           } else {
             openFormModal(member.id, opt.action);
           }
@@ -1366,11 +1646,16 @@
         const hasMembers = familyMembers.length > 0;
         content.innerHTML = `
           <div class="feed-empty">
-            <div class="feed-empty-icon">${hasMembers ? '📱' : '👋'}</div>
+            <div class="feed-empty-icon">${hasMembers ? '✨' : '👋'}</div>
             <div class="feed-empty-text">
               ${hasMembers
-                ? '<strong>Your feed is empty</strong><br>Long-press a bubble above to add appointments, events, or tasks.'
-                : '<strong>Welcome to Life!</strong><br>Tap the + button above to add your first family member.'}
+                ? '<strong>All clear!</strong><br>Nothing needs your attention right now.'
+                : '<strong>Welcome to Life!</strong><br>Your family command center starts here.'}
+            </div>
+            <div class="feed-empty-hint">
+              ${hasMembers
+                ? '💡 Long-press a bubble to quickly add items'
+                : '💡 Tap + to add your first family member'}
             </div>
           </div>
         `;
@@ -1626,6 +1911,11 @@
           <ul>
             ${(data.handoffs || ['Check roster for overlaps']).map(i => `<li>${i}</li>`).join('')}
           </ul>
+
+          <h4>❓ Open Questions</h4>
+          <ul>
+            ${(data.openQuestions || ['Any appointments need confirming?']).map(i => `<li>${i}</li>`).join('')}
+          </ul>
         </div>
       `;
     }
@@ -1704,6 +1994,14 @@
 
         case 'roster':
           return `
+            <div class="screenshot-import-placeholder" onclick="showScreenshotHint()">
+              <span class="screenshot-icon">📷</span>
+              <span class="screenshot-text">Import from Screenshot</span>
+              <span class="screenshot-badge">Coming Soon</span>
+            </div>
+            <div class="form-divider">
+              <span>or enter manually</span>
+            </div>
             <div class="form-group">
               <label class="form-label">Date *</label>
               <input type="date" class="form-input" id="formDate">
@@ -1961,7 +2259,8 @@
         appointments: [],
         prepTasks: [],
         priorities: [],
-        handoffs: []
+        handoffs: [],
+        openQuestions: []
       };
 
       // Week overview
@@ -2027,6 +2326,24 @@
       if (summaryData.handoffs.length === 0) {
         summaryData.handoffs.push('No handoff conflicts detected');
       }
+
+      // Open Questions (max 5)
+      if (appointments.length > 0) {
+        summaryData.openQuestions.push('Any appointments need confirming or rescheduling?');
+      }
+      if (rosters.length > 0) {
+        summaryData.openQuestions.push('Are all roster shifts finalized?');
+      }
+      const children = familyMembers.filter(m => m.role === 'child');
+      if (children.length > 0) {
+        summaryData.openQuestions.push('Any childcare arrangements needed?');
+      }
+      if (events.length > 0) {
+        summaryData.openQuestions.push('Any event prep or RSVPs outstanding?');
+      }
+      summaryData.openQuestions.push('What could derail this week?');
+      // Limit to 5
+      summaryData.openQuestions = summaryData.openQuestions.slice(0, 5);
 
       // Create weekly summary item
       const weeklyItem = {
@@ -2209,6 +2526,70 @@
     function closeSettings() {
       document.getElementById('modalOverlay').classList.remove('open');
       document.getElementById('settingsSheet').classList.remove('open');
+    }
+
+    // Share Task Functions
+    let shareTaskFromMember = null;
+
+    function openShareTaskSheet(fromMemberId) {
+      shareTaskFromMember = fromMemberId;
+      const fromMember = getMemberById(fromMemberId);
+
+      // Populate assignee dropdown with other adults
+      const assigneeSelect = document.getElementById('shareTaskAssignee');
+      const otherAdults = familyMembers.filter(m => m.role === 'adult' && m.id !== fromMemberId);
+
+      assigneeSelect.innerHTML = otherAdults.length > 0
+        ? otherAdults.map(m => `<option value="${m.id}">${m.icon} ${m.name}</option>`).join('')
+        : '<option value="">No other adults available</option>';
+
+      document.getElementById('shareTaskSubtitle').textContent = `From ${fromMember?.name || 'Unknown'}`;
+      document.getElementById('shareTaskTitle').value = '';
+      document.getElementById('shareTaskPriority').value = 'normal';
+      document.getElementById('shareTaskNotes').value = '';
+
+      openModal('shareTaskSheet');
+    }
+
+    function closeShareTaskSheet() {
+      document.getElementById('modalOverlay').classList.remove('open');
+      document.getElementById('shareTaskSheet').classList.remove('open');
+      shareTaskFromMember = null;
+    }
+
+    function submitShareTask() {
+      const title = document.getElementById('shareTaskTitle').value.trim();
+      const assigneeId = document.getElementById('shareTaskAssignee').value;
+      const priority = document.getElementById('shareTaskPriority').value;
+      const notes = document.getElementById('shareTaskNotes').value.trim();
+
+      if (!title) {
+        alert('Please enter a task description');
+        return;
+      }
+      if (!assigneeId) {
+        alert('Please select someone to assign this task to');
+        return;
+      }
+
+      const fromMember = getMemberById(shareTaskFromMember);
+      const toMember = getMemberById(assigneeId);
+
+      const sharedTask = {
+        id: generateId(),
+        memberId: assigneeId,
+        type: 'handoff',
+        title: title,
+        notes: notes ? `From ${fromMember?.name || 'Unknown'}: ${notes}` : `Shared by ${fromMember?.name || 'Unknown'}`,
+        createdAt: new Date().toISOString(),
+        priority: priority,
+        fromMemberId: shareTaskFromMember
+      };
+
+      feedItems.push(sharedTask);
+      saveData();
+      closeShareTaskSheet();
+      renderFeed();
     }
 
     function confirmResetData() {
