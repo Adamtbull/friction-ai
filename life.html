@@ -965,7 +965,7 @@
 </head>
 <body>
   <!-- BUILD TAG -->
-  <div class="build-tag">BUILD v1.0</div>
+  <div class="build-tag">BUILD v1.1</div>
 
   <!-- HEADER -->
   <header class="app-header">
@@ -1046,6 +1046,7 @@
         <select class="form-select" id="memberRole">
           <option value="adult">Adult</option>
           <option value="child">Child</option>
+          <option value="household">Household</option>
         </select>
       </div>
       <div class="form-group">
@@ -1105,11 +1106,8 @@
     };
 
     // --- DEFAULT DATA ---
-    const DEFAULT_MEMBERS = [
-      { id: 'me', name: 'Me', role: 'adult', icon: '👨' },
-      { id: 'wife', name: 'Wife', role: 'adult', icon: '👩' },
-      { id: 'household', name: 'Home', role: 'household', icon: '🏠' }
-    ];
+    // Start empty - user adds their own family members
+    const DEFAULT_MEMBERS = [];
 
     // --- MENU OPTIONS BY ROLE ---
     const MENU_OPTIONS = {
@@ -1165,16 +1163,11 @@
         const membersData = localStorage.getItem(STORAGE_KEYS.MEMBERS);
         const feedData = localStorage.getItem(STORAGE_KEYS.FEED);
 
-        familyMembers = membersData ? JSON.parse(membersData) : [...DEFAULT_MEMBERS];
+        familyMembers = membersData ? JSON.parse(membersData) : [];
         feedItems = feedData ? JSON.parse(feedData) : [];
-
-        // Ensure household always exists
-        if (!familyMembers.find(m => m.role === 'household')) {
-          familyMembers.push({ id: 'household', name: 'Home', role: 'household', icon: '🏠' });
-        }
       } catch (e) {
         console.error('Error loading data:', e);
-        familyMembers = [...DEFAULT_MEMBERS];
+        familyMembers = [];
         feedItems = [];
       }
     }
@@ -1370,12 +1363,14 @@
       const content = document.getElementById('feedContent');
 
       if (feedItems.length === 0) {
+        const hasMembers = familyMembers.length > 0;
         content.innerHTML = `
           <div class="feed-empty">
-            <div class="feed-empty-icon">📱</div>
+            <div class="feed-empty-icon">${hasMembers ? '📱' : '👋'}</div>
             <div class="feed-empty-text">
-              <strong>Your feed is empty</strong><br>
-              Long-press a bubble above to add appointments, events, or tasks.
+              ${hasMembers
+                ? '<strong>Your feed is empty</strong><br>Long-press a bubble above to add appointments, events, or tasks.'
+                : '<strong>Welcome to Life!</strong><br>Tap the + button above to add your first family member.'}
             </div>
           </div>
         `;
@@ -2083,7 +2078,7 @@
       }
 
       if (!icon) {
-        icon = role === 'child' ? '👶' : '👤';
+        icon = role === 'child' ? '👶' : role === 'household' ? '🏠' : '👤';
       }
 
       const newMember = {
