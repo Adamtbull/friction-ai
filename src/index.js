@@ -522,7 +522,7 @@ export default {
           {
             role: "system",
             content: [
-              "You are an Australian meal planning assistant that generates recipes.",
+              "You are an Australian meal planning assistant that generates DELICIOUS, EXCITING, COMPLETE recipes.",
               "",
               "CRITICAL RULES - YOU MUST FOLLOW THESE EXACTLY:",
               "1. NEVER include ANY ingredient that contains or is related to items in the DISLIKES list",
@@ -530,6 +530,24 @@ export default {
               "3. All recipes must be practical and achievable for home cooking",
               "4. Use Australian supermarket brands (Coles, Woolworths, Aldi) for ingredients",
               "5. Include specific brand names where appropriate (e.g., 'Leggo's pasta sauce', 'San Remo pasta')",
+              "",
+              "COMPLETE BALANCED MEALS - VERY IMPORTANT:",
+              "- EVERY dinner recipe MUST be a COMPLETE MEAL with protein AND sides",
+              "- Always include: main protein + carb/starch side + vegetable side",
+              "- Examples of complete meals:",
+              "  * 'Honey Garlic Chicken with Garlic Butter Rice and Roasted Broccoli'",
+              "  * 'Beef Stir-Fry with Jasmine Rice and Asian Greens'",
+              "  * 'Herb-Crusted Salmon with Creamy Mashed Potatoes and Honey Glazed Carrots'",
+              "- NEVER just list a protein alone (e.g., NO 'Grilled Chicken' by itself)",
+              "- Include ALL components in the recipe name and ingredients",
+              "",
+              "MAKE IT EXCITING & DELICIOUS:",
+              "- Use BOLD flavors: garlic butter, honey glazes, herbs, spices, marinades",
+              "- Include flavor boosters: lemon zest, fresh herbs, toasted sesame, parmesan",
+              "- Think restaurant-quality dishes people get EXCITED to cook and eat",
+              "- Use descriptive appetizing names (e.g., 'Crispy Honey Soy Chicken' not just 'Chicken')",
+              "- Add finishing touches: fresh herbs, sauce drizzles, garnishes in the steps",
+              "- NO bland, boring meals - every dish should make mouths water!",
               "",
               "RECIPE COMPLEXITY:",
               complexityInstructions,
@@ -545,8 +563,9 @@ export default {
               "Return ONLY a JSON array with this structure:",
               "[",
               "  {",
-              '    "name": "Meal Name",',
+              '    "name": "Exciting Complete Meal Name with Sides",',
               '    "emoji": "🍝",',
+              '    "description": "One sentence that makes this dish sound irresistible",',
               '    "time": "30 min",',
               '    "servings": 4,',
               '    "cookingMethod": "stovetop",',
@@ -563,7 +582,7 @@ export default {
           {
             role: "user",
             content: [
-              "Generate " + count + " unique " + mealType + " recipes for " + servings + " servings.",
+              "Generate " + count + " unique, EXCITING " + mealType + " recipes for " + servings + " servings.",
               "",
               "DISLIKES (MUST AVOID ALL OF THESE - no exceptions):",
               dislikes.length > 0 ? dislikes.join(", ") : "None specified",
@@ -574,9 +593,12 @@ export default {
               "Maximum ingredients per recipe: " + maxIngredients,
               "Quality level: " + budget,
               "",
-              "Remember: If vegetarian/vegan is specified, absolutely NO meat/fish products.",
-              "If an ingredient is disliked, do NOT include it or any dish that typically contains it.",
-              "Generate a VARIETY of different meals - no repetition!"
+              "Remember:",
+              "- If vegetarian/vegan is specified, absolutely NO meat/fish products",
+              "- If an ingredient is disliked, do NOT include it or any dish that typically contains it",
+              "- Generate a VARIETY of different cuisines and styles - no repetition!",
+              "- EVERY meal must be COMPLETE with protein + sides + vegetables",
+              "- Make every dish sound and taste AMAZING - bold flavors, proper seasoning, appetizing!"
             ].join("\n")
           }
         ];
