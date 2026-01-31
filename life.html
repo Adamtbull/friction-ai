@@ -330,6 +330,101 @@
       box-shadow: var(--shadow-sm);
     }
 
+    /* Today View Card */
+    .today-view-card {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: white;
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .today-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .today-icon {
+      font-size: 1.25rem;
+    }
+
+    .today-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      flex: 1;
+    }
+
+    .today-date {
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+
+    .today-items {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .today-item {
+      font-size: 0.9rem;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.1);
+      border-radius: var(--radius-sm);
+    }
+
+    .today-item strong {
+      color: #93c5fd;
+    }
+
+    /* Undo Toast */
+    .undo-toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--primary);
+      color: white;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow-lg);
+      z-index: 1500;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .undo-toast.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .undo-toast-text {
+      font-size: 0.9rem;
+    }
+
+    .undo-toast-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .undo-toast-btn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
     /* ========================================
        FEED CARDS
        ======================================== */
@@ -1264,6 +1359,13 @@
   </main>
 
   <!-- FLOATING ACTION BUTTON -->
+  <!-- UNDO TOAST -->
+  <div class="undo-toast" id="undoToast">
+    <span class="undo-toast-text">Item removed</span>
+    <button class="undo-toast-btn" onclick="undoDelete()">Undo</button>
+  </div>
+
+  <!-- FLOATING ACTION BUTTON -->
   <button class="fab" id="fabBtn" onclick="toggleFabMenu()">+</button>
 
   <div class="fab-menu" id="fabMenu">
@@ -1672,25 +1774,55 @@
       reader.readAsDataURL(file);
     }
 
-    // AI parsing function - calls your backend or external API
+    // AI parsing function - calls the backend API
     async function parseAppointmentImage(imageBase64) {
-      // TODO: Replace with actual API call to ChatGPT/Perplexity
-      // For now, this is a placeholder that shows the concept
+      const idToken = localStorage.getItem('google_id_token');
 
-      // Example API call structure:
-      // const response = await fetch('/api/parse-appointment', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ image: imageBase64 })
-      // });
-      // return await response.json();
+      if (!idToken) {
+        console.warn('No auth token - user needs to sign in');
+        return null;
+      }
 
-      // Placeholder - simulate a delay and return null
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      try {
+        // Remove data URL prefix if present
+        const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, '');
 
-      // Return null to indicate manual entry needed
-      // When API is connected, return: { title, date, time, location, notes }
-      return null;
+        const response = await fetch('/api/appointments/extract', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`
+          },
+          body: JSON.stringify({
+            imageBase64: base64Data,
+            locale: 'en-AU',
+            tz: 'Australia/Sydney'
+          })
+        });
+
+        if (!response.ok) {
+          console.error('API error:', response.status);
+          return null;
+        }
+
+        const data = await response.json();
+
+        if (data.appointment) {
+          // Map API response to our form fields
+          return {
+            title: data.appointment.title || '',
+            date: data.appointment.date || '',
+            time: data.appointment.time || '',
+            location: data.appointment.venueName || data.appointment.address || '',
+            notes: data.appointment.notes || ''
+          };
+        }
+
+        return null;
+      } catch (err) {
+        console.error('Failed to parse appointment image:', err);
+        return null;
+      }
     }
 
     // Location search - opens maps
@@ -1907,6 +2039,12 @@
 
       let html = '';
 
+      // Today View - show what's happening today
+      const todayCard = renderTodayView();
+      if (todayCard) {
+        html += todayCard;
+      }
+
       if (pinned.length > 0) {
         html += '<div class="feed-section-title">Pinned</div>';
         pinned.forEach(item => html += renderFeedCard(item));
@@ -1918,6 +2056,47 @@
       }
 
       content.innerHTML = html;
+    }
+
+    function renderTodayView() {
+      const today = new Date().toISOString().split('T')[0];
+      const todayItems = feedItems.filter(item => item.date === today && item.type !== 'weekly');
+
+      if (todayItems.length === 0) return '';
+
+      const appointments = todayItems.filter(i => i.type === 'appointment');
+      const rosters = todayItems.filter(i => i.type === 'roster');
+      const events = todayItems.filter(i => i.type === 'event');
+
+      let itemsHtml = '';
+
+      appointments.forEach(a => {
+        const member = getMemberById(a.memberId);
+        itemsHtml += `<div class="today-item">🩺 <strong>${formatTime(a.time)}</strong> - ${a.title} (${member?.name || 'Unknown'})</div>`;
+      });
+
+      rosters.forEach(r => {
+        const member = getMemberById(r.memberId);
+        itemsHtml += `<div class="today-item">📋 <strong>${formatTime(r.startTime)}</strong> - ${member?.name || 'Adult'} working</div>`;
+      });
+
+      events.forEach(e => {
+        const member = getMemberById(e.memberId);
+        itemsHtml += `<div class="today-item">🎉 ${e.time ? `<strong>${formatTime(e.time)}</strong> - ` : ''}${e.title}</div>`;
+      });
+
+      return `
+        <div class="today-view-card">
+          <div class="today-header">
+            <span class="today-icon">📅</span>
+            <span class="today-title">Today</span>
+            <span class="today-date">${new Date().toLocaleDateString('en-AU', { weekday: 'long', day: 'numeric', month: 'short' })}</span>
+          </div>
+          <div class="today-items">
+            ${itemsHtml}
+          </div>
+        </div>
+      `;
     }
 
     function renderFeedCard(item) {
@@ -2150,10 +2329,51 @@
     // ========================================
     // FEED ACTIONS
     // ========================================
+    let lastDeletedItem = null;
+    let undoTimeout = null;
+
     function markDone(itemId) {
-      feedItems = feedItems.filter(item => item.id !== itemId);
+      const item = feedItems.find(i => i.id === itemId);
+      if (!item) return;
+
+      // Store for undo
+      lastDeletedItem = { ...item };
+
+      // Remove item
+      feedItems = feedItems.filter(i => i.id !== itemId);
       saveData();
       renderFeed();
+
+      // Show undo toast
+      showUndoToast();
+    }
+
+    function showUndoToast() {
+      const toast = document.getElementById('undoToast');
+      toast.classList.add('visible');
+
+      // Clear any existing timeout
+      if (undoTimeout) clearTimeout(undoTimeout);
+
+      // Auto-hide after 5 seconds
+      undoTimeout = setTimeout(() => {
+        toast.classList.remove('visible');
+        lastDeletedItem = null;
+      }, 5000);
+    }
+
+    function undoDelete() {
+      if (lastDeletedItem) {
+        feedItems.push(lastDeletedItem);
+        saveData();
+        renderFeed();
+        lastDeletedItem = null;
+      }
+
+      // Hide toast
+      const toast = document.getElementById('undoToast');
+      toast.classList.remove('visible');
+      if (undoTimeout) clearTimeout(undoTimeout);
     }
 
     function toggleStep(itemId, stepIdx) {
