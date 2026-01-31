@@ -7030,19 +7030,73 @@
     let selectedMealIds = new Set();
     let currentMealType = 'breakfast';
 
-    // Fallback meal database (used when API fails)
+    // Extensive offline meal database
     const FALLBACK_MEALS = {
       breakfast: [
         { id: 1, name: 'Avocado Toast', emoji: '🥑', time: '10 min', servings: 2, ingredients: [{name: 'Helga\'s sourdough bread', quantity: '4 slices'}, {name: 'Avocado', quantity: '2'}, {name: 'Eggs', quantity: '4'}, {name: 'Cherry tomatoes', quantity: '100g'}], steps: ['Toast bread until golden', 'Mash avocado with salt and pepper', 'Poach or fry eggs', 'Spread avocado on toast, top with eggs and tomatoes'] },
-        { id: 2, name: 'Pancakes', emoji: '🥞', time: '20 min', servings: 4, ingredients: [{name: 'White Wings pancake mix', quantity: '200g'}, {name: 'Milk', quantity: '250ml'}, {name: 'Eggs', quantity: '2'}, {name: 'Maple syrup', quantity: '100ml'}], steps: ['Mix pancake batter', 'Heat pan with butter', 'Pour batter and cook until bubbles form', 'Flip and cook other side', 'Serve with maple syrup'] }
+        { id: 2, name: 'Pancakes', emoji: '🥞', time: '20 min', servings: 4, ingredients: [{name: 'White Wings pancake mix', quantity: '200g'}, {name: 'Milk', quantity: '250ml'}, {name: 'Eggs', quantity: '2'}, {name: 'Maple syrup', quantity: '100ml'}], steps: ['Mix pancake batter', 'Heat pan with butter', 'Pour batter and cook until bubbles form', 'Flip and cook other side', 'Serve with maple syrup'] },
+        { id: 3, name: 'Eggs Benedict', emoji: '🍳', time: '25 min', servings: 2, ingredients: [{name: 'English muffins', quantity: '2'}, {name: 'Eggs', quantity: '4'}, {name: 'Ham slices', quantity: '4'}, {name: 'Hollandaise sauce', quantity: '100ml'}], steps: ['Toast muffins', 'Poach eggs', 'Layer ham on muffins', 'Top with poached eggs and hollandaise'] },
+        { id: 4, name: 'Bacon & Eggs', emoji: '🥓', time: '15 min', servings: 2, ingredients: [{name: 'Bacon rashers', quantity: '6'}, {name: 'Eggs', quantity: '4'}, {name: 'Bread', quantity: '4 slices'}, {name: 'Butter', quantity: '20g'}], steps: ['Fry bacon until crispy', 'Fry eggs in bacon fat', 'Toast bread', 'Serve together'] },
+        { id: 5, name: 'Smoothie Bowl', emoji: '🫐', time: '10 min', servings: 1, ingredients: [{name: 'Frozen berries', quantity: '200g'}, {name: 'Banana', quantity: '1'}, {name: 'Greek yoghurt', quantity: '100g'}, {name: 'Granola', quantity: '50g'}], steps: ['Blend berries, banana and yoghurt', 'Pour into bowl', 'Top with granola and fresh fruit'] },
+        { id: 6, name: 'French Toast', emoji: '🍞', time: '15 min', servings: 2, ingredients: [{name: 'Brioche bread', quantity: '4 slices'}, {name: 'Eggs', quantity: '2'}, {name: 'Milk', quantity: '100ml'}, {name: 'Cinnamon', quantity: '1 tsp'}], steps: ['Whisk eggs, milk and cinnamon', 'Dip bread in mixture', 'Fry until golden on both sides', 'Serve with maple syrup'] },
+        { id: 7, name: 'Breakfast Burrito', emoji: '🌯', time: '20 min', servings: 2, ingredients: [{name: 'Tortillas', quantity: '2 large'}, {name: 'Eggs', quantity: '4'}, {name: 'Bacon', quantity: '4 rashers'}, {name: 'Cheese', quantity: '50g'}], steps: ['Scramble eggs', 'Cook bacon', 'Warm tortillas', 'Fill with eggs, bacon and cheese, roll up'] },
+        { id: 8, name: 'Porridge', emoji: '🥣', time: '10 min', servings: 2, ingredients: [{name: 'Uncle Tobys oats', quantity: '1 cup'}, {name: 'Milk', quantity: '2 cups'}, {name: 'Honey', quantity: '2 tbsp'}, {name: 'Banana', quantity: '1'}], steps: ['Cook oats with milk', 'Stir until creamy', 'Top with sliced banana and honey'] },
+        { id: 9, name: 'Omelette', emoji: '🍳', time: '15 min', servings: 1, ingredients: [{name: 'Eggs', quantity: '3'}, {name: 'Cheese', quantity: '30g'}, {name: 'Ham', quantity: '50g'}, {name: 'Mushrooms', quantity: '50g'}], steps: ['Beat eggs', 'Cook mushrooms and ham', 'Pour eggs in pan', 'Add fillings and fold'] },
+        { id: 10, name: 'Fruit Salad', emoji: '🍓', time: '10 min', servings: 2, ingredients: [{name: 'Strawberries', quantity: '100g'}, {name: 'Blueberries', quantity: '100g'}, {name: 'Banana', quantity: '1'}, {name: 'Yoghurt', quantity: '200g'}], steps: ['Wash and chop fruit', 'Combine in bowl', 'Serve with yoghurt'] },
+        { id: 11, name: 'Muesli Bowl', emoji: '🥣', time: '5 min', servings: 1, ingredients: [{name: 'Carman\'s muesli', quantity: '60g'}, {name: 'Milk', quantity: '200ml'}, {name: 'Honey', quantity: '1 tbsp'}, {name: 'Berries', quantity: '50g'}], steps: ['Pour muesli into bowl', 'Add milk', 'Top with honey and berries'] },
+        { id: 12, name: 'Vegemite Toast', emoji: '🍞', time: '5 min', servings: 2, ingredients: [{name: 'Bread', quantity: '4 slices'}, {name: 'Butter', quantity: '20g'}, {name: 'Vegemite', quantity: '2 tsp'}, {name: 'Avocado', quantity: '1'}], steps: ['Toast bread', 'Spread butter then vegemite', 'Top with sliced avocado'] },
+        { id: 13, name: 'Chia Pudding', emoji: '🥛', time: '5 min + overnight', servings: 2, ingredients: [{name: 'Chia seeds', quantity: '4 tbsp'}, {name: 'Coconut milk', quantity: '400ml'}, {name: 'Honey', quantity: '2 tbsp'}, {name: 'Mango', quantity: '1'}], steps: ['Mix chia seeds with coconut milk and honey', 'Refrigerate overnight', 'Top with fresh mango'] },
+        { id: 14, name: 'Shakshuka', emoji: '🍳', time: '25 min', servings: 2, ingredients: [{name: 'Eggs', quantity: '4'}, {name: 'Canned tomatoes', quantity: '400g'}, {name: 'Capsicum', quantity: '1'}, {name: 'Feta cheese', quantity: '50g'}], steps: ['Sauté capsicum', 'Add tomatoes and simmer', 'Create wells and crack in eggs', 'Cover and cook until eggs set'] },
+        { id: 15, name: 'Breakfast Wrap', emoji: '🌯', time: '15 min', servings: 2, ingredients: [{name: 'Wraps', quantity: '2'}, {name: 'Scrambled eggs', quantity: '4'}, {name: 'Avocado', quantity: '1'}, {name: 'Sriracha', quantity: '1 tbsp'}], steps: ['Scramble eggs', 'Warm wraps', 'Add eggs, avocado and sriracha', 'Roll up'] },
+        { id: 16, name: 'Acai Bowl', emoji: '🫐', time: '10 min', servings: 1, ingredients: [{name: 'Acai packet', quantity: '100g'}, {name: 'Banana', quantity: '1'}, {name: 'Granola', quantity: '50g'}, {name: 'Coconut flakes', quantity: '20g'}], steps: ['Blend acai with half banana', 'Pour into bowl', 'Top with granola, banana and coconut'] },
+        { id: 17, name: 'Hash Browns & Eggs', emoji: '🥔', time: '20 min', servings: 2, ingredients: [{name: 'Hash browns', quantity: '4'}, {name: 'Eggs', quantity: '4'}, {name: 'Baked beans', quantity: '200g'}, {name: 'Toast', quantity: '2 slices'}], steps: ['Cook hash browns', 'Fry eggs', 'Heat beans', 'Serve together with toast'] },
+        { id: 18, name: 'Crumpets', emoji: '🧈', time: '10 min', servings: 2, ingredients: [{name: 'Crumpets', quantity: '4'}, {name: 'Butter', quantity: '40g'}, {name: 'Honey', quantity: '2 tbsp'}, {name: 'Strawberries', quantity: '100g'}], steps: ['Toast crumpets', 'Spread with butter', 'Drizzle honey', 'Serve with strawberries'] },
+        { id: 19, name: 'Yoghurt Parfait', emoji: '🍨', time: '5 min', servings: 1, ingredients: [{name: 'Greek yoghurt', quantity: '200g'}, {name: 'Granola', quantity: '50g'}, {name: 'Mixed berries', quantity: '100g'}, {name: 'Honey', quantity: '1 tbsp'}], steps: ['Layer yoghurt in glass', 'Add granola and berries', 'Repeat layers', 'Drizzle with honey'] },
+        { id: 20, name: 'Cheese Toastie', emoji: '🧀', time: '10 min', servings: 1, ingredients: [{name: 'Bread', quantity: '2 slices'}, {name: 'Cheese', quantity: '50g'}, {name: 'Butter', quantity: '15g'}, {name: 'Tomato', quantity: '1'}], steps: ['Butter bread', 'Add cheese and tomato', 'Toast in sandwich press until golden'] }
       ],
       lunch: [
-        { id: 3, name: 'Chicken Caesar Salad', emoji: '🥗', time: '15 min', servings: 2, ingredients: [{name: 'Chicken breast', quantity: '300g'}, {name: 'Cos lettuce', quantity: '1 head'}, {name: 'Paul Newman Caesar dressing', quantity: '100ml'}, {name: 'Parmesan', quantity: '50g'}], steps: ['Grill chicken until cooked', 'Chop lettuce', 'Slice chicken', 'Combine with dressing and parmesan'] },
-        { id: 4, name: 'BLT Sandwich', emoji: '🥪', time: '10 min', servings: 2, ingredients: [{name: 'Bacon rashers', quantity: '6'}, {name: 'Lettuce', quantity: '4 leaves'}, {name: 'Tomato', quantity: '1'}, {name: 'Helga\'s bread', quantity: '4 slices'}], steps: ['Cook bacon until crispy', 'Toast bread', 'Assemble with lettuce and tomato'] }
+        { id: 21, name: 'Chicken Caesar Salad', emoji: '🥗', time: '15 min', servings: 2, ingredients: [{name: 'Chicken breast', quantity: '300g'}, {name: 'Cos lettuce', quantity: '1 head'}, {name: 'Caesar dressing', quantity: '100ml'}, {name: 'Parmesan', quantity: '50g'}], steps: ['Grill chicken', 'Chop lettuce', 'Slice chicken', 'Combine with dressing and parmesan'] },
+        { id: 22, name: 'BLT Sandwich', emoji: '🥪', time: '10 min', servings: 2, ingredients: [{name: 'Bacon rashers', quantity: '6'}, {name: 'Lettuce', quantity: '4 leaves'}, {name: 'Tomato', quantity: '1'}, {name: 'Bread', quantity: '4 slices'}], steps: ['Cook bacon until crispy', 'Toast bread', 'Assemble with lettuce and tomato'] },
+        { id: 23, name: 'Tuna Salad', emoji: '🐟', time: '10 min', servings: 2, ingredients: [{name: 'Canned tuna', quantity: '185g'}, {name: 'Mixed leaves', quantity: '100g'}, {name: 'Cherry tomatoes', quantity: '100g'}, {name: 'Olive oil', quantity: '2 tbsp'}], steps: ['Drain tuna', 'Combine with salad leaves', 'Add tomatoes', 'Dress with olive oil'] },
+        { id: 24, name: 'Chicken Wrap', emoji: '🌯', time: '15 min', servings: 2, ingredients: [{name: 'Chicken breast', quantity: '300g'}, {name: 'Tortilla wraps', quantity: '2'}, {name: 'Lettuce', quantity: '50g'}, {name: 'Mayo', quantity: '2 tbsp'}], steps: ['Cook and slice chicken', 'Warm tortillas', 'Fill with chicken, lettuce and mayo', 'Roll up'] },
+        { id: 25, name: 'Soup & Bread', emoji: '🍜', time: '20 min', servings: 2, ingredients: [{name: 'Campbell\'s soup', quantity: '420g'}, {name: 'Crusty bread', quantity: '4 slices'}, {name: 'Butter', quantity: '30g'}], steps: ['Heat soup', 'Toast bread', 'Spread with butter', 'Serve together'] },
+        { id: 26, name: 'Greek Salad', emoji: '🥗', time: '10 min', servings: 2, ingredients: [{name: 'Cucumber', quantity: '1'}, {name: 'Tomatoes', quantity: '2'}, {name: 'Feta cheese', quantity: '100g'}, {name: 'Olives', quantity: '50g'}], steps: ['Chop vegetables', 'Cube feta', 'Combine all ingredients', 'Dress with olive oil and lemon'] },
+        { id: 27, name: 'Ham & Cheese Toastie', emoji: '🥪', time: '10 min', servings: 1, ingredients: [{name: 'Bread', quantity: '2 slices'}, {name: 'Ham', quantity: '50g'}, {name: 'Cheese', quantity: '50g'}, {name: 'Butter', quantity: '15g'}], steps: ['Butter bread', 'Layer ham and cheese', 'Toast until golden'] },
+        { id: 28, name: 'Poke Bowl', emoji: '🍚', time: '20 min', servings: 2, ingredients: [{name: 'Salmon', quantity: '200g'}, {name: 'Sushi rice', quantity: '1 cup'}, {name: 'Avocado', quantity: '1'}, {name: 'Edamame', quantity: '100g'}], steps: ['Cook rice', 'Cube salmon', 'Slice avocado', 'Assemble bowl with all ingredients'] },
+        { id: 29, name: 'Quesadilla', emoji: '🧀', time: '15 min', servings: 2, ingredients: [{name: 'Tortillas', quantity: '4'}, {name: 'Cheese', quantity: '150g'}, {name: 'Chicken', quantity: '200g'}, {name: 'Salsa', quantity: '100ml'}], steps: ['Grill chicken and slice', 'Fill tortillas with chicken and cheese', 'Cook until cheese melts', 'Serve with salsa'] },
+        { id: 30, name: 'Pasta Salad', emoji: '🍝', time: '20 min', servings: 4, ingredients: [{name: 'Pasta', quantity: '300g'}, {name: 'Cherry tomatoes', quantity: '200g'}, {name: 'Mozzarella', quantity: '125g'}, {name: 'Basil pesto', quantity: '3 tbsp'}], steps: ['Cook pasta and cool', 'Halve tomatoes', 'Cube mozzarella', 'Combine with pesto'] },
+        { id: 31, name: 'Fried Rice', emoji: '🍚', time: '20 min', servings: 2, ingredients: [{name: 'Cooked rice', quantity: '2 cups'}, {name: 'Eggs', quantity: '2'}, {name: 'Frozen peas', quantity: '100g'}, {name: 'Soy sauce', quantity: '2 tbsp'}], steps: ['Scramble eggs', 'Add rice and peas', 'Season with soy sauce', 'Stir fry until hot'] },
+        { id: 32, name: 'Hummus Wrap', emoji: '🌯', time: '10 min', servings: 1, ingredients: [{name: 'Wrap', quantity: '1'}, {name: 'Hummus', quantity: '3 tbsp'}, {name: 'Cucumber', quantity: '50g'}, {name: 'Falafel', quantity: '3'}], steps: ['Spread hummus on wrap', 'Add falafel and cucumber', 'Roll up'] },
+        { id: 33, name: 'Club Sandwich', emoji: '🥪', time: '15 min', servings: 1, ingredients: [{name: 'Bread', quantity: '3 slices'}, {name: 'Chicken', quantity: '100g'}, {name: 'Bacon', quantity: '2 rashers'}, {name: 'Lettuce & tomato', quantity: '50g'}], steps: ['Toast bread', 'Cook bacon', 'Layer ingredients between bread', 'Cut diagonally'] },
+        { id: 34, name: 'Noodle Soup', emoji: '🍜', time: '15 min', servings: 2, ingredients: [{name: 'Instant noodles', quantity: '2 packets'}, {name: 'Chicken stock', quantity: '1L'}, {name: 'Bok choy', quantity: '2'}, {name: 'Boiled egg', quantity: '2'}], steps: ['Boil stock', 'Cook noodles', 'Add bok choy', 'Top with halved eggs'] },
+        { id: 35, name: 'Bruschetta', emoji: '🍅', time: '15 min', servings: 2, ingredients: [{name: 'Baguette', quantity: '1'}, {name: 'Tomatoes', quantity: '4'}, {name: 'Basil', quantity: '10 leaves'}, {name: 'Garlic', quantity: '2 cloves'}], steps: ['Slice and toast baguette', 'Dice tomatoes with basil', 'Rub bread with garlic', 'Top with tomato mixture'] },
+        { id: 36, name: 'Jacket Potato', emoji: '🥔', time: '60 min', servings: 2, ingredients: [{name: 'Potatoes', quantity: '2 large'}, {name: 'Butter', quantity: '30g'}, {name: 'Baked beans', quantity: '200g'}, {name: 'Cheese', quantity: '50g'}], steps: ['Bake potatoes until soft', 'Cut open and add butter', 'Top with beans and cheese'] },
+        { id: 37, name: 'Sushi Roll', emoji: '🍣', time: '30 min', servings: 2, ingredients: [{name: 'Sushi rice', quantity: '1 cup'}, {name: 'Nori sheets', quantity: '4'}, {name: 'Cucumber', quantity: '1'}, {name: 'Avocado', quantity: '1'}], steps: ['Cook and season rice', 'Lay nori on mat', 'Add rice and fillings', 'Roll tightly and slice'] },
+        { id: 38, name: 'Caprese Salad', emoji: '🍅', time: '10 min', servings: 2, ingredients: [{name: 'Tomatoes', quantity: '3'}, {name: 'Fresh mozzarella', quantity: '200g'}, {name: 'Fresh basil', quantity: '1 bunch'}, {name: 'Balsamic glaze', quantity: '2 tbsp'}], steps: ['Slice tomatoes and mozzarella', 'Arrange alternating slices', 'Add basil leaves', 'Drizzle with balsamic'] },
+        { id: 39, name: 'Minestrone', emoji: '🥣', time: '30 min', servings: 4, ingredients: [{name: 'Mixed vegetables', quantity: '400g'}, {name: 'Cannellini beans', quantity: '400g'}, {name: 'Pasta', quantity: '100g'}, {name: 'Vegetable stock', quantity: '1L'}], steps: ['Sauté vegetables', 'Add stock and beans', 'Cook pasta in soup', 'Season and serve'] },
+        { id: 40, name: 'Egg Salad Sandwich', emoji: '🥪', time: '15 min', servings: 2, ingredients: [{name: 'Eggs', quantity: '4'}, {name: 'Mayo', quantity: '3 tbsp'}, {name: 'Bread', quantity: '4 slices'}, {name: 'Chives', quantity: '1 tbsp'}], steps: ['Boil and chop eggs', 'Mix with mayo and chives', 'Spread on bread', 'Make sandwiches'] }
       ],
       dinner: [
-        { id: 5, name: 'Spaghetti Bolognese', emoji: '🍝', time: '30 min', servings: 4, ingredients: [{name: 'Beef mince', quantity: '500g'}, {name: 'San Remo spaghetti', quantity: '400g'}, {name: 'Leggo\'s pasta sauce', quantity: '500g'}, {name: 'Parmesan', quantity: '50g'}], steps: ['Brown mince', 'Add sauce and simmer', 'Cook pasta', 'Combine and serve with parmesan'] },
-        { id: 6, name: 'Chicken Stir Fry', emoji: '🥘', time: '20 min', servings: 4, ingredients: [{name: 'Chicken breast', quantity: '500g'}, {name: 'SunRice jasmine rice', quantity: '2 cups'}, {name: 'Mixed vegetables', quantity: '400g'}, {name: 'Kikkoman soy sauce', quantity: '3 tbsp'}], steps: ['Cook rice', 'Stir fry chicken', 'Add vegetables', 'Season with soy sauce'] }
+        { id: 41, name: 'Spaghetti Bolognese', emoji: '🍝', time: '30 min', servings: 4, ingredients: [{name: 'Beef mince', quantity: '500g'}, {name: 'San Remo spaghetti', quantity: '400g'}, {name: 'Leggo\'s pasta sauce', quantity: '500g'}, {name: 'Parmesan', quantity: '50g'}], steps: ['Brown mince', 'Add sauce and simmer', 'Cook pasta', 'Combine and serve with parmesan'] },
+        { id: 42, name: 'Chicken Stir Fry', emoji: '🥘', time: '20 min', servings: 4, ingredients: [{name: 'Chicken breast', quantity: '500g'}, {name: 'SunRice jasmine rice', quantity: '2 cups'}, {name: 'Mixed vegetables', quantity: '400g'}, {name: 'Soy sauce', quantity: '3 tbsp'}], steps: ['Cook rice', 'Stir fry chicken', 'Add vegetables', 'Season with soy sauce'] },
+        { id: 43, name: 'Fish & Chips', emoji: '🐟', time: '30 min', servings: 4, ingredients: [{name: 'Fish fillets', quantity: '4'}, {name: 'Frozen chips', quantity: '500g'}, {name: 'Lemon', quantity: '1'}, {name: 'Tartare sauce', quantity: '100ml'}], steps: ['Bake chips', 'Pan fry fish', 'Serve with lemon and tartare'] },
+        { id: 44, name: 'Tacos', emoji: '🌮', time: '25 min', servings: 4, ingredients: [{name: 'Beef mince', quantity: '500g'}, {name: 'Taco kit', quantity: '1'}, {name: 'Lettuce', quantity: '100g'}, {name: 'Cheese', quantity: '100g'}], steps: ['Brown mince with seasoning', 'Warm shells', 'Assemble with toppings'] },
+        { id: 45, name: 'Butter Chicken', emoji: '🍛', time: '35 min', servings: 4, ingredients: [{name: 'Chicken thigh', quantity: '600g'}, {name: 'Patak\'s butter chicken sauce', quantity: '450g'}, {name: 'Rice', quantity: '2 cups'}, {name: 'Naan bread', quantity: '4'}], steps: ['Cook chicken', 'Add sauce and simmer', 'Serve with rice and naan'] },
+        { id: 46, name: 'Pork Chops', emoji: '🥩', time: '25 min', servings: 4, ingredients: [{name: 'Pork chops', quantity: '4'}, {name: 'Mashed potato', quantity: '500g'}, {name: 'Green beans', quantity: '200g'}, {name: 'Gravy', quantity: '250ml'}], steps: ['Season and pan fry chops', 'Prepare mash', 'Steam beans', 'Serve with gravy'] },
+        { id: 47, name: 'Salmon & Veggies', emoji: '🐟', time: '25 min', servings: 2, ingredients: [{name: 'Salmon fillets', quantity: '2'}, {name: 'Asparagus', quantity: '1 bunch'}, {name: 'Lemon', quantity: '1'}, {name: 'Olive oil', quantity: '2 tbsp'}], steps: ['Season salmon', 'Bake with asparagus', 'Drizzle with lemon'] },
+        { id: 48, name: 'Beef Burgers', emoji: '🍔', time: '25 min', servings: 4, ingredients: [{name: 'Beef patties', quantity: '4'}, {name: 'Burger buns', quantity: '4'}, {name: 'Cheese', quantity: '4 slices'}, {name: 'Lettuce & tomato', quantity: '100g'}], steps: ['Grill patties', 'Toast buns', 'Assemble with toppings'] },
+        { id: 49, name: 'Carbonara', emoji: '🍝', time: '20 min', servings: 4, ingredients: [{name: 'Spaghetti', quantity: '400g'}, {name: 'Bacon', quantity: '200g'}, {name: 'Eggs', quantity: '3'}, {name: 'Parmesan', quantity: '100g'}], steps: ['Cook pasta', 'Fry bacon', 'Mix eggs and parmesan', 'Combine all quickly'] },
+        { id: 50, name: 'Roast Chicken', emoji: '🍗', time: '90 min', servings: 4, ingredients: [{name: 'Whole chicken', quantity: '1.5kg'}, {name: 'Potatoes', quantity: '500g'}, {name: 'Carrots', quantity: '300g'}, {name: 'Gravy', quantity: '250ml'}], steps: ['Season chicken', 'Roast with vegetables', 'Rest and carve', 'Serve with gravy'] },
+        { id: 51, name: 'Lamb Chops', emoji: '🥩', time: '20 min', servings: 4, ingredients: [{name: 'Lamb chops', quantity: '8'}, {name: 'Mint sauce', quantity: '100ml'}, {name: 'Mashed potato', quantity: '500g'}, {name: 'Peas', quantity: '200g'}], steps: ['Season and grill chops', 'Make mash', 'Cook peas', 'Serve with mint sauce'] },
+        { id: 52, name: 'Pad Thai', emoji: '🍜', time: '25 min', servings: 2, ingredients: [{name: 'Rice noodles', quantity: '200g'}, {name: 'Prawns', quantity: '200g'}, {name: 'Pad Thai sauce', quantity: '100ml'}, {name: 'Bean sprouts', quantity: '100g'}], steps: ['Soak noodles', 'Cook prawns', 'Stir fry with sauce', 'Add sprouts'] },
+        { id: 53, name: 'Lasagne', emoji: '🍝', time: '60 min', servings: 6, ingredients: [{name: 'Beef mince', quantity: '500g'}, {name: 'Lasagne sheets', quantity: '250g'}, {name: 'Pasta sauce', quantity: '500g'}, {name: 'Cheese sauce', quantity: '500ml'}], steps: ['Make meat sauce', 'Layer with pasta and cheese sauce', 'Bake until golden'] },
+        { id: 54, name: 'Thai Green Curry', emoji: '🍛', time: '30 min', servings: 4, ingredients: [{name: 'Chicken thigh', quantity: '500g'}, {name: 'Green curry paste', quantity: '3 tbsp'}, {name: 'Coconut milk', quantity: '400ml'}, {name: 'Rice', quantity: '2 cups'}], steps: ['Fry paste', 'Add chicken', 'Pour in coconut milk', 'Serve with rice'] },
+        { id: 55, name: 'Fried Rice', emoji: '🍚', time: '20 min', servings: 4, ingredients: [{name: 'Cooked rice', quantity: '4 cups'}, {name: 'Eggs', quantity: '3'}, {name: 'Vegetables', quantity: '200g'}, {name: 'Soy sauce', quantity: '3 tbsp'}], steps: ['Scramble eggs', 'Add rice and veg', 'Season with soy sauce'] },
+        { id: 56, name: 'Shepherd\'s Pie', emoji: '🥧', time: '45 min', servings: 4, ingredients: [{name: 'Lamb mince', quantity: '500g'}, {name: 'Mashed potato', quantity: '600g'}, {name: 'Frozen vegetables', quantity: '200g'}, {name: 'Gravy', quantity: '250ml'}], steps: ['Brown mince with veg', 'Add gravy', 'Top with mash', 'Bake until golden'] },
+        { id: 57, name: 'Chicken Schnitzel', emoji: '🍗', time: '25 min', servings: 4, ingredients: [{name: 'Chicken breast', quantity: '4'}, {name: 'Breadcrumbs', quantity: '200g'}, {name: 'Eggs', quantity: '2'}, {name: 'Lemon', quantity: '1'}], steps: ['Flatten chicken', 'Coat in egg then crumbs', 'Pan fry until golden', 'Serve with lemon'] },
+        { id: 58, name: 'Beef Nachos', emoji: '🌮', time: '20 min', servings: 4, ingredients: [{name: 'Beef mince', quantity: '400g'}, {name: 'Corn chips', quantity: '200g'}, {name: 'Cheese', quantity: '150g'}, {name: 'Salsa', quantity: '200g'}], steps: ['Cook mince with spices', 'Layer chips on tray', 'Top with mince and cheese', 'Bake until melted'] },
+        { id: 59, name: 'Honey Soy Chicken', emoji: '🍗', time: '30 min', servings: 4, ingredients: [{name: 'Chicken thighs', quantity: '8'}, {name: 'Honey', quantity: '3 tbsp'}, {name: 'Soy sauce', quantity: '3 tbsp'}, {name: 'Rice', quantity: '2 cups'}], steps: ['Marinate chicken', 'Bake until caramelised', 'Serve with rice'] },
+        { id: 60, name: 'Beef Stroganoff', emoji: '🥘', time: '30 min', servings: 4, ingredients: [{name: 'Beef strips', quantity: '500g'}, {name: 'Mushrooms', quantity: '200g'}, {name: 'Sour cream', quantity: '200ml'}, {name: 'Egg noodles', quantity: '400g'}], steps: ['Sear beef', 'Cook mushrooms', 'Add sour cream', 'Serve over noodles'] }
       ]
     };
 
@@ -7075,9 +7129,9 @@
       grid.innerHTML = '<div class="meal-ideas-empty"><div class="ai-loading-spinner"></div><p>Generating ' + currentMealType + ' ideas with AI...</p></div>';
 
       try {
-        const token = localStorage.getItem('friction_id_token');
+        const token = localStorage.getItem('google_id_token');
         if (!token) {
-          throw new Error('Please sign in to generate meal ideas');
+          throw new Error('Please sign in with Google to generate AI meal ideas. Go to the main page to sign in.');
         }
 
         // Get quality preference from settings
@@ -7114,14 +7168,22 @@
             budget: quality,
             complexity: mealPreferences.complexity || 'any',
             cookingMethod: mealPreferences.cookingMethod || 'any',
-            count: 20
+            count: 10  // Reduced from 20 to improve API reliability
           })
         });
 
+        console.log('API response status:', response.status);
+
         if (!response.ok) {
-          const err = await response.json();
-          console.error('API error:', err);
-          throw new Error(err.error || 'Failed to generate meals');
+          const errText = await response.text();
+          console.error('API error response:', errText);
+          let errObj;
+          try {
+            errObj = JSON.parse(errText);
+          } catch (e) {
+            throw new Error('API error: ' + response.status + ' - ' + errText.substring(0, 200));
+          }
+          throw new Error(errObj.error || 'Failed to generate meals (status ' + response.status + ')');
         }
 
         const data = await response.json();
@@ -7142,18 +7204,74 @@
       } catch (error) {
         console.error('Meal generation error:', error);
 
+        // Check if it's an authentication error
+        const isAuthError = error.message.includes('sign in');
+
         // Show error in the grid
         const grid = document.getElementById('mealIdeasGrid');
-        grid.innerHTML = `
-          <div class="meal-ideas-empty" style="color: #e74c3c;">
-            <div class="meal-ideas-empty-icon">⚠️</div>
-            <p><strong>AI Generation Failed</strong></p>
-            <p style="font-size: 0.85rem; margin-top: 8px;">${error.message}</p>
-            <p style="font-size: 0.8rem; margin-top: 12px; color: var(--text-muted);">Check browser console (F12) for details.<br>Make sure you're signed in.</p>
-            <button class="smart-meal-btn primary" onclick="generateMealIdeas()" style="margin-top: 16px;">Try Again</button>
-          </div>
-        `;
+        if (isAuthError) {
+          grid.innerHTML = `
+            <div class="meal-ideas-empty" style="color: #e74c3c;">
+              <div class="meal-ideas-empty-icon">🔐</div>
+              <p><strong>Sign In Required</strong></p>
+              <p style="font-size: 0.85rem; margin-top: 8px;">AI meal generation requires a Google account.</p>
+              <a href="/" class="smart-meal-btn primary" style="margin-top: 16px; text-decoration: none; display: inline-block;">Sign In with Google</a>
+              <button class="smart-meal-btn" onclick="generateMealIdeas()" style="margin-top: 8px;">Try Again</button>
+            </div>
+          `;
+        } else {
+          // API failed - show error details and offer fallback
+          console.log('API failed:', error.message);
+          const grid = document.getElementById('mealIdeasGrid');
+          grid.innerHTML = `
+            <div class="meal-ideas-empty" style="color: #e74c3c;">
+              <div class="meal-ideas-empty-icon">⚠️</div>
+              <p><strong>AI Generation Failed</strong></p>
+              <p style="font-size: 0.85rem; margin-top: 8px;">${error.message}</p>
+              <div style="margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+                <button class="smart-meal-btn primary" onclick="generateMealIdeas()">Try Again</button>
+                <button class="smart-meal-btn" onclick="useOfflineMeals()">Use Offline Meals</button>
+              </div>
+            </div>
+          `;
+        }
       }
+    }
+
+    function useOfflineMeals() {
+      const fallbackMeals = FALLBACK_MEALS[currentMealType] || FALLBACK_MEALS.dinner;
+
+      // Filter by dislikes
+      let filteredMeals = fallbackMeals.filter(meal => {
+        const mealText = (meal.name + ' ' + meal.ingredients.map(i => i.name).join(' ')).toLowerCase();
+        return !mealPreferences.dislikes.some(dislike =>
+          mealText.includes(dislike.toLowerCase())
+        );
+      });
+
+      // Filter by diet
+      if (mealPreferences.diet === 'vegetarian' || mealPreferences.diet === 'vegan') {
+        const meatKeywords = ['chicken', 'beef', 'pork', 'lamb', 'fish', 'salmon', 'tuna', 'prawn', 'bacon', 'ham', 'mince', 'steak'];
+        filteredMeals = filteredMeals.filter(meal => {
+          const mealText = (meal.name + ' ' + meal.ingredients.map(i => i.name).join(' ')).toLowerCase();
+          return !meatKeywords.some(meat => mealText.includes(meat));
+        });
+      }
+
+      // Shuffle and take 20
+      filteredMeals = filteredMeals.sort(() => Math.random() - 0.5).slice(0, 20);
+
+      // Add unique IDs
+      mealIdeas = filteredMeals.map((meal, index) => ({
+        ...meal,
+        id: Date.now() + index
+      }));
+
+      selectedMealIds.clear();
+      renderMealIdeasGrid();
+
+      // Show toast that we're using offline meals
+      showToast('Using offline meals (AI unavailable)', 'info');
     }
 
     function renderMealIdeasGrid() {
@@ -7311,9 +7429,9 @@
       let priceData = null;
 
       try {
-        const token = localStorage.getItem('friction_id_token');
+        const token = localStorage.getItem('google_id_token');
         if (!token) {
-          throw new Error('Please sign in');
+          throw new Error('Please sign in with Google to search prices');
         }
 
         // Get selected stores from preferences
