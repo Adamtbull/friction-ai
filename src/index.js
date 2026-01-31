@@ -439,7 +439,7 @@ export default {
         var maxIngredients = parseInt(bodyMeals.maxIngredients, 10) || 12;
         var budget = bodyMeals.budget || "standard"; // budget, standard, premium
         var count = parseInt(bodyMeals.count, 10) || 6;
-        if (count > 12) count = 12;
+        if (count > 20) count = 20;
         if (count < 1) count = 1;
 
         var mealsRate = await enforceRateLimit(env, "meals:generate:" + hashEmail(authMeals.email), 20, 600);

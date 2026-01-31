@@ -6590,9 +6590,14 @@
         return;
       }
 
+      // Refresh shopping items from localStorage
+      shoppingItems = JSON.parse(localStorage.getItem('life_shopping') || '[]');
       const items = shoppingItems.filter(i => !i.completed);
 
+      console.log('Opening store with items:', items);
+
       if (items.length === 0) {
+        showToast('Add items to your shopping list first!');
         window.open(store.base, '_blank');
         return;
       }
@@ -6614,6 +6619,7 @@
       const searchQuery = productNames.join(' ');
       const searchUrl = store.search + encodeURIComponent(searchQuery);
 
+      console.log('Search URL:', searchUrl);
       showToast(`Opening ${storeName.charAt(0).toUpperCase() + storeName.slice(1)} with ${items.length} items...`);
 
       window.open(searchUrl, '_blank');
@@ -7024,7 +7030,21 @@
         }
 
         // Get quality preference from settings
-        const quality = document.querySelector('input[name="quality"]:checked')?.value || 'standard';
+        const quality = document.querySelector('input[name="quality"]:checked')?.value || mealPreferences.budget || 'standard';
+
+        // Build diet preferences array from the diet setting
+        const dietPrefs = [];
+        if (mealPreferences.diet && mealPreferences.diet !== 'none') {
+          dietPrefs.push(mealPreferences.diet);
+        }
+
+        console.log('Generating meals with:', {
+          mealType: currentMealType,
+          dislikes: mealPreferences.dislikes,
+          dietPreferences: dietPrefs,
+          servings: mealPreferences.servings,
+          maxIngredients: mealPreferences.maxIngredients
+        });
 
         const response = await fetch('/api/meals/generate', {
           method: 'POST',
@@ -7034,21 +7054,23 @@
           },
           body: JSON.stringify({
             mealType: currentMealType,
-            dislikes: mealPreferences.dislikes,
-            dietPreferences: mealPreferences.dietaryRestrictions || [],
-            servings: parseInt(mealPreferences.mealSize) || 4,
+            dislikes: mealPreferences.dislikes || [],
+            dietPreferences: dietPrefs,
+            servings: parseInt(mealPreferences.servings) || 4,
             maxIngredients: parseInt(mealPreferences.maxIngredients) || 12,
             budget: quality,
-            count: 6
+            count: 20
           })
         });
 
         if (!response.ok) {
           const err = await response.json();
+          console.error('API error:', err);
           throw new Error(err.error || 'Failed to generate meals');
         }
 
         const data = await response.json();
+        console.log('Received meals:', data);
         mealIdeas = data.meals || [];
         selectedMealIds.clear();
         renderMealIdeasGrid();
@@ -7059,7 +7081,7 @@
         mealIdeas = mealIdeas.filter(meal => {
           const ingredientNames = meal.ingredients.map(i => typeof i === 'string' ? i : i.name);
           const hasDisliked = ingredientNames.some(ing =>
-            mealPreferences.dislikes.some(dis => ing.toLowerCase().includes(dis.toLowerCase()))
+            (mealPreferences.dislikes || []).some(dis => ing.toLowerCase().includes(dis.toLowerCase()))
           );
           return !hasDisliked;
         });
