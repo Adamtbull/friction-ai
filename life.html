@@ -6,6 +6,7 @@
   <title>Life Assistant - Family Operations Hub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     /* ========================================
        LIFE PAGE - COMPLETE STYLES
@@ -4333,6 +4334,65 @@
       return `${baseKey}_${getCurrentUserId()}`;
     }
 
+    // --- GOOGLE SIGN-IN ---
+    const GOOGLE_CLIENT_ID = '37442638167-t8m3fql61v05h01qmvall1bki9k88tim.apps.googleusercontent.com';
+    let pendingActionAfterSignIn = null;
+
+    function renderGoogleSignInButton(containerId, actionAfterSignIn) {
+      pendingActionAfterSignIn = actionAfterSignIn;
+
+      // Wait for Google API to load
+      if (typeof google === 'undefined' || !google.accounts) {
+        setTimeout(() => renderGoogleSignInButton(containerId, actionAfterSignIn), 100);
+        return;
+      }
+
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleGoogleSignInCallback
+      });
+
+      google.accounts.id.renderButton(container, {
+        theme: 'outline',
+        size: 'large',
+        text: 'signin_with',
+        width: 250
+      });
+    }
+
+    function handleGoogleSignInCallback(response) {
+      // Decode the JWT token
+      const base64Url = response.credential.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const padded = base64 + '==='.slice((base64.length + 3) % 4);
+      const payload = JSON.parse(atob(padded));
+
+      // Store user info
+      const user = {
+        email: payload.email,
+        name: payload.name,
+        picture: payload.picture
+      };
+      localStorage.setItem('friction_user', JSON.stringify(user));
+      localStorage.setItem('google_id_token', response.credential);
+
+      // Reload user-specific data
+      loadShoppingItems();
+      loadMealData();
+      loadAdhdTasks();
+
+      showToast('Signed in as ' + user.name);
+
+      // Execute pending action
+      if (pendingActionAfterSignIn === 'meals') {
+        generateMealIdeas();
+      }
+      pendingActionAfterSignIn = null;
+    }
+
     // --- STORAGE KEYS ---
     const STORAGE_KEYS = {
       MEMBERS: 'FAMILY_MEMBERS_V1',
@@ -7511,7 +7571,8 @@
         console.error('Meal generation error:', error);
 
         // Check if it's an authentication error
-        const isAuthError = error.message.includes('sign in');
+        const isAuthError = error.message.toLowerCase().includes('sign in') ||
+                           error.message.toLowerCase().includes('authentication');
 
         // Show error in the grid
         const grid = document.getElementById('mealIdeasGrid');
@@ -7519,16 +7580,17 @@
           grid.innerHTML = `
             <div class="meal-ideas-empty" style="color: #e74c3c;">
               <div class="meal-ideas-empty-icon">🔐</div>
-              <p><strong>Sign In Required</strong></p>
-              <p style="font-size: 0.85rem; margin-top: 8px;">AI meal generation requires a Google account.</p>
-              <a href="/" class="smart-meal-btn primary" style="margin-top: 16px; text-decoration: none; display: inline-block;">Sign In with Google</a>
-              <button class="smart-meal-btn" onclick="generateMealIdeas()" style="margin-top: 8px;">Try Again</button>
+              <p><strong>Session Expired</strong></p>
+              <p style="font-size: 0.85rem; margin-top: 8px;">Please sign in again to use AI features.</p>
+              <div id="googleSignInButtonMeals" style="margin-top: 16px;"></div>
+              <button class="smart-meal-btn" onclick="useOfflineMeals()" style="margin-top: 12px;">Use Offline Meals Instead</button>
             </div>
           `;
+          // Render Google Sign-In button
+          renderGoogleSignInButton('googleSignInButtonMeals', 'meals');
         } else {
           // API failed - show error details and offer fallback
           console.log('API failed:', error.message);
-          const grid = document.getElementById('mealIdeasGrid');
           grid.innerHTML = `
             <div class="meal-ideas-empty" style="color: #e74c3c;">
               <div class="meal-ideas-empty-icon">⚠️</div>
