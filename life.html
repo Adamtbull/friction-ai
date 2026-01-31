@@ -4519,8 +4519,130 @@
       document.getElementById('timerModal').classList.remove('active');
     }
 
-    function showScreenshotHint() {
-      alert('Screenshot import is coming soon! For now, please enter your roster details manually below.');
+    // Roster photo handling with AI parsing for multiple shifts
+    let rosterPhotoData = null;
+    let extractedShifts = [];
+
+    async function handleRosterPhoto(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const preview = document.getElementById('rosterPhotoPreview');
+      preview.classList.add('has-image');
+      preview.innerHTML = `
+        <img src="${URL.createObjectURL(file)}" alt="Roster" style="max-height: 150px; object-fit: contain;">
+        <div class="ai-status">🤖 Analyzing roster... This may take a moment for large schedules.</div>
+      `;
+
+      // Convert to base64 for API
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        rosterPhotoData = e.target.result;
+
+        // Call AI to parse the roster
+        try {
+          const shifts = await parseRosterImage(rosterPhotoData);
+          extractedShifts = shifts || [];
+
+          if (extractedShifts.length > 0) {
+            // Show preview of all extracted shifts
+            let shiftsHtml = extractedShifts.map((shift, idx) => `
+              <div class="extracted-shift" style="display:flex; justify-content:space-between; padding:8px; background:var(--surface); border-radius:8px; margin:4px 0;">
+                <span><strong>${shift.date}</strong></span>
+                <span>${shift.startTime} - ${shift.endTime}</span>
+                <span style="color:var(--text-muted);">${shift.location || ''}</span>
+              </div>
+            `).join('');
+
+            preview.innerHTML = `
+              <div style="max-height: 200px; overflow-y: auto;">
+                <div class="ai-status" style="background:#dcfce7;color:#166534; margin-bottom:8px;">✓ Found ${extractedShifts.length} shifts!</div>
+                ${shiftsHtml}
+              </div>
+              <button class="form-submit" style="margin-top:12px; width:100%;" onclick="addAllExtractedShifts()">
+                📅 Add All ${extractedShifts.length} Shifts to Calendar
+              </button>
+            `;
+          } else {
+            preview.innerHTML = `
+              <img src="${rosterPhotoData}" alt="Roster" style="max-height: 100px;">
+              <div class="ai-status" style="background:#fef3c7;color:#92400e;">No shifts found. Try a clearer image or enter manually.</div>
+            `;
+          }
+        } catch (err) {
+          console.error('AI parsing failed:', err);
+          preview.innerHTML = `
+            <img src="${rosterPhotoData}" alt="Roster" style="max-height: 100px;">
+            <div class="ai-status" style="background:#fee2e2;color:#991b1b;">Could not extract shifts: ${err.message}</div>
+          `;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function parseRosterImage(imageBase64) {
+      const idToken = localStorage.getItem('google_id_token');
+
+      if (!idToken) {
+        throw new Error('Please sign in to use AI features');
+      }
+
+      const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, '');
+
+      const response = await fetch('/api/roster/extract', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+        },
+        body: JSON.stringify({
+          imageBase64: base64Data,
+          locale: 'en-AU',
+          tz: 'Australia/Sydney'
+        })
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to parse roster');
+      }
+
+      const data = await response.json();
+      return data.shifts || [];
+    }
+
+    function addAllExtractedShifts() {
+      if (extractedShifts.length === 0) {
+        alert('No shifts to add');
+        return;
+      }
+
+      const memberId = currentSheetMemberId;
+      let added = 0;
+
+      extractedShifts.forEach(shift => {
+        const newItem = {
+          id: generateId(),
+          type: 'roster',
+          memberId: memberId,
+          date: shift.date,
+          startTime: shift.startTime,
+          endTime: shift.endTime,
+          location: shift.location || '',
+          notes: shift.notes || '',
+          createdAt: new Date().toISOString()
+        };
+        feedItems.push(newItem);
+        added++;
+      });
+
+      saveData();
+      closeBottomSheet();
+      renderFeed();
+      renderCalendarView();
+
+      alert(`Added ${added} shifts to the calendar!`);
+      extractedShifts = [];
     }
 
     // Appointment photo handling with AI parsing
@@ -5282,13 +5404,15 @@
 
         case 'roster':
           return `
-            <div class="screenshot-import-placeholder" onclick="showScreenshotHint()">
-              <span class="screenshot-icon">📷</span>
-              <span class="screenshot-text">Import from Screenshot</span>
-              <span class="screenshot-badge">Coming Soon</span>
+            <div class="screenshot-import-placeholder" onclick="document.getElementById('rosterPhoto').click()">
+              <span class="screenshot-icon">📸</span>
+              <span class="screenshot-text">Scan roster/schedule (whole month OK!)</span>
+              <span class="screenshot-badge">AI Fill</span>
+              <input type="file" id="rosterPhoto" accept="image/*" capture="environment" style="display:none" onchange="handleRosterPhoto(event)">
             </div>
+            <div id="rosterPhotoPreview" class="appointment-photo-preview"></div>
             <div class="form-divider">
-              <span>or enter manually</span>
+              <span>or enter single shift manually</span>
             </div>
             <div class="form-group">
               <label class="form-label">Date *</label>
