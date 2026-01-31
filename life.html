@@ -1550,20 +1550,21 @@
     }
 
     .bubble {
-      width: 64px;
-      height: 64px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       background: var(--bg);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.75rem;
+      font-size: 2rem;
       border: 3px solid transparent;
       transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
       cursor: pointer;
       user-select: none;
       -webkit-user-select: none;
       touch-action: manipulation;
+      overflow: hidden;
     }
 
     .bubble.pressing {
@@ -2590,13 +2591,13 @@
     }
 
     .profile-avatar {
-      width: 64px;
-      height: 64px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2rem;
+      font-size: 2.25rem;
       overflow: hidden;
     }
 
