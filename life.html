@@ -7168,14 +7168,22 @@
             budget: quality,
             complexity: mealPreferences.complexity || 'any',
             cookingMethod: mealPreferences.cookingMethod || 'any',
-            count: 20
+            count: 10  // Reduced from 20 to improve API reliability
           })
         });
 
+        console.log('API response status:', response.status);
+
         if (!response.ok) {
-          const err = await response.json();
-          console.error('API error:', err);
-          throw new Error(err.error || 'Failed to generate meals');
+          const errText = await response.text();
+          console.error('API error response:', errText);
+          let errObj;
+          try {
+            errObj = JSON.parse(errText);
+          } catch (e) {
+            throw new Error('API error: ' + response.status + ' - ' + errText.substring(0, 200));
+          }
+          throw new Error(errObj.error || 'Failed to generate meals (status ' + response.status + ')');
         }
 
         const data = await response.json();
@@ -7212,9 +7220,20 @@
             </div>
           `;
         } else {
-          // API failed - fall back to offline meals
-          console.log('API failed, using offline meals');
-          useOfflineMeals();
+          // API failed - show error details and offer fallback
+          console.log('API failed:', error.message);
+          const grid = document.getElementById('mealIdeasGrid');
+          grid.innerHTML = `
+            <div class="meal-ideas-empty" style="color: #e74c3c;">
+              <div class="meal-ideas-empty-icon">⚠️</div>
+              <p><strong>AI Generation Failed</strong></p>
+              <p style="font-size: 0.85rem; margin-top: 8px;">${error.message}</p>
+              <div style="margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+                <button class="smart-meal-btn primary" onclick="generateMealIdeas()">Try Again</button>
+                <button class="smart-meal-btn" onclick="useOfflineMeals()">Use Offline Meals</button>
+              </div>
+            </div>
+          `;
         }
       }
     }
