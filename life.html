@@ -5865,22 +5865,42 @@
         }
       }
 
-      // Small delay for UX, then use local breakdown
-      // (AI API can be added later if endpoint exists)
-      setTimeout(() => {
-        try {
-          const steps = generateLocalBreakdown(currentBreakdownTask, clarificationAnswers);
-          showBreakdownResult(steps);
-        } catch (error) {
-          console.error('Breakdown error:', error);
-          showBreakdownResult([
-            'Start by gathering what you need',
-            'Do the first small thing you can think of',
-            'Take it one step at a time',
-            'You\'ve got this!'
-          ]);
+      try {
+        // Try AI-powered breakdown first
+        const idToken = localStorage.getItem('google_id_token');
+        let steps = [];
+
+        if (idToken) {
+          try {
+            const response = await fetch('/api/tasks/breakdown', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
+              },
+              body: JSON.stringify({ task: context })
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              steps = data.steps || [];
+            }
+          } catch (e) {
+            console.log('AI breakdown not available, using local fallback');
+          }
         }
-      }, 800);
+
+        // Fallback to local breakdown if AI didn't work
+        if (steps.length === 0) {
+          steps = generateLocalBreakdown(currentBreakdownTask, clarificationAnswers);
+        }
+
+        showBreakdownResult(steps);
+      } catch (error) {
+        console.error('Breakdown error:', error);
+        const steps = generateLocalBreakdown(currentBreakdownTask, clarificationAnswers);
+        showBreakdownResult(steps);
+      }
     }
 
     function generateLocalBreakdown(task, clarifications) {
