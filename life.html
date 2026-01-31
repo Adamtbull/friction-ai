@@ -537,6 +537,20 @@
       color: var(--text-secondary);
     }
 
+    .card-recurrence-badge {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #dbeafe;
+      color: #1e40af;
+      text-transform: capitalize;
+    }
+
+    [data-theme="dark"] .card-recurrence-badge {
+      background: #1e3a5f;
+      color: #93c5fd;
+    }
+
     .card-member-badge {
       font-size: 0.7rem;
       color: var(--text-muted);
@@ -2367,6 +2381,7 @@
         <div class="${cardClass}" data-id="${item.id}">
           <div class="card-header">
             <span class="card-type-badge">${typeLabels[item.type] || item.type}</span>
+            ${item.recurrence ? `<span class="card-recurrence-badge">🔁 ${item.recurrence}</span>` : ''}
             <span class="card-member-badge">${memberIcon} ${memberName}</span>
           </div>
           <div class="card-title">
@@ -2589,6 +2604,17 @@
               <label class="form-label">Notes</label>
               <textarea class="form-textarea" id="formNotes" placeholder="Any additional details..."></textarea>
             </div>
+            <div class="form-group">
+              <label class="form-label">Repeat</label>
+              <select class="form-select" id="formRecurrence">
+                <option value="none">Does not repeat</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="fortnightly">Fortnightly</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+              </select>
+            </div>
           `;
 
         case 'roster':
@@ -2709,6 +2735,7 @@
       const locationEl = document.getElementById('formLocation');
       const notesEl = document.getElementById('formNotes');
       const timeframeEl = document.getElementById('formTimeframe');
+      const recurrenceEl = document.getElementById('formRecurrence');
 
       const title = titleEl?.value?.trim();
       const date = dateEl?.value;
@@ -2718,6 +2745,7 @@
       const location = locationEl?.value?.trim();
       const notes = notesEl?.value?.trim();
       const timeframe = timeframeEl?.value?.trim();
+      const recurrence = recurrenceEl?.value || 'none';
 
       // Validation
       if (currentFormType === 'appointment' && (!title || !date || !time)) {
@@ -2758,10 +2786,16 @@
         endTime,
         location,
         notes,
-        timeframe
+        timeframe,
+        recurrence: recurrence !== 'none' ? recurrence : null
       };
 
       feedItems.push(newItem);
+
+      // Generate recurring items if recurrence is set
+      if (recurrence !== 'none' && date) {
+        generateRecurringItems(newItem, recurrence);
+      }
 
       // Auto-create prep card for appointments within 7 days
       if (currentFormType === 'appointment' && date && isWithinDays(date, 7)) {
@@ -2788,6 +2822,75 @@
       saveData();
       closeFormSheet();
       renderFeed();
+    }
+
+    function generateRecurringItems(baseItem, recurrence) {
+      const baseDate = new Date(baseItem.date);
+      const maxItems = 12; // Generate up to 12 future occurrences
+
+      for (let i = 1; i <= maxItems; i++) {
+        const nextDate = new Date(baseDate);
+
+        switch (recurrence) {
+          case 'daily':
+            nextDate.setDate(baseDate.getDate() + i);
+            break;
+          case 'weekly':
+            nextDate.setDate(baseDate.getDate() + (i * 7));
+            break;
+          case 'fortnightly':
+            nextDate.setDate(baseDate.getDate() + (i * 14));
+            break;
+          case 'monthly':
+            nextDate.setMonth(baseDate.getMonth() + i);
+            break;
+          case 'yearly':
+            nextDate.setFullYear(baseDate.getFullYear() + i);
+            break;
+        }
+
+        // Only create items up to 90 days in the future (except yearly)
+        const now = new Date();
+        const daysAhead = (nextDate - now) / (1000 * 60 * 60 * 24);
+        if (recurrence !== 'yearly' && daysAhead > 90) break;
+        if (recurrence === 'yearly' && daysAhead > 400) break;
+
+        const recurringItem = {
+          id: generateId(),
+          memberId: baseItem.memberId,
+          type: baseItem.type,
+          title: baseItem.title,
+          createdAt: new Date().toISOString(),
+          date: nextDate.toISOString().split('T')[0],
+          time: baseItem.time,
+          startTime: baseItem.startTime,
+          endTime: baseItem.endTime,
+          location: baseItem.location,
+          notes: baseItem.notes,
+          recurrence: recurrence,
+          parentId: baseItem.id,
+          isRecurring: true
+        };
+
+        feedItems.push(recurringItem);
+
+        // Also create prep items for recurring appointments
+        if (baseItem.type === 'appointment' && isWithinDays(recurringItem.date, 7)) {
+          const prepItem = {
+            id: generateId(),
+            memberId: baseItem.memberId,
+            type: 'prep',
+            title: `Prep: ${baseItem.title}`,
+            relatedTitle: baseItem.title,
+            relatedId: recurringItem.id,
+            createdAt: new Date().toISOString(),
+            date: recurringItem.date,
+            steps: PREP_STEPS.map(s => ({ ...s, done: false })),
+            questions: [...PREP_QUESTIONS]
+          };
+          feedItems.push(prepItem);
+        }
+      }
     }
 
     function checkRosterConflicts(newRoster) {
