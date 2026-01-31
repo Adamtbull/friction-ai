@@ -7263,13 +7263,11 @@
         lifeMemberRoleType.textContent = (roleType || 'adult').toLowerCase();
       }
       setMemberPanelVisible(true);
-      console.log('OPEN MEMBER PANEL: ' + personId);
     }
 
     function closeMemberPanel() {
       if (!lifeMemberPanel || !lifeMemberPanel.classList.contains('active')) return;
       setMemberPanelVisible(false);
-      console.log('CLOSE MEMBER PANEL');
     }
 
     var bubbleMenuState = {
@@ -7326,7 +7324,6 @@
       requestAnimationFrame(function() {
         positionBubbleMenu(anchorEl);
       });
-      console.log('OPEN BUBBLE MENU: ' + personId);
     }
 
     function closeBubbleMenu() {
@@ -7339,7 +7336,6 @@
         lifeBubbleMenuOverlay.classList.remove('active');
         lifeBubbleMenuOverlay.setAttribute('aria-hidden', 'true');
       }
-      console.log('CLOSE BUBBLE MENU');
     }
 
     function startBubbleLongPress(button, event) {
@@ -7614,7 +7610,6 @@
       if (!lifeBubbleStrip) return;
       lifeBubbleStrip.innerHTML = '';
       syncFamilyMemberRoleTypes();
-      console.log('BUBBLES RENDERED: ' + familyMembers.length);
       familyMembers.forEach(function(person) {
         var bubble = document.createElement('div');
         bubble.className = 'life-bubble';
@@ -8698,7 +8693,6 @@
     }
 
     function saveActivePersonEdits() {
-      console.log('saveProfile:start', activePersonId);
       setActiveEditError('');
       try {
         var person = getPersonById(activePersonId);
@@ -8730,7 +8724,6 @@
           });
         }));
         savePeople();
-        console.log('saveProfile:success', activePersonId);
         setEditMode(false);
         lifeState.editMode = false;
         lifeState.expandedNodeId = null;
