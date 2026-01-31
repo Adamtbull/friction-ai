@@ -1619,8 +1619,8 @@
        LONG-PRESS ACTION MENU
        ======================================== */
     .action-menu {
-      position: absolute;
-      top: 80px;
+      position: fixed;
+      top: auto;
       left: 50%;
       transform: translateX(-50%) scale(0.9);
       background: var(--card-bg);
@@ -1631,7 +1631,7 @@
       display: flex;
       flex-direction: column;
       gap: 2px;
-      z-index: 100;
+      z-index: 9000;
       opacity: 0;
       pointer-events: none;
       transition: all 0.2s ease;
@@ -3753,7 +3753,13 @@
     function openMenu(memberId) {
       closeAllMenus();
       const menu = document.getElementById(`menu-${memberId}`);
-      if (menu) menu.classList.add('visible');
+      const bubble = menu?.parentElement?.querySelector('.bubble');
+      if (menu && bubble) {
+        const rect = bubble.getBoundingClientRect();
+        menu.style.top = (rect.bottom + 10) + 'px';
+        menu.style.left = (rect.left + rect.width / 2) + 'px';
+        menu.classList.add('visible');
+      }
     }
 
     function closeAllMenus() {
