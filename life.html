@@ -103,6 +103,13 @@
       line-height: 1.5;
     }
 
+    /* Main Scrollable Area - contains bubbles and feed */
+    .main-scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
     /* BUILD TAG OVERLAY */
     .build-tag {
       position: fixed;
@@ -1520,9 +1527,7 @@
       background: var(--card-bg);
       padding: 16px 0;
       box-shadow: var(--shadow-sm);
-      flex-shrink: 0;
       position: relative;
-      z-index: 50;
     }
 
     .bubble-row {
@@ -1678,11 +1683,8 @@
        FEED LAYER
        ======================================== */
     .feed-layer {
-      flex: 1;
-      overflow-y: auto;
       padding: 20px;
       padding-bottom: 100px;
-      -webkit-overflow-scrolling: touch;
     }
 
     .feed-section-title {
@@ -2859,14 +2861,17 @@
     </div>
   </header>
 
-  <!-- BUBBLE NAVIGATION -->
-  <div class="bubble-container">
-    <div class="bubble-row" id="bubbleRow"></div>
-  </div>
+  <!-- MAIN SCROLLABLE AREA -->
+  <main class="main-scroll-area" id="mainScrollArea">
+    <!-- BUBBLE NAVIGATION -->
+    <div class="bubble-container">
+      <div class="bubble-row" id="bubbleRow"></div>
+    </div>
 
-  <!-- FEED LAYER -->
-  <main class="feed-layer" id="feedLayer">
-    <div id="feedContent"></div>
+    <!-- FEED LAYER -->
+    <div class="feed-layer" id="feedLayer">
+      <div id="feedContent"></div>
+    </div>
   </main>
 
   <!-- CALENDAR VIEW -->
@@ -5039,12 +5044,11 @@
 
       calendarVisible = !calendarVisible;
       const calendarView = document.getElementById('calendarView');
-      const feedLayer = document.getElementById('feedLayer');
       const calendarBtn = document.getElementById('calendarToggleBtn');
 
       if (calendarVisible) {
         calendarView.classList.add('visible');
-        feedLayer.style.display = 'none';
+        document.getElementById('mainScrollArea').style.display = 'none';
         calendarBtn.innerHTML = '📅';
         calendarBtn.title = 'Show Feed';
         calendarBtn.style.background = 'var(--adult)';
@@ -5052,7 +5056,7 @@
         renderCalendar();
       } else {
         calendarView.classList.remove('visible');
-        feedLayer.style.display = 'block';
+        document.getElementById('mainScrollArea').style.display = 'block';
         calendarBtn.innerHTML = '📅';
         calendarBtn.title = 'Calendar View';
         calendarBtn.style.background = '';
@@ -5230,18 +5234,17 @@
 
       shoppingVisible = !shoppingVisible;
       const shoppingView = document.getElementById('shoppingView');
-      const feedLayer = document.getElementById('feedLayer');
       const shoppingBtn = document.getElementById('shoppingToggleBtn');
 
       if (shoppingVisible) {
         shoppingView.classList.add('visible');
-        feedLayer.style.display = 'none';
+        document.getElementById('mainScrollArea').style.display = 'none';
         shoppingBtn.style.background = 'var(--adult)';
         shoppingBtn.style.color = 'white';
         renderShoppingList();
       } else {
         shoppingView.classList.remove('visible');
-        feedLayer.style.display = 'block';
+        document.getElementById('mainScrollArea').style.display = 'block';
         shoppingBtn.style.background = '';
         shoppingBtn.style.color = '';
       }
@@ -5385,18 +5388,17 @@
 
       mealPlannerVisible = !mealPlannerVisible;
       const mealView = document.getElementById('mealPlannerView');
-      const feedLayer = document.getElementById('feedLayer');
       const mealBtn = document.getElementById('mealToggleBtn');
 
       if (mealPlannerVisible) {
         mealView.classList.add('visible');
-        feedLayer.style.display = 'none';
+        document.getElementById('mainScrollArea').style.display = 'none';
         mealBtn.style.background = 'var(--adult)';
         mealBtn.style.color = 'white';
         renderMealPlanner();
       } else {
         mealView.classList.remove('visible');
-        feedLayer.style.display = 'block';
+        document.getElementById('mainScrollArea').style.display = 'block';
         mealBtn.style.background = '';
         mealBtn.style.color = '';
       }
@@ -5712,19 +5714,18 @@
 
       adhdTaskViewVisible = !adhdTaskViewVisible;
       const adhdView = document.getElementById('adhdTaskView');
-      const feedLayer = document.getElementById('feedLayer');
       const adhdBtn = document.getElementById('adhdTaskToggleBtn');
 
       if (adhdTaskViewVisible) {
         adhdView.classList.add('visible');
-        feedLayer.style.display = 'none';
+        document.getElementById('mainScrollArea').style.display = 'none';
         adhdBtn.style.background = 'var(--adult)';
         adhdBtn.style.color = 'white';
         showAdhdInputSection();
         renderAdhdTaskList();
       } else {
         adhdView.classList.remove('visible');
-        feedLayer.style.display = 'block';
+        document.getElementById('mainScrollArea').style.display = 'block';
         adhdBtn.style.background = '';
         adhdBtn.style.color = '';
       }
