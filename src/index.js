@@ -438,6 +438,8 @@ export default {
         var servings = parseInt(bodyMeals.servings, 10) || 4;
         var maxIngredients = parseInt(bodyMeals.maxIngredients, 10) || 12;
         var budget = bodyMeals.budget || "standard"; // budget, standard, premium
+        var complexity = bodyMeals.complexity || "any"; // quick, intermediate, scratch, any
+        var cookingMethod = bodyMeals.cookingMethod || "any"; // stovetop, oven, slowcooker, airfryer, bbq, nocook, any
         var count = parseInt(bodyMeals.count, 10) || 6;
         if (count > 20) count = 20;
         if (count < 1) count = 1;
@@ -450,6 +452,36 @@ export default {
             request,
             { "Retry-After": String(mealsRate.retryAfter) }
           );
+        }
+
+        // Build complexity instructions
+        var complexityInstructions = "";
+        if (complexity === "quick") {
+          complexityInstructions = "QUICK & EASY recipes only - use jar sauces (Leggo's, Dolmio), pre-made mixes, packet seasonings, minimal prep time.";
+        } else if (complexity === "intermediate") {
+          complexityInstructions = "INTERMEDIATE recipes - mix of convenience items and from-scratch elements. Some jar sauces OK but also include homemade components.";
+        } else if (complexity === "scratch") {
+          complexityInstructions = "FROM SCRATCH recipes only - NO jar sauces, NO packet mixes, NO pre-made seasonings. All sauces and components must be homemade.";
+        } else {
+          complexityInstructions = "Mix of easy and complex recipes.";
+        }
+
+        // Build cooking method instructions
+        var methodInstructions = "";
+        if (cookingMethod === "stovetop") {
+          methodInstructions = "STOVETOP cooking only - pan-fried, stir-fried, boiled, sautéed recipes.";
+        } else if (cookingMethod === "oven") {
+          methodInstructions = "OVEN recipes only - roasted, baked, grilled in oven.";
+        } else if (cookingMethod === "slowcooker") {
+          methodInstructions = "SLOW COOKER recipes only - set and forget meals, crockpot style.";
+        } else if (cookingMethod === "airfryer") {
+          methodInstructions = "AIR FRYER recipes only - quick crispy cooking.";
+        } else if (cookingMethod === "bbq") {
+          methodInstructions = "BBQ/GRILL recipes only - outdoor cooking, barbecue style.";
+        } else if (cookingMethod === "nocook") {
+          methodInstructions = "NO COOK recipes only - salads, sandwiches, cold meals, no heat required.";
+        } else {
+          methodInstructions = "Any cooking method is fine.";
         }
 
         var mealPrompt = [
@@ -465,6 +497,12 @@ export default {
               "4. Use Australian supermarket brands (Coles, Woolworths, Aldi) for ingredients",
               "5. Include specific brand names where appropriate (e.g., 'Leggo's pasta sauce', 'San Remo pasta')",
               "",
+              "RECIPE COMPLEXITY:",
+              complexityInstructions,
+              "",
+              "COOKING METHOD:",
+              methodInstructions,
+              "",
               "QUALITY LEVELS:",
               "- budget: Use home brand/generic products, cheaper cuts of meat, basic ingredients",
               "- standard: Use mid-range brands, regular quality ingredients",
@@ -477,6 +515,7 @@ export default {
               '    "emoji": "🍝",',
               '    "time": "30 min",',
               '    "servings": 4,',
+              '    "cookingMethod": "stovetop",',
               '    "ingredients": [',
               '      {"name": "ingredient with brand", "quantity": "500g", "estimatedPrice": 5.50}',
               "    ],",
@@ -502,7 +541,8 @@ export default {
               "Quality level: " + budget,
               "",
               "Remember: If vegetarian/vegan is specified, absolutely NO meat/fish products.",
-              "If an ingredient is disliked, do NOT include it or any dish that typically contains it."
+              "If an ingredient is disliked, do NOT include it or any dish that typically contains it.",
+              "Generate a VARIETY of different meals - no repetition!"
             ].join("\n")
           }
         ];

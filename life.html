@@ -4027,7 +4027,7 @@
       <div class="pref-tabs">
         <button class="pref-tab active" onclick="switchPrefTab('dislikes')">🚫 Dislikes</button>
         <button class="pref-tab" onclick="switchPrefTab('diet')">🥗 Diet</button>
-        <button class="pref-tab" onclick="switchPrefTab('settings')">⚙️ Settings</button>
+        <button class="pref-tab" onclick="switchPrefTab('cooking')">👨‍🍳 Cooking</button>
         <button class="pref-tab" onclick="switchPrefTab('stores')">🏪 Stores</button>
       </div>
 
@@ -4062,41 +4062,31 @@
         <div class="pref-options" id="dietOptions"></div>
       </div>
 
-      <!-- Settings Tab -->
-      <div class="pref-panel" id="prefSettings">
-        <div class="pref-setting">
-          <label>Weekly Budget</label>
-          <div class="budget-input">
-            <span>$</span>
-            <input type="number" id="mealBudget" value="150" min="50" max="500">
-            <span>/week</span>
-          </div>
-        </div>
+      <!-- Cooking Tab -->
+      <div class="pref-panel" id="prefCooking">
+        <p class="pref-description">Recipe Complexity:</p>
+        <div class="pref-options" id="complexityOptions"></div>
 
-        <div class="pref-setting">
-          <label>Servings per Meal</label>
-          <div class="stepper">
-            <button onclick="adjustSetting('servings', -1)">−</button>
-            <span id="servingsValue">4</span>
-            <button onclick="adjustSetting('servings', 1)">+</button>
-          </div>
-        </div>
+        <p class="pref-description" style="margin-top: 20px;">Cooking Method:</p>
+        <div class="pref-options" id="cookingMethodOptions"></div>
 
-        <div class="pref-setting">
-          <label>Max Ingredients per Meal</label>
-          <div class="stepper">
-            <button onclick="adjustSetting('maxIngredients', -1)">−</button>
-            <span id="maxIngredientsValue">7</span>
-            <button onclick="adjustSetting('maxIngredients', 1)">+</button>
+        <div class="pref-settings-group" style="margin-top: 20px;">
+          <div class="pref-setting">
+            <label>Servings per Meal</label>
+            <div class="stepper">
+              <button onclick="adjustSetting('servings', -1)">−</button>
+              <span id="servingsValue">4</span>
+              <button onclick="adjustSetting('servings', 1)">+</button>
+            </div>
           </div>
-        </div>
 
-        <div class="pref-setting">
-          <label>Meals per Day</label>
-          <div class="stepper">
-            <button onclick="adjustSetting('mealsPerDay', -1)">−</button>
-            <span id="mealsPerDayValue">3</span>
-            <button onclick="adjustSetting('mealsPerDay', 1)">+</button>
+          <div class="pref-setting">
+            <label>Max Ingredients</label>
+            <div class="stepper">
+              <button onclick="adjustSetting('maxIngredients', -1)">−</button>
+              <span id="maxIngredientsValue">7</span>
+              <button onclick="adjustSetting('maxIngredients', 1)">+</button>
+            </div>
           </div>
         </div>
       </div>
@@ -6694,8 +6684,29 @@
       servings: 4,
       maxIngredients: 7,
       mealsPerDay: 3,
-      stores: ['woolworths', 'coles']
+      stores: ['woolworths', 'coles'],
+      complexity: 'any',
+      cookingMethod: 'any'
     }));
+
+    // Recipe Complexity Options
+    const COMPLEXITY_OPTIONS = [
+      { id: 'any', icon: '🍳', title: 'Any Complexity', desc: 'Mix of easy and complex' },
+      { id: 'quick', icon: '⚡', title: 'Quick & Easy', desc: 'Jar sauces, pre-made mixes, minimal prep' },
+      { id: 'intermediate', icon: '👨‍🍳', title: 'Intermediate', desc: 'Some from scratch, some shortcuts' },
+      { id: 'scratch', icon: '⭐', title: 'From Scratch', desc: 'All homemade, no pre-made sauces' }
+    ];
+
+    // Cooking Method Options
+    const COOKING_METHOD_OPTIONS = [
+      { id: 'any', icon: '🍽️', title: 'Any Method', desc: 'All cooking styles' },
+      { id: 'stovetop', icon: '🍳', title: 'Stovetop', desc: 'Pan-fried, stir-fry, boiled' },
+      { id: 'oven', icon: '🔥', title: 'Oven Baked', desc: 'Roasted, baked, grilled' },
+      { id: 'slowcooker', icon: '🥘', title: 'Slow Cooker', desc: 'Set and forget meals' },
+      { id: 'airfryer', icon: '💨', title: 'Air Fryer', desc: 'Quick crispy cooking' },
+      { id: 'bbq', icon: '🔥', title: 'BBQ / Grill', desc: 'Outdoor cooking' },
+      { id: 'nocook', icon: '🥗', title: 'No Cook', desc: 'Salads, sandwiches, cold meals' }
+    ];
 
     const INGREDIENT_OPTIONS = {
       veggies: ['Onion', 'Garlic', 'Capsicum', 'Mushrooms', 'Tomato', 'Spinach', 'Broccoli', 'Carrot', 'Zucchini', 'Eggplant', 'Celery', 'Peas', 'Corn', 'Beans', 'Cabbage', 'Cauliflower', 'Asparagus', 'Kale'],
@@ -6769,11 +6780,41 @@
         </div>
       `).join('');
 
+      // Render complexity options
+      const complexityContainer = document.getElementById('complexityOptions');
+      if (complexityContainer) {
+        complexityContainer.innerHTML = COMPLEXITY_OPTIONS.map(opt => `
+          <div class="pref-option ${mealPreferences.complexity === opt.id ? 'selected' : ''}"
+               onclick="selectComplexity('${opt.id}')">
+            <div class="pref-option-icon">${opt.icon}</div>
+            <div class="pref-option-text">
+              <div class="pref-option-title">${opt.title}</div>
+              <div class="pref-option-desc">${opt.desc}</div>
+            </div>
+            ${mealPreferences.complexity === opt.id ? '<span class="store-check">✓</span>' : ''}
+          </div>
+        `).join('');
+      }
+
+      // Render cooking method options
+      const cookingMethodContainer = document.getElementById('cookingMethodOptions');
+      if (cookingMethodContainer) {
+        cookingMethodContainer.innerHTML = COOKING_METHOD_OPTIONS.map(opt => `
+          <div class="pref-option ${mealPreferences.cookingMethod === opt.id ? 'selected' : ''}"
+               onclick="selectCookingMethod('${opt.id}')">
+            <div class="pref-option-icon">${opt.icon}</div>
+            <div class="pref-option-text">
+              <div class="pref-option-title">${opt.title}</div>
+              <div class="pref-option-desc">${opt.desc}</div>
+            </div>
+            ${mealPreferences.cookingMethod === opt.id ? '<span class="store-check">✓</span>' : ''}
+          </div>
+        `).join('');
+      }
+
       // Update settings values
-      document.getElementById('mealBudget').value = mealPreferences.budget;
       document.getElementById('servingsValue').textContent = mealPreferences.servings;
       document.getElementById('maxIngredientsValue').textContent = mealPreferences.maxIngredients;
-      document.getElementById('mealsPerDayValue').textContent = mealPreferences.mealsPerDay;
     }
 
     function switchPrefTab(tabName) {
@@ -6796,6 +6837,16 @@
 
     function selectDiet(dietId) {
       mealPreferences.diet = dietId;
+      renderMealPreferences();
+    }
+
+    function selectComplexity(complexityId) {
+      mealPreferences.complexity = complexityId;
+      renderMealPreferences();
+    }
+
+    function selectCookingMethod(methodId) {
+      mealPreferences.cookingMethod = methodId;
       renderMealPreferences();
     }
 
@@ -7043,7 +7094,9 @@
           dislikes: mealPreferences.dislikes,
           dietPreferences: dietPrefs,
           servings: mealPreferences.servings,
-          maxIngredients: mealPreferences.maxIngredients
+          maxIngredients: mealPreferences.maxIngredients,
+          complexity: mealPreferences.complexity,
+          cookingMethod: mealPreferences.cookingMethod
         });
 
         const response = await fetch('/api/meals/generate', {
@@ -7059,6 +7112,8 @@
             servings: parseInt(mealPreferences.servings) || 4,
             maxIngredients: parseInt(mealPreferences.maxIngredients) || 12,
             budget: quality,
+            complexity: mealPreferences.complexity || 'any',
+            cookingMethod: mealPreferences.cookingMethod || 'any',
             count: 20
           })
         });
