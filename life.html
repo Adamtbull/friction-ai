@@ -35,6 +35,52 @@
       --radius-xl: 20px;
     }
 
+    /* Dark Mode */
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --border: #334155;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+      --shadow-lg: 0 10px 40px rgba(0,0,0,0.5);
+    }
+
+    [data-theme="dark"] .bubble.type-adult {
+      background: #1e3a5f;
+    }
+
+    [data-theme="dark"] .bubble.type-child {
+      background: #422006;
+    }
+
+    [data-theme="dark"] .bubble.type-household {
+      background: #134e4a;
+    }
+
+    [data-theme="dark"] .profile-avatar.type-adult { background: #1e3a5f; }
+    [data-theme="dark"] .profile-avatar.type-child { background: #422006; }
+    [data-theme="dark"] .profile-avatar.type-household { background: #134e4a; }
+
+    [data-theme="dark"] .build-tag {
+      background: #334155;
+    }
+
+    [data-theme="dark"] .screenshot-import-placeholder {
+      background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+      border-color: var(--adult);
+    }
+
+    [data-theme="dark"] .open-questions {
+      background: #422006;
+    }
+
+    [data-theme="dark"] .micro-steps {
+      background: #334155;
+    }
+
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
@@ -469,6 +515,9 @@
     .feed-card.type-prep { border-left-color: var(--warning); }
     .feed-card.type-conflict { border-left-color: var(--danger); }
     .feed-card.type-handoff { border-left-color: #f97316; }
+    .feed-card.type-birthday { border-left-color: #ec4899; background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%); }
+
+    [data-theme="dark"] .feed-card.type-birthday { background: linear-gradient(135deg, #500724 0%, #831843 100%); }
 
     .card-header {
       display: flex;
@@ -1229,6 +1278,54 @@
       margin-top: 2px;
     }
 
+    /* Toggle Switch */
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--border);
+      transition: 0.3s;
+      border-radius: 28px;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+      background-color: var(--adult);
+    }
+
+    .toggle-switch input:checked + .toggle-slider:before {
+      transform: translateX(24px);
+    }
+
     /* ========================================
        TIMER MODAL
        ======================================== */
@@ -1445,6 +1542,10 @@
         <label class="form-label">Fallback Icon (emoji)</label>
         <input type="text" class="form-input" id="memberIcon" placeholder="👤" maxlength="2">
       </div>
+      <div class="form-group">
+        <label class="form-label">Birthday (optional)</label>
+        <input type="date" class="form-input" id="memberBirthday">
+      </div>
     </div>
     <div class="sheet-actions">
       <button class="btn btn-secondary" onclick="closeAddMemberSheet()">Cancel</button>
@@ -1459,6 +1560,19 @@
       <h3 class="sheet-title">Settings</h3>
     </div>
     <div class="sheet-content">
+      <div class="settings-section">
+        <div class="settings-section-title">Appearance</div>
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <div class="settings-item-label">Dark Mode</div>
+            <div class="settings-item-desc">Easier on the eyes at night</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
       <div class="settings-section">
         <div class="settings-section-title">Data Management</div>
         <div class="settings-item">
@@ -2208,6 +2322,20 @@
           body = renderWeeklySummaryContent(item);
           break;
 
+        case 'birthday':
+          body = item.notes || '';
+          meta = item.date ? `
+            <div class="card-meta">
+              <span class="card-meta-item">📅 ${formatDate(item.date)}</span>
+            </div>
+          ` : '';
+          actions = `
+            <div class="card-actions">
+              <button class="card-action-btn secondary" onclick="markDone('${item.id}')">✓ Noted</button>
+            </div>
+          `;
+          break;
+
         default:
           body = item.notes || item.content || '';
       }
@@ -2221,7 +2349,8 @@
         goal: '🎯 Goal',
         note: '📝 Note',
         conflict: '⚠️ Conflict',
-        weekly: '📌 Weekly Plan'
+        weekly: '📌 Weekly Plan',
+        birthday: '🎂 Birthday'
       };
 
       return `
@@ -2835,6 +2964,7 @@
       document.getElementById('memberName').value = '';
       document.getElementById('memberRole').value = 'adult';
       document.getElementById('memberIcon').value = '';
+      document.getElementById('memberBirthday').value = '';
       document.getElementById('memberPhoto').value = '';
       document.getElementById('memberPhotoPreview').innerHTML = '📷';
       memberPhotoData = null;
@@ -2864,6 +2994,7 @@
       const name = document.getElementById('memberName').value.trim();
       const role = document.getElementById('memberRole').value;
       let icon = document.getElementById('memberIcon').value.trim();
+      const birthday = document.getElementById('memberBirthday').value;
 
       if (!name) {
         alert('Please enter a name');
@@ -2879,7 +3010,8 @@
         name,
         role,
         icon,
-        photo: memberPhotoData || null
+        photo: memberPhotoData || null,
+        birthday: birthday || null
       };
 
       // Insert before household
@@ -3017,6 +3149,24 @@
       document.getElementById('settingsSheet').classList.remove('open');
     }
 
+    // Dark Mode Functions
+    function toggleDarkMode() {
+      const isDark = document.getElementById('darkModeToggle').checked;
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      localStorage.setItem('LIFE_DARK_MODE', isDark ? 'true' : 'false');
+    }
+
+    function initDarkMode() {
+      const savedPref = localStorage.getItem('LIFE_DARK_MODE');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark = savedPref === 'true' || (savedPref === null && prefersDark);
+
+      if (isDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.getElementById('darkModeToggle').checked = true;
+      }
+    }
+
     // Share Task Functions
     let shareTaskFromMember = null;
 
@@ -3110,9 +3260,62 @@
     // INITIALIZATION
     // ========================================
     function init() {
+      initDarkMode();
       loadData();
+      checkBirthdays();
       renderBubbles();
       renderFeed();
+    }
+
+    // Check for upcoming birthdays and create reminder cards
+    function checkBirthdays() {
+      const today = new Date();
+      const todayMonth = today.getMonth();
+      const todayDay = today.getDate();
+
+      familyMembers.forEach(member => {
+        if (!member.birthday) return;
+
+        const bday = new Date(member.birthday);
+        const bdayMonth = bday.getMonth();
+        const bdayDay = bday.getDate();
+
+        // Check if birthday is within next 7 days
+        for (let i = 0; i <= 7; i++) {
+          const checkDate = new Date(today);
+          checkDate.setDate(today.getDate() + i);
+
+          if (checkDate.getMonth() === bdayMonth && checkDate.getDate() === bdayDay) {
+            // Check if we already have a birthday card for this member this year
+            const existingCard = feedItems.find(item =>
+              item.type === 'birthday' &&
+              item.memberId === member.id &&
+              item.year === today.getFullYear()
+            );
+
+            if (!existingCard) {
+              const age = today.getFullYear() - bday.getFullYear();
+              const isToday = i === 0;
+
+              feedItems.push({
+                id: generateId(),
+                memberId: member.id,
+                type: 'birthday',
+                title: isToday ? `🎂 Happy Birthday ${member.name}!` : `🎂 ${member.name}'s Birthday Coming Up!`,
+                notes: isToday
+                  ? `${member.name} turns ${age} today!`
+                  : `${member.name} turns ${age} in ${i} day${i > 1 ? 's' : ''}`,
+                date: `${today.getFullYear()}-${String(bdayMonth + 1).padStart(2, '0')}-${String(bdayDay).padStart(2, '0')}`,
+                year: today.getFullYear(),
+                createdAt: new Date().toISOString(),
+                pinned: isToday
+              });
+              saveData();
+            }
+            break;
+          }
+        }
+      });
     }
 
     // Start the app
