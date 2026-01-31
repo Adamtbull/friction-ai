@@ -3,51 +3,130 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Friction AI - Family OS</title>
+  <title>Life - Family Operations Hub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-
   <style>
-    /* --- CORE THEME --- */
+    /* ========================================
+       LIFE PAGE - COMPLETE STYLES
+       ======================================== */
+
     :root {
       --primary: #0f172a;
-      --bg: #f8fafc;
-      --household: #4f9d9a;
+      --primary-light: #1e293b;
+      --bg: #f1f5f9;
+      --card-bg: #ffffff;
+      --household: #0d9488;
       --adult: #3b82f6;
       --child: #f59e0b;
+      --danger: #ef4444;
+      --success: #22c55e;
+      --warning: #eab308;
+      --text-primary: #0f172a;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 10px 40px rgba(0,0,0,0.12);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
     }
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    
-    body {
-      font-family: 'Inter', -apple-system, sans-serif;
-      background: var(--bg);
-      color: #1e293b;
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
       margin: 0;
       padding: 0;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden; /* Prevent body scroll, we scroll internal elements */
+      height: 100%;
+      overflow: hidden;
     }
 
-    /* --- BUBBLE NAV (Horizontal Scroll) --- */
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    /* BUILD TAG OVERLAY */
+    .build-tag {
+      position: fixed;
+      top: 8px;
+      right: 8px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.65rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+      z-index: 9999;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      opacity: 0.7;
+    }
+
+    /* ========================================
+       HEADER
+       ======================================== */
+    .app-header {
+      background: var(--card-bg);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .app-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .settings-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+
+    /* ========================================
+       BUBBLE NAVIGATION
+       ======================================== */
     .bubble-container {
-      background: white;
+      background: var(--card-bg);
       padding: 16px 0;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-      z-index: 10;
+      box-shadow: var(--shadow-sm);
+      flex-shrink: 0;
+      position: relative;
+      z-index: 50;
     }
 
     .bubble-row {
       display: flex;
-      gap: 24px;
+      gap: 20px;
       overflow-x: auto;
-      padding: 10px 24px;
-      scrollbar-width: none; /* Firefox */
-      -ms-overflow-style: none; /* IE */
+      padding: 8px 20px 12px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
     }
-    .bubble-row::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+
+    .bubble-row::-webkit-scrollbar { display: none; }
 
     .bubble-wrapper {
       position: relative;
@@ -58,47 +137,82 @@
     }
 
     .bubble {
-      width: 68px;
-      height: 68px;
+      width: 64px;
+      height: 64px;
       border-radius: 50%;
-      background: #f1f5f9;
+      background: var(--bg);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.8rem;
+      font-size: 1.75rem;
       border: 3px solid transparent;
-      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
       cursor: pointer;
-      user-select: none; /* Important for long press */
+      user-select: none;
       -webkit-user-select: none;
       touch-action: manipulation;
     }
 
-    /* Active/Pressed State for Feedback */
-    .bubble.pressing { transform: scale(0.92); }
-    .bubble.selected { transform: scale(1.1); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
-
-    .bubble.type-adult { border-color: var(--adult); color: var(--adult); background: #eff6ff; }
-    .bubble.type-child { border-color: var(--child); color: var(--child); background: #fffbeb; }
-    .bubble.type-household { border-color: var(--household); color: var(--household); background: #f0fdfa; }
-
-    .bubble-label {
-      margin-top: 8px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #64748b;
+    .bubble.pressing {
+      transform: scale(0.9);
     }
 
-    /* --- POP-OUT MENU (Long Press) --- */
+    .bubble.selected {
+      transform: scale(1.08);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+
+    .bubble.type-adult {
+      border-color: var(--adult);
+      background: #eff6ff;
+    }
+
+    .bubble.type-child {
+      border-color: var(--child);
+      background: #fffbeb;
+    }
+
+    .bubble.type-household {
+      border-color: var(--household);
+      background: #f0fdfa;
+    }
+
+    .bubble-label {
+      margin-top: 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-align: center;
+      max-width: 70px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .bubble-add {
+      border: 2px dashed var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+    }
+
+    .bubble-add:hover {
+      border-color: var(--text-secondary);
+      color: var(--text-secondary);
+    }
+
+    /* ========================================
+       LONG-PRESS ACTION MENU
+       ======================================== */
     .action-menu {
       position: absolute;
-      top: 85px;
+      top: 80px;
       left: 50%;
-      transform: translateX(-50%) scale(0.95);
-      background: white;
-      border-radius: 12px;
-      width: 180px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      transform: translateX(-50%) scale(0.9);
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      min-width: 180px;
+      box-shadow: var(--shadow-lg);
       padding: 6px;
       display: flex;
       flex-direction: column;
@@ -109,6 +223,17 @@
       transition: all 0.2s ease;
     }
 
+    .action-menu::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 8px solid transparent;
+      border-bottom-color: var(--card-bg);
+      border-top: 0;
+    }
+
     .action-menu.visible {
       opacity: 1;
       pointer-events: auto;
@@ -116,55 +241,353 @@
     }
 
     .menu-item {
-      padding: 12px;
-      font-size: 0.9rem;
-      color: #334155;
+      padding: 12px 14px;
+      font-size: 0.875rem;
+      color: var(--text-primary);
       background: none;
       border: none;
       text-align: left;
-      border-radius: 8px;
+      border-radius: var(--radius-sm);
       font-weight: 500;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      cursor: pointer;
+      font-family: inherit;
     }
-    .menu-item:active { background: #f1f5f9; }
 
-    /* --- FEED LAYER (Scrollable) --- */
+    .menu-item:hover, .menu-item:active {
+      background: var(--bg);
+    }
+
+    .menu-icon {
+      font-size: 1rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    /* ========================================
+       FEED LAYER
+       ======================================== */
     .feed-layer {
       flex: 1;
       overflow-y: auto;
       padding: 20px;
-      background: var(--bg);
+      padding-bottom: 100px;
+      -webkit-overflow-scrolling: touch;
     }
 
-    .feed-header {
-      font-size: 0.85rem;
+    .feed-section-title {
+      font-size: 0.75rem;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: #94a3b8;
+      color: var(--text-muted);
       font-weight: 700;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
+      margin-top: 8px;
     }
 
-    .feed-card {
-      background: white;
-      border-radius: 16px;
-      padding: 16px;
+    .feed-empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+
+    .feed-empty-icon {
+      font-size: 3rem;
       margin-bottom: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-      border-left: 5px solid #e2e8f0;
+      opacity: 0.5;
+    }
+
+    .feed-empty-text {
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* ========================================
+       FEED CARDS
+       ======================================== */
+    .feed-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow-sm);
+      border-left: 4px solid var(--border);
       animation: slideUp 0.3s ease-out;
     }
 
-    .card-pinned { border-left-color: var(--primary); background: #f8fafc; border: 1px solid #e2e8f0; }
-    .card-roster { border-left-color: var(--adult); }
-    .card-milestone { border-left-color: var(--child); }
-    
-    .card-title { font-weight: 600; font-size: 1rem; margin-bottom: 6px; color: #0f172a; }
-    .card-body { font-size: 0.95rem; color: #475569; line-height: 1.5; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-    /* --- FAB (Floating Action Button) --- */
+    .feed-card.pinned {
+      border-left-color: var(--primary);
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+    }
+
+    .feed-card.type-appointment { border-left-color: #8b5cf6; }
+    .feed-card.type-roster { border-left-color: var(--adult); }
+    .feed-card.type-milestone { border-left-color: var(--child); }
+    .feed-card.type-event { border-left-color: #ec4899; }
+    .feed-card.type-goal { border-left-color: var(--success); }
+    .feed-card.type-note { border-left-color: var(--text-muted); }
+    .feed-card.type-prep { border-left-color: var(--warning); }
+    .feed-card.type-conflict { border-left-color: var(--danger); }
+    .feed-card.type-handoff { border-left-color: #f97316; }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .card-type-badge {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      background: var(--bg);
+      color: var(--text-secondary);
+    }
+
+    .card-member-badge {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-title {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title .pin-icon {
+      color: var(--primary);
+    }
+
+    .card-body {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .card-meta {
+      display: flex;
+      gap: 16px;
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .card-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .card-action-btn {
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      border: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+
+    .card-action-btn.primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .card-action-btn.primary:hover {
+      background: var(--primary-light);
+    }
+
+    .card-action-btn.secondary {
+      background: var(--bg);
+      color: var(--text-primary);
+    }
+
+    .card-action-btn.secondary:hover {
+      background: var(--border);
+    }
+
+    .card-action-btn.success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .card-action-btn.timer {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    /* ========================================
+       MICRO-STEPS (ADHD Engine)
+       ======================================== */
+    .micro-steps {
+      margin-top: 12px;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+    }
+
+    .micro-steps-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .micro-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .micro-step:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .micro-step-checkbox {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .micro-step-checkbox.checked {
+      background: var(--success);
+      border-color: var(--success);
+      color: white;
+    }
+
+    .micro-step-content {
+      flex: 1;
+    }
+
+    .micro-step-text {
+      font-size: 0.875rem;
+      color: var(--text-primary);
+    }
+
+    .micro-step.completed .micro-step-text {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .micro-step-time {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .micro-step-timer {
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      background: #fef3c7;
+      color: #92400e;
+      font-size: 0.7rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+
+    .micro-step-timer:hover {
+      background: #fde68a;
+    }
+
+    /* Open Questions Section */
+    .open-questions {
+      margin-top: 12px;
+      padding: 12px;
+      background: #fef3c7;
+      border-radius: var(--radius-sm);
+    }
+
+    .open-questions-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #92400e;
+      margin-bottom: 8px;
+    }
+
+    .open-question-item {
+      font-size: 0.85rem;
+      color: #78350f;
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ========================================
+       WEEKLY SUMMARY CARD
+       ======================================== */
+    .weekly-summary-section {
+      margin-top: 8px;
+    }
+
+    .weekly-summary-section h4 {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin: 12px 0 6px;
+    }
+
+    .weekly-summary-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .weekly-summary-section li {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      padding: 3px 0;
+    }
+
+    /* ========================================
+       FLOATING ACTION BUTTON
+       ======================================== */
     .fab {
       position: fixed;
       bottom: 24px;
@@ -177,224 +600,1666 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
-      box-shadow: 0 4px 15px rgba(15, 23, 42, 0.4);
+      font-size: 1.75rem;
+      box-shadow: var(--shadow-lg);
       cursor: pointer;
       z-index: 200;
+      border: none;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    /* --- MODAL (For Profile Tap) --- */
+    .fab:hover {
+      transform: scale(1.05);
+    }
+
+    .fab:active {
+      transform: scale(0.95);
+    }
+
+    .fab-menu {
+      position: fixed;
+      bottom: 90px;
+      right: 24px;
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      padding: 8px;
+      z-index: 199;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+      transition: all 0.2s;
+    }
+
+    .fab-menu.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .fab-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      white-space: nowrap;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .fab-menu-item:hover {
+      background: var(--bg);
+    }
+
+    .fab-menu-item .icon {
+      font-size: 1.1rem;
+    }
+
+    /* ========================================
+       MODALS & BOTTOM SHEETS
+       ======================================== */
     .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.5); 
-      z-index: 900; display: none; opacity: 0; transition: opacity 0.2s;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 900;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
     }
-    .modal-overlay.open { display: block; opacity: 1; }
-    
-    .bottom-sheet {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: white; border-radius: 20px 20px 0 0;
-      padding: 24px; z-index: 1000;
-      transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-    .bottom-sheet.open { transform: translateY(0); }
 
-    @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .bottom-sheet {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card-bg);
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      padding: 0;
+      z-index: 1000;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .bottom-sheet.open {
+      transform: translateY(0);
+    }
+
+    .sheet-handle {
+      width: 40px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 12px auto;
+      flex-shrink: 0;
+    }
+
+    .sheet-header {
+      padding: 0 20px 16px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .sheet-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .sheet-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .sheet-content {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .sheet-actions {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+      flex-shrink: 0;
+      background: var(--card-bg);
+    }
+
+    /* ========================================
+       FORMS
+       ======================================== */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 16px; /* Prevents iOS zoom */
+      font-family: inherit;
+      background: var(--card-bg);
+      color: var(--text-primary);
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--adult);
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    .btn {
+      padding: 14px 24px;
+      border-radius: var(--radius-sm);
+      border: none;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+      flex: 1;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-light);
+    }
+
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+
+    .btn-danger {
+      background: #fef2f2;
+      color: var(--danger);
+    }
+
+    .btn-danger:hover {
+      background: #fee2e2;
+    }
+
+    /* ========================================
+       PROFILE PANEL
+       ======================================== */
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .profile-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+    }
+
+    .profile-avatar.type-adult { background: #eff6ff; }
+    .profile-avatar.type-child { background: #fffbeb; }
+    .profile-avatar.type-household { background: #f0fdfa; }
+
+    .profile-info h2 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .profile-role {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-transform: capitalize;
+    }
+
+    .profile-section {
+      margin-top: 20px;
+    }
+
+    .profile-section-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .profile-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .profile-item:last-child {
+      border-bottom: none;
+    }
+
+    .profile-item-label {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .profile-item-value {
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    /* ========================================
+       SETTINGS PANEL
+       ======================================== */
+    .settings-section {
+      margin-bottom: 24px;
+    }
+
+    .settings-section-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .settings-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .settings-item-info {
+      flex: 1;
+    }
+
+    .settings-item-label {
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .settings-item-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ========================================
+       UTILITIES
+       ======================================== */
+    .text-danger { color: var(--danger); }
+    .text-success { color: var(--success); }
+    .text-warning { color: var(--warning); }
+    .text-muted { color: var(--text-muted); }
+    .font-bold { font-weight: 600; }
+    .mt-2 { margin-top: 8px; }
+    .mt-4 { margin-top: 16px; }
+    .mb-2 { margin-bottom: 8px; }
+    .hidden { display: none !important; }
+
+    /* ========================================
+       RESPONSIVE
+       ======================================== */
+    @media (min-width: 768px) {
+      .feed-layer {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+    }
   </style>
 </head>
 <body>
+  <!-- BUILD TAG -->
+  <div class="build-tag">BUILD v1.0</div>
 
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="app-title">Life</div>
+    <button class="settings-btn" onclick="openSettings()">⚙️</button>
+  </header>
+
+  <!-- BUBBLE NAVIGATION -->
   <div class="bubble-container">
-    <div class="bubble-row" id="bubbleRow">
-      </div>
+    <div class="bubble-row" id="bubbleRow"></div>
   </div>
 
-  <div class="feed-layer" id="feedLayer">
-    <div class="feed-header">Current Focus</div>
-    
-    <div class="feed-card card-pinned">
-      <div class="card-title">📌 Weekly AI Summary</div>
-      <div class="card-body">
-        • <b>Roster:</b> Overlap on Tuesday PM.<br>
-        • <b>Health:</b> Confirm Heparin competency.<br>
-        • <b>Tasks:</b> 3 high priority items pending.
-      </div>
-    </div>
+  <!-- FEED LAYER -->
+  <main class="feed-layer" id="feedLayer">
+    <div id="feedContent"></div>
+  </main>
 
-    <div class="feed-card card-roster">
-      <div class="card-title">📋 Roster Imported</div>
-      <div class="card-body">Shift added for Monday 0700-1530 (Ward 2B).</div>
+  <!-- FLOATING ACTION BUTTON -->
+  <button class="fab" id="fabBtn" onclick="toggleFabMenu()">+</button>
+
+  <div class="fab-menu" id="fabMenu">
+    <div class="fab-menu-item" onclick="openAddMemberModal()">
+      <span class="icon">👤</span>
+      <span>Add Family Member</span>
+    </div>
+    <div class="fab-menu-item" onclick="openFormModal('household', 'note')">
+      <span class="icon">🏠</span>
+      <span>Household Item</span>
+    </div>
+    <div class="fab-menu-item" onclick="generateWeeklyPlan()">
+      <span class="icon">📋</span>
+      <span>Generate Weekly Plan</span>
     </div>
   </div>
 
-  <div class="fab" onclick="alert('Quick Add Global Item')">+</div>
+  <!-- MODAL OVERLAY -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
 
-  <div class="modal-overlay" id="modalOverlay" onclick="closeProfile()"></div>
+  <!-- PROFILE SHEET -->
   <div class="bottom-sheet" id="profileSheet">
-    <h2 id="profileTitle" style="margin-top:0">Profile</h2>
-    <p>Profile details and history would appear here.</p>
-    <button onclick="closeProfile()" style="width:100%; padding:12px; background:#f1f5f9; border:none; border-radius:8px;">Close</button>
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 class="sheet-title" id="profileSheetTitle">Profile</h3>
+    </div>
+    <div class="sheet-content" id="profileSheetContent"></div>
+    <div class="sheet-actions">
+      <button class="btn btn-secondary" onclick="closeProfileSheet()">Close</button>
+    </div>
+  </div>
+
+  <!-- FORM SHEET -->
+  <div class="bottom-sheet" id="formSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 class="sheet-title" id="formSheetTitle">Add Item</h3>
+      <p class="sheet-subtitle" id="formSheetSubtitle"></p>
+    </div>
+    <div class="sheet-content" id="formSheetContent"></div>
+    <div class="sheet-actions">
+      <button class="btn btn-secondary" onclick="closeFormSheet()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitForm()">Save</button>
+    </div>
+  </div>
+
+  <!-- ADD MEMBER SHEET -->
+  <div class="bottom-sheet" id="addMemberSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 class="sheet-title">Add Family Member</h3>
+    </div>
+    <div class="sheet-content">
+      <div class="form-group">
+        <label class="form-label">Name</label>
+        <input type="text" class="form-input" id="memberName" placeholder="Enter name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Role</label>
+        <select class="form-select" id="memberRole">
+          <option value="adult">Adult</option>
+          <option value="child">Child</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Icon (emoji)</label>
+        <input type="text" class="form-input" id="memberIcon" placeholder="👤" maxlength="2">
+      </div>
+    </div>
+    <div class="sheet-actions">
+      <button class="btn btn-secondary" onclick="closeAddMemberSheet()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveMember()">Add Member</button>
+    </div>
+  </div>
+
+  <!-- SETTINGS SHEET -->
+  <div class="bottom-sheet" id="settingsSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 class="sheet-title">Settings</h3>
+    </div>
+    <div class="sheet-content">
+      <div class="settings-section">
+        <div class="settings-section-title">Data Management</div>
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <div class="settings-item-label">Reset Family Data</div>
+            <div class="settings-item-desc">Clear all data and start fresh</div>
+          </div>
+          <button class="btn btn-danger" onclick="confirmResetData()" style="flex:0;">Reset</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">About</div>
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <div class="settings-item-label">Version</div>
+          </div>
+          <span class="text-muted">1.0.0</span>
+        </div>
+      </div>
+    </div>
+    <div class="sheet-actions">
+      <button class="btn btn-secondary" onclick="closeSettings()">Close</button>
+    </div>
   </div>
 
   <script>
-    // --- DATA MODEL ---
-    const familyMembers = [
-      { id: 'me', name: 'Me', role: 'adult', icon: '👨‍⚕️' },
+    // ========================================
+    // LIFE PAGE - COMPLETE APPLICATION
+    // ========================================
+
+    // --- STORAGE KEYS ---
+    const STORAGE_KEYS = {
+      MEMBERS: 'FAMILY_MEMBERS_V1',
+      FEED: 'FEED_ITEMS_V1',
+      WEEKLY: 'WEEKLY_SUMMARY_V1',
+      SETTINGS: 'SETTINGS_V1'
+    };
+
+    // --- DEFAULT DATA ---
+    const DEFAULT_MEMBERS = [
+      { id: 'me', name: 'Me', role: 'adult', icon: '👨' },
       { id: 'wife', name: 'Wife', role: 'adult', icon: '👩' },
-      { id: 'bubby', name: 'Bubby', role: 'child', icon: '👶' },
-      { id: 'house', name: 'Home', role: 'household', icon: '🏠' }
+      { id: 'household', name: 'Home', role: 'household', icon: '🏠' }
     ];
 
-    const menuOptions = {
+    // --- MENU OPTIONS BY ROLE ---
+    const MENU_OPTIONS = {
       adult: [
-        { label: 'Add Appointment', icon: '🩺' },
-        { label: 'Add Roster', icon: '📋' },
-        { label: 'Add Event', icon: '🎉' },
-        { label: 'Add Goal', icon: '🎯' },
-        { label: 'Add Note', icon: '📝' },
-        { label: 'Share Task', icon: '🤝' }
+        { action: 'appointment', label: 'Add Appointment', icon: '🩺' },
+        { action: 'roster', label: 'Add Roster', icon: '📋' },
+        { action: 'event', label: 'Add Event', icon: '🎉' },
+        { action: 'goal', label: 'Add Goal', icon: '🎯' },
+        { action: 'note', label: 'Add Note', icon: '📝' },
+        { action: 'share', label: 'Share Task', icon: '🤝' }
       ],
       child: [
-        { label: 'Add Appointment', icon: '🩺' },
-        { label: 'Add Milestone', icon: '⭐' },
-        { label: 'Add Event', icon: '🎉' },
-        { label: 'Add Goal', icon: '🎯' },
-        { label: 'Add Photo/Note', icon: '📸' }
+        { action: 'appointment', label: 'Add Appointment', icon: '🩺' },
+        { action: 'milestone', label: 'Add Milestone', icon: '⭐' },
+        { action: 'event', label: 'Add Event', icon: '🎉' },
+        { action: 'goal', label: 'Add Goal', icon: '🎯' },
+        { action: 'note', label: 'Add Photo/Note', icon: '📸' }
       ],
       household: [
-        { label: 'Shared Task', icon: '📦' },
-        { label: 'Shared Event', icon: '🎉' },
-        { label: 'Weekly Plan', icon: '📝' }
+        { action: 'note', label: 'Shared Task', icon: '📦' },
+        { action: 'event', label: 'Shared Event', icon: '🎉' },
+        { action: 'weekly', label: 'Weekly Plan', icon: '📋' }
       ]
     };
 
-    // --- RENDER BUBBLES ---
-    const bubbleRow = document.getElementById('bubbleRow');
-    
-    familyMembers.forEach(member => {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'bubble-wrapper';
-      
-      // Bubble
-      const bubble = document.createElement('div');
-      bubble.className = `bubble type-${member.role}`;
-      bubble.innerHTML = member.icon;
-      bubble.dataset.id = member.id;
-      bubble.dataset.role = member.role;
-      
-      // Label
-      const label = document.createElement('div');
-      label.className = 'bubble-label';
-      label.textContent = member.name;
+    // --- PREP MICRO-STEPS TEMPLATE ---
+    const PREP_STEPS = [
+      { text: 'Confirm appointment time & location', time: 2 },
+      { text: 'Check if any fasting/prep required', time: 1 },
+      { text: 'Gather required documents/referrals', time: 3 },
+      { text: 'Pack essentials (wallet, phone, snacks)', time: 3 },
+      { text: 'Plan travel route & parking', time: 2 },
+      { text: 'Set leave-time reminder', time: 1 }
+    ];
 
-      // Menu (Hidden)
+    const PREP_QUESTIONS = [
+      'Any fasting required?',
+      'Any forms/referrals needed?',
+      'Any special items to bring?'
+    ];
+
+    // --- STATE ---
+    let familyMembers = [];
+    let feedItems = [];
+    let currentFormMember = null;
+    let currentFormType = null;
+
+    // ========================================
+    // PERSISTENCE
+    // ========================================
+    function loadData() {
+      try {
+        const membersData = localStorage.getItem(STORAGE_KEYS.MEMBERS);
+        const feedData = localStorage.getItem(STORAGE_KEYS.FEED);
+
+        familyMembers = membersData ? JSON.parse(membersData) : [...DEFAULT_MEMBERS];
+        feedItems = feedData ? JSON.parse(feedData) : [];
+
+        // Ensure household always exists
+        if (!familyMembers.find(m => m.role === 'household')) {
+          familyMembers.push({ id: 'household', name: 'Home', role: 'household', icon: '🏠' });
+        }
+      } catch (e) {
+        console.error('Error loading data:', e);
+        familyMembers = [...DEFAULT_MEMBERS];
+        feedItems = [];
+      }
+    }
+
+    function saveData() {
+      try {
+        localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify(familyMembers));
+        localStorage.setItem(STORAGE_KEYS.FEED, JSON.stringify(feedItems));
+      } catch (e) {
+        console.error('Error saving data:', e);
+      }
+    }
+
+    function resetAllData() {
+      Object.values(STORAGE_KEYS).forEach(key => localStorage.removeItem(key));
+      familyMembers = [...DEFAULT_MEMBERS];
+      feedItems = [];
+      saveData();
+      renderBubbles();
+      renderFeed();
+      closeSettings();
+    }
+
+    // ========================================
+    // UTILITIES
+    // ========================================
+    function generateId() {
+      return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+
+    function formatDate(dateStr) {
+      const d = new Date(dateStr);
+      return d.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
+    }
+
+    function formatTime(timeStr) {
+      const [h, m] = timeStr.split(':');
+      const hour = parseInt(h);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const hour12 = hour % 12 || 12;
+      return `${hour12}:${m} ${ampm}`;
+    }
+
+    function isWithinDays(dateStr, days) {
+      const target = new Date(dateStr);
+      const now = new Date();
+      const diff = (target - now) / (1000 * 60 * 60 * 24);
+      return diff >= 0 && diff <= days;
+    }
+
+    function getMemberById(id) {
+      return familyMembers.find(m => m.id === id);
+    }
+
+    function startTimer(minutes) {
+      const url = `shortcuts://run-shortcut?name=Start%20Focus%20Timer&input=${minutes}`;
+      window.location.href = url;
+    }
+
+    // ========================================
+    // BUBBLE RENDERING
+    // ========================================
+    function renderBubbles() {
+      const row = document.getElementById('bubbleRow');
+      row.innerHTML = '';
+
+      familyMembers.forEach(member => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'bubble-wrapper';
+
+        const bubble = document.createElement('div');
+        bubble.className = `bubble type-${member.role}`;
+        bubble.innerHTML = member.icon;
+        bubble.dataset.id = member.id;
+
+        const label = document.createElement('div');
+        label.className = 'bubble-label';
+        label.textContent = member.name;
+
+        const menu = createActionMenu(member);
+
+        wrapper.appendChild(bubble);
+        wrapper.appendChild(label);
+        wrapper.appendChild(menu);
+        row.appendChild(wrapper);
+
+        attachBubbleInteraction(bubble, member);
+      });
+
+      // Add "+" bubble for adding members
+      const addWrapper = document.createElement('div');
+      addWrapper.className = 'bubble-wrapper';
+      const addBubble = document.createElement('div');
+      addBubble.className = 'bubble bubble-add';
+      addBubble.innerHTML = '+';
+      addBubble.onclick = openAddMemberModal;
+      const addLabel = document.createElement('div');
+      addLabel.className = 'bubble-label';
+      addLabel.textContent = 'Add';
+      addWrapper.appendChild(addBubble);
+      addWrapper.appendChild(addLabel);
+      row.appendChild(addWrapper);
+    }
+
+    function createActionMenu(member) {
       const menu = document.createElement('div');
       menu.className = 'action-menu';
       menu.id = `menu-${member.id}`;
-      
-      // Populate Menu Items
-      const options = menuOptions[member.role] || menuOptions.adult;
+
+      const options = MENU_OPTIONS[member.role] || MENU_OPTIONS.adult;
       options.forEach(opt => {
         const btn = document.createElement('button');
         btn.className = 'menu-item';
-        btn.innerHTML = `<span>${opt.icon}</span> ${opt.label}`;
-        btn.onclick = () => handleMenuAction(member.name, opt.label);
+        btn.innerHTML = `<span class="menu-icon">${opt.icon}</span>${opt.label}`;
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          closeAllMenus();
+          if (opt.action === 'weekly') {
+            generateWeeklyPlan();
+          } else if (opt.action === 'share') {
+            // Share task - open assignment modal
+            alert('Share Task feature coming soon!');
+          } else {
+            openFormModal(member.id, opt.action);
+          }
+        };
         menu.appendChild(btn);
       });
 
-      wrapper.appendChild(bubble);
-      wrapper.appendChild(label);
-      wrapper.appendChild(menu);
-      bubbleRow.appendChild(wrapper);
+      return menu;
+    }
 
-      // Attach Touch Logic
-      attachInteraction(bubble, member);
-    });
-
-    // --- INTERACTION LOGIC (The "Physics") ---
-    function attachInteraction(element, member) {
+    function attachBubbleInteraction(element, member) {
       let pressTimer;
       let isLongPress = false;
+      let startY = 0;
 
-      // START (Touch or Mouse)
       const startPress = (e) => {
-        // Prevent default only on touch to stop scrolling while holding? 
-        // Actually, we want to allow scrolling if they drag.
-        
         isLongPress = false;
+        startY = e.touches ? e.touches[0].clientY : e.clientY;
         element.classList.add('pressing');
-        
+
         pressTimer = setTimeout(() => {
           isLongPress = true;
           element.classList.remove('pressing');
           openMenu(member.id);
-          // Vibrate if supported
-          if (navigator.vibrate) navigator.vibrate(50); 
-        }, 400); // 400ms Threshold
+          if (navigator.vibrate) navigator.vibrate(30);
+        }, 400);
       };
 
-      // END (Touch or Mouse)
       const endPress = (e) => {
         clearTimeout(pressTimer);
         element.classList.remove('pressing');
-        
+
         if (!isLongPress) {
-          // If it wasn't a long press, treat as Tap
-          // But check if they scrolled/dragged away? (Simple version for now)
-          openProfile(member);
+          openProfileSheet(member);
         }
       };
 
-      // CANCEL (If they scroll away)
-      const cancelPress = () => {
-        clearTimeout(pressTimer);
-        element.classList.remove('pressing');
+      const cancelPress = (e) => {
+        const currentY = e.touches ? e.touches[0].clientY : e.clientY;
+        if (Math.abs(currentY - startY) > 10) {
+          clearTimeout(pressTimer);
+          element.classList.remove('pressing');
+        }
       };
 
       element.addEventListener('touchstart', startPress, { passive: true });
       element.addEventListener('touchend', endPress);
-      element.addEventListener('touchmove', cancelPress);
-      
+      element.addEventListener('touchmove', cancelPress, { passive: true });
       element.addEventListener('mousedown', startPress);
       element.addEventListener('mouseup', endPress);
-      element.addEventListener('mouseleave', cancelPress);
+      element.addEventListener('mouseleave', () => {
+        clearTimeout(pressTimer);
+        element.classList.remove('pressing');
+      });
     }
 
-    // --- UI ACTIONS ---
     function openMenu(memberId) {
-      // Close all others
-      document.querySelectorAll('.action-menu').forEach(el => el.classList.remove('visible'));
-      
+      closeAllMenus();
       const menu = document.getElementById(`menu-${memberId}`);
       if (menu) menu.classList.add('visible');
     }
 
-    function openProfile(member) {
-      // Close menus first
-      document.querySelectorAll('.action-menu').forEach(el => el.classList.remove('visible'));
-      
-      document.getElementById('profileTitle').textContent = `${member.name}'s Profile`;
-      document.getElementById('modalOverlay').classList.add('open');
-      document.getElementById('profileSheet').classList.add('open');
+    function closeAllMenus() {
+      document.querySelectorAll('.action-menu').forEach(m => m.classList.remove('visible'));
     }
 
-    function closeProfile() {
+    // ========================================
+    // FEED RENDERING
+    // ========================================
+    function renderFeed() {
+      const content = document.getElementById('feedContent');
+
+      if (feedItems.length === 0) {
+        content.innerHTML = `
+          <div class="feed-empty">
+            <div class="feed-empty-icon">📱</div>
+            <div class="feed-empty-text">
+              <strong>Your feed is empty</strong><br>
+              Long-press a bubble above to add appointments, events, or tasks.
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      // Sort: pinned first, then by urgency (due within 48h), then by date
+      const sorted = [...feedItems].sort((a, b) => {
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return 1;
+
+        const aUrgent = a.date && isWithinDays(a.date, 2);
+        const bUrgent = b.date && isWithinDays(b.date, 2);
+        if (aUrgent && !bUrgent) return -1;
+        if (!aUrgent && bUrgent) return 1;
+
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
+
+      // Separate pinned and regular
+      const pinned = sorted.filter(item => item.pinned);
+      const regular = sorted.filter(item => !item.pinned);
+
+      let html = '';
+
+      if (pinned.length > 0) {
+        html += '<div class="feed-section-title">Pinned</div>';
+        pinned.forEach(item => html += renderFeedCard(item));
+      }
+
+      if (regular.length > 0) {
+        html += '<div class="feed-section-title">Current Focus</div>';
+        regular.forEach(item => html += renderFeedCard(item));
+      }
+
+      content.innerHTML = html;
+    }
+
+    function renderFeedCard(item) {
+      const member = getMemberById(item.memberId);
+      const memberName = member ? member.name : 'Unknown';
+      const memberIcon = member ? member.icon : '👤';
+
+      let cardClass = `feed-card type-${item.type}`;
+      if (item.pinned) cardClass += ' pinned';
+
+      let body = '';
+      let meta = '';
+      let actions = '';
+      let microSteps = '';
+
+      switch (item.type) {
+        case 'appointment':
+          body = item.notes || 'No additional details';
+          if (item.location) body = `📍 ${item.location}<br>${body}`;
+          meta = `
+            <div class="card-meta">
+              <span class="card-meta-item">📅 ${formatDate(item.date)}</span>
+              <span class="card-meta-item">🕐 ${formatTime(item.time)}</span>
+            </div>
+          `;
+          actions = `
+            <div class="card-actions">
+              <button class="card-action-btn success" onclick="markDone('${item.id}')">✓ Done</button>
+            </div>
+          `;
+          break;
+
+        case 'prep':
+          body = `Prepare for: <strong>${item.relatedTitle}</strong>`;
+          microSteps = renderMicroSteps(item);
+          break;
+
+        case 'roster':
+          body = `${formatTime(item.startTime)} - ${formatTime(item.endTime)}`;
+          if (item.location) body += `<br>📍 ${item.location}`;
+          if (item.notes) body += `<br>${item.notes}`;
+          meta = `
+            <div class="card-meta">
+              <span class="card-meta-item">📅 ${formatDate(item.date)}</span>
+            </div>
+          `;
+          actions = `
+            <div class="card-actions">
+              <button class="card-action-btn success" onclick="markDone('${item.id}')">✓ Done</button>
+            </div>
+          `;
+          break;
+
+        case 'milestone':
+          body = item.notes || 'A special moment!';
+          meta = `
+            <div class="card-meta">
+              <span class="card-meta-item">📅 ${formatDate(item.date)}</span>
+            </div>
+          `;
+          break;
+
+        case 'event':
+          body = item.notes || '';
+          if (item.location) body = `📍 ${item.location}${body ? '<br>' + body : ''}`;
+          meta = `
+            <div class="card-meta">
+              <span class="card-meta-item">📅 ${formatDate(item.date)}</span>
+              ${item.time ? `<span class="card-meta-item">🕐 ${formatTime(item.time)}</span>` : ''}
+            </div>
+          `;
+          actions = `
+            <div class="card-actions">
+              <button class="card-action-btn success" onclick="markDone('${item.id}')">✓ Done</button>
+            </div>
+          `;
+          break;
+
+        case 'goal':
+          body = item.notes || '';
+          if (item.timeframe) body = `⏱️ ${item.timeframe}${body ? '<br>' + body : ''}`;
+          actions = `
+            <div class="card-actions">
+              <button class="card-action-btn success" onclick="markDone('${item.id}')">✓ Achieved</button>
+            </div>
+          `;
+          break;
+
+        case 'note':
+          body = item.notes || item.content || '';
+          actions = `
+            <div class="card-actions">
+              <button class="card-action-btn secondary" onclick="markDone('${item.id}')">✓ Dismiss</button>
+            </div>
+          `;
+          break;
+
+        case 'conflict':
+          body = item.description;
+          actions = `
+            <div class="card-actions">
+              <button class="card-action-btn secondary" onclick="markDone('${item.id}')">Resolved</button>
+            </div>
+          `;
+          break;
+
+        case 'weekly':
+          body = renderWeeklySummaryContent(item);
+          break;
+
+        default:
+          body = item.notes || item.content || '';
+      }
+
+      const typeLabels = {
+        appointment: '🩺 Appointment',
+        prep: '⚡ Prep Needed',
+        roster: '📋 Roster',
+        milestone: '⭐ Milestone',
+        event: '🎉 Event',
+        goal: '🎯 Goal',
+        note: '📝 Note',
+        conflict: '⚠️ Conflict',
+        weekly: '📌 Weekly Plan'
+      };
+
+      return `
+        <div class="${cardClass}" data-id="${item.id}">
+          <div class="card-header">
+            <span class="card-type-badge">${typeLabels[item.type] || item.type}</span>
+            <span class="card-member-badge">${memberIcon} ${memberName}</span>
+          </div>
+          <div class="card-title">
+            ${item.pinned ? '<span class="pin-icon">📌</span>' : ''}
+            ${item.title}
+          </div>
+          <div class="card-body">${body}</div>
+          ${meta}
+          ${microSteps}
+          ${actions}
+        </div>
+      `;
+    }
+
+    function renderMicroSteps(item) {
+      if (!item.steps || item.steps.length === 0) return '';
+
+      const stepsHtml = item.steps.map((step, idx) => {
+        const checked = step.done ? 'checked' : '';
+        const completed = step.done ? 'completed' : '';
+        return `
+          <div class="micro-step ${completed}">
+            <div class="micro-step-checkbox ${checked}" onclick="toggleStep('${item.id}', ${idx})">
+              ${step.done ? '✓' : ''}
+            </div>
+            <div class="micro-step-content">
+              <div class="micro-step-text">${step.text}</div>
+              <div class="micro-step-time">~${step.time} min</div>
+            </div>
+            <button class="micro-step-timer" onclick="startTimer(${step.time <= 2 ? 3 : step.time})">
+              Start ${step.time <= 2 ? 3 : step.time}m
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      let questionsHtml = '';
+      if (item.questions && item.questions.length > 0) {
+        questionsHtml = `
+          <div class="open-questions">
+            <div class="open-questions-title">❓ Open Questions</div>
+            ${item.questions.map(q => `<div class="open-question-item">• ${q}</div>`).join('')}
+          </div>
+        `;
+      }
+
+      return `
+        <div class="micro-steps">
+          <div class="micro-steps-title">Micro-Steps</div>
+          ${stepsHtml}
+        </div>
+        ${questionsHtml}
+      `;
+    }
+
+    function renderWeeklySummaryContent(item) {
+      const data = item.summaryData || {};
+
+      return `
+        <div class="weekly-summary-section">
+          <h4>📅 Week at a Glance</h4>
+          <ul>
+            ${(data.weekOverview || ['No items scheduled']).map(i => `<li>${i}</li>`).join('')}
+          </ul>
+
+          <h4>👥 Roster Overview</h4>
+          <ul>
+            ${(data.rosterOverview || ['No roster entries']).map(i => `<li>${i}</li>`).join('')}
+          </ul>
+
+          <h4>🩺 Appointments & Events</h4>
+          <ul>
+            ${(data.appointments || ['None this week']).map(i => `<li>${i}</li>`).join('')}
+          </ul>
+
+          <h4>⚡ Prep Tasks Needed</h4>
+          <ul>
+            ${(data.prepTasks || ['None']).map(i => `<li>${i}</li>`).join('')}
+          </ul>
+
+          <h4>🎯 Top 5 Priority Actions</h4>
+          <ul>
+            ${(data.priorities || ['Review upcoming appointments']).map(i => `<li>${i}</li>`).join('')}
+          </ul>
+
+          <h4>🤝 Handoffs & Coordination</h4>
+          <ul>
+            ${(data.handoffs || ['Check roster for overlaps']).map(i => `<li>${i}</li>`).join('')}
+          </ul>
+        </div>
+      `;
+    }
+
+    // ========================================
+    // FEED ACTIONS
+    // ========================================
+    function markDone(itemId) {
+      feedItems = feedItems.filter(item => item.id !== itemId);
+      saveData();
+      renderFeed();
+    }
+
+    function toggleStep(itemId, stepIdx) {
+      const item = feedItems.find(i => i.id === itemId);
+      if (item && item.steps && item.steps[stepIdx]) {
+        item.steps[stepIdx].done = !item.steps[stepIdx].done;
+        saveData();
+        renderFeed();
+      }
+    }
+
+    // ========================================
+    // FORM HANDLING
+    // ========================================
+    function openFormModal(memberId, formType) {
+      currentFormMember = memberId;
+      currentFormType = formType;
+
+      const member = getMemberById(memberId);
+      const memberName = member ? member.name : 'Unknown';
+
+      const titles = {
+        appointment: 'Add Appointment',
+        roster: 'Add Roster Entry',
+        milestone: 'Add Milestone',
+        event: 'Add Event',
+        goal: 'Add Goal',
+        note: 'Add Note'
+      };
+
+      document.getElementById('formSheetTitle').textContent = titles[formType] || 'Add Item';
+      document.getElementById('formSheetSubtitle').textContent = `For ${memberName}`;
+      document.getElementById('formSheetContent').innerHTML = getFormHtml(formType);
+
+      openModal('formSheet');
+    }
+
+    function getFormHtml(type) {
+      switch (type) {
+        case 'appointment':
+          return `
+            <div class="form-group">
+              <label class="form-label">Title *</label>
+              <input type="text" class="form-input" id="formTitle" placeholder="e.g., Doctor checkup">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Date *</label>
+                <input type="date" class="form-input" id="formDate">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Time *</label>
+                <input type="time" class="form-input" id="formTime">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Location</label>
+              <input type="text" class="form-input" id="formLocation" placeholder="e.g., Medical Centre">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Notes</label>
+              <textarea class="form-textarea" id="formNotes" placeholder="Any additional details..."></textarea>
+            </div>
+          `;
+
+        case 'roster':
+          return `
+            <div class="form-group">
+              <label class="form-label">Date *</label>
+              <input type="date" class="form-input" id="formDate">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Start Time *</label>
+                <input type="time" class="form-input" id="formStartTime">
+              </div>
+              <div class="form-group">
+                <label class="form-label">End Time *</label>
+                <input type="time" class="form-input" id="formEndTime">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Location / Ward</label>
+              <input type="text" class="form-input" id="formLocation" placeholder="e.g., Ward 2B">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Notes</label>
+              <textarea class="form-textarea" id="formNotes" placeholder="Any notes..."></textarea>
+            </div>
+          `;
+
+        case 'milestone':
+          return `
+            <div class="form-group">
+              <label class="form-label">Title *</label>
+              <input type="text" class="form-input" id="formTitle" placeholder="e.g., First steps!">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date *</label>
+              <input type="date" class="form-input" id="formDate">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Notes</label>
+              <textarea class="form-textarea" id="formNotes" placeholder="Describe this special moment..."></textarea>
+            </div>
+          `;
+
+        case 'event':
+          return `
+            <div class="form-group">
+              <label class="form-label">Title *</label>
+              <input type="text" class="form-input" id="formTitle" placeholder="e.g., Birthday party">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Date *</label>
+                <input type="date" class="form-input" id="formDate">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Time</label>
+                <input type="time" class="form-input" id="formTime">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Location</label>
+              <input type="text" class="form-input" id="formLocation" placeholder="e.g., Park">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Notes</label>
+              <textarea class="form-textarea" id="formNotes" placeholder="Details..."></textarea>
+            </div>
+          `;
+
+        case 'goal':
+          return `
+            <div class="form-group">
+              <label class="form-label">Goal Title *</label>
+              <input type="text" class="form-input" id="formTitle" placeholder="e.g., Learn to ride a bike">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Timeframe</label>
+              <input type="text" class="form-input" id="formTimeframe" placeholder="e.g., By end of summer">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Notes</label>
+              <textarea class="form-textarea" id="formNotes" placeholder="Details about this goal..."></textarea>
+            </div>
+          `;
+
+        case 'note':
+          return `
+            <div class="form-group">
+              <label class="form-label">Title</label>
+              <input type="text" class="form-input" id="formTitle" placeholder="Quick title (optional)">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Note *</label>
+              <textarea class="form-textarea" id="formNotes" placeholder="Write your note..." style="min-height: 120px;"></textarea>
+            </div>
+          `;
+
+        default:
+          return '<p>Form not available</p>';
+      }
+    }
+
+    function submitForm() {
+      const titleEl = document.getElementById('formTitle');
+      const dateEl = document.getElementById('formDate');
+      const timeEl = document.getElementById('formTime');
+      const startTimeEl = document.getElementById('formStartTime');
+      const endTimeEl = document.getElementById('formEndTime');
+      const locationEl = document.getElementById('formLocation');
+      const notesEl = document.getElementById('formNotes');
+      const timeframeEl = document.getElementById('formTimeframe');
+
+      const title = titleEl?.value?.trim();
+      const date = dateEl?.value;
+      const time = timeEl?.value;
+      const startTime = startTimeEl?.value;
+      const endTime = endTimeEl?.value;
+      const location = locationEl?.value?.trim();
+      const notes = notesEl?.value?.trim();
+      const timeframe = timeframeEl?.value?.trim();
+
+      // Validation
+      if (currentFormType === 'appointment' && (!title || !date || !time)) {
+        alert('Please fill in Title, Date, and Time');
+        return;
+      }
+      if (currentFormType === 'roster' && (!date || !startTime || !endTime)) {
+        alert('Please fill in Date, Start Time, and End Time');
+        return;
+      }
+      if (currentFormType === 'milestone' && (!title || !date)) {
+        alert('Please fill in Title and Date');
+        return;
+      }
+      if (currentFormType === 'event' && (!title || !date)) {
+        alert('Please fill in Title and Date');
+        return;
+      }
+      if (currentFormType === 'goal' && !title) {
+        alert('Please fill in Goal Title');
+        return;
+      }
+      if (currentFormType === 'note' && !notes) {
+        alert('Please write a note');
+        return;
+      }
+
+      // Create feed item
+      const newItem = {
+        id: generateId(),
+        memberId: currentFormMember,
+        type: currentFormType,
+        title: title || (currentFormType === 'roster' ? 'Shift' : 'Note'),
+        createdAt: new Date().toISOString(),
+        date,
+        time,
+        startTime,
+        endTime,
+        location,
+        notes,
+        timeframe
+      };
+
+      feedItems.push(newItem);
+
+      // Auto-create prep card for appointments within 7 days
+      if (currentFormType === 'appointment' && date && isWithinDays(date, 7)) {
+        const prepItem = {
+          id: generateId(),
+          memberId: currentFormMember,
+          type: 'prep',
+          title: `Prep: ${title}`,
+          relatedTitle: title,
+          relatedId: newItem.id,
+          createdAt: new Date().toISOString(),
+          date: date,
+          steps: PREP_STEPS.map(s => ({ ...s, done: false })),
+          questions: [...PREP_QUESTIONS]
+        };
+        feedItems.push(prepItem);
+      }
+
+      // Check for roster conflicts
+      if (currentFormType === 'roster') {
+        checkRosterConflicts(newItem);
+      }
+
+      saveData();
+      closeFormSheet();
+      renderFeed();
+    }
+
+    function checkRosterConflicts(newRoster) {
+      const sameDayRosters = feedItems.filter(item =>
+        item.type === 'roster' &&
+        item.date === newRoster.date &&
+        item.id !== newRoster.id &&
+        item.memberId !== newRoster.memberId
+      );
+
+      sameDayRosters.forEach(otherRoster => {
+        // Check time overlap
+        const newStart = newRoster.startTime;
+        const newEnd = newRoster.endTime;
+        const otherStart = otherRoster.startTime;
+        const otherEnd = otherRoster.endTime;
+
+        const overlap = (newStart < otherEnd && newEnd > otherStart);
+
+        if (overlap) {
+          const member1 = getMemberById(newRoster.memberId)?.name || 'Adult 1';
+          const member2 = getMemberById(otherRoster.memberId)?.name || 'Adult 2';
+
+          const conflictItem = {
+            id: generateId(),
+            memberId: 'household',
+            type: 'conflict',
+            title: '⚠️ Roster Overlap Detected',
+            description: `${member1} and ${member2} both have shifts on ${formatDate(newRoster.date)}. Handoff coordination needed!`,
+            createdAt: new Date().toISOString(),
+            date: newRoster.date
+          };
+
+          feedItems.push(conflictItem);
+        }
+      });
+    }
+
+    // ========================================
+    // WEEKLY PLAN GENERATION
+    // ========================================
+    function generateWeeklyPlan() {
+      closeFabMenu();
+
+      // Remove existing weekly summary
+      feedItems = feedItems.filter(item => item.type !== 'weekly');
+
+      // Gather data for the week
+      const now = new Date();
+      const weekEnd = new Date(now);
+      weekEnd.setDate(weekEnd.getDate() + 7);
+
+      const thisWeekItems = feedItems.filter(item => {
+        if (!item.date) return false;
+        const d = new Date(item.date);
+        return d >= now && d <= weekEnd;
+      });
+
+      const appointments = thisWeekItems.filter(i => i.type === 'appointment');
+      const rosters = thisWeekItems.filter(i => i.type === 'roster');
+      const events = thisWeekItems.filter(i => i.type === 'event');
+      const preps = feedItems.filter(i => i.type === 'prep');
+
+      // Build summary data
+      const summaryData = {
+        weekOverview: [],
+        rosterOverview: [],
+        appointments: [],
+        prepTasks: [],
+        priorities: [],
+        handoffs: []
+      };
+
+      // Week overview
+      summaryData.weekOverview.push(`${appointments.length} appointment(s) scheduled`);
+      summaryData.weekOverview.push(`${rosters.length} roster shift(s)`);
+      summaryData.weekOverview.push(`${events.length} event(s)`);
+
+      // Roster overview
+      rosters.forEach(r => {
+        const member = getMemberById(r.memberId);
+        summaryData.rosterOverview.push(
+          `${member?.name || 'Adult'}: ${formatDate(r.date)} ${formatTime(r.startTime)}-${formatTime(r.endTime)}`
+        );
+      });
+      if (summaryData.rosterOverview.length === 0) {
+        summaryData.rosterOverview.push('No roster entries this week');
+      }
+
+      // Appointments
+      appointments.forEach(a => {
+        const member = getMemberById(a.memberId);
+        summaryData.appointments.push(
+          `${member?.name || 'Member'}: ${a.title} on ${formatDate(a.date)}`
+        );
+      });
+      events.forEach(e => {
+        summaryData.appointments.push(`Event: ${e.title} on ${formatDate(e.date)}`);
+      });
+      if (summaryData.appointments.length === 0) {
+        summaryData.appointments.push('None scheduled');
+      }
+
+      // Prep tasks
+      preps.forEach(p => {
+        const incomplete = p.steps?.filter(s => !s.done).length || 0;
+        if (incomplete > 0) {
+          summaryData.prepTasks.push(`${p.title}: ${incomplete} steps remaining`);
+        }
+      });
+      if (summaryData.prepTasks.length === 0) {
+        summaryData.prepTasks.push('All prep complete!');
+      }
+
+      // Priorities
+      if (appointments.length > 0) {
+        summaryData.priorities.push('Confirm all appointment times');
+      }
+      if (preps.length > 0) {
+        summaryData.priorities.push('Complete prep checklists');
+      }
+      summaryData.priorities.push('Check roster for handoff needs');
+      summaryData.priorities.push('Plan meals for the week');
+      summaryData.priorities.push('Review family calendar together');
+
+      // Handoffs
+      const rosterDates = [...new Set(rosters.map(r => r.date))];
+      rosterDates.forEach(date => {
+        const dayRosters = rosters.filter(r => r.date === date);
+        if (dayRosters.length > 1) {
+          summaryData.handoffs.push(`${formatDate(date)}: Multiple adults working - coordinate handoff`);
+        }
+      });
+      if (summaryData.handoffs.length === 0) {
+        summaryData.handoffs.push('No handoff conflicts detected');
+      }
+
+      // Create weekly summary item
+      const weeklyItem = {
+        id: generateId(),
+        memberId: 'household',
+        type: 'weekly',
+        title: "This Week's Family Plan",
+        pinned: true,
+        createdAt: new Date().toISOString(),
+        summaryData
+      };
+
+      feedItems.unshift(weeklyItem);
+      saveData();
+      renderFeed();
+
+      // Scroll to top
+      document.getElementById('feedLayer').scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Placeholder for future AI integration
+    async function generateWeeklyPlanWithAI() {
+      // This function could be extended to call an AI API
+      // For now, it uses the local generateWeeklyPlan function
+      console.log('AI weekly plan generation placeholder - using local generation');
+      generateWeeklyPlan();
+    }
+
+    // ========================================
+    // MEMBER MANAGEMENT
+    // ========================================
+    function openAddMemberModal() {
+      closeFabMenu();
+      closeAllMenus();
+      document.getElementById('memberName').value = '';
+      document.getElementById('memberRole').value = 'adult';
+      document.getElementById('memberIcon').value = '';
+      openModal('addMemberSheet');
+    }
+
+    function saveMember() {
+      const name = document.getElementById('memberName').value.trim();
+      const role = document.getElementById('memberRole').value;
+      let icon = document.getElementById('memberIcon').value.trim();
+
+      if (!name) {
+        alert('Please enter a name');
+        return;
+      }
+
+      if (!icon) {
+        icon = role === 'child' ? '👶' : '👤';
+      }
+
+      const newMember = {
+        id: generateId(),
+        name,
+        role,
+        icon
+      };
+
+      // Insert before household
+      const householdIdx = familyMembers.findIndex(m => m.role === 'household');
+      if (householdIdx >= 0) {
+        familyMembers.splice(householdIdx, 0, newMember);
+      } else {
+        familyMembers.push(newMember);
+      }
+
+      saveData();
+      closeAddMemberSheet();
+      renderBubbles();
+    }
+
+    // ========================================
+    // PROFILE SHEET
+    // ========================================
+    function openProfileSheet(member) {
+      closeAllMenus();
+
+      document.getElementById('profileSheetTitle').textContent = `${member.name}'s Profile`;
+
+      const memberItems = feedItems.filter(item => item.memberId === member.id);
+      const appointments = memberItems.filter(i => i.type === 'appointment').length;
+      const rosters = memberItems.filter(i => i.type === 'roster').length;
+      const milestones = memberItems.filter(i => i.type === 'milestone').length;
+      const goals = memberItems.filter(i => i.type === 'goal').length;
+
+      let statsHtml = `
+        <div class="profile-header">
+          <div class="profile-avatar type-${member.role}">${member.icon}</div>
+          <div class="profile-info">
+            <h2>${member.name}</h2>
+            <div class="profile-role">${member.role}</div>
+          </div>
+        </div>
+        <div class="profile-section">
+          <div class="profile-section-title">Stats</div>
+          <div class="profile-item">
+            <span class="profile-item-label">Appointments</span>
+            <span class="profile-item-value">${appointments}</span>
+          </div>
+      `;
+
+      if (member.role === 'adult') {
+        statsHtml += `
+          <div class="profile-item">
+            <span class="profile-item-label">Roster Entries</span>
+            <span class="profile-item-value">${rosters}</span>
+          </div>
+        `;
+      }
+
+      if (member.role === 'child') {
+        statsHtml += `
+          <div class="profile-item">
+            <span class="profile-item-label">Milestones</span>
+            <span class="profile-item-value">${milestones}</span>
+          </div>
+        `;
+      }
+
+      statsHtml += `
+          <div class="profile-item">
+            <span class="profile-item-label">Goals</span>
+            <span class="profile-item-value">${goals}</span>
+          </div>
+        </div>
+      `;
+
+      // Show recent items
+      if (memberItems.length > 0) {
+        const recent = memberItems.slice(0, 3);
+        statsHtml += `
+          <div class="profile-section">
+            <div class="profile-section-title">Recent Items</div>
+            ${recent.map(item => `
+              <div class="profile-item">
+                <span class="profile-item-label">${item.title}</span>
+                <span class="profile-item-value text-muted">${item.type}</span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      document.getElementById('profileSheetContent').innerHTML = statsHtml;
+      openModal('profileSheet');
+    }
+
+    // ========================================
+    // MODAL MANAGEMENT
+    // ========================================
+    function openModal(sheetId) {
+      document.getElementById('modalOverlay').classList.add('open');
+      document.getElementById(sheetId).classList.add('open');
+    }
+
+    function closeAllModals() {
+      document.getElementById('modalOverlay').classList.remove('open');
+      document.querySelectorAll('.bottom-sheet').forEach(sheet => {
+        sheet.classList.remove('open');
+      });
+      closeFabMenu();
+    }
+
+    function closeProfileSheet() {
       document.getElementById('modalOverlay').classList.remove('open');
       document.getElementById('profileSheet').classList.remove('open');
     }
 
-    function handleMenuAction(who, action) {
-      document.querySelectorAll('.action-menu').forEach(el => el.classList.remove('visible'));
-      alert(`Action: ${action} for ${who}`);
-      // Phase 2 will replace this alert with the Input Card
+    function closeFormSheet() {
+      document.getElementById('modalOverlay').classList.remove('open');
+      document.getElementById('formSheet').classList.remove('open');
+      currentFormMember = null;
+      currentFormType = null;
     }
 
-    // Close menus on background tap
+    function closeAddMemberSheet() {
+      document.getElementById('modalOverlay').classList.remove('open');
+      document.getElementById('addMemberSheet').classList.remove('open');
+    }
+
+    function openSettings() {
+      openModal('settingsSheet');
+    }
+
+    function closeSettings() {
+      document.getElementById('modalOverlay').classList.remove('open');
+      document.getElementById('settingsSheet').classList.remove('open');
+    }
+
+    function confirmResetData() {
+      if (confirm('Are you sure you want to reset all family data? This cannot be undone.')) {
+        resetAllData();
+      }
+    }
+
+    // FAB Menu
+    function toggleFabMenu() {
+      document.getElementById('fabMenu').classList.toggle('visible');
+    }
+
+    function closeFabMenu() {
+      document.getElementById('fabMenu').classList.remove('visible');
+    }
+
+    // Close menus on outside click
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.bubble-wrapper')) {
-        document.querySelectorAll('.action-menu').forEach(el => el.classList.remove('visible'));
+        closeAllMenus();
+      }
+      if (!e.target.closest('.fab') && !e.target.closest('.fab-menu')) {
+        closeFabMenu();
       }
     });
 
+    // ========================================
+    // INITIALIZATION
+    // ========================================
+    function init() {
+      loadData();
+      renderBubbles();
+      renderFeed();
+    }
+
+    // Start the app
+    init();
   </script>
 </body>
 </html>
