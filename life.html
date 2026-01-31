@@ -7126,24 +7126,33 @@
 
         const data = await response.json();
         console.log('Received meals:', data);
+
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
         mealIdeas = data.meals || [];
+
+        if (mealIdeas.length === 0) {
+          throw new Error('No meals returned from AI');
+        }
+
         selectedMealIds.clear();
         renderMealIdeasGrid();
       } catch (error) {
         console.error('Meal generation error:', error);
-        // Fall back to local database
-        mealIdeas = (FALLBACK_MEALS[currentMealType] || FALLBACK_MEALS.dinner).slice();
-        mealIdeas = mealIdeas.filter(meal => {
-          const ingredientNames = meal.ingredients.map(i => typeof i === 'string' ? i : i.name);
-          const hasDisliked = ingredientNames.some(ing =>
-            (mealPreferences.dislikes || []).some(dis => ing.toLowerCase().includes(dis.toLowerCase()))
-          );
-          return !hasDisliked;
-        });
-        selectedMealIds.clear();
-        renderMealIdeasGrid();
-        // Show error toast
-        showToast(error.message || 'Using offline meals - sign in for AI-generated recipes');
+
+        // Show error in the grid
+        const grid = document.getElementById('mealIdeasGrid');
+        grid.innerHTML = `
+          <div class="meal-ideas-empty" style="color: #e74c3c;">
+            <div class="meal-ideas-empty-icon">⚠️</div>
+            <p><strong>AI Generation Failed</strong></p>
+            <p style="font-size: 0.85rem; margin-top: 8px;">${error.message}</p>
+            <p style="font-size: 0.8rem; margin-top: 12px; color: var(--text-muted);">Check browser console (F12) for details.<br>Make sure you're signed in.</p>
+            <button class="smart-meal-btn primary" onclick="generateMealIdeas()" style="margin-top: 16px;">Try Again</button>
+          </div>
+        `;
       }
     }
 
