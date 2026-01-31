@@ -544,6 +544,7 @@ export default {
           "indonesian": "Indonesian (nasi goreng, satay, rendang, gado-gado, mie goreng)",
           "malaysian": "Malaysian (laksa, nasi lemak, char kway teow, satay, roti canai)",
           "sri_lankan": "Sri Lankan (hoppers, kottu, lamprais, curry, pol sambol)",
+          "nepalese": "Nepalese (momo dumplings, dal bhat, thukpa noodle soup, sekuwa, sel roti, gundruk)",
           "ethiopian": "Ethiopian (injera, doro wat, tibs, kitfo, shiro)",
           "caribbean": "Caribbean (jerk chicken, rice & peas, curry goat, ackee, plantains)",
           "brazilian": "Brazilian (feijoada, picanha, coxinha, pão de queijo, moqueca)",
