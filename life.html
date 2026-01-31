@@ -998,6 +998,308 @@
       border: none;
     }
 
+    /* Meal Tabs */
+    .meal-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--bg);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      margin-bottom: 16px;
+    }
+
+    .meal-tab {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      background: transparent;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+    }
+
+    .meal-tab.active {
+      background: var(--card-bg);
+      color: var(--text-primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .meal-tab-content {
+      display: none;
+    }
+
+    .meal-tab-content.active {
+      display: block;
+    }
+
+    /* Meal Ideas Header */
+    .meal-ideas-header {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    /* Meal Ideas Grid */
+    .meal-ideas-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .meal-ideas-empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+
+    .meal-ideas-empty-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+    }
+
+    /* Meal Idea Card */
+    .meal-idea-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      position: relative;
+    }
+
+    .meal-idea-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .meal-idea-card.selected {
+      ring: 2px solid var(--adult);
+      box-shadow: 0 0 0 2px var(--adult);
+    }
+
+    .meal-idea-image {
+      height: 100px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--adult) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+    }
+
+    .meal-idea-content {
+      padding: 12px;
+    }
+
+    .meal-idea-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+      color: var(--text-primary);
+    }
+
+    .meal-idea-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .meal-idea-checkbox {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+    }
+
+    .meal-idea-card.selected .meal-idea-checkbox {
+      background: var(--adult);
+      border-color: var(--adult);
+      color: white;
+    }
+
+    /* Meal Selection Bar */
+    .meal-selection-bar {
+      position: sticky;
+      bottom: 0;
+      background: var(--card-bg);
+      padding: 16px;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 -16px -16px;
+    }
+
+    .add-to-list-btn {
+      padding: 12px 20px;
+      background: var(--success);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    /* Expanded Meal Content */
+    .expanded-meal-image {
+      height: 150px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--adult) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      margin: -20px -20px 20px;
+    }
+
+    .expanded-meal-section {
+      margin-bottom: 20px;
+    }
+
+    .expanded-meal-section h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin: 0 0 12px;
+      color: var(--text-primary);
+    }
+
+    .expanded-ingredient-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .expanded-ingredient {
+      padding: 6px 12px;
+      background: var(--bg);
+      border-radius: 20px;
+      font-size: 0.8rem;
+    }
+
+    .expanded-steps-list {
+      counter-reset: step;
+    }
+
+    .expanded-step {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .expanded-step:last-child {
+      border-bottom: none;
+    }
+
+    .expanded-step-number {
+      width: 28px;
+      height: 28px;
+      background: var(--adult);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .expanded-step-text {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .expanded-meal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .expanded-meal-actions button {
+      flex: 1;
+    }
+
+    /* Ingredient Review */
+    .ingredient-review-list {
+      margin-bottom: 20px;
+    }
+
+    .ingredient-review-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+    }
+
+    .ingredient-review-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+    }
+
+    .ingredient-review-name {
+      flex: 1;
+      font-size: 0.9rem;
+    }
+
+    .ingredient-review-price {
+      font-weight: 600;
+      color: var(--success);
+    }
+
+    /* Quality Preference */
+    .quality-preference {
+      margin-bottom: 20px;
+      padding: 16px;
+      background: var(--bg);
+      border-radius: var(--radius-md);
+    }
+
+    .quality-preference h4 {
+      margin: 0 0 12px;
+      font-size: 0.9rem;
+    }
+
+    .quality-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .quality-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+
+    .quality-option:hover {
+      background: var(--card-bg);
+    }
+
+    .quality-label {
+      font-size: 0.9rem;
+    }
+
     /* Meal Preferences Modal Styles */
     .pref-tabs {
       display: flex;
@@ -3409,29 +3711,99 @@
 
   <!-- MEAL PLANNER VIEW -->
   <div class="meal-planner-view" id="mealPlannerView">
-    <div class="meal-planner-header">
-      <button class="calendar-nav-btn" onclick="changeMealWeek(-1)">←</button>
-      <h3 class="meal-week-title" id="mealWeekTitle">This Week</h3>
-      <button class="calendar-nav-btn" onclick="changeMealWeek(1)">→</button>
+    <!-- Tabs for switching between Ideas and Weekly Plan -->
+    <div class="meal-tabs">
+      <button class="meal-tab active" onclick="switchMealTab('ideas')">✨ Meal Ideas</button>
+      <button class="meal-tab" onclick="switchMealTab('weekly')">📅 Weekly Plan</button>
     </div>
 
-    <!-- Smart Meal Generator Quick Actions -->
-    <div class="smart-meal-actions">
-      <button class="smart-meal-btn" onclick="openMealPreferences()">
-        ⚙️ Preferences
-      </button>
-      <button class="smart-meal-btn primary" onclick="generateAIMeals()">
-        ✨ AI Generate Meals
-      </button>
+    <!-- MEAL IDEAS TAB -->
+    <div class="meal-tab-content active" id="mealIdeasTab">
+      <div class="meal-ideas-header">
+        <button class="smart-meal-btn" onclick="openMealPreferences()">⚙️ Preferences</button>
+        <button class="smart-meal-btn primary" onclick="generateMealIdeas()">✨ Generate Ideas</button>
+      </div>
+
+      <!-- Meal Ideas Grid -->
+      <div class="meal-ideas-grid" id="mealIdeasGrid">
+        <div class="meal-ideas-empty">
+          <div class="meal-ideas-empty-icon">🍳</div>
+          <p>Tap "Generate Ideas" to get personalized meal suggestions based on your preferences!</p>
+        </div>
+      </div>
+
+      <!-- Selected Meals Actions -->
+      <div class="meal-selection-bar" id="mealSelectionBar" style="display: none;">
+        <span id="selectedMealCount">0 meals selected</span>
+        <button class="add-to-list-btn" onclick="openIngredientReview()">
+          🛒 Add Ingredients to List
+        </button>
+      </div>
     </div>
 
-    <div class="meal-days" id="mealDays">
-      <!-- Days will be rendered here -->
-    </div>
+    <!-- WEEKLY PLAN TAB -->
+    <div class="meal-tab-content" id="mealWeeklyTab">
+      <div class="meal-planner-header">
+        <button class="calendar-nav-btn" onclick="changeMealWeek(-1)">←</button>
+        <h3 class="meal-week-title" id="mealWeekTitle">This Week</h3>
+        <button class="calendar-nav-btn" onclick="changeMealWeek(1)">→</button>
+      </div>
 
-    <div class="meal-actions">
-      <button class="meal-generate-btn" onclick="generateShoppingFromMeals()">
-        🛒 Generate Shopping List
+      <div class="meal-days" id="mealDays">
+        <!-- Days will be rendered here -->
+      </div>
+
+      <div class="meal-actions">
+        <button class="meal-generate-btn" onclick="generateShoppingFromMeals()">
+          🛒 Generate Shopping List
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPANDED MEAL CARD MODAL -->
+  <div class="modal-sheet" id="expandedMealSheet">
+    <div class="modal-header">
+      <h3 id="expandedMealTitle">Meal Name</h3>
+      <button class="modal-close" onclick="closeExpandedMeal()">×</button>
+    </div>
+    <div class="modal-content" id="expandedMealContent">
+      <!-- Will be populated dynamically -->
+    </div>
+  </div>
+
+  <!-- INGREDIENT REVIEW MODAL -->
+  <div class="modal-sheet" id="ingredientReviewSheet">
+    <div class="modal-header">
+      <h3>Review Ingredients</h3>
+      <button class="modal-close" onclick="closeIngredientReview()">×</button>
+    </div>
+    <div class="modal-content">
+      <p class="pref-description">Uncheck ingredients you already have:</p>
+      <div class="ingredient-review-list" id="ingredientReviewList">
+        <!-- Ingredients will be listed here -->
+      </div>
+
+      <div class="quality-preference">
+        <h4>Ingredient Quality</h4>
+        <div class="quality-options">
+          <label class="quality-option">
+            <input type="radio" name="quality" value="budget" checked>
+            <span class="quality-label">💰 Budget (Home Brand)</span>
+          </label>
+          <label class="quality-option">
+            <input type="radio" name="quality" value="standard">
+            <span class="quality-label">🏪 Standard (Store Brand)</span>
+          </label>
+          <label class="quality-option">
+            <input type="radio" name="quality" value="premium">
+            <span class="quality-label">⭐ Premium Quality</span>
+          </label>
+        </div>
+      </div>
+
+      <button class="form-submit" onclick="addIngredientsWithPricing()">
+        🔍 Find Best Prices & Add to List
       </button>
     </div>
   </div>
@@ -6428,6 +6800,273 @@
         mealBtn.style.background = '';
         mealBtn.style.color = '';
       }
+    }
+
+    // ========================================
+    // MEAL IDEAS FUNCTIONALITY
+    // ========================================
+    let mealIdeas = [];
+    let selectedMealIds = new Set();
+
+    // Extended meal database with steps
+    const MEAL_IDEAS_DATABASE = [
+      {
+        id: 1, name: 'Spaghetti Bolognese', emoji: '🍝', time: '30 min', servings: 4,
+        ingredients: ['500g beef mince', '400g spaghetti', '2 cans diced tomatoes', '1 onion', '3 garlic cloves', 'Italian herbs', 'Parmesan cheese'],
+        steps: ['Dice onion and garlic, sauté in olive oil until soft', 'Add mince and cook until browned', 'Add tomatoes and herbs, simmer 20 mins', 'Cook pasta according to packet', 'Serve with parmesan on top']
+      },
+      {
+        id: 2, name: 'Chicken Stir Fry', emoji: '🥘', time: '20 min', servings: 4,
+        ingredients: ['500g chicken breast', '2 cups rice', '1 capsicum', '1 broccoli head', '3 tbsp soy sauce', '1 tbsp sesame oil', 'Ginger'],
+        steps: ['Cook rice according to packet', 'Slice chicken into strips', 'Stir fry chicken until golden', 'Add vegetables and stir fry 3-4 mins', 'Add soy sauce and sesame oil, toss to coat']
+      },
+      {
+        id: 3, name: 'Fish Tacos', emoji: '🌮', time: '25 min', servings: 4,
+        ingredients: ['400g white fish fillets', '8 small tortillas', '1/4 cabbage', '1 lime', '1 avocado', 'Sour cream', 'Coriander'],
+        steps: ['Season fish with lime and spices', 'Pan fry fish until flaky', 'Shred cabbage finely', 'Warm tortillas', 'Assemble tacos with fish, cabbage, avocado, sour cream']
+      },
+      {
+        id: 4, name: 'Veggie Curry', emoji: '🍛', time: '35 min', servings: 4,
+        ingredients: ['400g chickpeas', '400ml coconut milk', '2 cups spinach', '2 cans diced tomatoes', '2 tbsp curry paste', '1 onion', 'Rice'],
+        steps: ['Sauté onion until soft', 'Add curry paste and cook 1 min', 'Add chickpeas, tomatoes, coconut milk', 'Simmer 20 mins', 'Stir in spinach, serve with rice']
+      },
+      {
+        id: 5, name: 'Grilled Lamb Chops', emoji: '🥩', time: '25 min', servings: 4,
+        ingredients: ['8 lamb chops', '500g baby potatoes', '200g green beans', 'Fresh rosemary', '4 garlic cloves', 'Olive oil', 'Lemon'],
+        steps: ['Marinate lamb with rosemary, garlic, oil', 'Boil potatoes until tender', 'Grill lamb 4 mins each side', 'Steam beans until crisp-tender', 'Serve with lemon wedges']
+      },
+      {
+        id: 6, name: 'Salmon & Veggies', emoji: '🐟', time: '20 min', servings: 4,
+        ingredients: ['4 salmon fillets', '1 bunch asparagus', '2 lemons', '4 tbsp olive oil', 'Fresh dill', 'Salt & pepper'],
+        steps: ['Preheat oven to 200°C', 'Place salmon and asparagus on tray', 'Drizzle with oil and lemon', 'Season and add dill', 'Bake 15 mins until salmon flakes']
+      },
+      {
+        id: 7, name: 'Beef Burgers', emoji: '🍔', time: '25 min', servings: 4,
+        ingredients: ['500g beef mince', '4 burger buns', 'Lettuce', '2 tomatoes', '4 cheese slices', 'Pickles', 'Sauce of choice'],
+        steps: ['Form mince into 4 patties', 'Season with salt and pepper', 'Grill or pan fry 4-5 mins each side', 'Toast buns lightly', 'Assemble with cheese, lettuce, tomato, pickles']
+      },
+      {
+        id: 8, name: 'Mushroom Risotto', emoji: '🍄', time: '40 min', servings: 4,
+        ingredients: ['300g arborio rice', '400g mushrooms', '1L chicken stock', '1 onion', '100g parmesan', 'White wine', 'Butter'],
+        steps: ['Sauté onion in butter', 'Add mushrooms and cook until soft', 'Add rice and toast 2 mins', 'Add wine, then stock gradually', 'Stir constantly until creamy, fold in parmesan']
+      }
+    ];
+
+    function switchMealTab(tab) {
+      document.querySelectorAll('.meal-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.meal-tab-content').forEach(c => c.classList.remove('active'));
+
+      if (tab === 'ideas') {
+        document.querySelector('.meal-tab:first-child').classList.add('active');
+        document.getElementById('mealIdeasTab').classList.add('active');
+      } else {
+        document.querySelector('.meal-tab:last-child').classList.add('active');
+        document.getElementById('mealWeeklyTab').classList.add('active');
+      }
+    }
+
+    function generateMealIdeas() {
+      // Show loading
+      const grid = document.getElementById('mealIdeasGrid');
+      grid.innerHTML = '<div class="meal-ideas-empty"><div class="ai-loading-spinner"></div><p>Generating meal ideas...</p></div>';
+
+      // Simulate AI generation with timeout
+      setTimeout(() => {
+        // Filter based on preferences
+        mealIdeas = MEAL_IDEAS_DATABASE.filter(meal => {
+          const hasDisliked = meal.ingredients.some(ing =>
+            mealPreferences.dislikes.some(dis => ing.toLowerCase().includes(dis.toLowerCase()))
+          );
+          return !hasDisliked;
+        });
+
+        // Shuffle and take 6
+        mealIdeas = mealIdeas.sort(() => Math.random() - 0.5).slice(0, 6);
+        selectedMealIds.clear();
+        renderMealIdeasGrid();
+      }, 1000);
+    }
+
+    function renderMealIdeasGrid() {
+      const grid = document.getElementById('mealIdeasGrid');
+
+      if (mealIdeas.length === 0) {
+        grid.innerHTML = `
+          <div class="meal-ideas-empty">
+            <div class="meal-ideas-empty-icon">🍳</div>
+            <p>Tap "Generate Ideas" to get personalized meal suggestions!</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = mealIdeas.map(meal => `
+        <div class="meal-idea-card ${selectedMealIds.has(meal.id) ? 'selected' : ''}"
+             onclick="toggleMealSelection(${meal.id})"
+             ondblclick="expandMealCard(${meal.id})">
+          <div class="meal-idea-checkbox">${selectedMealIds.has(meal.id) ? '✓' : ''}</div>
+          <div class="meal-idea-image">${meal.emoji}</div>
+          <div class="meal-idea-content">
+            <div class="meal-idea-name">${meal.name}</div>
+            <div class="meal-idea-meta">${meal.time} • ${meal.servings} servings</div>
+          </div>
+        </div>
+      `).join('');
+
+      updateSelectionBar();
+    }
+
+    function toggleMealSelection(mealId) {
+      if (selectedMealIds.has(mealId)) {
+        selectedMealIds.delete(mealId);
+      } else {
+        selectedMealIds.add(mealId);
+      }
+      renderMealIdeasGrid();
+    }
+
+    function updateSelectionBar() {
+      const bar = document.getElementById('mealSelectionBar');
+      const count = selectedMealIds.size;
+
+      if (count > 0) {
+        bar.style.display = 'flex';
+        document.getElementById('selectedMealCount').textContent = `${count} meal${count > 1 ? 's' : ''} selected`;
+      } else {
+        bar.style.display = 'none';
+      }
+    }
+
+    function expandMealCard(mealId) {
+      const meal = mealIdeas.find(m => m.id === mealId);
+      if (!meal) return;
+
+      document.getElementById('expandedMealTitle').textContent = meal.name;
+      document.getElementById('expandedMealContent').innerHTML = `
+        <div class="expanded-meal-image">${meal.emoji}</div>
+
+        <div class="expanded-meal-section">
+          <h4>📋 Ingredients (${meal.ingredients.length})</h4>
+          <div class="expanded-ingredient-list">
+            ${meal.ingredients.map(ing => `<span class="expanded-ingredient">${ing}</span>`).join('')}
+          </div>
+        </div>
+
+        <div class="expanded-meal-section">
+          <h4>👨‍🍳 Steps</h4>
+          <div class="expanded-steps-list">
+            ${meal.steps.map((step, i) => `
+              <div class="expanded-step">
+                <div class="expanded-step-number">${i + 1}</div>
+                <div class="expanded-step-text">${step}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="expanded-meal-actions">
+          <button class="smart-meal-btn ${selectedMealIds.has(mealId) ? '' : 'primary'}"
+                  onclick="toggleMealSelection(${mealId}); closeExpandedMeal(); renderMealIdeasGrid();">
+            ${selectedMealIds.has(mealId) ? '✓ Selected' : '+ Select This Meal'}
+          </button>
+        </div>
+      `;
+
+      openModal('expandedMealSheet');
+    }
+
+    function closeExpandedMeal() {
+      document.getElementById('expandedMealSheet').classList.remove('open');
+      document.getElementById('modalOverlay').classList.remove('open');
+    }
+
+    function openIngredientReview() {
+      const selectedMeals = mealIdeas.filter(m => selectedMealIds.has(m.id));
+      const allIngredients = [];
+
+      selectedMeals.forEach(meal => {
+        meal.ingredients.forEach(ing => {
+          if (!allIngredients.some(i => i.name === ing)) {
+            allIngredients.push({ name: ing, checked: true, price: null });
+          }
+        });
+      });
+
+      const container = document.getElementById('ingredientReviewList');
+      container.innerHTML = allIngredients.map((ing, i) => `
+        <div class="ingredient-review-item">
+          <input type="checkbox" id="ing_${i}" checked data-name="${ing.name}">
+          <label class="ingredient-review-name" for="ing_${i}">${ing.name}</label>
+          <span class="ingredient-review-price" id="price_${i}">--</span>
+        </div>
+      `).join('');
+
+      openModal('ingredientReviewSheet');
+    }
+
+    function closeIngredientReview() {
+      document.getElementById('ingredientReviewSheet').classList.remove('open');
+      document.getElementById('modalOverlay').classList.remove('open');
+    }
+
+    async function addIngredientsWithPricing() {
+      const checkboxes = document.querySelectorAll('#ingredientReviewList input[type="checkbox"]:checked');
+      const quality = document.querySelector('input[name="quality"]:checked')?.value || 'standard';
+
+      const ingredients = Array.from(checkboxes).map(cb => cb.dataset.name);
+
+      // Show loading
+      const btn = document.querySelector('#ingredientReviewSheet .form-submit');
+      btn.textContent = '🔍 Finding prices...';
+      btn.disabled = true;
+
+      // Simulate price lookup
+      setTimeout(() => {
+        const priceMultiplier = quality === 'budget' ? 0.7 : quality === 'premium' ? 1.4 : 1;
+        let totalCost = 0;
+
+        checkboxes.forEach((cb, i) => {
+          const basePrice = (Math.random() * 6 + 2);
+          const price = (basePrice * priceMultiplier).toFixed(2);
+          totalCost += parseFloat(price);
+          document.getElementById(`price_${i}`).textContent = `$${price}`;
+        });
+
+        // Add to shopping list
+        ingredients.forEach(ing => {
+          const newItem = {
+            id: 'shop_' + Date.now() + Math.random(),
+            name: ing,
+            category: guessCategory(ing),
+            completed: false,
+            createdAt: new Date().toISOString()
+          };
+          shoppingItems.push(newItem);
+        });
+
+        saveShoppingList();
+
+        btn.textContent = `✓ Added! Est. Total: $${totalCost.toFixed(2)}`;
+
+        setTimeout(() => {
+          closeIngredientReview();
+          selectedMealIds.clear();
+          renderMealIdeasGrid();
+          btn.textContent = '🔍 Find Best Prices & Add to List';
+          btn.disabled = false;
+          alert(`${ingredients.length} ingredients added to shopping list!\nEstimated total: $${totalCost.toFixed(2)}`);
+        }, 1500);
+      }, 1500);
+    }
+
+    function guessCategory(ingredient) {
+      const lower = ingredient.toLowerCase();
+      if (lower.includes('chicken') || lower.includes('beef') || lower.includes('pork') || lower.includes('lamb') || lower.includes('fish') || lower.includes('salmon') || lower.includes('prawn')) return 'meat';
+      if (lower.includes('milk') || lower.includes('cheese') || lower.includes('cream') || lower.includes('butter') || lower.includes('parmesan')) return 'dairy';
+      if (lower.includes('bread') || lower.includes('bun') || lower.includes('tortilla')) return 'bakery';
+      if (lower.includes('rice') || lower.includes('pasta') || lower.includes('oil') || lower.includes('sauce') || lower.includes('stock')) return 'pantry';
+      if (lower.includes('onion') || lower.includes('garlic') || lower.includes('tomato') || lower.includes('lettuce') || lower.includes('cabbage') || lower.includes('broccoli') || lower.includes('spinach') || lower.includes('mushroom') || lower.includes('potato') || lower.includes('capsicum') || lower.includes('avocado') || lower.includes('lime') || lower.includes('lemon') || lower.includes('asparagus') || lower.includes('bean') || lower.includes('herb') || lower.includes('coriander') || lower.includes('dill') || lower.includes('rosemary')) return 'produce';
+      return 'other';
     }
 
     function getWeekDates(offset = 0) {
