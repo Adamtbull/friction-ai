@@ -4100,7 +4100,7 @@
         <div class="store-options" id="storeOptions"></div>
       </div>
 
-      <button class="form-submit" onclick="saveMealPreferences()">Save Preferences</button>
+      <button class="form-submit" onclick="saveMealPreferencesAndClose()">Save Preferences</button>
     </div>
   </div>
 
@@ -4310,6 +4310,28 @@
     // ========================================
     // LIFE PAGE - COMPLETE APPLICATION
     // ========================================
+
+    // --- USER IDENTIFICATION ---
+    function getCurrentUserId() {
+      try {
+        const userJson = localStorage.getItem('friction_user');
+        if (userJson) {
+          const user = JSON.parse(userJson);
+          // Use email as unique identifier (simple hash for shorter keys)
+          if (user.email) {
+            return user.email.split('@')[0].replace(/[^a-z0-9]/gi, '').substring(0, 10);
+          }
+        }
+      } catch (e) {
+        console.warn('Could not get user ID:', e);
+      }
+      return 'default';
+    }
+
+    // Get user-specific storage key
+    function getUserStorageKey(baseKey) {
+      return `${baseKey}_${getCurrentUserId()}`;
+    }
 
     // --- STORAGE KEYS ---
     const STORAGE_KEYS = {
@@ -6225,8 +6247,16 @@
     // ========================================
     // SHOPPING LIST FUNCTIONS
     // ========================================
-    let shoppingItems = JSON.parse(localStorage.getItem('life_shopping') || '[]');
+    let shoppingItems = [];
     let shoppingVisible = false;
+
+    function loadShoppingItems() {
+      shoppingItems = JSON.parse(localStorage.getItem(getUserStorageKey('life_shopping')) || '[]');
+    }
+
+    function saveShoppingItems() {
+      localStorage.setItem(getUserStorageKey('life_shopping'), JSON.stringify(shoppingItems));
+    }
 
     const categoryInfo = {
       produce: { icon: '🥬', name: 'Produce' },
@@ -6384,7 +6414,7 @@
     }
 
     function saveShoppingList() {
-      localStorage.setItem('life_shopping', JSON.stringify(shoppingItems));
+      localStorage.setItem(getUserStorageKey('life_shopping'), JSON.stringify(shoppingItems));
     }
 
     // ========================================
@@ -6681,7 +6711,7 @@
       }
 
       // Refresh shopping items from localStorage
-      shoppingItems = JSON.parse(localStorage.getItem('life_shopping') || '[]');
+      shoppingItems = JSON.parse(localStorage.getItem(getUserStorageKey('life_shopping')) || '[]');
       const items = shoppingItems.filter(i => !i.completed);
 
       console.log('Opening store with items:', items);
@@ -6772,12 +6802,12 @@
     // ========================================
     // MEAL PLANNER FUNCTIONS
     // ========================================
-    let mealPlan = JSON.parse(localStorage.getItem('life_meals') || '{}');
+    let mealPlan = {};
     let mealPlannerVisible = false;
     let mealWeekOffset = 0;
 
     // Meal Preferences Data
-    let mealPreferences = JSON.parse(localStorage.getItem('life_meal_prefs') || JSON.stringify({
+    const DEFAULT_MEAL_PREFS = {
       dislikes: [],
       diet: 'none',
       budget: 150,
@@ -6787,13 +6817,27 @@
       preferredStore: 'woolworths',
       complexity: 'any',
       cookingMethod: 'any'
-    }));
+    };
+    let mealPreferences = { ...DEFAULT_MEAL_PREFS };
 
-    // Migration: convert old stores array to preferredStore
-    if (mealPreferences.stores && !mealPreferences.preferredStore) {
-      mealPreferences.preferredStore = mealPreferences.stores[0] || 'woolworths';
-      delete mealPreferences.stores;
-      localStorage.setItem('life_meal_prefs', JSON.stringify(mealPreferences));
+    function loadMealData() {
+      mealPlan = JSON.parse(localStorage.getItem(getUserStorageKey('life_meals')) || '{}');
+      mealPreferences = JSON.parse(localStorage.getItem(getUserStorageKey('life_meal_prefs')) || JSON.stringify(DEFAULT_MEAL_PREFS));
+
+      // Migration: convert old stores array to preferredStore
+      if (mealPreferences.stores && !mealPreferences.preferredStore) {
+        mealPreferences.preferredStore = mealPreferences.stores[0] || 'woolworths';
+        delete mealPreferences.stores;
+        saveMealPreferences();
+      }
+    }
+
+    function saveMealPlan() {
+      localStorage.setItem(getUserStorageKey('life_meals'), JSON.stringify(mealPlan));
+    }
+
+    function saveMealPreferences() {
+      localStorage.setItem(getUserStorageKey('life_meal_prefs'), JSON.stringify(mealPreferences));
     }
 
     // Recipe Complexity Options
@@ -6975,9 +7019,9 @@
       document.getElementById(`${setting}Value`).textContent = mealPreferences[setting];
     }
 
-    function saveMealPreferences() {
+    function saveMealPreferencesAndClose() {
       mealPreferences.budget = parseInt(document.getElementById('mealBudget').value) || 150;
-      localStorage.setItem('life_meal_prefs', JSON.stringify(mealPreferences));
+      saveMealPreferences();
       closeMealPreferences();
       alert('Preferences saved!');
     }
@@ -7096,7 +7140,7 @@
         }
       });
 
-      localStorage.setItem('life_meals', JSON.stringify(mealPlan));
+      saveMealPlan();
       renderMealPlanner();
       alert('Meals generated! Check your weekly plan.');
     }
@@ -7793,10 +7837,6 @@
       }
     }
 
-    function saveMealPlan() {
-      localStorage.setItem('life_meals', JSON.stringify(mealPlan));
-    }
-
     function generateShoppingFromMeals() {
       const days = getWeekDates(mealWeekOffset);
       const ingredients = [];
@@ -7856,8 +7896,16 @@
     // ========================================
     // ADHD TASK BREAKDOWN FUNCTIONS
     // ========================================
-    let adhdTasks = JSON.parse(localStorage.getItem('life_adhd_tasks') || '[]');
+    let adhdTasks = [];
     let adhdTaskViewVisible = false;
+
+    function loadAdhdTasks() {
+      adhdTasks = JSON.parse(localStorage.getItem(getUserStorageKey('life_adhd_tasks')) || '[]');
+    }
+
+    function saveAdhdTasks() {
+      localStorage.setItem(getUserStorageKey('life_adhd_tasks'), JSON.stringify(adhdTasks));
+    }
     let currentBreakdownTask = null;
     let clarificationQuestions = [];
     let clarificationAnswers = {};
@@ -8496,10 +8544,6 @@
       }
     }
 
-    function saveAdhdTasks() {
-      localStorage.setItem('life_adhd_tasks', JSON.stringify(adhdTasks));
-    }
-
     // ========================================
     // FOCUS MODE FUNCTIONS
     // ========================================
@@ -8799,6 +8843,10 @@
       initDarkMode();
       initNotifications();
       loadData();
+      // Load user-specific data
+      loadShoppingItems();
+      loadMealData();
+      loadAdhdTasks();
       checkBirthdays();
       renderBubbles();
       renderFeed();
