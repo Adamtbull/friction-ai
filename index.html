@@ -14076,9 +14076,7 @@
     if (btnLife) {
       btnLife.addEventListener('click', function() {
         closeMenu();
-        setActiveView('life', true);
-        setLifeTab('people');
-        setPersonViewActive(false);
+        window.location.href = '/life.html';
       });
     }
 
