@@ -6514,35 +6514,44 @@
       });
 
       storeContainer.innerHTML = sortedStores.map(store => `
-        <a href="${getStoreSearchUrl(store.id)}" target="_blank" rel="noopener"
-           class="export-option ${store.id === preferredStore ? 'preferred' : ''}"
-           onclick="closeExportSheet(); showToast('Opening ${store.name}...');">
+        <div class="export-option ${store.id === preferredStore ? 'preferred' : ''}"
+           onclick="openStoreAndCopyList('${store.id}')">
           <div class="store-logo ${store.id}">${store.letter}</div>
           <span>${store.name}${store.id === preferredStore ? ' (Your Store)' : ''}</span>
-        </a>
+        </div>
       `).join('');
     }
 
-    function getStoreSearchUrl(storeName) {
+    function openStoreAndCopyList(storeName) {
       const store = STORE_URLS[storeName];
-      if (!store) return '#';
+      if (!store) return;
 
       // Get shopping items
       const items = shoppingItems.filter(i => !i.completed);
-      if (items.length === 0) return store.base;
+      if (items.length === 0) {
+        showToast('No items to shop for!');
+        return;
+      }
 
-      // Get product names and convert store-specific brands to generic
-      const productNames = items.map(i => {
+      // Format list for easy reading while shopping
+      const storeFriendlyName = storeName.charAt(0).toUpperCase() + storeName.slice(1);
+      const listText = items.map(i => {
         let name = i.name.replace(/^\d+\s*(g|kg|ml|L|cups?|tbsp|tsp|bunch|head|cloves?)\s+/i, '').trim();
-
-        // Remove store-specific brand names and convert to generic
         name = convertToGenericBrand(name, storeName);
-
         return name;
-      });
+      }).join('\n');
 
-      const searchQuery = productNames.slice(0, 10).join(' '); // Limit to 10 items for URL length
-      return store.search + encodeURIComponent(searchQuery);
+      // Copy to clipboard
+      navigator.clipboard.writeText(listText).then(() => {
+        showToast(`${items.length} items copied to clipboard!`);
+        closeExportSheet();
+
+        // Open store homepage
+        window.open(store.base, '_blank');
+      }).catch(() => {
+        // Fallback - show the list to manually copy
+        showExportPreview(`Shopping List for ${storeFriendlyName}:\n\n${listText}`);
+      });
     }
 
     function convertToGenericBrand(itemName, targetStore) {
