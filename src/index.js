@@ -1738,18 +1738,6 @@ async function getUserList(env) {
   }
 }
 
-// =====================
-// USER DATA PERSISTENCE
-// =====================
-
-async function getUserData(env, email) {
-  return null;
-}
-
-async function saveUserData(env, email, data) {
-  return;
-}
-
 async function enforceRateLimit(env, key, limit, windowSeconds) {
   if (!env.FRICTION_KV) {
     return { allowed: true, retryAfter: 0 };
