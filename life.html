@@ -882,6 +882,56 @@
       background: var(--border);
     }
 
+    .profile-pic-upload {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 20px;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .profile-pic-upload:hover {
+      border-color: var(--adult);
+      background: var(--bg);
+    }
+
+    .profile-pic-preview {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      overflow: hidden;
+      border: 3px solid var(--border);
+    }
+
+    .profile-pic-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .profile-pic-upload-text {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .profile-pic-upload-text strong {
+      color: var(--adult);
+    }
+
+    .profile-pic-input {
+      display: none;
+    }
+
     .btn {
       padding: 14px 24px;
       border-radius: var(--radius-sm);
@@ -939,6 +989,7 @@
       align-items: center;
       justify-content: center;
       font-size: 2rem;
+      overflow: hidden;
     }
 
     .profile-avatar.type-adult { background: #eff6ff; }
@@ -1213,6 +1264,16 @@
     </div>
     <div class="sheet-content">
       <div class="form-group">
+        <label class="form-label">Profile Picture</label>
+        <div class="profile-pic-upload" onclick="document.getElementById('memberPhoto').click()">
+          <div class="profile-pic-preview" id="memberPhotoPreview">📷</div>
+          <div class="profile-pic-upload-text">
+            <strong>Tap to upload</strong><br>or use emoji below
+          </div>
+          <input type="file" class="profile-pic-input" id="memberPhoto" accept="image/*" onchange="handlePhotoUpload(event)">
+        </div>
+      </div>
+      <div class="form-group">
         <label class="form-label">Name</label>
         <input type="text" class="form-input" id="memberName" placeholder="Enter name">
       </div>
@@ -1225,7 +1286,7 @@
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Icon (emoji)</label>
+        <label class="form-label">Fallback Icon (emoji)</label>
         <input type="text" class="form-input" id="memberIcon" placeholder="👤" maxlength="2">
       </div>
     </div>
@@ -1521,8 +1582,14 @@
 
         const bubble = document.createElement('div');
         bubble.className = `bubble type-${member.role}`;
-        bubble.innerHTML = member.icon;
         bubble.dataset.id = member.id;
+
+        // Show photo if available, otherwise show emoji
+        if (member.photo) {
+          bubble.innerHTML = `<img src="${member.photo}" alt="${member.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+        } else {
+          bubble.innerHTML = member.icon;
+        }
 
         const label = document.createElement('div');
         label.className = 'bubble-label';
@@ -2367,13 +2434,37 @@
     // ========================================
     // MEMBER MANAGEMENT
     // ========================================
+    let memberPhotoData = null;
+
     function openAddMemberModal() {
       closeFabMenu();
       closeAllMenus();
       document.getElementById('memberName').value = '';
       document.getElementById('memberRole').value = 'adult';
       document.getElementById('memberIcon').value = '';
+      document.getElementById('memberPhoto').value = '';
+      document.getElementById('memberPhotoPreview').innerHTML = '📷';
+      memberPhotoData = null;
       openModal('addMemberSheet');
+    }
+
+    function handlePhotoUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // Validate file size (max 500KB to keep localStorage reasonable)
+      if (file.size > 500000) {
+        alert('Image too large. Please use an image under 500KB.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        memberPhotoData = e.target.result;
+        document.getElementById('memberPhotoPreview').innerHTML =
+          `<img src="${memberPhotoData}" alt="Profile">`;
+      };
+      reader.readAsDataURL(file);
     }
 
     function saveMember() {
@@ -2394,7 +2485,8 @@
         id: generateId(),
         name,
         role,
-        icon
+        icon,
+        photo: memberPhotoData || null
       };
 
       // Insert before household
@@ -2424,9 +2516,13 @@
       const milestones = memberItems.filter(i => i.type === 'milestone').length;
       const goals = memberItems.filter(i => i.type === 'goal').length;
 
+      const avatarContent = member.photo
+        ? `<img src="${member.photo}" alt="${member.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+        : member.icon;
+
       let statsHtml = `
         <div class="profile-header">
-          <div class="profile-avatar type-${member.role}">${member.icon}</div>
+          <div class="profile-avatar type-${member.role}">${avatarContent}</div>
           <div class="profile-info">
             <h2>${member.name}</h2>
             <div class="profile-role">${member.role}</div>
