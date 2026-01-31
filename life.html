@@ -1572,6 +1572,16 @@
             <span class="toggle-slider"></span>
           </label>
         </div>
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <div class="settings-item-label">Notifications</div>
+            <div class="settings-item-desc" id="notificationStatus">Remind me before appointments</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="notificationToggle" onchange="toggleNotifications()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Data Management</div>
@@ -3167,6 +3177,123 @@
       }
     }
 
+    // Notification Functions
+    let notificationTimers = [];
+
+    async function toggleNotifications() {
+      const toggle = document.getElementById('notificationToggle');
+      const status = document.getElementById('notificationStatus');
+
+      if (toggle.checked) {
+        // Request permission
+        if (!('Notification' in window)) {
+          status.textContent = 'Not supported in this browser';
+          toggle.checked = false;
+          return;
+        }
+
+        const permission = await Notification.requestPermission();
+
+        if (permission === 'granted') {
+          localStorage.setItem('LIFE_NOTIFICATIONS', 'true');
+          status.textContent = 'Notifications enabled ✓';
+          scheduleNotifications();
+        } else {
+          toggle.checked = false;
+          status.textContent = 'Permission denied';
+        }
+      } else {
+        localStorage.setItem('LIFE_NOTIFICATIONS', 'false');
+        status.textContent = 'Remind me before appointments';
+        clearScheduledNotifications();
+      }
+    }
+
+    function initNotifications() {
+      const enabled = localStorage.getItem('LIFE_NOTIFICATIONS') === 'true';
+      const toggle = document.getElementById('notificationToggle');
+      const status = document.getElementById('notificationStatus');
+
+      if (enabled && Notification.permission === 'granted') {
+        toggle.checked = true;
+        status.textContent = 'Notifications enabled ✓';
+        scheduleNotifications();
+      } else if (enabled && Notification.permission !== 'granted') {
+        localStorage.setItem('LIFE_NOTIFICATIONS', 'false');
+      }
+    }
+
+    function scheduleNotifications() {
+      clearScheduledNotifications();
+
+      const now = new Date();
+      const todayStr = now.toISOString().split('T')[0];
+
+      // Find appointments for today and tomorrow
+      const upcomingItems = feedItems.filter(item => {
+        if (item.type !== 'appointment' || !item.date || !item.time) return false;
+        const itemDate = new Date(item.date + 'T' + item.time);
+        const diffMs = itemDate - now;
+        // Within next 24 hours
+        return diffMs > 0 && diffMs < 24 * 60 * 60 * 1000;
+      });
+
+      upcomingItems.forEach(item => {
+        const itemDate = new Date(item.date + 'T' + item.time);
+        const member = getMemberById(item.memberId);
+
+        // Schedule 1 hour before
+        const oneHourBefore = itemDate.getTime() - (60 * 60 * 1000);
+        const msUntilOneHour = oneHourBefore - now.getTime();
+
+        if (msUntilOneHour > 0) {
+          const timer = setTimeout(() => {
+            showNotification(
+              `${item.title} in 1 hour`,
+              `${member?.name || 'Appointment'} at ${formatTime(item.time)}${item.location ? ' - ' + item.location : ''}`
+            );
+          }, msUntilOneHour);
+          notificationTimers.push(timer);
+        }
+
+        // Schedule 15 minutes before
+        const fifteenMinBefore = itemDate.getTime() - (15 * 60 * 1000);
+        const msUntilFifteen = fifteenMinBefore - now.getTime();
+
+        if (msUntilFifteen > 0) {
+          const timer = setTimeout(() => {
+            showNotification(
+              `${item.title} in 15 minutes!`,
+              `Time to go! ${item.location ? '📍 ' + item.location : ''}`
+            );
+          }, msUntilFifteen);
+          notificationTimers.push(timer);
+        }
+      });
+    }
+
+    function clearScheduledNotifications() {
+      notificationTimers.forEach(timer => clearTimeout(timer));
+      notificationTimers = [];
+    }
+
+    function showNotification(title, body) {
+      if (Notification.permission === 'granted') {
+        const notification = new Notification(title, {
+          body: body,
+          icon: '📅',
+          badge: '📅',
+          tag: 'life-reminder',
+          requireInteraction: true
+        });
+
+        notification.onclick = () => {
+          window.focus();
+          notification.close();
+        };
+      }
+    }
+
     // Share Task Functions
     let shareTaskFromMember = null;
 
@@ -3261,6 +3388,7 @@
     // ========================================
     function init() {
       initDarkMode();
+      initNotifications();
       loadData();
       checkBirthdays();
       renderBubbles();
