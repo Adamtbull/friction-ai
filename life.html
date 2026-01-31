@@ -939,6 +939,16 @@
       gap: 8px;
     }
 
+    .meal-slot-emoji {
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .meal-slot-info {
+      flex: 1;
+      min-width: 0;
+    }
+
     .meal-slot-name {
       font-weight: 500;
       color: var(--text-primary);
@@ -1221,15 +1231,77 @@
       margin: 0 -16px -16px;
     }
 
+    .meal-selection-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .add-to-plan-btn,
     .add-to-list-btn {
-      padding: 12px 20px;
-      background: var(--success);
+      padding: 10px 14px;
       color: white;
       border: none;
       border-radius: var(--radius-md);
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       cursor: pointer;
+    }
+
+    .add-to-plan-btn {
+      background: var(--primary);
+    }
+
+    .add-to-list-btn {
+      background: var(--success);
+    }
+
+    /* Meal Assignment List */
+    .meal-assignment-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 20px;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+
+    .meal-assignment-item {
+      background: var(--bg);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .meal-assignment-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .meal-assignment-emoji {
+      font-size: 1.5rem;
+    }
+
+    .meal-assignment-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+      flex: 1;
+    }
+
+    .meal-assignment-selects {
+      display: flex;
+      gap: 8px;
+    }
+
+    .meal-assignment-selects select {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--card-bg);
+      font-size: 0.9rem;
+      color: var(--text-primary);
     }
 
     /* Expanded Meal Content */
@@ -3844,9 +3916,14 @@
       <!-- Selected Meals Actions -->
       <div class="meal-selection-bar" id="mealSelectionBar" style="display: none;">
         <span id="selectedMealCount">0 meals selected</span>
-        <button class="add-to-list-btn" onclick="openIngredientReview()">
-          🛒 Add Ingredients to List
-        </button>
+        <div class="meal-selection-buttons">
+          <button class="add-to-plan-btn" onclick="openMealPlanAssignment()">
+            📅 Add to Plan
+          </button>
+          <button class="add-to-list-btn" onclick="openIngredientReview()">
+            🛒 Add to List
+          </button>
+        </div>
       </div>
     </div>
 
@@ -3913,6 +3990,24 @@
 
       <button class="form-submit" onclick="addIngredientsWithPricing()">
         🔍 Find Best Prices & Add to List
+      </button>
+    </div>
+  </div>
+
+  <!-- MEAL PLAN ASSIGNMENT SHEET -->
+  <div class="modal-sheet" id="mealPlanAssignmentSheet">
+    <div class="modal-header">
+      <h3>Add to Meal Plan</h3>
+      <button class="modal-close" onclick="closeMealPlanAssignment()">×</button>
+    </div>
+    <div class="modal-content">
+      <p class="pref-description">Assign each meal to a day:</p>
+      <div class="meal-assignment-list" id="mealAssignmentList">
+        <!-- Meals will be listed here with date pickers -->
+      </div>
+
+      <button class="form-submit" onclick="confirmMealPlanAssignment()">
+        ✓ Add to Meal Plan
       </button>
     </div>
   </div>
@@ -7900,6 +7995,114 @@
       document.getElementById('modalOverlay').classList.remove('open');
     }
 
+    // Meal Plan Assignment Functions
+    function openMealPlanAssignment() {
+      const selectedMeals = mealIdeas.filter(m => selectedMealIds.has(m.id));
+
+      if (selectedMeals.length === 0) {
+        alert('Please select at least one meal first');
+        return;
+      }
+
+      // Get dates for the next 14 days
+      const dates = [];
+      const today = new Date();
+      for (let i = 0; i < 14; i++) {
+        const d = new Date(today);
+        d.setDate(today.getDate() + i);
+        const dateStr = d.toISOString().split('T')[0];
+        const dayName = d.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
+        dates.push({ value: dateStr, label: dayName });
+      }
+
+      const container = document.getElementById('mealAssignmentList');
+      container.innerHTML = selectedMeals.map((meal, i) => `
+        <div class="meal-assignment-item" data-meal-id="${meal.id}">
+          <div class="meal-assignment-header">
+            <span class="meal-assignment-emoji">${meal.emoji}</span>
+            <span class="meal-assignment-name">${meal.name}</span>
+          </div>
+          <div class="meal-assignment-selects">
+            <select id="assignDate_${i}" class="assign-date">
+              ${dates.map((d, idx) => `<option value="${d.value}" ${idx === i % 7 ? 'selected' : ''}>${d.label}</option>`).join('')}
+            </select>
+            <select id="assignType_${i}" class="assign-type">
+              <option value="breakfast">Breakfast</option>
+              <option value="lunch">Lunch</option>
+              <option value="dinner" selected>Dinner</option>
+            </select>
+          </div>
+        </div>
+      `).join('');
+
+      openModal('mealPlanAssignmentSheet');
+    }
+
+    function closeMealPlanAssignment() {
+      document.getElementById('mealPlanAssignmentSheet').classList.remove('open');
+      document.getElementById('modalOverlay').classList.remove('open');
+    }
+
+    function confirmMealPlanAssignment() {
+      const selectedMeals = mealIdeas.filter(m => selectedMealIds.has(m.id));
+      let assignedCount = 0;
+
+      selectedMeals.forEach((meal, i) => {
+        const dateStr = document.getElementById(`assignDate_${i}`).value;
+        const type = document.getElementById(`assignType_${i}`).value;
+
+        if (!mealPlan[dateStr]) {
+          mealPlan[dateStr] = {};
+        }
+
+        // Get ingredient names as strings
+        const ingredients = meal.ingredients.map(ing => {
+          if (typeof ing === 'string') return ing;
+          return ing.quantity ? `${ing.quantity} ${ing.name}` : ing.name;
+        });
+
+        mealPlan[dateStr][type] = {
+          name: meal.name,
+          emoji: meal.emoji,
+          ingredients: ingredients,
+          steps: meal.steps || [],
+          notes: meal.description || ''
+        };
+
+        assignedCount++;
+      });
+
+      saveMealPlan();
+      closeMealPlanAssignment();
+
+      // Clear selections and show success
+      selectedMealIds.clear();
+      renderMealIdeasGrid();
+
+      // Switch to weekly tab to show the added meals
+      switchMealTab('weekly');
+      renderMealPlanner();
+
+      // Show success message
+      showToast(`Added ${assignedCount} meal${assignedCount > 1 ? 's' : ''} to your meal plan!`);
+    }
+
+    function showToast(message) {
+      // Reuse the undo toast for general messages
+      const toast = document.getElementById('undoToast');
+      const textEl = toast.querySelector('.undo-toast-text');
+      const btnEl = toast.querySelector('.undo-toast-btn');
+
+      textEl.textContent = message;
+      btnEl.style.display = 'none';
+
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+        btnEl.style.display = '';
+      }, 3000);
+    }
+
     async function addIngredientsWithPricing() {
       const checkboxes = document.querySelectorAll('#ingredientReviewList input[type="checkbox"]:checked');
       const quality = document.querySelector('input[name="quality"]:checked')?.value || 'standard';
@@ -8095,7 +8298,8 @@
           <span class="meal-slot-type">${typeLabels[type]}</span>
           <div class="meal-slot-content">
             <div class="meal-slot-filled">
-              <div>
+              ${meal.emoji ? `<span class="meal-slot-emoji">${meal.emoji}</span>` : ''}
+              <div class="meal-slot-info">
                 <div class="meal-slot-name">${meal.name}</div>
                 ${meal.notes ? `<div class="meal-slot-notes">${meal.notes}</div>` : ''}
               </div>
