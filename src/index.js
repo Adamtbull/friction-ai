@@ -469,6 +469,7 @@ export default {
         var mealType = bodyMeals.mealType || "dinner"; // breakfast, lunch, dinner
         var dislikes = Array.isArray(bodyMeals.dislikes) ? bodyMeals.dislikes : [];
         var dietPreferences = Array.isArray(bodyMeals.dietPreferences) ? bodyMeals.dietPreferences : [];
+        var cuisines = Array.isArray(bodyMeals.cuisines) ? bodyMeals.cuisines : [];
         var servings = parseInt(bodyMeals.servings, 10) || 4;
         var maxIngredients = parseInt(bodyMeals.maxIngredients, 10) || 12;
         var budget = bodyMeals.budget || "standard"; // budget, standard, premium
@@ -518,11 +519,51 @@ export default {
           methodInstructions = "Any cooking method is fine.";
         }
 
+        // Build cuisine instructions - celebrating Australia's multicultural food scene!
+        var cuisineInstructions = "";
+        var cuisineMap = {
+          "australian": "Aussie Classics (meat pies, snags, pavlova, lamingtons, fish & chips, roast dinner, BBQ)",
+          "italian": "Italian (pasta, risotto, pizza, osso buco, tiramisu, bruschetta, minestrone)",
+          "chinese": "Chinese (stir-fry, dumplings, fried rice, kung pao, mapo tofu, sweet & sour)",
+          "indian": "Indian (curry, biryani, tikka masala, dal, naan, samosas, korma, vindaloo)",
+          "thai": "Thai (pad thai, green curry, tom yum, massaman, larb, satay)",
+          "vietnamese": "Vietnamese (pho, banh mi, spring rolls, bun cha, lemongrass chicken)",
+          "japanese": "Japanese (sushi, ramen, teriyaki, katsu, yakitori, donburi, miso)",
+          "korean": "Korean (bulgogi, bibimbap, kimchi jjigae, Korean fried chicken, japchae)",
+          "mexican": "Mexican (tacos, burritos, enchiladas, quesadillas, fajitas, nachos)",
+          "greek": "Greek (souvlaki, moussaka, gyros, spanakopita, dolmades, tzatziki)",
+          "lebanese": "Lebanese (shawarma, falafel, tabbouleh, hummus, kafta, fattoush)",
+          "middleeastern": "Middle Eastern (kebabs, shakshuka, mezze, kibbeh, baba ganoush)",
+          "turkish": "Turkish (doner, pide, kofte, manti, lahmacun, borek)",
+          "moroccan": "Moroccan (tagine, couscous, harira, b'stilla, chermoula)",
+          "spanish": "Spanish (paella, tapas, tortilla, gazpacho, chorizo dishes)",
+          "french": "French (coq au vin, beef bourguignon, quiche, ratatouille, crepes)",
+          "american": "American (burgers, mac & cheese, BBQ ribs, fried chicken, meatloaf)",
+          "british": "British (shepherd's pie, fish & chips, bangers & mash, Sunday roast)",
+          "filipino": "Filipino (adobo, sinigang, lumpia, kare-kare, lechon, pancit)",
+          "indonesian": "Indonesian (nasi goreng, satay, rendang, gado-gado, mie goreng)",
+          "malaysian": "Malaysian (laksa, nasi lemak, char kway teow, satay, roti canai)",
+          "sri_lankan": "Sri Lankan (hoppers, kottu, lamprais, curry, pol sambol)",
+          "ethiopian": "Ethiopian (injera, doro wat, tibs, kitfo, shiro)",
+          "caribbean": "Caribbean (jerk chicken, rice & peas, curry goat, ackee, plantains)",
+          "brazilian": "Brazilian (feijoada, picanha, coxinha, pão de queijo, moqueca)",
+          "german": "German (schnitzel, bratwurst, sauerbraten, spätzle, pretzels)",
+          "polish": "Polish (pierogi, bigos, kotlet schabowy, borscht, golabki)",
+          "portuguese": "Portuguese (piri piri chicken, bacalhau, francesinha, caldo verde)"
+        };
+
+        if (cuisines.length > 0) {
+          var cuisineNames = cuisines.map(function(c) { return cuisineMap[c] || c; });
+          cuisineInstructions = "CUISINE FOCUS: Generate meals from these cuisines: " + cuisineNames.join(", ") + ". Mix the selected cuisines evenly across the recipes.";
+        } else {
+          cuisineInstructions = "CUISINE VARIETY: Generate a diverse mix of cuisines to celebrate Australia's multicultural food scene - include Italian, Asian, Middle Eastern, Aussie classics, and more!";
+        }
+
         var mealPrompt = [
           {
             role: "system",
             content: [
-              "You are an Australian meal planning assistant that generates recipes.",
+              "You are an Australian meal planning assistant that generates DELICIOUS, EXCITING, COMPLETE recipes.",
               "",
               "CRITICAL RULES - YOU MUST FOLLOW THESE EXACTLY:",
               "1. NEVER include ANY ingredient that contains or is related to items in the DISLIKES list",
@@ -531,11 +572,31 @@ export default {
               "4. Use Australian supermarket brands (Coles, Woolworths, Aldi) for ingredients",
               "5. Include specific brand names where appropriate (e.g., 'Leggo's pasta sauce', 'San Remo pasta')",
               "",
+              "COMPLETE BALANCED MEALS - VERY IMPORTANT:",
+              "- EVERY dinner recipe MUST be a COMPLETE MEAL with protein AND sides",
+              "- Always include: main protein + carb/starch side + vegetable side",
+              "- Examples of complete meals:",
+              "  * 'Honey Garlic Chicken with Garlic Butter Rice and Roasted Broccoli'",
+              "  * 'Beef Stir-Fry with Jasmine Rice and Asian Greens'",
+              "  * 'Herb-Crusted Salmon with Creamy Mashed Potatoes and Honey Glazed Carrots'",
+              "- NEVER just list a protein alone (e.g., NO 'Grilled Chicken' by itself)",
+              "- Include ALL components in the recipe name and ingredients",
+              "",
+              "MAKE IT EXCITING & DELICIOUS:",
+              "- Use BOLD flavors: garlic butter, honey glazes, herbs, spices, marinades",
+              "- Include flavor boosters: lemon zest, fresh herbs, toasted sesame, parmesan",
+              "- Think restaurant-quality dishes people get EXCITED to cook and eat",
+              "- Use descriptive appetizing names (e.g., 'Crispy Honey Soy Chicken' not just 'Chicken')",
+              "- Add finishing touches: fresh herbs, sauce drizzles, garnishes in the steps",
+              "- NO bland, boring meals - every dish should make mouths water!",
+              "",
               "RECIPE COMPLEXITY:",
               complexityInstructions,
               "",
               "COOKING METHOD:",
               methodInstructions,
+              "",
+              cuisineInstructions,
               "",
               "QUALITY LEVELS:",
               "- budget: Use home brand/generic products, cheaper cuts of meat, basic ingredients",
@@ -545,8 +606,9 @@ export default {
               "Return ONLY a JSON array with this structure:",
               "[",
               "  {",
-              '    "name": "Meal Name",',
+              '    "name": "Exciting Complete Meal Name with Sides",',
               '    "emoji": "🍝",',
+              '    "description": "One sentence that makes this dish sound irresistible",',
               '    "time": "30 min",',
               '    "servings": 4,',
               '    "cookingMethod": "stovetop",',
@@ -563,7 +625,7 @@ export default {
           {
             role: "user",
             content: [
-              "Generate " + count + " unique " + mealType + " recipes for " + servings + " servings.",
+              "Generate " + count + " unique, EXCITING " + mealType + " recipes for " + servings + " servings.",
               "",
               "DISLIKES (MUST AVOID ALL OF THESE - no exceptions):",
               dislikes.length > 0 ? dislikes.join(", ") : "None specified",
@@ -574,9 +636,15 @@ export default {
               "Maximum ingredients per recipe: " + maxIngredients,
               "Quality level: " + budget,
               "",
-              "Remember: If vegetarian/vegan is specified, absolutely NO meat/fish products.",
-              "If an ingredient is disliked, do NOT include it or any dish that typically contains it.",
-              "Generate a VARIETY of different meals - no repetition!"
+              "CUISINES:",
+              cuisines.length > 0 ? "Focus on: " + cuisines.join(", ") : "Mix of diverse cuisines (Italian, Asian, Middle Eastern, Aussie, etc.)",
+              "",
+              "Remember:",
+              "- If vegetarian/vegan is specified, absolutely NO meat/fish products",
+              "- If an ingredient is disliked, do NOT include it or any dish that typically contains it",
+              "- EVERY meal must be COMPLETE with protein + sides + vegetables",
+              "- Make every dish sound and taste AMAZING - bold flavors, proper seasoning, appetizing!",
+              "- Use AUTHENTIC recipes from the specified cuisines - real dishes people would recognize!"
             ].join("\n")
           }
         ];

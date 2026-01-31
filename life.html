@@ -1159,6 +1159,28 @@
       color: var(--text-primary);
     }
 
+    .meal-idea-description {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      font-style: italic;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .expanded-meal-description {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      font-style: italic;
+      text-align: center;
+      margin-bottom: 16px;
+      padding: 0 12px;
+      line-height: 1.4;
+    }
+
     .meal-idea-meta {
       font-size: 0.75rem;
       color: var(--text-muted);
@@ -1428,6 +1450,34 @@
       background: var(--danger);
       color: white;
       border-color: var(--danger);
+    }
+
+    /* Cuisine chips - positive selection color */
+    .cuisine-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .cuisine-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+    }
+
+    .cuisine-chip .cuisine-icon {
+      font-size: 1.1rem;
+    }
+
+    .cuisine-chip .cuisine-name {
+      font-size: 0.85rem;
+    }
+
+    .cuisine-chip.selected {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
     }
 
     .pref-options {
@@ -4031,6 +4081,7 @@
       <div class="pref-tabs">
         <button class="pref-tab active" onclick="switchPrefTab('dislikes')">🚫 Dislikes</button>
         <button class="pref-tab" onclick="switchPrefTab('diet')">🥗 Diet</button>
+        <button class="pref-tab" onclick="switchPrefTab('cuisine')">🌍 Cuisine</button>
         <button class="pref-tab" onclick="switchPrefTab('cooking')">👨‍🍳 Cooking</button>
         <button class="pref-tab" onclick="switchPrefTab('stores')">🏪 Stores</button>
       </div>
@@ -4064,6 +4115,13 @@
       <div class="pref-panel" id="prefDiet">
         <p class="pref-description">Select your dietary preferences:</p>
         <div class="pref-options" id="dietOptions"></div>
+      </div>
+
+      <!-- Cuisine Tab -->
+      <div class="pref-panel" id="prefCuisine">
+        <p class="pref-description">Select cuisines you'd like to explore:</p>
+        <p class="pref-subdesc" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Tap multiple to mix cuisines, or leave blank for variety</p>
+        <div class="pref-chips cuisine-chips" id="cuisineOptions"></div>
       </div>
 
       <!-- Cooking Tab -->
@@ -7030,6 +7088,7 @@
     const DEFAULT_MEAL_PREFS = {
       dislikes: [],
       diet: 'none',
+      cuisines: [],
       budget: 150,
       servings: 4,
       maxIngredients: 7,
@@ -7097,6 +7156,38 @@
       { id: 'kosher', icon: '✡️', title: 'Kosher', desc: 'Jewish dietary laws' }
     ];
 
+    // Cuisine Options - Celebrating Australia's multicultural food scene!
+    const CUISINE_OPTIONS = [
+      { id: 'australian', icon: '🦘', name: 'Aussie Classics' },
+      { id: 'italian', icon: '🇮🇹', name: 'Italian' },
+      { id: 'chinese', icon: '🇨🇳', name: 'Chinese' },
+      { id: 'indian', icon: '🇮🇳', name: 'Indian' },
+      { id: 'thai', icon: '🇹🇭', name: 'Thai' },
+      { id: 'vietnamese', icon: '🇻🇳', name: 'Vietnamese' },
+      { id: 'japanese', icon: '🇯🇵', name: 'Japanese' },
+      { id: 'korean', icon: '🇰🇷', name: 'Korean' },
+      { id: 'mexican', icon: '🇲🇽', name: 'Mexican' },
+      { id: 'greek', icon: '🇬🇷', name: 'Greek' },
+      { id: 'lebanese', icon: '🇱🇧', name: 'Lebanese' },
+      { id: 'middleeastern', icon: '🧆', name: 'Middle Eastern' },
+      { id: 'turkish', icon: '🇹🇷', name: 'Turkish' },
+      { id: 'moroccan', icon: '🇲🇦', name: 'Moroccan' },
+      { id: 'spanish', icon: '🇪🇸', name: 'Spanish' },
+      { id: 'french', icon: '🇫🇷', name: 'French' },
+      { id: 'american', icon: '🇺🇸', name: 'American' },
+      { id: 'british', icon: '🇬🇧', name: 'British' },
+      { id: 'filipino', icon: '🇵🇭', name: 'Filipino' },
+      { id: 'indonesian', icon: '🇮🇩', name: 'Indonesian' },
+      { id: 'malaysian', icon: '🇲🇾', name: 'Malaysian' },
+      { id: 'sri_lankan', icon: '🇱🇰', name: 'Sri Lankan' },
+      { id: 'ethiopian', icon: '🇪🇹', name: 'Ethiopian' },
+      { id: 'caribbean', icon: '🏝️', name: 'Caribbean' },
+      { id: 'brazilian', icon: '🇧🇷', name: 'Brazilian' },
+      { id: 'german', icon: '🇩🇪', name: 'German' },
+      { id: 'polish', icon: '🇵🇱', name: 'Polish' },
+      { id: 'portuguese', icon: '🇵🇹', name: 'Portuguese' }
+    ];
+
     const STORE_OPTIONS = [
       { id: 'woolworths', name: 'Woolworths', letter: 'W' },
       { id: 'coles', name: 'Coles', letter: 'C' },
@@ -7139,6 +7230,19 @@
           ${mealPreferences.diet === opt.id ? '<span class="store-check">✓</span>' : ''}
         </div>
       `).join('');
+
+      // Render cuisine options (multi-select chips)
+      const cuisineContainer = document.getElementById('cuisineOptions');
+      if (cuisineContainer) {
+        const selectedCuisines = mealPreferences.cuisines || [];
+        cuisineContainer.innerHTML = CUISINE_OPTIONS.map(cuisine => `
+          <div class="pref-chip cuisine-chip ${selectedCuisines.includes(cuisine.id) ? 'selected' : ''}"
+               onclick="toggleCuisine('${cuisine.id}')">
+            <span class="cuisine-icon">${cuisine.icon}</span>
+            <span class="cuisine-name">${cuisine.name}</span>
+          </div>
+        `).join('');
+      }
 
       // Render store options (single select - pick your preferred store)
       const storeContainer = document.getElementById('storeOptions');
@@ -7208,6 +7312,19 @@
 
     function selectDiet(dietId) {
       mealPreferences.diet = dietId;
+      renderMealPreferences();
+    }
+
+    function toggleCuisine(cuisineId) {
+      if (!mealPreferences.cuisines) {
+        mealPreferences.cuisines = [];
+      }
+      const idx = mealPreferences.cuisines.indexOf(cuisineId);
+      if (idx > -1) {
+        mealPreferences.cuisines.splice(idx, 1);
+      } else {
+        mealPreferences.cuisines.push(cuisineId);
+      }
       renderMealPreferences();
     }
 
@@ -7443,26 +7560,26 @@
         { id: 40, name: 'Egg Salad Sandwich', emoji: '🥪', time: '15 min', servings: 2, ingredients: [{name: 'Eggs', quantity: '4'}, {name: 'Mayo', quantity: '3 tbsp'}, {name: 'Bread', quantity: '4 slices'}, {name: 'Chives', quantity: '1 tbsp'}], steps: ['Boil and chop eggs', 'Mix with mayo and chives', 'Spread on bread', 'Make sandwiches'] }
       ],
       dinner: [
-        { id: 41, name: 'Spaghetti Bolognese', emoji: '🍝', time: '30 min', servings: 4, ingredients: [{name: 'Beef mince', quantity: '500g'}, {name: 'San Remo spaghetti', quantity: '400g'}, {name: 'Leggo\'s pasta sauce', quantity: '500g'}, {name: 'Parmesan', quantity: '50g'}], steps: ['Brown mince', 'Add sauce and simmer', 'Cook pasta', 'Combine and serve with parmesan'] },
-        { id: 42, name: 'Chicken Stir Fry', emoji: '🥘', time: '20 min', servings: 4, ingredients: [{name: 'Chicken breast', quantity: '500g'}, {name: 'SunRice jasmine rice', quantity: '2 cups'}, {name: 'Mixed vegetables', quantity: '400g'}, {name: 'Soy sauce', quantity: '3 tbsp'}], steps: ['Cook rice', 'Stir fry chicken', 'Add vegetables', 'Season with soy sauce'] },
-        { id: 43, name: 'Fish & Chips', emoji: '🐟', time: '30 min', servings: 4, ingredients: [{name: 'Fish fillets', quantity: '4'}, {name: 'Frozen chips', quantity: '500g'}, {name: 'Lemon', quantity: '1'}, {name: 'Tartare sauce', quantity: '100ml'}], steps: ['Bake chips', 'Pan fry fish', 'Serve with lemon and tartare'] },
-        { id: 44, name: 'Tacos', emoji: '🌮', time: '25 min', servings: 4, ingredients: [{name: 'Beef mince', quantity: '500g'}, {name: 'Taco kit', quantity: '1'}, {name: 'Lettuce', quantity: '100g'}, {name: 'Cheese', quantity: '100g'}], steps: ['Brown mince with seasoning', 'Warm shells', 'Assemble with toppings'] },
-        { id: 45, name: 'Butter Chicken', emoji: '🍛', time: '35 min', servings: 4, ingredients: [{name: 'Chicken thigh', quantity: '600g'}, {name: 'Patak\'s butter chicken sauce', quantity: '450g'}, {name: 'Rice', quantity: '2 cups'}, {name: 'Naan bread', quantity: '4'}], steps: ['Cook chicken', 'Add sauce and simmer', 'Serve with rice and naan'] },
-        { id: 46, name: 'Pork Chops', emoji: '🥩', time: '25 min', servings: 4, ingredients: [{name: 'Pork chops', quantity: '4'}, {name: 'Mashed potato', quantity: '500g'}, {name: 'Green beans', quantity: '200g'}, {name: 'Gravy', quantity: '250ml'}], steps: ['Season and pan fry chops', 'Prepare mash', 'Steam beans', 'Serve with gravy'] },
-        { id: 47, name: 'Salmon & Veggies', emoji: '🐟', time: '25 min', servings: 2, ingredients: [{name: 'Salmon fillets', quantity: '2'}, {name: 'Asparagus', quantity: '1 bunch'}, {name: 'Lemon', quantity: '1'}, {name: 'Olive oil', quantity: '2 tbsp'}], steps: ['Season salmon', 'Bake with asparagus', 'Drizzle with lemon'] },
-        { id: 48, name: 'Beef Burgers', emoji: '🍔', time: '25 min', servings: 4, ingredients: [{name: 'Beef patties', quantity: '4'}, {name: 'Burger buns', quantity: '4'}, {name: 'Cheese', quantity: '4 slices'}, {name: 'Lettuce & tomato', quantity: '100g'}], steps: ['Grill patties', 'Toast buns', 'Assemble with toppings'] },
-        { id: 49, name: 'Carbonara', emoji: '🍝', time: '20 min', servings: 4, ingredients: [{name: 'Spaghetti', quantity: '400g'}, {name: 'Bacon', quantity: '200g'}, {name: 'Eggs', quantity: '3'}, {name: 'Parmesan', quantity: '100g'}], steps: ['Cook pasta', 'Fry bacon', 'Mix eggs and parmesan', 'Combine all quickly'] },
-        { id: 50, name: 'Roast Chicken', emoji: '🍗', time: '90 min', servings: 4, ingredients: [{name: 'Whole chicken', quantity: '1.5kg'}, {name: 'Potatoes', quantity: '500g'}, {name: 'Carrots', quantity: '300g'}, {name: 'Gravy', quantity: '250ml'}], steps: ['Season chicken', 'Roast with vegetables', 'Rest and carve', 'Serve with gravy'] },
-        { id: 51, name: 'Lamb Chops', emoji: '🥩', time: '20 min', servings: 4, ingredients: [{name: 'Lamb chops', quantity: '8'}, {name: 'Mint sauce', quantity: '100ml'}, {name: 'Mashed potato', quantity: '500g'}, {name: 'Peas', quantity: '200g'}], steps: ['Season and grill chops', 'Make mash', 'Cook peas', 'Serve with mint sauce'] },
-        { id: 52, name: 'Pad Thai', emoji: '🍜', time: '25 min', servings: 2, ingredients: [{name: 'Rice noodles', quantity: '200g'}, {name: 'Prawns', quantity: '200g'}, {name: 'Pad Thai sauce', quantity: '100ml'}, {name: 'Bean sprouts', quantity: '100g'}], steps: ['Soak noodles', 'Cook prawns', 'Stir fry with sauce', 'Add sprouts'] },
-        { id: 53, name: 'Lasagne', emoji: '🍝', time: '60 min', servings: 6, ingredients: [{name: 'Beef mince', quantity: '500g'}, {name: 'Lasagne sheets', quantity: '250g'}, {name: 'Pasta sauce', quantity: '500g'}, {name: 'Cheese sauce', quantity: '500ml'}], steps: ['Make meat sauce', 'Layer with pasta and cheese sauce', 'Bake until golden'] },
-        { id: 54, name: 'Thai Green Curry', emoji: '🍛', time: '30 min', servings: 4, ingredients: [{name: 'Chicken thigh', quantity: '500g'}, {name: 'Green curry paste', quantity: '3 tbsp'}, {name: 'Coconut milk', quantity: '400ml'}, {name: 'Rice', quantity: '2 cups'}], steps: ['Fry paste', 'Add chicken', 'Pour in coconut milk', 'Serve with rice'] },
-        { id: 55, name: 'Fried Rice', emoji: '🍚', time: '20 min', servings: 4, ingredients: [{name: 'Cooked rice', quantity: '4 cups'}, {name: 'Eggs', quantity: '3'}, {name: 'Vegetables', quantity: '200g'}, {name: 'Soy sauce', quantity: '3 tbsp'}], steps: ['Scramble eggs', 'Add rice and veg', 'Season with soy sauce'] },
-        { id: 56, name: 'Shepherd\'s Pie', emoji: '🥧', time: '45 min', servings: 4, ingredients: [{name: 'Lamb mince', quantity: '500g'}, {name: 'Mashed potato', quantity: '600g'}, {name: 'Frozen vegetables', quantity: '200g'}, {name: 'Gravy', quantity: '250ml'}], steps: ['Brown mince with veg', 'Add gravy', 'Top with mash', 'Bake until golden'] },
-        { id: 57, name: 'Chicken Schnitzel', emoji: '🍗', time: '25 min', servings: 4, ingredients: [{name: 'Chicken breast', quantity: '4'}, {name: 'Breadcrumbs', quantity: '200g'}, {name: 'Eggs', quantity: '2'}, {name: 'Lemon', quantity: '1'}], steps: ['Flatten chicken', 'Coat in egg then crumbs', 'Pan fry until golden', 'Serve with lemon'] },
-        { id: 58, name: 'Beef Nachos', emoji: '🌮', time: '20 min', servings: 4, ingredients: [{name: 'Beef mince', quantity: '400g'}, {name: 'Corn chips', quantity: '200g'}, {name: 'Cheese', quantity: '150g'}, {name: 'Salsa', quantity: '200g'}], steps: ['Cook mince with spices', 'Layer chips on tray', 'Top with mince and cheese', 'Bake until melted'] },
-        { id: 59, name: 'Honey Soy Chicken', emoji: '🍗', time: '30 min', servings: 4, ingredients: [{name: 'Chicken thighs', quantity: '8'}, {name: 'Honey', quantity: '3 tbsp'}, {name: 'Soy sauce', quantity: '3 tbsp'}, {name: 'Rice', quantity: '2 cups'}], steps: ['Marinate chicken', 'Bake until caramelised', 'Serve with rice'] },
-        { id: 60, name: 'Beef Stroganoff', emoji: '🥘', time: '30 min', servings: 4, ingredients: [{name: 'Beef strips', quantity: '500g'}, {name: 'Mushrooms', quantity: '200g'}, {name: 'Sour cream', quantity: '200ml'}, {name: 'Egg noodles', quantity: '400g'}], steps: ['Sear beef', 'Cook mushrooms', 'Add sour cream', 'Serve over noodles'] }
+        { id: 41, name: 'Creamy Garlic Parmesan Pasta with Crispy Bacon and Caesar Salad', emoji: '🍝', description: 'Rich, creamy pasta loaded with garlic and parmesan, topped with crispy bacon bits and served with fresh caesar salad.', time: '30 min', servings: 4, ingredients: [{name: 'San Remo fettuccine', quantity: '400g'}, {name: 'Bacon rashers', quantity: '200g'}, {name: 'Parmesan', quantity: '100g'}, {name: 'Garlic', quantity: '4 cloves'}, {name: 'Thickened cream', quantity: '300ml'}, {name: 'Cos lettuce', quantity: '1 head'}, {name: 'Caesar dressing', quantity: '100ml'}], steps: ['Cook pasta al dente', 'Fry bacon until crispy, set aside', 'Saute garlic in bacon fat, add cream and parmesan', 'Toss pasta in creamy sauce', 'Top with crispy bacon, serve with caesar salad'] },
+        { id: 42, name: 'Sticky Honey Garlic Chicken with Garlic Butter Rice and Steamed Greens', emoji: '🍗', description: 'Caramelised chicken thighs glazed in sweet honey garlic sauce, served with fluffy garlic butter rice and tender Asian greens.', time: '35 min', servings: 4, ingredients: [{name: 'Chicken thighs', quantity: '8'}, {name: 'Honey', quantity: '4 tbsp'}, {name: 'Garlic', quantity: '6 cloves'}, {name: 'Soy sauce', quantity: '3 tbsp'}, {name: 'SunRice jasmine rice', quantity: '2 cups'}, {name: 'Butter', quantity: '30g'}, {name: 'Broccolini', quantity: '2 bunches'}], steps: ['Cook rice, stir through garlic butter when done', 'Pan fry chicken until golden', 'Add honey, garlic and soy, simmer until sticky glaze forms', 'Steam broccolini until bright green', 'Serve chicken over rice with greens on the side'] },
+        { id: 43, name: 'Crispy Beer-Battered Fish with Chunky Chips and Mushy Peas', emoji: '🐟', description: 'Golden, crispy battered fish fillets with thick-cut chips and traditional mushy peas - classic fish shop quality at home!', time: '40 min', servings: 4, ingredients: [{name: 'Flathead fillets', quantity: '4'}, {name: 'Beer', quantity: '1 can'}, {name: 'Self-raising flour', quantity: '200g'}, {name: 'Potatoes', quantity: '800g'}, {name: 'Frozen peas', quantity: '300g'}, {name: 'Butter', quantity: '30g'}, {name: 'Lemon', quantity: '2'}], steps: ['Cut potatoes into thick chips, toss in oil, bake at 220C', 'Make batter with beer and flour', 'Dip fish in batter, deep fry until golden', 'Mash peas with butter, salt and mint', 'Serve fish and chips with mushy peas and lemon wedges'] },
+        { id: 44, name: 'Loaded Mexican Beef Tacos with Spanish Rice and Refried Beans', emoji: '🌮', description: 'Spicy seasoned beef in crunchy shells topped with all the fixings, alongside flavourful Spanish rice and creamy refried beans.', time: '30 min', servings: 4, ingredients: [{name: 'Beef mince', quantity: '500g'}, {name: 'Old El Paso taco kit', quantity: '1'}, {name: 'Rice', quantity: '1 cup'}, {name: 'Canned tomatoes', quantity: '200g'}, {name: 'Refried beans', quantity: '400g'}, {name: 'Cheese', quantity: '150g'}, {name: 'Sour cream', quantity: '150ml'}, {name: 'Avocado', quantity: '2'}], steps: ['Cook rice with canned tomatoes and cumin for Spanish rice', 'Brown mince with taco seasoning', 'Heat refried beans', 'Warm taco shells', 'Load tacos with beef, cheese, sour cream and guacamole, serve with rice and beans'] },
+        { id: 45, name: 'Creamy Butter Chicken with Fragrant Basmati Rice and Garlic Naan', emoji: '🍛', description: 'Tender chicken in rich, velvety tomato-cream sauce with aromatic spices, served with fluffy basmati and warm garlic naan.', time: '40 min', servings: 4, ingredients: [{name: 'Chicken thigh', quantity: '600g'}, {name: 'Patak\'s butter chicken sauce', quantity: '450g'}, {name: 'Thickened cream', quantity: '100ml'}, {name: 'Basmati rice', quantity: '2 cups'}, {name: 'Garlic naan', quantity: '4'}, {name: 'Fresh coriander', quantity: '1 bunch'}, {name: 'Butter', quantity: '30g'}], steps: ['Cook rice with cardamom pod for fragrance', 'Pan fry chicken pieces until golden', 'Add sauce and cream, simmer 15 mins', 'Warm naan in oven with garlic butter', 'Garnish curry with fresh coriander, serve with rice and naan'] },
+        { id: 46, name: 'Pan-Seared Pork Chops with Creamy Mash and Honey Glazed Carrots', emoji: '🥩', description: 'Juicy, golden pork chops with a herb crust, served with buttery mashed potatoes and sweet honey-glazed baby carrots.', time: '35 min', servings: 4, ingredients: [{name: 'Pork chops', quantity: '4'}, {name: 'Potatoes', quantity: '800g'}, {name: 'Baby carrots', quantity: '400g'}, {name: 'Butter', quantity: '80g'}, {name: 'Honey', quantity: '3 tbsp'}, {name: 'Fresh thyme', quantity: '1 bunch'}, {name: 'Cream', quantity: '100ml'}], steps: ['Boil potatoes, mash with butter and cream', 'Season pork with thyme, pan fry until golden', 'Roast carrots with honey and butter until glazed', 'Rest pork and make pan gravy', 'Plate with mash, glazed carrots and gravy drizzle'] },
+        { id: 47, name: 'Herb-Crusted Salmon with Lemon Butter Potatoes and Roasted Asparagus', emoji: '🐟', description: 'Perfectly cooked salmon with a crispy herb crust, served with zesty lemon butter baby potatoes and tender asparagus spears.', time: '35 min', servings: 4, ingredients: [{name: 'Salmon fillets', quantity: '4'}, {name: 'Baby potatoes', quantity: '600g'}, {name: 'Asparagus', quantity: '2 bunches'}, {name: 'Fresh dill', quantity: '1 bunch'}, {name: 'Lemon', quantity: '2'}, {name: 'Butter', quantity: '60g'}, {name: 'Garlic', quantity: '3 cloves'}], steps: ['Halve potatoes, roast with garlic and butter', 'Press herb breadcrumb mix onto salmon', 'Bake salmon until just cooked through', 'Toss asparagus in oil, roast until tender', 'Squeeze lemon over potatoes, serve with salmon and asparagus'] },
+        { id: 48, name: 'Juicy Smash Burgers with Loaded Fries and Coleslaw', emoji: '🍔', description: 'Crispy-edged smash patties with melted cheese, special sauce and all the toppings, served with cheesy loaded fries and creamy slaw.', time: '30 min', servings: 4, ingredients: [{name: 'Beef mince', quantity: '600g'}, {name: 'Brioche buns', quantity: '4'}, {name: 'American cheese', quantity: '8 slices'}, {name: 'Frozen chips', quantity: '500g'}, {name: 'Coleslaw mix', quantity: '250g'}, {name: 'Mayo', quantity: '100ml'}, {name: 'Pickles', quantity: '1 jar'}], steps: ['Cook chips, top with cheese to melt', 'Form mince into balls, smash flat on hot griddle', 'Add cheese slice to melt, toast buns', 'Mix coleslaw with mayo', 'Stack burgers with pickles and sauce, serve with loaded fries and slaw'] },
+        { id: 49, name: 'Silky Carbonara with Garlic Bread and Garden Salad', emoji: '🍝', description: 'Authentic creamy carbonara with crispy pancetta and pecorino, served with golden garlic bread and fresh garden salad.', time: '25 min', servings: 4, ingredients: [{name: 'San Remo spaghetti', quantity: '400g'}, {name: 'Pancetta', quantity: '200g'}, {name: 'Eggs', quantity: '4'}, {name: 'Pecorino', quantity: '100g'}, {name: 'Garlic bread', quantity: '1 loaf'}, {name: 'Mixed salad leaves', quantity: '150g'}, {name: 'Cherry tomatoes', quantity: '200g'}], steps: ['Cook pasta, reserve pasta water', 'Fry pancetta until crispy', 'Whisk eggs with pecorino', 'Toss hot pasta with egg mix and pancetta', 'Bake garlic bread, serve with salad dressed in olive oil'] },
+        { id: 50, name: 'Golden Roast Chicken with Crispy Potatoes and Honey Roasted Vegetables', emoji: '🍗', description: 'Perfectly golden roast chicken with crispy skin, served with crunchy roast potatoes and sweet honey-glazed root vegetables.', time: '90 min', servings: 4, ingredients: [{name: 'Whole chicken', quantity: '1.8kg'}, {name: 'Potatoes', quantity: '800g'}, {name: 'Carrots', quantity: '400g'}, {name: 'Parsnips', quantity: '300g'}, {name: 'Honey', quantity: '3 tbsp'}, {name: 'Fresh rosemary', quantity: '1 bunch'}, {name: 'Butter', quantity: '50g'}], steps: ['Rub chicken with butter and rosemary, roast at 200C', 'Par-boil potatoes, rough up edges, roast in chicken fat', 'Toss carrots and parsnips in honey, roast alongside', 'Rest chicken 15 mins before carving', 'Serve with crispy potatoes and glazed vegetables'] },
+        { id: 51, name: 'Herb-Crusted Lamb Cutlets with Mint Pea Mash and Rosemary Jus', emoji: '🥩', description: 'Tender lamb cutlets with a fragrant herb crust, served with vibrant mint pea mash and rich rosemary gravy.', time: '30 min', servings: 4, ingredients: [{name: 'Lamb cutlets', quantity: '12'}, {name: 'Potatoes', quantity: '600g'}, {name: 'Frozen peas', quantity: '300g'}, {name: 'Fresh mint', quantity: '1 bunch'}, {name: 'Fresh rosemary', quantity: '1 bunch'}, {name: 'Butter', quantity: '60g'}, {name: 'Lamb stock', quantity: '250ml'}], steps: ['Boil potatoes, mash with butter', 'Cook peas, fold into mash with chopped mint', 'Season lamb, pan fry to medium-rare', 'Make jus with pan juices, stock and rosemary', 'Plate mash, top with lamb, drizzle with jus'] },
+        { id: 52, name: 'Zesty Prawn Pad Thai with Fresh Lime and Crushed Peanuts', emoji: '🍜', description: 'Authentic street-style pad thai with juicy prawns, tangy tamarind sauce, and topped with lime, peanuts and fresh herbs.', time: '25 min', servings: 4, ingredients: [{name: 'Rice noodles', quantity: '400g'}, {name: 'Prawns', quantity: '400g'}, {name: 'Pad Thai sauce', quantity: '150ml'}, {name: 'Bean sprouts', quantity: '200g'}, {name: 'Peanuts', quantity: '100g'}, {name: 'Lime', quantity: '2'}, {name: 'Fresh coriander', quantity: '1 bunch'}], steps: ['Soak noodles until soft', 'Stir fry prawns until pink, set aside', 'Toss noodles in wok with sauce', 'Add prawns and bean sprouts', 'Serve topped with crushed peanuts, lime wedges and coriander'] },
+        { id: 53, name: 'Rich Beef Lasagne with Garlic Bread and Caprese Salad', emoji: '🍝', description: 'Layers of rich beef ragu and creamy bechamel, baked until golden, served with crusty garlic bread and fresh caprese salad.', time: '75 min', servings: 6, ingredients: [{name: 'Beef mince', quantity: '600g'}, {name: 'Lasagne sheets', quantity: '250g'}, {name: 'Leggo\'s pasta sauce', quantity: '500g'}, {name: 'Bechamel sauce', quantity: '500ml'}, {name: 'Mozzarella', quantity: '200g'}, {name: 'Garlic bread', quantity: '1 loaf'}, {name: 'Fresh basil', quantity: '1 bunch'}], steps: ['Brown mince, add sauce, simmer 20 mins', 'Layer meat sauce, pasta sheets and bechamel', 'Top with mozzarella, bake until golden', 'Bake garlic bread', 'Serve with tomato, mozzarella and basil salad'] },
+        { id: 54, name: 'Fragrant Thai Green Curry with Jasmine Rice and Prawn Crackers', emoji: '🍛', description: 'Aromatic coconut green curry loaded with tender chicken and vegetables, served with fragrant jasmine rice and crispy prawn crackers.', time: '35 min', servings: 4, ingredients: [{name: 'Chicken thigh', quantity: '600g'}, {name: 'Green curry paste', quantity: '4 tbsp'}, {name: 'Coconut milk', quantity: '400ml'}, {name: 'Thai basil', quantity: '1 bunch'}, {name: 'SunRice jasmine rice', quantity: '2 cups'}, {name: 'Bamboo shoots', quantity: '200g'}, {name: 'Prawn crackers', quantity: '1 packet'}], steps: ['Cook jasmine rice', 'Fry curry paste until fragrant', 'Add chicken, cook through', 'Pour in coconut milk and bamboo shoots, simmer', 'Stir in Thai basil, serve with rice and prawn crackers'] },
+        { id: 55, name: 'Special Fried Rice with Honey Sesame Chicken and Asian Greens', emoji: '🍚', description: 'Wok-tossed fried rice loaded with prawns and vegetables, served with crispy honey sesame chicken pieces and stir-fried bok choy.', time: '30 min', servings: 4, ingredients: [{name: 'Cooked rice', quantity: '4 cups'}, {name: 'Chicken breast', quantity: '400g'}, {name: 'Eggs', quantity: '3'}, {name: 'Frozen mixed veg', quantity: '200g'}, {name: 'Honey', quantity: '3 tbsp'}, {name: 'Sesame seeds', quantity: '2 tbsp'}, {name: 'Bok choy', quantity: '4'}], steps: ['Coat chicken pieces in cornflour, fry until crispy', 'Toss in honey and sesame seeds', 'Scramble eggs in wok, add rice and veg', 'Season with soy and sesame oil', 'Stir fry bok choy with garlic, serve all together'] },
+        { id: 56, name: 'Comforting Shepherd\'s Pie with Cheesy Mash and Buttered Peas', emoji: '🥧', description: 'Hearty lamb mince filling topped with golden cheesy mash, served with buttery garden peas - ultimate comfort food!', time: '50 min', servings: 4, ingredients: [{name: 'Lamb mince', quantity: '500g'}, {name: 'Potatoes', quantity: '800g'}, {name: 'Frozen peas', quantity: '250g'}, {name: 'Cheese', quantity: '100g'}, {name: 'Butter', quantity: '60g'}, {name: 'Worcestershire sauce', quantity: '2 tbsp'}, {name: 'Beef stock', quantity: '250ml'}], steps: ['Brown lamb with onion and carrots', 'Add stock and Worcestershire, simmer until thick', 'Mash potatoes with butter and cheese', 'Top meat with cheesy mash, bake until golden', 'Serve with buttered peas'] },
+        { id: 57, name: 'Crispy Chicken Schnitzel with Creamy Mushroom Sauce and Mash', emoji: '🍗', description: 'Golden crumbed chicken schnitzel smothered in creamy garlic mushroom sauce, served with buttery mashed potatoes.', time: '35 min', servings: 4, ingredients: [{name: 'Chicken breast', quantity: '4'}, {name: 'Breadcrumbs', quantity: '200g'}, {name: 'Mushrooms', quantity: '300g'}, {name: 'Thickened cream', quantity: '200ml'}, {name: 'Potatoes', quantity: '800g'}, {name: 'Butter', quantity: '60g'}, {name: 'Garlic', quantity: '3 cloves'}], steps: ['Flatten chicken, coat in flour, egg and crumbs', 'Pan fry until golden and cooked through', 'Saute mushrooms with garlic, add cream', 'Mash potatoes with butter', 'Serve schnitzel topped with mushroom sauce alongside mash'] },
+        { id: 58, name: 'Loaded Beef Nachos with Guacamole and Mexican Rice', emoji: '🌮', description: 'Crispy tortilla chips piled high with spiced beef, melted cheese and all the toppings, served with fresh guac and fluffy Mexican rice.', time: '30 min', servings: 4, ingredients: [{name: 'Beef mince', quantity: '500g'}, {name: 'Corn chips', quantity: '250g'}, {name: 'Cheese', quantity: '200g'}, {name: 'Avocado', quantity: '2'}, {name: 'Rice', quantity: '1 cup'}, {name: 'Salsa', quantity: '250g'}, {name: 'Sour cream', quantity: '150ml'}], steps: ['Cook rice with tomato paste and cumin', 'Brown mince with taco spices', 'Layer chips with beef and cheese, bake until melted', 'Mash avocados with lime for guac', 'Top nachos with salsa, sour cream and guac, serve with rice'] },
+        { id: 59, name: 'Sticky Honey Sesame Chicken with Egg Fried Rice and Stir-Fried Vegetables', emoji: '🍗', description: 'Crispy chicken pieces in irresistible sticky honey sesame glaze, served with fluffy egg fried rice and colourful stir-fried veg.', time: '35 min', servings: 4, ingredients: [{name: 'Chicken thighs', quantity: '600g'}, {name: 'Honey', quantity: '4 tbsp'}, {name: 'Sesame seeds', quantity: '3 tbsp'}, {name: 'SunRice jasmine rice', quantity: '2 cups'}, {name: 'Eggs', quantity: '3'}, {name: 'Asian stir-fry veg', quantity: '400g'}, {name: 'Soy sauce', quantity: '4 tbsp'}], steps: ['Cook rice, stir through scrambled eggs', 'Cut and fry chicken until crispy', 'Coat in honey, soy and sesame glaze', 'Stir fry vegetables with garlic', 'Serve glazed chicken over egg fried rice with veg'] },
+        { id: 60, name: 'Creamy Beef Stroganoff with Buttered Egg Noodles and Green Beans', emoji: '🥘', description: 'Tender beef strips in rich, creamy paprika sauce with mushrooms, served over buttery egg noodles with garlicky green beans.', time: '35 min', servings: 4, ingredients: [{name: 'Beef strips', quantity: '600g'}, {name: 'Mushrooms', quantity: '300g'}, {name: 'Sour cream', quantity: '250ml'}, {name: 'Egg noodles', quantity: '400g'}, {name: 'Green beans', quantity: '300g'}, {name: 'Butter', quantity: '50g'}, {name: 'Paprika', quantity: '2 tbsp'}], steps: ['Sear beef with paprika until browned, set aside', 'Saute mushrooms until golden', 'Return beef, add sour cream and simmer', 'Cook noodles, toss in butter', 'Saute green beans with garlic, serve all together'] }
       ]
     };
 
@@ -7513,6 +7630,7 @@
           mealType: currentMealType,
           dislikes: mealPreferences.dislikes,
           dietPreferences: dietPrefs,
+          cuisines: mealPreferences.cuisines,
           servings: mealPreferences.servings,
           maxIngredients: mealPreferences.maxIngredients,
           complexity: mealPreferences.complexity,
@@ -7529,6 +7647,7 @@
             mealType: currentMealType,
             dislikes: mealPreferences.dislikes || [],
             dietPreferences: dietPrefs,
+            cuisines: mealPreferences.cuisines || [],
             servings: parseInt(mealPreferences.servings) || 4,
             maxIngredients: parseInt(mealPreferences.maxIngredients) || 12,
             budget: quality,
@@ -7663,6 +7782,7 @@
           <div class="meal-idea-image">${meal.emoji}</div>
           <div class="meal-idea-content">
             <div class="meal-idea-name">${meal.name}</div>
+            ${meal.description ? `<div class="meal-idea-description">${meal.description}</div>` : ''}
             <div class="meal-idea-meta">${meal.time} • ${meal.servings} servings</div>
           </div>
         </div>
@@ -7712,6 +7832,7 @@
       document.getElementById('expandedMealTitle').textContent = meal.name;
       document.getElementById('expandedMealContent').innerHTML = `
         <div class="expanded-meal-image">${meal.emoji}</div>
+        ${meal.description ? `<div class="expanded-meal-description">${meal.description}</div>` : ''}
 
         <div class="expanded-meal-section">
           <h4>📋 Ingredients (${meal.ingredients.length})</h4>
