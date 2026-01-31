@@ -451,6 +451,385 @@
     }
 
     /* ========================================
+       SHOPPING LIST VIEW
+       ======================================== */
+    .shopping-view {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      overflow: auto;
+      background: var(--bg);
+      padding: 16px;
+    }
+
+    .shopping-view.visible {
+      display: flex;
+    }
+
+    .shopping-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .shopping-header h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .shopping-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .shopping-action-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: var(--card-bg);
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .shopping-action-btn:hover {
+      background: var(--border);
+    }
+
+    .shopping-add {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .shopping-add input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      background: var(--card-bg);
+      color: var(--text-primary);
+    }
+
+    .shopping-add select {
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      background: var(--card-bg);
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    .shopping-add-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: var(--adult);
+      color: white;
+      font-size: 1.5rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .shopping-add-btn:hover {
+      opacity: 0.9;
+    }
+
+    .shopping-categories {
+      flex: 1;
+      overflow: auto;
+    }
+
+    .shopping-category {
+      margin-bottom: 16px;
+    }
+
+    .shopping-category-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+
+    .shopping-category-icon {
+      font-size: 1.1rem;
+    }
+
+    .shopping-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--card-bg);
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .shopping-item.completed {
+      opacity: 0.5;
+    }
+
+    .shopping-item.completed .shopping-item-name {
+      text-decoration: line-through;
+    }
+
+    .shopping-checkbox {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .shopping-checkbox.checked {
+      background: var(--success);
+      border-color: var(--success);
+      color: white;
+    }
+
+    .shopping-item-name {
+      flex: 1;
+      font-size: 1rem;
+      color: var(--text-primary);
+    }
+
+    .shopping-item-delete {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .shopping-item:hover .shopping-item-delete {
+      opacity: 1;
+    }
+
+    .shopping-item-delete:hover {
+      color: var(--danger);
+    }
+
+    .shopping-summary {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      margin-top: 16px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .shopping-empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+
+    .shopping-empty-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+    }
+
+    /* ========================================
+       MEAL PLANNER VIEW
+       ======================================== */
+    .meal-planner-view {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      overflow: auto;
+      background: var(--bg);
+      padding: 16px;
+    }
+
+    .meal-planner-view.visible {
+      display: flex;
+    }
+
+    .meal-planner-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0 16px;
+    }
+
+    .meal-week-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .meal-days {
+      flex: 1;
+      overflow: auto;
+    }
+
+    .meal-day {
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .meal-day-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--primary);
+      color: white;
+    }
+
+    .meal-day-header.today {
+      background: var(--adult);
+    }
+
+    .meal-day-name {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .meal-day-date {
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+
+    .meal-slots {
+      padding: 12px;
+    }
+
+    .meal-slot {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      background: var(--bg);
+    }
+
+    .meal-slot:last-child {
+      margin-bottom: 0;
+    }
+
+    .meal-slot-type {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      width: 60px;
+      flex-shrink: 0;
+    }
+
+    .meal-slot-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .meal-slot-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .meal-slot-empty:hover {
+      color: var(--adult);
+    }
+
+    .meal-slot-filled {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .meal-slot-name {
+      font-weight: 500;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+    }
+
+    .meal-slot-notes {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .meal-slot-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .meal-slot-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .meal-slot-btn:hover {
+      background: var(--border);
+      color: var(--text-primary);
+    }
+
+    .meal-actions {
+      padding-top: 16px;
+    }
+
+    .meal-generate-btn {
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: var(--success);
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .meal-generate-btn:hover {
+      opacity: 0.9;
+    }
+
+    /* ========================================
        BUBBLE NAVIGATION
        ======================================== */
     .bubble-container {
@@ -1743,6 +2122,8 @@
       <div class="app-title">Life</div>
     </div>
     <div class="header-right">
+      <button class="header-btn" id="shoppingToggleBtn" onclick="toggleShoppingView()" title="Shopping List">🛒</button>
+      <button class="header-btn" id="mealToggleBtn" onclick="toggleMealPlannerView()" title="Meal Planner">🍽️</button>
       <button class="header-btn" id="calendarToggleBtn" onclick="toggleCalendarView()" title="Calendar View">📅</button>
       <button class="header-btn" onclick="openSettings()" title="Settings">⚙️</button>
     </div>
@@ -1770,6 +2151,90 @@
     </div>
     <div class="calendar-grid" id="calendarGrid"></div>
     <div class="calendar-day-detail" id="calendarDayDetail"></div>
+  </div>
+
+  <!-- SHOPPING LIST VIEW -->
+  <div class="shopping-view" id="shoppingView">
+    <div class="shopping-header">
+      <h3>Shopping List</h3>
+      <div class="shopping-actions">
+        <button class="shopping-action-btn" onclick="clearCompletedItems()" title="Clear completed">🗑️</button>
+        <button class="shopping-action-btn" onclick="generateListFromMeals()" title="Generate from meals">🍽️</button>
+      </div>
+    </div>
+
+    <div class="shopping-add">
+      <input type="text" id="shoppingInput" placeholder="Add item..." onkeypress="handleShoppingKeypress(event)">
+      <select id="shoppingCategory">
+        <option value="produce">🥬 Produce</option>
+        <option value="dairy">🧀 Dairy</option>
+        <option value="meat">🥩 Meat</option>
+        <option value="bakery">🍞 Bakery</option>
+        <option value="pantry">🥫 Pantry</option>
+        <option value="frozen">🧊 Frozen</option>
+        <option value="drinks">🥤 Drinks</option>
+        <option value="household">🧹 Household</option>
+        <option value="other">📦 Other</option>
+      </select>
+      <button class="shopping-add-btn" onclick="addShoppingItem()">+</button>
+    </div>
+
+    <div class="shopping-categories" id="shoppingCategories">
+      <!-- Categories will be rendered here -->
+    </div>
+
+    <div class="shopping-summary" id="shoppingSummary">
+      <span class="shopping-count">0 items</span>
+      <span class="shopping-completed">0 completed</span>
+    </div>
+  </div>
+
+  <!-- MEAL PLANNER VIEW -->
+  <div class="meal-planner-view" id="mealPlannerView">
+    <div class="meal-planner-header">
+      <button class="calendar-nav-btn" onclick="changeMealWeek(-1)">←</button>
+      <h3 class="meal-week-title" id="mealWeekTitle">This Week</h3>
+      <button class="calendar-nav-btn" onclick="changeMealWeek(1)">→</button>
+    </div>
+
+    <div class="meal-days" id="mealDays">
+      <!-- Days will be rendered here -->
+    </div>
+
+    <div class="meal-actions">
+      <button class="meal-generate-btn" onclick="generateShoppingFromMeals()">
+        🛒 Generate Shopping List
+      </button>
+    </div>
+  </div>
+
+  <!-- ADD MEAL MODAL -->
+  <div class="modal-sheet" id="addMealSheet">
+    <div class="modal-header">
+      <h3>Add Meal</h3>
+      <button class="modal-close" onclick="closeAddMealSheet()">×</button>
+    </div>
+    <div class="modal-content">
+      <input type="hidden" id="mealDayIndex">
+      <input type="hidden" id="mealType">
+
+      <div class="form-field">
+        <label>Meal Name</label>
+        <input type="text" id="mealName" placeholder="e.g., Spaghetti Bolognese">
+      </div>
+
+      <div class="form-field">
+        <label>Ingredients (one per line)</label>
+        <textarea id="mealIngredients" rows="4" placeholder="500g mince&#10;1 onion&#10;2 cans tomatoes&#10;Pasta"></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>Notes</label>
+        <input type="text" id="mealNotes" placeholder="e.g., Kid-friendly, 30 mins">
+      </div>
+
+      <button class="form-submit" onclick="saveMeal()">Save Meal</button>
+    </div>
   </div>
 
   <!-- FLOATING ACTION BUTTON -->
@@ -3870,6 +4335,432 @@
         if (b.time) return 1;
         return 0;
       });
+    }
+
+    // ========================================
+    // SHOPPING LIST FUNCTIONS
+    // ========================================
+    let shoppingItems = JSON.parse(localStorage.getItem('life_shopping') || '[]');
+    let shoppingVisible = false;
+
+    const categoryInfo = {
+      produce: { icon: '🥬', name: 'Produce' },
+      dairy: { icon: '🧀', name: 'Dairy' },
+      meat: { icon: '🥩', name: 'Meat' },
+      bakery: { icon: '🍞', name: 'Bakery' },
+      pantry: { icon: '🥫', name: 'Pantry' },
+      frozen: { icon: '🧊', name: 'Frozen' },
+      drinks: { icon: '🥤', name: 'Drinks' },
+      household: { icon: '🧹', name: 'Household' },
+      other: { icon: '📦', name: 'Other' }
+    };
+
+    function toggleShoppingView() {
+      // Close other views first
+      if (calendarVisible) toggleCalendarView();
+      if (mealPlannerVisible) toggleMealPlannerView();
+
+      shoppingVisible = !shoppingVisible;
+      const shoppingView = document.getElementById('shoppingView');
+      const feedLayer = document.getElementById('feedLayer');
+      const shoppingBtn = document.getElementById('shoppingToggleBtn');
+
+      if (shoppingVisible) {
+        shoppingView.classList.add('visible');
+        feedLayer.style.display = 'none';
+        shoppingBtn.style.background = 'var(--adult)';
+        shoppingBtn.style.color = 'white';
+        renderShoppingList();
+      } else {
+        shoppingView.classList.remove('visible');
+        feedLayer.style.display = 'block';
+        shoppingBtn.style.background = '';
+        shoppingBtn.style.color = '';
+      }
+    }
+
+    function renderShoppingList() {
+      const container = document.getElementById('shoppingCategories');
+
+      if (shoppingItems.length === 0) {
+        container.innerHTML = `
+          <div class="shopping-empty">
+            <div class="shopping-empty-icon">🛒</div>
+            <div>Your shopping list is empty</div>
+            <div style="font-size: 0.85rem; margin-top: 8px;">Add items above or generate from meal plans</div>
+          </div>
+        `;
+        updateShoppingSummary();
+        return;
+      }
+
+      // Group items by category
+      const grouped = {};
+      shoppingItems.forEach(item => {
+        if (!grouped[item.category]) grouped[item.category] = [];
+        grouped[item.category].push(item);
+      });
+
+      // Render categories in order
+      const categoryOrder = ['produce', 'dairy', 'meat', 'bakery', 'pantry', 'frozen', 'drinks', 'household', 'other'];
+      let html = '';
+
+      categoryOrder.forEach(cat => {
+        if (!grouped[cat] || grouped[cat].length === 0) return;
+
+        const info = categoryInfo[cat];
+        const items = grouped[cat];
+
+        html += `
+          <div class="shopping-category">
+            <div class="shopping-category-header">
+              <span class="shopping-category-icon">${info.icon}</span>
+              <span>${info.name}</span>
+              <span style="color: var(--text-muted); font-weight: normal;">(${items.length})</span>
+            </div>
+            ${items.map(item => `
+              <div class="shopping-item ${item.completed ? 'completed' : ''}" data-id="${item.id}">
+                <div class="shopping-checkbox ${item.completed ? 'checked' : ''}" onclick="toggleShoppingItem('${item.id}')">
+                  ${item.completed ? '✓' : ''}
+                </div>
+                <span class="shopping-item-name">${item.name}</span>
+                <button class="shopping-item-delete" onclick="deleteShoppingItem('${item.id}')">×</button>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      updateShoppingSummary();
+    }
+
+    function updateShoppingSummary() {
+      const total = shoppingItems.length;
+      const completed = shoppingItems.filter(i => i.completed).length;
+      document.querySelector('.shopping-count').textContent = `${total} item${total !== 1 ? 's' : ''}`;
+      document.querySelector('.shopping-completed').textContent = `${completed} completed`;
+    }
+
+    function addShoppingItem() {
+      const input = document.getElementById('shoppingInput');
+      const category = document.getElementById('shoppingCategory').value;
+      const name = input.value.trim();
+
+      if (!name) return;
+
+      const newItem = {
+        id: 'shop_' + Date.now(),
+        name: name,
+        category: category,
+        completed: false,
+        createdAt: new Date().toISOString()
+      };
+
+      shoppingItems.push(newItem);
+      saveShoppingList();
+      renderShoppingList();
+      input.value = '';
+      input.focus();
+    }
+
+    function handleShoppingKeypress(event) {
+      if (event.key === 'Enter') {
+        addShoppingItem();
+      }
+    }
+
+    function toggleShoppingItem(id) {
+      const item = shoppingItems.find(i => i.id === id);
+      if (item) {
+        item.completed = !item.completed;
+        saveShoppingList();
+        renderShoppingList();
+      }
+    }
+
+    function deleteShoppingItem(id) {
+      shoppingItems = shoppingItems.filter(i => i.id !== id);
+      saveShoppingList();
+      renderShoppingList();
+    }
+
+    function clearCompletedItems() {
+      const completed = shoppingItems.filter(i => i.completed).length;
+      if (completed === 0) {
+        alert('No completed items to clear');
+        return;
+      }
+      if (confirm(`Clear ${completed} completed item${completed !== 1 ? 's' : ''}?`)) {
+        shoppingItems = shoppingItems.filter(i => !i.completed);
+        saveShoppingList();
+        renderShoppingList();
+      }
+    }
+
+    function saveShoppingList() {
+      localStorage.setItem('life_shopping', JSON.stringify(shoppingItems));
+    }
+
+    // ========================================
+    // MEAL PLANNER FUNCTIONS
+    // ========================================
+    let mealPlan = JSON.parse(localStorage.getItem('life_meals') || '{}');
+    let mealPlannerVisible = false;
+    let mealWeekOffset = 0;
+
+    function toggleMealPlannerView() {
+      // Close other views first
+      if (calendarVisible) toggleCalendarView();
+      if (shoppingVisible) toggleShoppingView();
+
+      mealPlannerVisible = !mealPlannerVisible;
+      const mealView = document.getElementById('mealPlannerView');
+      const feedLayer = document.getElementById('feedLayer');
+      const mealBtn = document.getElementById('mealToggleBtn');
+
+      if (mealPlannerVisible) {
+        mealView.classList.add('visible');
+        feedLayer.style.display = 'none';
+        mealBtn.style.background = 'var(--adult)';
+        mealBtn.style.color = 'white';
+        renderMealPlanner();
+      } else {
+        mealView.classList.remove('visible');
+        feedLayer.style.display = 'block';
+        mealBtn.style.background = '';
+        mealBtn.style.color = '';
+      }
+    }
+
+    function getWeekDates(offset = 0) {
+      const today = new Date();
+      const currentDay = today.getDay();
+      const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
+
+      const monday = new Date(today);
+      monday.setDate(today.getDate() + mondayOffset + (offset * 7));
+
+      const days = [];
+      const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(monday);
+        date.setDate(monday.getDate() + i);
+        days.push({
+          name: dayNames[i],
+          date: date,
+          dateStr: date.toISOString().split('T')[0],
+          isToday: date.toDateString() === today.toDateString()
+        });
+      }
+
+      return days;
+    }
+
+    function renderMealPlanner() {
+      const days = getWeekDates(mealWeekOffset);
+
+      // Update week title
+      const firstDay = days[0].date;
+      const lastDay = days[6].date;
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+      let title = '';
+      if (mealWeekOffset === 0) {
+        title = 'This Week';
+      } else if (mealWeekOffset === 1) {
+        title = 'Next Week';
+      } else if (mealWeekOffset === -1) {
+        title = 'Last Week';
+      } else {
+        title = `${monthNames[firstDay.getMonth()]} ${firstDay.getDate()} - ${monthNames[lastDay.getMonth()]} ${lastDay.getDate()}`;
+      }
+      document.getElementById('mealWeekTitle').textContent = title;
+
+      // Render days
+      const container = document.getElementById('mealDays');
+      container.innerHTML = days.map((day, index) => {
+        const meals = mealPlan[day.dateStr] || {};
+
+        return `
+          <div class="meal-day">
+            <div class="meal-day-header ${day.isToday ? 'today' : ''}">
+              <span class="meal-day-name">${day.name}</span>
+              <span class="meal-day-date">${day.date.getDate()} ${monthNames[day.date.getMonth()]}</span>
+            </div>
+            <div class="meal-slots">
+              ${renderMealSlot(day.dateStr, 'breakfast', meals.breakfast)}
+              ${renderMealSlot(day.dateStr, 'lunch', meals.lunch)}
+              ${renderMealSlot(day.dateStr, 'dinner', meals.dinner)}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderMealSlot(dateStr, type, meal) {
+      const typeLabels = { breakfast: 'Brekky', lunch: 'Lunch', dinner: 'Dinner' };
+
+      if (!meal) {
+        return `
+          <div class="meal-slot">
+            <span class="meal-slot-type">${typeLabels[type]}</span>
+            <div class="meal-slot-content">
+              <span class="meal-slot-empty" onclick="openAddMealSheet('${dateStr}', '${type}')">+ Add meal</span>
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="meal-slot">
+          <span class="meal-slot-type">${typeLabels[type]}</span>
+          <div class="meal-slot-content">
+            <div class="meal-slot-filled">
+              <div>
+                <div class="meal-slot-name">${meal.name}</div>
+                ${meal.notes ? `<div class="meal-slot-notes">${meal.notes}</div>` : ''}
+              </div>
+              <div class="meal-slot-actions">
+                <button class="meal-slot-btn" onclick="openAddMealSheet('${dateStr}', '${type}')" title="Edit">✏️</button>
+                <button class="meal-slot-btn" onclick="deleteMeal('${dateStr}', '${type}')" title="Remove">×</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function changeMealWeek(delta) {
+      mealWeekOffset += delta;
+      renderMealPlanner();
+    }
+
+    function openAddMealSheet(dateStr, type) {
+      document.getElementById('mealDayIndex').value = dateStr;
+      document.getElementById('mealType').value = type;
+
+      const existingMeal = mealPlan[dateStr]?.[type];
+      if (existingMeal) {
+        document.getElementById('mealName').value = existingMeal.name || '';
+        document.getElementById('mealIngredients').value = (existingMeal.ingredients || []).join('\n');
+        document.getElementById('mealNotes').value = existingMeal.notes || '';
+      } else {
+        document.getElementById('mealName').value = '';
+        document.getElementById('mealIngredients').value = '';
+        document.getElementById('mealNotes').value = '';
+      }
+
+      openModal('addMealSheet');
+    }
+
+    function closeAddMealSheet() {
+      document.getElementById('modalOverlay').classList.remove('open');
+      document.getElementById('addMealSheet').classList.remove('open');
+    }
+
+    function saveMeal() {
+      const dateStr = document.getElementById('mealDayIndex').value;
+      const type = document.getElementById('mealType').value;
+      const name = document.getElementById('mealName').value.trim();
+      const ingredientsText = document.getElementById('mealIngredients').value.trim();
+      const notes = document.getElementById('mealNotes').value.trim();
+
+      if (!name) {
+        alert('Please enter a meal name');
+        return;
+      }
+
+      const ingredients = ingredientsText
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0);
+
+      if (!mealPlan[dateStr]) {
+        mealPlan[dateStr] = {};
+      }
+
+      mealPlan[dateStr][type] = {
+        name,
+        ingredients,
+        notes
+      };
+
+      saveMealPlan();
+      closeAddMealSheet();
+      renderMealPlanner();
+    }
+
+    function deleteMeal(dateStr, type) {
+      if (mealPlan[dateStr] && mealPlan[dateStr][type]) {
+        delete mealPlan[dateStr][type];
+        if (Object.keys(mealPlan[dateStr]).length === 0) {
+          delete mealPlan[dateStr];
+        }
+        saveMealPlan();
+        renderMealPlanner();
+      }
+    }
+
+    function saveMealPlan() {
+      localStorage.setItem('life_meals', JSON.stringify(mealPlan));
+    }
+
+    function generateShoppingFromMeals() {
+      const days = getWeekDates(mealWeekOffset);
+      const ingredients = [];
+
+      days.forEach(day => {
+        const meals = mealPlan[day.dateStr] || {};
+        ['breakfast', 'lunch', 'dinner'].forEach(type => {
+          if (meals[type] && meals[type].ingredients) {
+            meals[type].ingredients.forEach(ing => {
+              if (!ingredients.includes(ing.toLowerCase())) {
+                ingredients.push(ing);
+              }
+            });
+          }
+        });
+      });
+
+      if (ingredients.length === 0) {
+        alert('No ingredients found in meal plan for this week');
+        return;
+      }
+
+      // Add to shopping list (avoid duplicates)
+      const existingNames = shoppingItems.map(i => i.name.toLowerCase());
+      let added = 0;
+
+      ingredients.forEach(ing => {
+        if (!existingNames.includes(ing.toLowerCase())) {
+          shoppingItems.push({
+            id: 'shop_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+            name: ing,
+            category: 'other',
+            completed: false,
+            createdAt: new Date().toISOString()
+          });
+          added++;
+        }
+      });
+
+      saveShoppingList();
+
+      if (added > 0) {
+        alert(`Added ${added} ingredient${added !== 1 ? 's' : ''} to shopping list`);
+        toggleMealPlannerView();
+        toggleShoppingView();
+      } else {
+        alert('All ingredients are already in your shopping list');
+      }
+    }
+
+    function generateListFromMeals() {
+      // Switch to meal planner to generate from there
+      toggleShoppingView();
+      toggleMealPlannerView();
     }
 
     // Share Task Functions
