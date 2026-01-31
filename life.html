@@ -1452,6 +1452,34 @@
       border-color: var(--danger);
     }
 
+    /* Cuisine chips - positive selection color */
+    .cuisine-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .cuisine-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+    }
+
+    .cuisine-chip .cuisine-icon {
+      font-size: 1.1rem;
+    }
+
+    .cuisine-chip .cuisine-name {
+      font-size: 0.85rem;
+    }
+
+    .cuisine-chip.selected {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
     .pref-options {
       display: flex;
       flex-direction: column;
@@ -4053,6 +4081,7 @@
       <div class="pref-tabs">
         <button class="pref-tab active" onclick="switchPrefTab('dislikes')">🚫 Dislikes</button>
         <button class="pref-tab" onclick="switchPrefTab('diet')">🥗 Diet</button>
+        <button class="pref-tab" onclick="switchPrefTab('cuisine')">🌍 Cuisine</button>
         <button class="pref-tab" onclick="switchPrefTab('cooking')">👨‍🍳 Cooking</button>
         <button class="pref-tab" onclick="switchPrefTab('stores')">🏪 Stores</button>
       </div>
@@ -4086,6 +4115,13 @@
       <div class="pref-panel" id="prefDiet">
         <p class="pref-description">Select your dietary preferences:</p>
         <div class="pref-options" id="dietOptions"></div>
+      </div>
+
+      <!-- Cuisine Tab -->
+      <div class="pref-panel" id="prefCuisine">
+        <p class="pref-description">Select cuisines you'd like to explore:</p>
+        <p class="pref-subdesc" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Tap multiple to mix cuisines, or leave blank for variety</p>
+        <div class="pref-chips cuisine-chips" id="cuisineOptions"></div>
       </div>
 
       <!-- Cooking Tab -->
@@ -7052,6 +7088,7 @@
     const DEFAULT_MEAL_PREFS = {
       dislikes: [],
       diet: 'none',
+      cuisines: [],
       budget: 150,
       servings: 4,
       maxIngredients: 7,
@@ -7119,6 +7156,38 @@
       { id: 'kosher', icon: '✡️', title: 'Kosher', desc: 'Jewish dietary laws' }
     ];
 
+    // Cuisine Options - Celebrating Australia's multicultural food scene!
+    const CUISINE_OPTIONS = [
+      { id: 'australian', icon: '🦘', name: 'Aussie Classics' },
+      { id: 'italian', icon: '🇮🇹', name: 'Italian' },
+      { id: 'chinese', icon: '🇨🇳', name: 'Chinese' },
+      { id: 'indian', icon: '🇮🇳', name: 'Indian' },
+      { id: 'thai', icon: '🇹🇭', name: 'Thai' },
+      { id: 'vietnamese', icon: '🇻🇳', name: 'Vietnamese' },
+      { id: 'japanese', icon: '🇯🇵', name: 'Japanese' },
+      { id: 'korean', icon: '🇰🇷', name: 'Korean' },
+      { id: 'mexican', icon: '🇲🇽', name: 'Mexican' },
+      { id: 'greek', icon: '🇬🇷', name: 'Greek' },
+      { id: 'lebanese', icon: '🇱🇧', name: 'Lebanese' },
+      { id: 'middleeastern', icon: '🧆', name: 'Middle Eastern' },
+      { id: 'turkish', icon: '🇹🇷', name: 'Turkish' },
+      { id: 'moroccan', icon: '🇲🇦', name: 'Moroccan' },
+      { id: 'spanish', icon: '🇪🇸', name: 'Spanish' },
+      { id: 'french', icon: '🇫🇷', name: 'French' },
+      { id: 'american', icon: '🇺🇸', name: 'American' },
+      { id: 'british', icon: '🇬🇧', name: 'British' },
+      { id: 'filipino', icon: '🇵🇭', name: 'Filipino' },
+      { id: 'indonesian', icon: '🇮🇩', name: 'Indonesian' },
+      { id: 'malaysian', icon: '🇲🇾', name: 'Malaysian' },
+      { id: 'sri_lankan', icon: '🇱🇰', name: 'Sri Lankan' },
+      { id: 'ethiopian', icon: '🇪🇹', name: 'Ethiopian' },
+      { id: 'caribbean', icon: '🏝️', name: 'Caribbean' },
+      { id: 'brazilian', icon: '🇧🇷', name: 'Brazilian' },
+      { id: 'german', icon: '🇩🇪', name: 'German' },
+      { id: 'polish', icon: '🇵🇱', name: 'Polish' },
+      { id: 'portuguese', icon: '🇵🇹', name: 'Portuguese' }
+    ];
+
     const STORE_OPTIONS = [
       { id: 'woolworths', name: 'Woolworths', letter: 'W' },
       { id: 'coles', name: 'Coles', letter: 'C' },
@@ -7161,6 +7230,19 @@
           ${mealPreferences.diet === opt.id ? '<span class="store-check">✓</span>' : ''}
         </div>
       `).join('');
+
+      // Render cuisine options (multi-select chips)
+      const cuisineContainer = document.getElementById('cuisineOptions');
+      if (cuisineContainer) {
+        const selectedCuisines = mealPreferences.cuisines || [];
+        cuisineContainer.innerHTML = CUISINE_OPTIONS.map(cuisine => `
+          <div class="pref-chip cuisine-chip ${selectedCuisines.includes(cuisine.id) ? 'selected' : ''}"
+               onclick="toggleCuisine('${cuisine.id}')">
+            <span class="cuisine-icon">${cuisine.icon}</span>
+            <span class="cuisine-name">${cuisine.name}</span>
+          </div>
+        `).join('');
+      }
 
       // Render store options (single select - pick your preferred store)
       const storeContainer = document.getElementById('storeOptions');
@@ -7230,6 +7312,19 @@
 
     function selectDiet(dietId) {
       mealPreferences.diet = dietId;
+      renderMealPreferences();
+    }
+
+    function toggleCuisine(cuisineId) {
+      if (!mealPreferences.cuisines) {
+        mealPreferences.cuisines = [];
+      }
+      const idx = mealPreferences.cuisines.indexOf(cuisineId);
+      if (idx > -1) {
+        mealPreferences.cuisines.splice(idx, 1);
+      } else {
+        mealPreferences.cuisines.push(cuisineId);
+      }
       renderMealPreferences();
     }
 
@@ -7535,6 +7630,7 @@
           mealType: currentMealType,
           dislikes: mealPreferences.dislikes,
           dietPreferences: dietPrefs,
+          cuisines: mealPreferences.cuisines,
           servings: mealPreferences.servings,
           maxIngredients: mealPreferences.maxIngredients,
           complexity: mealPreferences.complexity,
@@ -7551,6 +7647,7 @@
             mealType: currentMealType,
             dislikes: mealPreferences.dislikes || [],
             dietPreferences: dietPrefs,
+            cuisines: mealPreferences.cuisines || [],
             servings: parseInt(mealPreferences.servings) || 4,
             maxIngredients: parseInt(mealPreferences.maxIngredients) || 12,
             budget: quality,
