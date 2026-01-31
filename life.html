@@ -5884,116 +5884,290 @@
     }
 
     function generateLocalBreakdown(task, clarifications) {
-      // Smart local breakdown based on common patterns
+      // Smart context-aware breakdown
       const lowerTask = task.toLowerCase();
       let steps = [];
+
+      // Extract potential person name from task
+      const personMatch = task.match(/(?:get |help |prepare |ready |for )?(\b[A-Z][a-z]+\b)(?:'s| ready| prepared| for| to)/i);
+      const personName = personMatch ? personMatch[1] : null;
 
       // Get clarification context
       const cleanType = clarifications['clean'] || 'tidy';
       const organizeType = clarifications['organize'] || 'sort';
 
-      if (lowerTask.includes('clean')) {
+      // ===== TRAVEL / TRIP PREPARATION =====
+      if (lowerTask.includes('trip') || lowerTask.includes('travel') || lowerTask.includes('holiday') ||
+          lowerTask.includes('vacation') || lowerTask.includes('ready for') &&
+          (lowerTask.includes('china') || lowerTask.includes('overseas') || lowerTask.includes('flight') ||
+           lowerTask.includes('airport') || lowerTask.includes('japan') || lowerTask.includes('europe') ||
+           lowerTask.includes('usa') || lowerTask.includes('america') || lowerTask.includes('bali') ||
+           lowerTask.includes('thailand') || lowerTask.includes('vietnam') || lowerTask.includes('uk') ||
+           lowerTask.includes('new zealand') || lowerTask.includes('fiji'))) {
+
+        const destination = task.match(/(?:to |for |going to )([A-Z][a-z]+(?:\s[A-Z][a-z]+)?)/)?.[1] || 'the trip';
+        const traveler = personName || 'everyone';
+
+        steps = [
+          `Check passport validity for ${traveler} (must be valid 6+ months)`,
+          `Research visa requirements for ${destination}`,
+          `Book flights and save confirmation details`,
+          `Arrange accommodation and save booking refs`,
+          `Check vaccination requirements and book appointments if needed`,
+          `Arrange travel insurance`,
+          `Notify bank of travel dates to avoid card blocks`,
+          `Create packing list based on ${destination} weather and activities`,
+          `Arrange pet/house sitter if needed`,
+          `Download offline maps and translation apps`,
+          `Copy important documents (passport, insurance, bookings)`,
+          `Check phone/data roaming or get local SIM plan`,
+          `Pack bags (start 2-3 days before)`,
+          `Confirm all bookings 24 hours before departure`
+        ];
+      }
+      // ===== SCHOOL / KIDS PREPARATION =====
+      else if (lowerTask.includes('school') || lowerTask.includes('back to school') ||
+               lowerTask.includes('term') || lowerTask.includes('semester')) {
+        const child = personName || 'the kids';
+        steps = [
+          `Check school supply list for ${child}`,
+          `Go through existing supplies - what can be reused?`,
+          `Make shopping list for items needed`,
+          `Buy school supplies (do one store trip)`,
+          `Check uniform - does it still fit?`,
+          `Order/buy new uniform items if needed`,
+          `Label all items with name`,
+          `Set up homework station at home`,
+          `Check school calendar for important dates`,
+          `Update emergency contact info with school`,
+          `Prepare school bag the night before`,
+          `Reset bedtime routine 1 week before school starts`
+        ];
+      }
+      // ===== EVENT / PARTY PLANNING =====
+      else if (lowerTask.includes('party') || lowerTask.includes('birthday') ||
+               lowerTask.includes('event') || lowerTask.includes('celebration')) {
+        const celebrant = personName || 'the guest of honor';
+        steps = [
+          `Set a date and time for the event`,
+          `Decide on budget`,
+          `Create guest list`,
+          `Choose venue (home or external)`,
+          `Send invitations (give 2-3 weeks notice)`,
+          `Plan menu/catering - order or make?`,
+          `Order cake or plan to bake`,
+          `Plan decorations and theme`,
+          `Organize activities or entertainment`,
+          `Buy/organize gift for ${celebrant}`,
+          `Prep food that can be made ahead`,
+          `Set up decorations day before`,
+          `Confirm RSVPs and final numbers`,
+          `Enjoy the celebration!`
+        ];
+      }
+      // ===== MOVING HOUSE =====
+      else if (lowerTask.includes('move') || lowerTask.includes('moving') ||
+               lowerTask.includes('relocat') || lowerTask.includes('new house') || lowerTask.includes('new home')) {
+        steps = [
+          `Set moving date and book removalists (or truck)`,
+          `Start decluttering - donate/sell what you don't need`,
+          `Gather packing supplies (boxes, tape, markers)`,
+          `Pack one room at a time, label boxes clearly`,
+          `Redirect mail to new address`,
+          `Transfer utilities (electricity, gas, internet)`,
+          `Update address with bank, Medicare, license`,
+          `Pack essentials box (toiletries, chargers, snacks, tools)`,
+          `Deep clean old place or book cleaners`,
+          `Do final walkthrough of old place`,
+          `Supervise loading/unloading`,
+          `Unpack essentials first (beds, kitchen, bathroom)`,
+          `Gradually unpack other rooms over coming weeks`
+        ];
+      }
+      // ===== APPOINTMENT PREPARATION =====
+      else if (lowerTask.includes('appointment') || lowerTask.includes('doctor') ||
+               lowerTask.includes('dentist') || lowerTask.includes('meeting')) {
+        const who = personName || 'yourself';
+        steps = [
+          `Confirm appointment date, time, and location`,
+          `Check what documents/ID you need to bring`,
+          `Write down questions you want to ask`,
+          `Check if fasting or other prep required`,
+          `Set reminder for day before`,
+          `Prepare ${who}'s Medicare/insurance details`,
+          `Plan travel time (add buffer for parking/traffic)`,
+          `Pack bag with everything needed`,
+          `Set alarm to leave on time`,
+          `After: Note down any follow-up actions`
+        ];
+      }
+      // ===== CLEANING (with clarifications) =====
+      else if (lowerTask.includes('clean')) {
         if (cleanType === 'deep') {
           steps = [
-            'Gather all cleaning supplies (spray, cloths, mop, etc.)',
-            'Clear the surfaces of clutter first',
-            'Start from top to bottom (dust high shelves first)',
-            'Wipe down all surfaces with cleaner',
-            'Clean any mirrors or glass',
-            'Vacuum or sweep the floors',
-            'Mop hard floors or spot-clean carpet',
-            'Take out any trash',
-            'Put cleaning supplies away'
+            'Gather all cleaning supplies (spray, cloths, mop)',
+            'Clear surfaces of clutter first',
+            'Start high - dust ceiling fans and light fixtures',
+            'Wipe down walls and doors',
+            'Clean windows and mirrors',
+            'Deep clean kitchen (inside oven, fridge)',
+            'Scrub bathroom thoroughly',
+            'Vacuum all floors including under furniture',
+            'Mop hard floors',
+            'Wash all bedding and curtains',
+            'Take out all rubbish and recycling'
           ];
         } else if (cleanType === 'declutter') {
           steps = [
             'Get 3 bags/boxes: Keep, Donate, Trash',
-            'Pick ONE area to start (don\'t try to do everything)',
-            'Go through items one by one - decide in 5 seconds',
-            'If you haven\'t used it in a year, it goes',
+            'Pick ONE room or area to start',
+            'Empty one drawer/shelf completely',
+            'Sort items quickly - 5 second decisions',
+            'Only keep things you use or truly love',
             'Put "Keep" items back neatly',
-            'Take donation bag to your car NOW',
-            'Put trash bag out immediately'
-          ];
-        } else if (cleanType === 'organize') {
-          steps = [
-            'Decide on categories for this space',
-            'Empty everything out (yes, everything)',
-            'Sort items into your categories',
-            'Get containers or labels if needed',
-            'Assign a HOME for each category',
-            'Put everything back in its new home',
-            'Label containers if helpful'
+            'Bag up donations - put in car NOW',
+            'Take trash out immediately',
+            'Move to next area, repeat'
           ];
         } else {
           steps = [
-            'Set a timer for 15 minutes',
-            'Put away anything that\'s out of place',
-            'Wipe down visible surfaces',
-            'Quick vacuum/sweep high-traffic areas',
-            'Fluff pillows and straighten blankets',
+            'Set a 15-minute timer',
+            'Quick tidy - put things back where they belong',
+            'Wipe down kitchen benches',
+            'Wipe bathroom sink and toilet',
+            'Spot clean any marks or spills',
+            'Quick vacuum/sweep main areas',
+            'Take out any full bins',
+            'Fluff cushions and fold throws',
             'Done! Good enough is good enough!'
           ];
         }
-      } else if (lowerTask.includes('tax') || lowerTask.includes('paperwork')) {
+      }
+      // ===== TAX / FINANCIAL =====
+      else if (lowerTask.includes('tax') || lowerTask.includes('finances') || lowerTask.includes('budget')) {
         steps = [
-          'Gather all relevant documents in one spot',
-          'Make a checklist of what you need',
-          'Find ONE missing document (just one for now)',
-          'Open the form/website you need',
-          'Fill in just the EASY parts first (name, address)',
-          'Take a 5-minute break',
-          'Fill in the next section',
-          'Review what you\'ve done',
-          'Submit or save progress'
+          'Gather all income statements (payslips, payment summaries)',
+          'Collect receipts for deductions (work expenses, donations)',
+          'Download statements from bank and super',
+          'Log into myGov/ATO or open tax software',
+          'Enter income details first (the easy part)',
+          'Enter deductions one category at a time',
+          'Double-check all numbers',
+          'Review and submit (or save for accountant)',
+          'Save/print confirmation for records',
+          'Note any estimated tax refund/bill'
         ];
-      } else if (lowerTask.includes('email') || lowerTask.includes('inbox')) {
+      }
+      // ===== EMAIL / INBOX =====
+      else if (lowerTask.includes('email') || lowerTask.includes('inbox')) {
         steps = [
-          'Open your inbox (that\'s it for now)',
-          'Delete obvious spam/junk (10 at a time)',
-          'Star/flag anything urgent',
-          'Reply to ONE easy email',
-          'Take a breath',
-          'Reply to one more',
-          'Unsubscribe from ONE newsletter you never read',
-          'Archive anything older than a month that you\'ve handled'
+          'Open inbox and sort by sender or date',
+          'Delete/archive obvious junk and old newsletters',
+          'Unsubscribe from 3 lists you never read',
+          'Star/flag anything that needs action',
+          'Reply to quick emails first (under 2 mins each)',
+          'Schedule time for emails needing longer replies',
+          'File emails you need to keep into folders',
+          'Archive everything else older than 1 month',
+          'Aim for inbox under 50 items'
         ];
-      } else if (lowerTask.includes('garage') || lowerTask.includes('shed') || lowerTask.includes('storage')) {
+      }
+      // ===== COOKING / MEAL PREP =====
+      else if (lowerTask.includes('cook') || lowerTask.includes('dinner') ||
+               lowerTask.includes('meal prep') || lowerTask.includes('lunch')) {
         steps = [
-          'Take a "before" photo (for motivation later!)',
-          'Clear ONE small section completely',
-          'Sort that section: Keep, Donate, Trash, Relocate',
-          'Put Trash items directly in bin NOW',
-          'Box up Donate items and put in car',
-          'Return Keep items to cleared section, organized',
-          'Move to next small section',
-          'Repeat until done or energy runs out',
-          'Take an "after" photo - you did great!'
+          'Decide on recipe (keep it simple!)',
+          'Check pantry - make list of missing ingredients',
+          'Quick grocery shop if needed',
+          'Read recipe fully before starting',
+          'Get all ingredients and tools out first',
+          'Preheat oven/boil water if needed',
+          'Prep all vegetables and ingredients',
+          'Follow recipe steps in order',
+          'Set timers so nothing burns',
+          'Clean as you go where possible',
+          'Serve and enjoy your creation!'
         ];
-      } else if (lowerTask.includes('cook') || lowerTask.includes('dinner') || lowerTask.includes('meal')) {
+      }
+      // ===== EXERCISE / FITNESS =====
+      else if (lowerTask.includes('exercise') || lowerTask.includes('workout') ||
+               lowerTask.includes('gym') || lowerTask.includes('fitness')) {
         steps = [
-          'Decide what you\'re making (pick something simple)',
-          'Check if you have the ingredients',
-          'Get everything out on the counter',
-          'Preheat oven/stove if needed',
-          'Prep ingredients (chop, measure)',
-          'Start cooking - follow recipe step by step',
-          'Set timer so you don\'t forget',
-          'Clean as you go (or don\'t, it\'s fine)',
-          'Serve and enjoy!'
+          'Put on workout clothes (do it now!)',
+          'Fill water bottle',
+          'Choose workout: cardio, strength, or both?',
+          'Set timer/start tracking app',
+          'Warm up: 5 mins light movement',
+          'Do main workout (start with 20-30 mins)',
+          'Cool down: stretching for 5 mins',
+          'Log your workout (builds motivation!)',
+          'Hydrate and have protein snack',
+          'Shower and feel accomplished!'
         ];
-      } else {
-        // Generic breakdown for unknown tasks
+      }
+      // ===== SHOPPING =====
+      else if (lowerTask.includes('shopping') || lowerTask.includes('groceries') ||
+               lowerTask.includes('buy') || lowerTask.includes('shop')) {
         steps = [
-          `Open/find what you need for "${task}"`,
-          'Identify the very first small action',
-          'Do that first small action (just that)',
-          'What\'s the next tiny step? Do that.',
-          'Take a quick break if needed',
-          'Continue with the next obvious step',
-          'Check your progress - celebrate small wins!',
-          'Keep going until it\'s done or you\'ve hit your time limit',
-          'If stuck, ask: "What\'s the smallest possible next step?"'
+          'Check what you already have at home',
+          'Write list organized by store section',
+          'Check for coupons or sales',
+          'Set a budget if needed',
+          'Go to store at a quieter time',
+          'Stick to the list (avoid impulse buys)',
+          'Check items off as you get them',
+          'Use self-checkout if faster',
+          'Put cold items away first when home',
+          'Done! Reward yourself with a cuppa'
+        ];
+      }
+      // ===== WORK PROJECT =====
+      else if (lowerTask.includes('project') || lowerTask.includes('presentation') ||
+               lowerTask.includes('report') || lowerTask.includes('work')) {
+        steps = [
+          'Define the exact outcome/deliverable needed',
+          'Break into smaller milestones',
+          'List all information/resources needed',
+          'Block focused time in calendar',
+          'Start with easiest section to build momentum',
+          'Draft rough version first (don\'t perfect yet)',
+          'Review and improve key sections',
+          'Get feedback if possible',
+          'Final polish and formatting',
+          'Submit/deliver and celebrate!'
+        ];
+      }
+      // ===== STUDY / LEARNING =====
+      else if (lowerTask.includes('study') || lowerTask.includes('exam') ||
+               lowerTask.includes('learn') || lowerTask.includes('course')) {
+        steps = [
+          'Gather all study materials needed',
+          'Clear study space of distractions',
+          'Review syllabus/exam topics',
+          'Break material into chunks',
+          'Study one chunk at a time (25-min sessions)',
+          'Take short breaks between sessions',
+          'Test yourself with practice questions',
+          'Review areas you got wrong',
+          'Get enough sleep before exam',
+          'Trust your preparation!'
+        ];
+      }
+      // ===== GENERIC FALLBACK (but better) =====
+      else {
+        // Try to extract action and object from task
+        const taskWords = task.split(' ');
+        steps = [
+          `Write down exactly what "done" looks like for: ${task}`,
+          'List everything this task might involve',
+          'Identify what you need to get started',
+          'Pick the smallest first step you can do in 2 minutes',
+          'Do that first step right now',
+          'What naturally comes next? Do that.',
+          'If stuck, ask: what would make this easier?',
+          'Set a timer for 25 minutes of focused work',
+          'Review progress and adjust approach if needed',
+          'Keep going until complete or take a planned break'
         ];
       }
 
