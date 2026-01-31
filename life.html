@@ -784,6 +784,20 @@
       background: #2563eb;
     }
 
+    .export-option.preferred {
+      border: 2px solid var(--adult);
+      background: rgba(37, 99, 235, 0.1);
+    }
+
+    .export-option.preferred:hover {
+      background: rgba(37, 99, 235, 0.2);
+    }
+
+    a.export-option {
+      text-decoration: none;
+      color: inherit;
+    }
+
     .export-logo {
       width: 40px;
       height: 40px;
@@ -3718,7 +3732,7 @@
       <button class="modal-close" onclick="closeExportSheet()">×</button>
     </div>
     <div class="modal-content">
-      <p class="pref-description">Copy your list for delivery apps or store websites:</p>
+      <p class="pref-description">Choose your store to shop:</p>
 
       <!-- Native Share Button (mobile) -->
       <div class="export-option share-native" id="nativeShareBtn" onclick="shareNative()" style="display: none;">
@@ -3726,23 +3740,12 @@
         <span>Share to Any App</span>
       </div>
 
-      <div class="export-options">
-        <div class="export-option" onclick="openStoreWebsite('woolworths')">
-          <div class="store-logo woolworths">W</div>
-          <span>Woolworths</span>
-        </div>
-        <div class="export-option" onclick="openStoreWebsite('coles')">
-          <div class="store-logo coles">C</div>
-          <span>Coles</span>
-        </div>
-        <div class="export-option" onclick="openStoreWebsite('aldi')">
-          <div class="store-logo aldi">A</div>
-          <span>Aldi</span>
-        </div>
-        <div class="export-option" onclick="openStoreWebsite('costco')">
-          <div class="store-logo costco">Co</div>
-          <span>Costco</span>
-        </div>
+      <div class="export-options" id="storeExportOptions">
+        <!-- Store options will be populated dynamically based on user's preferred store -->
+      </div>
+
+      <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+        <p class="pref-description" style="margin-bottom: 8px;">Or copy as text:</p>
         <div class="export-option" onclick="exportPlainText()">
           <div class="export-logo">📋</div>
           <span>Copy List</span>
@@ -6492,6 +6495,94 @@
       } else {
         nativeShareBtn.style.display = 'none';
       }
+
+      // Populate store options - show preferred store first with prominent styling
+      const storeContainer = document.getElementById('storeExportOptions');
+      const preferredStore = mealPreferences.preferredStore || 'woolworths';
+      const allStores = [
+        { id: 'woolworths', name: 'Woolworths', letter: 'W' },
+        { id: 'coles', name: 'Coles', letter: 'C' },
+        { id: 'aldi', name: 'Aldi', letter: 'A' },
+        { id: 'costco', name: 'Costco', letter: 'Co' }
+      ];
+
+      // Put preferred store first
+      const sortedStores = allStores.sort((a, b) => {
+        if (a.id === preferredStore) return -1;
+        if (b.id === preferredStore) return 1;
+        return 0;
+      });
+
+      storeContainer.innerHTML = sortedStores.map(store => `
+        <a href="${getStoreSearchUrl(store.id)}" target="_blank" rel="noopener"
+           class="export-option ${store.id === preferredStore ? 'preferred' : ''}"
+           onclick="closeExportSheet(); showToast('Opening ${store.name}...');">
+          <div class="store-logo ${store.id}">${store.letter}</div>
+          <span>${store.name}${store.id === preferredStore ? ' (Your Store)' : ''}</span>
+        </a>
+      `).join('');
+    }
+
+    function getStoreSearchUrl(storeName) {
+      const store = STORE_URLS[storeName];
+      if (!store) return '#';
+
+      // Get shopping items
+      const items = shoppingItems.filter(i => !i.completed);
+      if (items.length === 0) return store.base;
+
+      // Get product names and convert store-specific brands to generic
+      const productNames = items.map(i => {
+        let name = i.name.replace(/^\d+\s*(g|kg|ml|L|cups?|tbsp|tsp|bunch|head|cloves?)\s+/i, '').trim();
+
+        // Remove store-specific brand names and convert to generic
+        name = convertToGenericBrand(name, storeName);
+
+        return name;
+      });
+
+      const searchQuery = productNames.slice(0, 10).join(' '); // Limit to 10 items for URL length
+      return store.search + encodeURIComponent(searchQuery);
+    }
+
+    function convertToGenericBrand(itemName, targetStore) {
+      // Brand mappings - convert store brands to generic or target store equivalent
+      const brandMappings = {
+        // Coles brands
+        "coles": { generic: "", alternatives: { woolworths: "woolworths", aldi: "" } },
+        "coles finest": { generic: "", alternatives: { woolworths: "woolworths gold", aldi: "" } },
+
+        // Woolworths brands
+        "woolworths": { generic: "", alternatives: { coles: "coles", aldi: "" } },
+        "woolworths gold": { generic: "", alternatives: { coles: "coles finest", aldi: "" } },
+        "macro": { generic: "organic", alternatives: {} },
+
+        // Common brand alternatives that exist everywhere
+        "leggo's": { generic: "leggo's", alternatives: {} },
+        "dolmio": { generic: "dolmio", alternatives: {} },
+        "san remo": { generic: "san remo", alternatives: {} }
+      };
+
+      let result = itemName.toLowerCase();
+
+      for (const [brand, mapping] of Object.entries(brandMappings)) {
+        if (result.includes(brand)) {
+          // Check if there's an alternative for the target store
+          const alt = mapping.alternatives[targetStore];
+          if (alt !== undefined) {
+            result = result.replace(brand, alt).trim();
+          } else {
+            // Use generic
+            result = result.replace(brand, mapping.generic).trim();
+          }
+        }
+      }
+
+      // Clean up double spaces
+      result = result.replace(/\s+/g, ' ').trim();
+
+      // Capitalize first letter
+      return result.charAt(0).toUpperCase() + result.slice(1);
     }
 
     // Native share to any app (mobile)
@@ -6684,10 +6775,17 @@
       servings: 4,
       maxIngredients: 7,
       mealsPerDay: 3,
-      stores: ['woolworths', 'coles'],
+      preferredStore: 'woolworths',
       complexity: 'any',
       cookingMethod: 'any'
     }));
+
+    // Migration: convert old stores array to preferredStore
+    if (mealPreferences.stores && !mealPreferences.preferredStore) {
+      mealPreferences.preferredStore = mealPreferences.stores[0] || 'woolworths';
+      delete mealPreferences.stores;
+      localStorage.setItem('life_meal_prefs', JSON.stringify(mealPreferences));
+    }
 
     // Recipe Complexity Options
     const COMPLEXITY_OPTIONS = [
@@ -6769,14 +6867,14 @@
         </div>
       `).join('');
 
-      // Render store options
+      // Render store options (single select - pick your preferred store)
       const storeContainer = document.getElementById('storeOptions');
       storeContainer.innerHTML = STORE_OPTIONS.map(store => `
-        <div class="store-option ${mealPreferences.stores.includes(store.id) ? 'selected' : ''}"
-             onclick="toggleStore('${store.id}')">
+        <div class="store-option ${mealPreferences.preferredStore === store.id ? 'selected' : ''}"
+             onclick="selectStore('${store.id}')">
           <div class="store-logo ${store.id}">${store.letter}</div>
           <div class="store-name">${store.name}</div>
-          ${mealPreferences.stores.includes(store.id) ? '<span class="store-check">✓</span>' : ''}
+          ${mealPreferences.preferredStore === store.id ? '<span class="store-check">✓</span>' : ''}
         </div>
       `).join('');
 
@@ -6850,13 +6948,8 @@
       renderMealPreferences();
     }
 
-    function toggleStore(storeId) {
-      const idx = mealPreferences.stores.indexOf(storeId);
-      if (idx > -1) {
-        mealPreferences.stores.splice(idx, 1);
-      } else {
-        mealPreferences.stores.push(storeId);
-      }
+    function selectStore(storeId) {
+      mealPreferences.preferredStore = storeId;
       renderMealPreferences();
     }
 
@@ -7434,8 +7527,8 @@
           throw new Error('Please sign in with Google to search prices');
         }
 
-        // Get selected stores from preferences
-        const stores = mealPreferences.stores || ['woolworths', 'coles'];
+        // Get preferred store from preferences
+        const preferredStore = mealPreferences.preferredStore || 'woolworths';
 
         const response = await fetch('/api/prices/search', {
           method: 'POST',
@@ -7445,7 +7538,7 @@
           },
           body: JSON.stringify({
             ingredients: ingredients,
-            stores: stores,
+            stores: [preferredStore],  // Use single preferred store
             quality: quality
           })
         });
