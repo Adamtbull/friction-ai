@@ -4617,7 +4617,12 @@
         return;
       }
 
-      const memberId = currentSheetMemberId;
+      const memberId = currentFormMember;
+      if (!memberId) {
+        alert('No member selected. Please try again.');
+        return;
+      }
+
       let added = 0;
 
       extractedShifts.forEach(shift => {
@@ -4637,7 +4642,7 @@
       });
 
       saveData();
-      closeBottomSheet();
+      closeFormModal();
       renderFeed();
       renderCalendarView();
 
