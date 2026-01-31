@@ -6593,25 +6593,22 @@
       const items = shoppingItems.filter(i => !i.completed);
 
       if (items.length === 0) {
-        // Just open the store homepage
         window.open(store.base, '_blank');
         return;
       }
 
-      // For stores, we'll open the store and also copy the list
-      // First item search - open in new tab
-      const firstItem = items[0].name.split(' ').slice(-2).join(' '); // Get last 2 words (usually the product)
-      const searchUrl = store.search + encodeURIComponent(firstItem);
-
-      // Copy full list to clipboard for user reference
-      const listText = items.map(i => i.name).join('\n');
-      navigator.clipboard.writeText(listText).then(() => {
-        showToast(`Opening ${storeName.charAt(0).toUpperCase() + storeName.slice(1)}... List copied to clipboard!`);
-      }).catch(() => {
-        showToast(`Opening ${storeName.charAt(0).toUpperCase() + storeName.slice(1)}...`);
+      // Get just the product names (strip quantities like "500g")
+      const productNames = items.map(i => {
+        // Remove quantity patterns like "500g", "2 cups", etc at the start
+        return i.name.replace(/^\d+\s*(g|kg|ml|L|cups?|tbsp|tsp|bunch|head|cloves?)\s+/i, '').trim();
       });
 
-      // Open store website
+      // Join all items for search (space-separated works for most stores)
+      const searchQuery = productNames.join(' ');
+      const searchUrl = store.search + encodeURIComponent(searchQuery);
+
+      showToast(`Opening ${storeName.charAt(0).toUpperCase() + storeName.slice(1)} with ${items.length} items...`);
+
       window.open(searchUrl, '_blank');
       closeExportSheet();
     }
