@@ -1034,6 +1034,37 @@
       display: block;
     }
 
+    /* Meal Type Tabs (Breakfast/Lunch/Dinner) */
+    .meal-type-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .meal-type-tab {
+      flex: 1;
+      padding: 12px 8px;
+      border: 2px solid var(--border);
+      background: var(--card-bg);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: var(--radius-md);
+      transition: all 0.15s;
+    }
+
+    .meal-type-tab:hover {
+      border-color: var(--adult);
+      color: var(--adult);
+    }
+
+    .meal-type-tab.active {
+      border-color: var(--adult);
+      background: var(--adult);
+      color: white;
+    }
+
     /* Meal Ideas Header */
     .meal-ideas-header {
       display: flex;
@@ -3679,13 +3710,21 @@
       <p class="pref-description">Copy your list for delivery apps or store websites:</p>
 
       <div class="export-options">
-        <div class="export-option" onclick="exportForStore('woolworths')">
+        <div class="export-option" onclick="openStoreWebsite('woolworths')">
           <div class="store-logo woolworths">W</div>
-          <span>Woolworths Online</span>
+          <span>Woolworths</span>
         </div>
-        <div class="export-option" onclick="exportForStore('coles')">
+        <div class="export-option" onclick="openStoreWebsite('coles')">
           <div class="store-logo coles">C</div>
-          <span>Coles Online</span>
+          <span>Coles</span>
+        </div>
+        <div class="export-option" onclick="openStoreWebsite('aldi')">
+          <div class="store-logo aldi">A</div>
+          <span>Aldi</span>
+        </div>
+        <div class="export-option" onclick="openStoreWebsite('costco')">
+          <div class="store-logo costco">Co</div>
+          <span>Costco</span>
         </div>
         <div class="export-option" onclick="exportForApp('doordash')">
           <div class="export-logo">🚗</div>
@@ -3719,6 +3758,13 @@
 
     <!-- MEAL IDEAS TAB -->
     <div class="meal-tab-content active" id="mealIdeasTab">
+      <!-- Meal Type Selector -->
+      <div class="meal-type-tabs">
+        <button class="meal-type-tab active" data-type="breakfast" onclick="selectMealType('breakfast')">🌅 Breakfast</button>
+        <button class="meal-type-tab" data-type="lunch" onclick="selectMealType('lunch')">☀️ Lunch</button>
+        <button class="meal-type-tab" data-type="dinner" onclick="selectMealType('dinner')">🌙 Dinner</button>
+      </div>
+
       <div class="meal-ideas-header">
         <button class="smart-meal-btn" onclick="openMealPreferences()">⚙️ Preferences</button>
         <button class="smart-meal-btn primary" onclick="generateMealIdeas()">✨ Generate Ideas</button>
@@ -6456,6 +6502,59 @@
       showExportPreview(text);
     }
 
+    // Store website URLs for direct shopping
+    const STORE_URLS = {
+      woolworths: {
+        base: 'https://www.woolworths.com.au',
+        search: 'https://www.woolworths.com.au/shop/search/products?searchTerm='
+      },
+      coles: {
+        base: 'https://www.coles.com.au',
+        search: 'https://www.coles.com.au/search?q='
+      },
+      aldi: {
+        base: 'https://www.aldi.com.au',
+        search: 'https://www.aldi.com.au/en/search/?text='
+      },
+      costco: {
+        base: 'https://www.costco.com.au',
+        search: 'https://www.costco.com.au/search?text='
+      }
+    };
+
+    function openStoreWebsite(storeName) {
+      const store = STORE_URLS[storeName];
+      if (!store) {
+        showToast('Store not supported');
+        return;
+      }
+
+      const items = shoppingItems.filter(i => !i.completed);
+
+      if (items.length === 0) {
+        // Just open the store homepage
+        window.open(store.base, '_blank');
+        return;
+      }
+
+      // For stores, we'll open the store and also copy the list
+      // First item search - open in new tab
+      const firstItem = items[0].name.split(' ').slice(-2).join(' '); // Get last 2 words (usually the product)
+      const searchUrl = store.search + encodeURIComponent(firstItem);
+
+      // Copy full list to clipboard for user reference
+      const listText = items.map(i => i.name).join('\n');
+      navigator.clipboard.writeText(listText).then(() => {
+        showToast(`Opening ${storeName.charAt(0).toUpperCase() + storeName.slice(1)}... List copied to clipboard!`);
+      }).catch(() => {
+        showToast(`Opening ${storeName.charAt(0).toUpperCase() + storeName.slice(1)}...`);
+      });
+
+      // Open store website
+      window.open(searchUrl, '_blank');
+      closeExportSheet();
+    }
+
     function exportForApp(appName) {
       const items = shoppingItems.filter(i => !i.completed);
       let text = '';
@@ -6807,50 +6906,34 @@
     // ========================================
     let mealIdeas = [];
     let selectedMealIds = new Set();
+    let currentMealType = 'breakfast';
 
-    // Extended meal database with steps
-    const MEAL_IDEAS_DATABASE = [
-      {
-        id: 1, name: 'Spaghetti Bolognese', emoji: '🍝', time: '30 min', servings: 4,
-        ingredients: ['500g beef mince', '400g spaghetti', '2 cans diced tomatoes', '1 onion', '3 garlic cloves', 'Italian herbs', 'Parmesan cheese'],
-        steps: ['Dice onion and garlic, sauté in olive oil until soft', 'Add mince and cook until browned', 'Add tomatoes and herbs, simmer 20 mins', 'Cook pasta according to packet', 'Serve with parmesan on top']
-      },
-      {
-        id: 2, name: 'Chicken Stir Fry', emoji: '🥘', time: '20 min', servings: 4,
-        ingredients: ['500g chicken breast', '2 cups rice', '1 capsicum', '1 broccoli head', '3 tbsp soy sauce', '1 tbsp sesame oil', 'Ginger'],
-        steps: ['Cook rice according to packet', 'Slice chicken into strips', 'Stir fry chicken until golden', 'Add vegetables and stir fry 3-4 mins', 'Add soy sauce and sesame oil, toss to coat']
-      },
-      {
-        id: 3, name: 'Fish Tacos', emoji: '🌮', time: '25 min', servings: 4,
-        ingredients: ['400g white fish fillets', '8 small tortillas', '1/4 cabbage', '1 lime', '1 avocado', 'Sour cream', 'Coriander'],
-        steps: ['Season fish with lime and spices', 'Pan fry fish until flaky', 'Shred cabbage finely', 'Warm tortillas', 'Assemble tacos with fish, cabbage, avocado, sour cream']
-      },
-      {
-        id: 4, name: 'Veggie Curry', emoji: '🍛', time: '35 min', servings: 4,
-        ingredients: ['400g chickpeas', '400ml coconut milk', '2 cups spinach', '2 cans diced tomatoes', '2 tbsp curry paste', '1 onion', 'Rice'],
-        steps: ['Sauté onion until soft', 'Add curry paste and cook 1 min', 'Add chickpeas, tomatoes, coconut milk', 'Simmer 20 mins', 'Stir in spinach, serve with rice']
-      },
-      {
-        id: 5, name: 'Grilled Lamb Chops', emoji: '🥩', time: '25 min', servings: 4,
-        ingredients: ['8 lamb chops', '500g baby potatoes', '200g green beans', 'Fresh rosemary', '4 garlic cloves', 'Olive oil', 'Lemon'],
-        steps: ['Marinate lamb with rosemary, garlic, oil', 'Boil potatoes until tender', 'Grill lamb 4 mins each side', 'Steam beans until crisp-tender', 'Serve with lemon wedges']
-      },
-      {
-        id: 6, name: 'Salmon & Veggies', emoji: '🐟', time: '20 min', servings: 4,
-        ingredients: ['4 salmon fillets', '1 bunch asparagus', '2 lemons', '4 tbsp olive oil', 'Fresh dill', 'Salt & pepper'],
-        steps: ['Preheat oven to 200°C', 'Place salmon and asparagus on tray', 'Drizzle with oil and lemon', 'Season and add dill', 'Bake 15 mins until salmon flakes']
-      },
-      {
-        id: 7, name: 'Beef Burgers', emoji: '🍔', time: '25 min', servings: 4,
-        ingredients: ['500g beef mince', '4 burger buns', 'Lettuce', '2 tomatoes', '4 cheese slices', 'Pickles', 'Sauce of choice'],
-        steps: ['Form mince into 4 patties', 'Season with salt and pepper', 'Grill or pan fry 4-5 mins each side', 'Toast buns lightly', 'Assemble with cheese, lettuce, tomato, pickles']
-      },
-      {
-        id: 8, name: 'Mushroom Risotto', emoji: '🍄', time: '40 min', servings: 4,
-        ingredients: ['300g arborio rice', '400g mushrooms', '1L chicken stock', '1 onion', '100g parmesan', 'White wine', 'Butter'],
-        steps: ['Sauté onion in butter', 'Add mushrooms and cook until soft', 'Add rice and toast 2 mins', 'Add wine, then stock gradually', 'Stir constantly until creamy, fold in parmesan']
-      }
-    ];
+    // Fallback meal database (used when API fails)
+    const FALLBACK_MEALS = {
+      breakfast: [
+        { id: 1, name: 'Avocado Toast', emoji: '🥑', time: '10 min', servings: 2, ingredients: [{name: 'Helga\'s sourdough bread', quantity: '4 slices'}, {name: 'Avocado', quantity: '2'}, {name: 'Eggs', quantity: '4'}, {name: 'Cherry tomatoes', quantity: '100g'}], steps: ['Toast bread until golden', 'Mash avocado with salt and pepper', 'Poach or fry eggs', 'Spread avocado on toast, top with eggs and tomatoes'] },
+        { id: 2, name: 'Pancakes', emoji: '🥞', time: '20 min', servings: 4, ingredients: [{name: 'White Wings pancake mix', quantity: '200g'}, {name: 'Milk', quantity: '250ml'}, {name: 'Eggs', quantity: '2'}, {name: 'Maple syrup', quantity: '100ml'}], steps: ['Mix pancake batter', 'Heat pan with butter', 'Pour batter and cook until bubbles form', 'Flip and cook other side', 'Serve with maple syrup'] }
+      ],
+      lunch: [
+        { id: 3, name: 'Chicken Caesar Salad', emoji: '🥗', time: '15 min', servings: 2, ingredients: [{name: 'Chicken breast', quantity: '300g'}, {name: 'Cos lettuce', quantity: '1 head'}, {name: 'Paul Newman Caesar dressing', quantity: '100ml'}, {name: 'Parmesan', quantity: '50g'}], steps: ['Grill chicken until cooked', 'Chop lettuce', 'Slice chicken', 'Combine with dressing and parmesan'] },
+        { id: 4, name: 'BLT Sandwich', emoji: '🥪', time: '10 min', servings: 2, ingredients: [{name: 'Bacon rashers', quantity: '6'}, {name: 'Lettuce', quantity: '4 leaves'}, {name: 'Tomato', quantity: '1'}, {name: 'Helga\'s bread', quantity: '4 slices'}], steps: ['Cook bacon until crispy', 'Toast bread', 'Assemble with lettuce and tomato'] }
+      ],
+      dinner: [
+        { id: 5, name: 'Spaghetti Bolognese', emoji: '🍝', time: '30 min', servings: 4, ingredients: [{name: 'Beef mince', quantity: '500g'}, {name: 'San Remo spaghetti', quantity: '400g'}, {name: 'Leggo\'s pasta sauce', quantity: '500g'}, {name: 'Parmesan', quantity: '50g'}], steps: ['Brown mince', 'Add sauce and simmer', 'Cook pasta', 'Combine and serve with parmesan'] },
+        { id: 6, name: 'Chicken Stir Fry', emoji: '🥘', time: '20 min', servings: 4, ingredients: [{name: 'Chicken breast', quantity: '500g'}, {name: 'SunRice jasmine rice', quantity: '2 cups'}, {name: 'Mixed vegetables', quantity: '400g'}, {name: 'Kikkoman soy sauce', quantity: '3 tbsp'}], steps: ['Cook rice', 'Stir fry chicken', 'Add vegetables', 'Season with soy sauce'] }
+      ]
+    };
+
+    function selectMealType(type) {
+      currentMealType = type;
+      document.querySelectorAll('.meal-type-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.type === type);
+      });
+      // Clear current ideas when switching type
+      mealIdeas = [];
+      selectedMealIds.clear();
+      renderMealIdeasGrid();
+    }
 
     function switchMealTab(tab) {
       document.querySelectorAll('.meal-tab').forEach(t => t.classList.remove('active'));
@@ -6865,26 +6948,61 @@
       }
     }
 
-    function generateMealIdeas() {
-      // Show loading
+    async function generateMealIdeas() {
       const grid = document.getElementById('mealIdeasGrid');
-      grid.innerHTML = '<div class="meal-ideas-empty"><div class="ai-loading-spinner"></div><p>Generating meal ideas...</p></div>';
+      grid.innerHTML = '<div class="meal-ideas-empty"><div class="ai-loading-spinner"></div><p>Generating ' + currentMealType + ' ideas with AI...</p></div>';
 
-      // Simulate AI generation with timeout
-      setTimeout(() => {
-        // Filter based on preferences
-        mealIdeas = MEAL_IDEAS_DATABASE.filter(meal => {
-          const hasDisliked = meal.ingredients.some(ing =>
+      try {
+        const token = localStorage.getItem('friction_id_token');
+        if (!token) {
+          throw new Error('Please sign in to generate meal ideas');
+        }
+
+        // Get quality preference from settings
+        const quality = document.querySelector('input[name="quality"]:checked')?.value || 'standard';
+
+        const response = await fetch('/api/meals/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            mealType: currentMealType,
+            dislikes: mealPreferences.dislikes,
+            dietPreferences: mealPreferences.dietaryRestrictions || [],
+            servings: parseInt(mealPreferences.mealSize) || 4,
+            maxIngredients: parseInt(mealPreferences.maxIngredients) || 12,
+            budget: quality,
+            count: 6
+          })
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.error || 'Failed to generate meals');
+        }
+
+        const data = await response.json();
+        mealIdeas = data.meals || [];
+        selectedMealIds.clear();
+        renderMealIdeasGrid();
+      } catch (error) {
+        console.error('Meal generation error:', error);
+        // Fall back to local database
+        mealIdeas = (FALLBACK_MEALS[currentMealType] || FALLBACK_MEALS.dinner).slice();
+        mealIdeas = mealIdeas.filter(meal => {
+          const ingredientNames = meal.ingredients.map(i => typeof i === 'string' ? i : i.name);
+          const hasDisliked = ingredientNames.some(ing =>
             mealPreferences.dislikes.some(dis => ing.toLowerCase().includes(dis.toLowerCase()))
           );
           return !hasDisliked;
         });
-
-        // Shuffle and take 6
-        mealIdeas = mealIdeas.sort(() => Math.random() - 0.5).slice(0, 6);
         selectedMealIds.clear();
         renderMealIdeasGrid();
-      }, 1000);
+        // Show error toast
+        showToast(error.message || 'Using offline meals - sign in for AI-generated recipes');
+      }
     }
 
     function renderMealIdeasGrid() {
@@ -6937,6 +7055,19 @@
       }
     }
 
+    // Helper to get ingredient name (handles both string and object formats)
+    function getIngredientName(ing) {
+      return typeof ing === 'string' ? ing : (ing.name || '');
+    }
+
+    function getIngredientDisplay(ing) {
+      if (typeof ing === 'string') return ing;
+      const name = ing.name || '';
+      const qty = ing.quantity || '';
+      const price = ing.estimatedPrice ? ` (~$${ing.estimatedPrice.toFixed(2)})` : '';
+      return qty ? `${qty} ${name}${price}` : `${name}${price}`;
+    }
+
     function expandMealCard(mealId) {
       const meal = mealIdeas.find(m => m.id === mealId);
       if (!meal) return;
@@ -6948,7 +7079,7 @@
         <div class="expanded-meal-section">
           <h4>📋 Ingredients (${meal.ingredients.length})</h4>
           <div class="expanded-ingredient-list">
-            ${meal.ingredients.map(ing => `<span class="expanded-ingredient">${ing}</span>`).join('')}
+            ${meal.ingredients.map(ing => `<span class="expanded-ingredient">${getIngredientDisplay(ing)}</span>`).join('')}
           </div>
         </div>
 
@@ -6986,8 +7117,10 @@
 
       selectedMeals.forEach(meal => {
         meal.ingredients.forEach(ing => {
-          if (!allIngredients.some(i => i.name === ing)) {
-            allIngredients.push({ name: ing, checked: true, price: null });
+          const name = getIngredientName(ing);
+          const quantity = typeof ing === 'object' ? (ing.quantity || '') : '';
+          if (!allIngredients.some(i => i.name === name)) {
+            allIngredients.push({ name, quantity, checked: true, price: null });
           }
         });
       });
@@ -6995,8 +7128,8 @@
       const container = document.getElementById('ingredientReviewList');
       container.innerHTML = allIngredients.map((ing, i) => `
         <div class="ingredient-review-item">
-          <input type="checkbox" id="ing_${i}" checked data-name="${ing.name}">
-          <label class="ingredient-review-name" for="ing_${i}">${ing.name}</label>
+          <input type="checkbox" id="ing_${i}" checked data-name="${ing.name}" data-quantity="${ing.quantity}">
+          <label class="ingredient-review-name" for="ing_${i}">${ing.quantity ? ing.quantity + ' ' : ''}${ing.name}</label>
           <span class="ingredient-review-price" id="price_${i}">--</span>
         </div>
       `).join('');
@@ -7013,49 +7146,99 @@
       const checkboxes = document.querySelectorAll('#ingredientReviewList input[type="checkbox"]:checked');
       const quality = document.querySelector('input[name="quality"]:checked')?.value || 'standard';
 
-      const ingredients = Array.from(checkboxes).map(cb => cb.dataset.name);
+      const ingredients = Array.from(checkboxes).map(cb => ({
+        name: cb.dataset.name,
+        quantity: cb.dataset.quantity || ''
+      }));
 
       // Show loading
       const btn = document.querySelector('#ingredientReviewSheet .form-submit');
-      btn.textContent = '🔍 Finding prices...';
+      btn.textContent = '🔍 Searching real prices...';
       btn.disabled = true;
 
-      // Simulate price lookup
-      setTimeout(() => {
-        const priceMultiplier = quality === 'budget' ? 0.7 : quality === 'premium' ? 1.4 : 1;
-        let totalCost = 0;
+      let totalCost = 0;
+      let priceData = null;
 
+      try {
+        const token = localStorage.getItem('friction_id_token');
+        if (!token) {
+          throw new Error('Please sign in');
+        }
+
+        // Get selected stores from preferences
+        const stores = mealPreferences.stores || ['woolworths', 'coles'];
+
+        const response = await fetch('/api/prices/search', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            ingredients: ingredients,
+            stores: stores,
+            quality: quality
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Price lookup failed');
+        }
+
+        priceData = await response.json();
+
+        // Update prices in UI
+        if (priceData && priceData.ingredients) {
+          priceData.ingredients.forEach((item, i) => {
+            if (item.price) {
+              const priceEl = document.getElementById(`price_${i}`);
+              if (priceEl) {
+                priceEl.textContent = `$${item.price.toFixed(2)}`;
+                priceEl.title = `${item.brand} @ ${item.store}`;
+              }
+            }
+          });
+          totalCost = priceData.totalEstimate || 0;
+        }
+      } catch (error) {
+        console.error('Price lookup error:', error);
+        // Fallback to estimated prices
+        const priceMultiplier = quality === 'budget' ? 0.7 : quality === 'premium' ? 1.4 : 1;
         checkboxes.forEach((cb, i) => {
           const basePrice = (Math.random() * 6 + 2);
           const price = (basePrice * priceMultiplier).toFixed(2);
           totalCost += parseFloat(price);
-          document.getElementById(`price_${i}`).textContent = `$${price}`;
+          document.getElementById(`price_${i}`).textContent = `~$${price}`;
         });
+      }
 
-        // Add to shopping list
-        ingredients.forEach(ing => {
-          const newItem = {
-            id: 'shop_' + Date.now() + Math.random(),
-            name: ing,
-            category: guessCategory(ing),
-            completed: false,
-            createdAt: new Date().toISOString()
-          };
-          shoppingItems.push(newItem);
-        });
+      // Add to shopping list with price info
+      ingredients.forEach((ing, i) => {
+        const priceInfo = priceData?.ingredients?.[i];
+        const newItem = {
+          id: 'shop_' + Date.now() + Math.random(),
+          name: ing.quantity ? `${ing.quantity} ${ing.name}` : ing.name,
+          category: guessCategory(ing.name),
+          completed: false,
+          createdAt: new Date().toISOString(),
+          price: priceInfo?.price || null,
+          store: priceInfo?.store || null,
+          brand: priceInfo?.brand || null
+        };
+        shoppingItems.push(newItem);
+      });
 
-        saveShoppingList();
+      saveShoppingList();
 
-        btn.textContent = `✓ Added! Est. Total: $${totalCost.toFixed(2)}`;
+      btn.textContent = `✓ Added! Est. Total: $${totalCost.toFixed(2)}`;
 
-        setTimeout(() => {
-          closeIngredientReview();
-          selectedMealIds.clear();
-          renderMealIdeasGrid();
-          btn.textContent = '🔍 Find Best Prices & Add to List';
-          btn.disabled = false;
-          alert(`${ingredients.length} ingredients added to shopping list!\nEstimated total: $${totalCost.toFixed(2)}`);
-        }, 1500);
+      setTimeout(() => {
+        closeIngredientReview();
+        selectedMealIds.clear();
+        renderMealIdeasGrid();
+        btn.textContent = '🔍 Find Best Prices & Add to List';
+        btn.disabled = false;
+        showToast(`${ingredients.length} ingredients added!\nEstimated total: $${totalCost.toFixed(2)}`);
       }, 1500);
     }
 
