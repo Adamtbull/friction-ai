@@ -35,6 +35,52 @@
       --radius-xl: 20px;
     }
 
+    /* Dark Mode */
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --border: #334155;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+      --shadow-lg: 0 10px 40px rgba(0,0,0,0.5);
+    }
+
+    [data-theme="dark"] .bubble.type-adult {
+      background: #1e3a5f;
+    }
+
+    [data-theme="dark"] .bubble.type-child {
+      background: #422006;
+    }
+
+    [data-theme="dark"] .bubble.type-household {
+      background: #134e4a;
+    }
+
+    [data-theme="dark"] .profile-avatar.type-adult { background: #1e3a5f; }
+    [data-theme="dark"] .profile-avatar.type-child { background: #422006; }
+    [data-theme="dark"] .profile-avatar.type-household { background: #134e4a; }
+
+    [data-theme="dark"] .build-tag {
+      background: #334155;
+    }
+
+    [data-theme="dark"] .screenshot-import-placeholder {
+      background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+      border-color: var(--adult);
+    }
+
+    [data-theme="dark"] .open-questions {
+      background: #422006;
+    }
+
+    [data-theme="dark"] .micro-steps {
+      background: #334155;
+    }
+
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
@@ -116,6 +162,1355 @@
       display: flex;
       align-items: center;
       gap: 12px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .header-btn:hover {
+      background: var(--border);
+    }
+
+    .header-btn.active {
+      background: var(--adult);
+      color: white;
+    }
+
+    /* ========================================
+       CALENDAR VIEW
+       ======================================== */
+    .calendar-view {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      overflow: auto;
+      background: var(--bg);
+      padding: 16px;
+    }
+
+    .calendar-view.visible {
+      display: flex;
+    }
+
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0 16px;
+    }
+
+    .calendar-nav-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: var(--card-bg);
+      font-size: 1.25rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .calendar-nav-btn:hover {
+      background: var(--border);
+    }
+
+    .calendar-month-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .calendar-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    .calendar-weekdays span {
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: 8px 0;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+
+    .calendar-day {
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--card-bg);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      position: relative;
+      transition: all 0.15s;
+      min-height: 44px;
+    }
+
+    .calendar-day:hover {
+      background: var(--border);
+    }
+
+    .calendar-day.other-month {
+      opacity: 0.3;
+    }
+
+    .calendar-day.today {
+      background: var(--adult);
+      color: white;
+    }
+
+    .calendar-day.selected {
+      ring: 2px solid var(--adult);
+      box-shadow: 0 0 0 2px var(--adult);
+    }
+
+    .calendar-day.has-events::after {
+      content: '';
+      position: absolute;
+      bottom: 4px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--danger);
+    }
+
+    .calendar-day.today.has-events::after {
+      background: white;
+    }
+
+    .calendar-day-number {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .calendar-day-detail {
+      margin-top: 16px;
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      min-height: 100px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .calendar-day-detail-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+
+    .calendar-day-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+
+    .calendar-day-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .calendar-day-item-time {
+      font-weight: 600;
+      color: var(--adult);
+      min-width: 50px;
+    }
+
+    .calendar-day-item-title {
+      flex: 1;
+    }
+
+    .calendar-empty {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 20px;
+    }
+
+    .calendar-detail-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .calendar-detail-header h4 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .calendar-event-count {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      background: var(--bg);
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
+
+    .calendar-no-events {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 24px;
+      font-size: 0.9rem;
+    }
+
+    .calendar-events-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .calendar-event-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--text-muted);
+    }
+
+    .calendar-event-item.appointment {
+      border-left-color: var(--adult);
+    }
+
+    .calendar-event-item.task {
+      border-left-color: var(--success);
+    }
+
+    .calendar-event-item.prep {
+      border-left-color: var(--warning);
+    }
+
+    .calendar-event-icon {
+      font-size: 1.2rem;
+      flex-shrink: 0;
+      width: 28px;
+      text-align: center;
+    }
+
+    .calendar-event-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .calendar-event-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .calendar-event-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .calendar-event-meta span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ========================================
+       SHOPPING LIST VIEW
+       ======================================== */
+    .shopping-view {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      overflow: auto;
+      background: var(--bg);
+      padding: 16px;
+    }
+
+    .shopping-view.visible {
+      display: flex;
+    }
+
+    .shopping-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .shopping-header h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .shopping-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .shopping-action-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: var(--card-bg);
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .shopping-action-btn:hover {
+      background: var(--border);
+    }
+
+    .shopping-add {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .shopping-add input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      background: var(--card-bg);
+      color: var(--text-primary);
+    }
+
+    .shopping-add select {
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      background: var(--card-bg);
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    .shopping-add-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: var(--adult);
+      color: white;
+      font-size: 1.5rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .shopping-add-btn:hover {
+      opacity: 0.9;
+    }
+
+    .shopping-categories {
+      flex: 1;
+      overflow: auto;
+    }
+
+    .shopping-category {
+      margin-bottom: 16px;
+    }
+
+    .shopping-category-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+
+    .shopping-category-icon {
+      font-size: 1.1rem;
+    }
+
+    .shopping-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--card-bg);
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .shopping-item.completed {
+      opacity: 0.5;
+    }
+
+    .shopping-item.completed .shopping-item-name {
+      text-decoration: line-through;
+    }
+
+    .shopping-checkbox {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .shopping-checkbox.checked {
+      background: var(--success);
+      border-color: var(--success);
+      color: white;
+    }
+
+    .shopping-item-name {
+      flex: 1;
+      font-size: 1rem;
+      color: var(--text-primary);
+    }
+
+    .shopping-item-delete {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .shopping-item:hover .shopping-item-delete {
+      opacity: 1;
+    }
+
+    .shopping-item-delete:hover {
+      color: var(--danger);
+    }
+
+    .shopping-summary {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      margin-top: 16px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .shopping-empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+
+    .shopping-empty-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+    }
+
+    /* ========================================
+       MEAL PLANNER VIEW
+       ======================================== */
+    .meal-planner-view {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      overflow: auto;
+      background: var(--bg);
+      padding: 16px;
+    }
+
+    .meal-planner-view.visible {
+      display: flex;
+    }
+
+    .meal-planner-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0 16px;
+    }
+
+    .meal-week-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .meal-days {
+      flex: 1;
+      overflow: auto;
+    }
+
+    .meal-day {
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .meal-day-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--primary);
+      color: white;
+    }
+
+    .meal-day-header.today {
+      background: var(--adult);
+    }
+
+    .meal-day-name {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .meal-day-date {
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+
+    .meal-slots {
+      padding: 12px;
+    }
+
+    .meal-slot {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      background: var(--bg);
+    }
+
+    .meal-slot:last-child {
+      margin-bottom: 0;
+    }
+
+    .meal-slot-type {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      width: 60px;
+      flex-shrink: 0;
+    }
+
+    .meal-slot-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .meal-slot-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .meal-slot-empty:hover {
+      color: var(--adult);
+    }
+
+    .meal-slot-filled {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .meal-slot-name {
+      font-weight: 500;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+    }
+
+    .meal-slot-notes {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .meal-slot-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .meal-slot-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .meal-slot-btn:hover {
+      background: var(--border);
+      color: var(--text-primary);
+    }
+
+    .meal-actions {
+      padding-top: 16px;
+    }
+
+    .meal-generate-btn {
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: var(--success);
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .meal-generate-btn:hover {
+      opacity: 0.9;
+    }
+
+    /* ========================================
+       ADHD TASK BREAKDOWN VIEW
+       ======================================== */
+    .adhd-task-view {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      overflow: auto;
+      background: var(--bg);
+      padding: 16px;
+    }
+
+    .adhd-task-view.visible {
+      display: flex;
+    }
+
+    .adhd-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .adhd-header h3 {
+      margin: 0 0 4px;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .adhd-subtitle {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .adhd-input-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 16px;
+    }
+
+    .adhd-label {
+      display: block;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+
+    .adhd-textarea {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      font-family: inherit;
+      resize: none;
+      background: var(--bg);
+      color: var(--text-primary);
+      transition: border-color 0.2s;
+    }
+
+    .adhd-textarea:focus {
+      outline: none;
+      border-color: var(--adult);
+    }
+
+    .adhd-breakdown-btn {
+      width: 100%;
+      margin-top: 14px;
+      padding: 16px 24px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .adhd-breakdown-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+    }
+
+    .adhd-breakdown-btn:active {
+      transform: translateY(0);
+    }
+
+    .adhd-tips {
+      margin-bottom: 24px;
+    }
+
+    .adhd-tip {
+      background: var(--card-bg);
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      border-left: 3px solid var(--warning);
+    }
+
+    .adhd-existing-tasks h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin: 0 0 12px;
+    }
+
+    .adhd-task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .adhd-task-item {
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .adhd-task-item:hover {
+      transform: translateX(4px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .adhd-task-item.completed {
+      opacity: 0.6;
+    }
+
+    .adhd-task-progress-ring {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: conic-gradient(var(--success) var(--progress, 0%), var(--border) 0%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .adhd-task-progress-inner {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .adhd-task-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .adhd-task-name {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .adhd-task-meta {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .adhd-task-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .adhd-task-action-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: var(--bg);
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .adhd-task-action-btn:hover {
+      background: var(--border);
+    }
+
+    /* Clarification Section */
+    .adhd-clarify-section {
+      padding: 16px;
+    }
+
+    .adhd-clarify-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .adhd-clarify-header h3 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .adhd-back-btn {
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: var(--card-bg);
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .adhd-clarify-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .adhd-clarify-question {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 20px;
+      text-align: center;
+    }
+
+    .adhd-clarify-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .adhd-clarify-option {
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      border: 2px solid var(--border);
+      background: var(--bg);
+      cursor: pointer;
+      text-align: left;
+      font-size: 1rem;
+      color: var(--text-primary);
+      transition: all 0.2s;
+    }
+
+    .adhd-clarify-option:hover {
+      border-color: var(--adult);
+      background: rgba(59, 130, 246, 0.1);
+    }
+
+    .adhd-clarify-option.selected {
+      border-color: var(--adult);
+      background: var(--adult);
+      color: white;
+    }
+
+    .adhd-clarify-custom {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .adhd-clarify-custom input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      background: var(--bg);
+      color: var(--text-primary);
+    }
+
+    .adhd-clarify-custom button {
+      width: 48px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: var(--adult);
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .adhd-clarify-progress {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Focus Mode */
+    .adhd-focus-section {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+    }
+
+    .adhd-focus-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .adhd-focus-header h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+    }
+
+    .adhd-focus-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-xl);
+      padding: 32px 24px;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .adhd-focus-step-label {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .adhd-focus-current-step {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.4;
+      margin-bottom: 24px;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .adhd-focus-progress {
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .adhd-focus-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--success), #34d399);
+      border-radius: 4px;
+      transition: width 0.5s ease;
+      width: 0%;
+    }
+
+    .adhd-focus-progress-text {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .adhd-focus-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .adhd-done-btn {
+      padding: 18px 24px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: white;
+      font-size: 1.2rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .adhd-done-btn:hover {
+      transform: scale(1.02);
+      box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+    }
+
+    .adhd-skip-btn {
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text-secondary);
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .adhd-skip-btn:hover {
+      background: var(--border);
+    }
+
+    .adhd-focus-timer {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .adhd-timer-text {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+
+    .adhd-timer-display {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 12px;
+    }
+
+    .adhd-timer-btn {
+      padding: 10px 24px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: var(--adult);
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .adhd-focus-all-steps {
+      margin-top: auto;
+    }
+
+    .adhd-show-steps-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .adhd-steps-list {
+      margin-top: 12px;
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .adhd-step-item {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.95rem;
+    }
+
+    .adhd-step-item:last-child {
+      border-bottom: none;
+    }
+
+    .adhd-step-item.completed {
+      opacity: 0.5;
+      text-decoration: line-through;
+    }
+
+    .adhd-step-item.current {
+      background: rgba(59, 130, 246, 0.1);
+      font-weight: 600;
+    }
+
+    .adhd-step-number {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .adhd-step-item.completed .adhd-step-number {
+      background: var(--success);
+      color: white;
+    }
+
+    .adhd-step-item.current .adhd-step-number {
+      background: var(--adult);
+      color: white;
+    }
+
+    /* Celebration */
+    .adhd-celebration {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .celebration-content {
+      text-align: center;
+      animation: celebratePop 0.5s ease;
+    }
+
+    .celebration-emoji {
+      font-size: 6rem;
+      margin-bottom: 20px;
+      animation: celebrateBounce 0.6s ease infinite;
+    }
+
+    .celebration-text {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    @keyframes celebratePop {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes celebrateBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    /* Loading */
+    .adhd-loading {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .adhd-loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--border);
+      border-top-color: var(--adult);
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .adhd-loading p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+    }
+
+    /* Breakdown Result */
+    .adhd-breakdown-summary {
+      background: var(--bg);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .adhd-breakdown-summary h4 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      color: var(--text-primary);
+    }
+
+    .adhd-breakdown-summary p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .adhd-breakdown-steps {
+      margin-bottom: 20px;
+    }
+
+    .adhd-breakdown-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+    }
+
+    .adhd-breakdown-step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--adult);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .adhd-breakdown-step-text {
+      flex: 1;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      padding-top: 3px;
+    }
+
+    .adhd-breakdown-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .adhd-save-btn {
+      padding: 16px 24px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .adhd-regenerate-btn {
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text-secondary);
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .adhd-empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+
+    .adhd-empty-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
     }
 
     /* ========================================
@@ -330,6 +1725,101 @@
       box-shadow: var(--shadow-sm);
     }
 
+    /* Today View Card */
+    .today-view-card {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: white;
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .today-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .today-icon {
+      font-size: 1.25rem;
+    }
+
+    .today-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      flex: 1;
+    }
+
+    .today-date {
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+
+    .today-items {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .today-item {
+      font-size: 0.9rem;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.1);
+      border-radius: var(--radius-sm);
+    }
+
+    .today-item strong {
+      color: #93c5fd;
+    }
+
+    /* Undo Toast */
+    .undo-toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--primary);
+      color: white;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow-lg);
+      z-index: 1500;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .undo-toast.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .undo-toast-text {
+      font-size: 0.9rem;
+    }
+
+    .undo-toast-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .undo-toast-btn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
     /* ========================================
        FEED CARDS
        ======================================== */
@@ -374,6 +1864,9 @@
     .feed-card.type-prep { border-left-color: var(--warning); }
     .feed-card.type-conflict { border-left-color: var(--danger); }
     .feed-card.type-handoff { border-left-color: #f97316; }
+    .feed-card.type-birthday { border-left-color: #ec4899; background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%); }
+
+    [data-theme="dark"] .feed-card.type-birthday { background: linear-gradient(135deg, #500724 0%, #831843 100%); }
 
     .card-header {
       display: flex;
@@ -391,6 +1884,20 @@
       font-weight: 600;
       background: var(--bg);
       color: var(--text-secondary);
+    }
+
+    .card-recurrence-badge {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #dbeafe;
+      color: #1e40af;
+      text-transform: capitalize;
+    }
+
+    [data-theme="dark"] .card-recurrence-badge {
+      background: #1e3a5f;
+      color: #93c5fd;
     }
 
     .card-member-badge {
@@ -882,6 +2389,110 @@
       background: var(--border);
     }
 
+    .profile-pic-upload {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 20px;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .profile-pic-upload:hover {
+      border-color: var(--adult);
+      background: var(--bg);
+    }
+
+    .profile-pic-preview {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      overflow: hidden;
+      border: 3px solid var(--border);
+    }
+
+    .profile-pic-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .profile-pic-upload-text {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .profile-pic-upload-text strong {
+      color: var(--adult);
+    }
+
+    .profile-pic-input {
+      display: none;
+    }
+
+    .appointment-photo-preview {
+      margin-bottom: 12px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: none;
+    }
+
+    .appointment-photo-preview.has-image {
+      display: block;
+    }
+
+    .appointment-photo-preview img {
+      width: 100%;
+      max-height: 150px;
+      object-fit: cover;
+      border-radius: var(--radius-md);
+    }
+
+    .appointment-photo-preview .ai-status {
+      padding: 10px;
+      background: #fef3c7;
+      color: #92400e;
+      font-size: 0.8rem;
+      text-align: center;
+      animation: pulse 1.5s infinite;
+    }
+
+    .location-input-wrapper {
+      display: flex;
+      gap: 8px;
+    }
+
+    .location-input-wrapper .form-input {
+      flex: 1;
+    }
+
+    .location-search-btn {
+      width: 48px;
+      height: 48px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      font-size: 1.25rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+
+    .location-search-btn:hover {
+      background: var(--border);
+    }
+
     .btn {
       padding: 14px 24px;
       border-radius: var(--radius-sm);
@@ -939,6 +2550,7 @@
       align-items: center;
       justify-content: center;
       font-size: 2rem;
+      overflow: hidden;
     }
 
     .profile-avatar.type-adult { background: #eff6ff; }
@@ -1027,6 +2639,54 @@
       font-size: 0.8rem;
       color: var(--text-muted);
       margin-top: 2px;
+    }
+
+    /* Toggle Switch */
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--border);
+      transition: 0.3s;
+      border-radius: 28px;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+      background-color: var(--adult);
+    }
+
+    .toggle-switch input:checked + .toggle-slider:before {
+      transform: translateX(24px);
     }
 
     /* ========================================
@@ -1145,7 +2805,13 @@
       <button class="back-btn" onclick="window.location.href='/'" title="Back to Home">←</button>
       <div class="app-title">Life</div>
     </div>
-    <button class="settings-btn" onclick="openSettings()">⚙️</button>
+    <div class="header-right">
+      <button class="header-btn" id="adhdTaskToggleBtn" onclick="toggleAdhdTaskView()" title="ADHD Task Breakdown">🧠</button>
+      <button class="header-btn" id="shoppingToggleBtn" onclick="toggleShoppingView()" title="Shopping List">🛒</button>
+      <button class="header-btn" id="mealToggleBtn" onclick="toggleMealPlannerView()" title="Meal Planner">🍽️</button>
+      <button class="header-btn" id="calendarToggleBtn" onclick="toggleCalendarView()" title="Calendar View">📅</button>
+      <button class="header-btn" onclick="openSettings()" title="Settings">⚙️</button>
+    </div>
   </header>
 
   <!-- BUBBLE NAVIGATION -->
@@ -1157,6 +2823,235 @@
   <main class="feed-layer" id="feedLayer">
     <div id="feedContent"></div>
   </main>
+
+  <!-- CALENDAR VIEW -->
+  <div class="calendar-view" id="calendarView">
+    <div class="calendar-header">
+      <button class="calendar-nav-btn" onclick="changeMonth(-1)">←</button>
+      <h3 class="calendar-month-title" id="calendarMonthTitle">January 2024</h3>
+      <button class="calendar-nav-btn" onclick="changeMonth(1)">→</button>
+    </div>
+    <div class="calendar-weekdays">
+      <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+    </div>
+    <div class="calendar-grid" id="calendarGrid"></div>
+    <div class="calendar-day-detail" id="calendarDayDetail"></div>
+  </div>
+
+  <!-- SHOPPING LIST VIEW -->
+  <div class="shopping-view" id="shoppingView">
+    <div class="shopping-header">
+      <h3>Shopping List</h3>
+      <div class="shopping-actions">
+        <button class="shopping-action-btn" onclick="clearCompletedItems()" title="Clear completed">🗑️</button>
+        <button class="shopping-action-btn" onclick="generateListFromMeals()" title="Generate from meals">🍽️</button>
+      </div>
+    </div>
+
+    <div class="shopping-add">
+      <input type="text" id="shoppingInput" placeholder="Add item..." onkeypress="handleShoppingKeypress(event)">
+      <select id="shoppingCategory">
+        <option value="produce">🥬 Produce</option>
+        <option value="dairy">🧀 Dairy</option>
+        <option value="meat">🥩 Meat</option>
+        <option value="bakery">🍞 Bakery</option>
+        <option value="pantry">🥫 Pantry</option>
+        <option value="frozen">🧊 Frozen</option>
+        <option value="drinks">🥤 Drinks</option>
+        <option value="household">🧹 Household</option>
+        <option value="other">📦 Other</option>
+      </select>
+      <button class="shopping-add-btn" onclick="addShoppingItem()">+</button>
+    </div>
+
+    <div class="shopping-categories" id="shoppingCategories">
+      <!-- Categories will be rendered here -->
+    </div>
+
+    <div class="shopping-summary" id="shoppingSummary">
+      <span class="shopping-count">0 items</span>
+      <span class="shopping-completed">0 completed</span>
+    </div>
+  </div>
+
+  <!-- MEAL PLANNER VIEW -->
+  <div class="meal-planner-view" id="mealPlannerView">
+    <div class="meal-planner-header">
+      <button class="calendar-nav-btn" onclick="changeMealWeek(-1)">←</button>
+      <h3 class="meal-week-title" id="mealWeekTitle">This Week</h3>
+      <button class="calendar-nav-btn" onclick="changeMealWeek(1)">→</button>
+    </div>
+
+    <div class="meal-days" id="mealDays">
+      <!-- Days will be rendered here -->
+    </div>
+
+    <div class="meal-actions">
+      <button class="meal-generate-btn" onclick="generateShoppingFromMeals()">
+        🛒 Generate Shopping List
+      </button>
+    </div>
+  </div>
+
+  <!-- ADHD TASK BREAKDOWN VIEW -->
+  <div class="adhd-task-view" id="adhdTaskView">
+    <!-- Input Mode -->
+    <div class="adhd-input-section" id="adhdInputSection">
+      <div class="adhd-header">
+        <h3>🧠 Task Breakdown</h3>
+        <p class="adhd-subtitle">Let's make this manageable</p>
+      </div>
+
+      <div class="adhd-input-card">
+        <label class="adhd-label">What do you need to do?</label>
+        <textarea id="adhdTaskInput" class="adhd-textarea" placeholder="e.g., Clean the house, Do my taxes, Organise the garage..." rows="3"></textarea>
+        <button class="adhd-breakdown-btn" onclick="startTaskBreakdown()">
+          <span class="btn-icon">✨</span>
+          Break it down for me
+        </button>
+      </div>
+
+      <div class="adhd-tips">
+        <div class="adhd-tip">💡 Tip: Be as vague or specific as you like - I'll ask questions if I need more info</div>
+      </div>
+
+      <!-- Existing Tasks -->
+      <div class="adhd-existing-tasks" id="adhdExistingTasks">
+        <h4>Your Tasks</h4>
+        <div class="adhd-task-list" id="adhdTaskList"></div>
+      </div>
+    </div>
+
+    <!-- Clarification Mode -->
+    <div class="adhd-clarify-section" id="adhdClarifySection" style="display: none;">
+      <div class="adhd-clarify-header">
+        <button class="adhd-back-btn" onclick="cancelClarification()">← Back</button>
+        <h3>Quick Question</h3>
+      </div>
+
+      <div class="adhd-clarify-card">
+        <p class="adhd-clarify-question" id="clarifyQuestion">What do you mean by "clean"?</p>
+        <div class="adhd-clarify-options" id="clarifyOptions">
+          <!-- Options will be rendered here -->
+        </div>
+        <div class="adhd-clarify-custom">
+          <input type="text" id="clarifyCustomInput" placeholder="Or type your own answer...">
+          <button onclick="submitCustomClarification()">→</button>
+        </div>
+      </div>
+
+      <div class="adhd-clarify-progress">
+        <span id="clarifyProgress">Question 1 of 2</span>
+      </div>
+    </div>
+
+    <!-- Focus Mode -->
+    <div class="adhd-focus-section" id="adhdFocusSection" style="display: none;">
+      <div class="adhd-focus-header">
+        <button class="adhd-back-btn" onclick="exitFocusMode()">← All Tasks</button>
+        <h3 id="focusTaskTitle">Task Name</h3>
+      </div>
+
+      <div class="adhd-focus-card">
+        <div class="adhd-focus-step-label">Just do this one thing:</div>
+        <div class="adhd-focus-current-step" id="focusCurrentStep">
+          Step text here
+        </div>
+        <div class="adhd-focus-progress">
+          <div class="adhd-focus-progress-bar" id="focusProgressBar"></div>
+        </div>
+        <div class="adhd-focus-progress-text" id="focusProgressText">Step 1 of 5</div>
+      </div>
+
+      <div class="adhd-focus-actions">
+        <button class="adhd-done-btn" onclick="completeCurrentStep()">
+          ✓ Done! Next step
+        </button>
+        <button class="adhd-skip-btn" onclick="skipCurrentStep()">
+          Skip for now
+        </button>
+      </div>
+
+      <div class="adhd-focus-timer" id="focusTimer" style="display: none;">
+        <div class="adhd-timer-text">Just 5 minutes - you can do this!</div>
+        <div class="adhd-timer-display" id="timerDisplay">5:00</div>
+        <button class="adhd-timer-btn" id="timerBtn" onclick="toggleFocusTimer()">Start Timer</button>
+      </div>
+
+      <div class="adhd-focus-all-steps">
+        <button class="adhd-show-steps-btn" onclick="toggleAllSteps()">
+          <span id="showStepsIcon">▼</span> Show all steps
+        </button>
+        <div class="adhd-steps-list" id="focusStepsList" style="display: none;"></div>
+      </div>
+    </div>
+
+    <!-- Celebration Overlay -->
+    <div class="adhd-celebration" id="adhdCelebration" style="display: none;">
+      <div class="celebration-content">
+        <div class="celebration-emoji" id="celebrationEmoji">🎉</div>
+        <div class="celebration-text" id="celebrationText">Amazing! You did it!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADHD Task Clarification Modal -->
+  <div class="modal-sheet" id="adhdBreakdownSheet">
+    <div class="modal-header">
+      <h3>Breaking Down Your Task</h3>
+      <button class="modal-close" onclick="closeAdhdBreakdownSheet()">×</button>
+    </div>
+    <div class="modal-content">
+      <div class="adhd-loading" id="adhdLoading">
+        <div class="adhd-loading-spinner"></div>
+        <p>Thinking about the best way to break this down...</p>
+      </div>
+      <div class="adhd-breakdown-result" id="adhdBreakdownResult" style="display: none;">
+        <div class="adhd-breakdown-summary" id="breakdownSummary"></div>
+        <div class="adhd-breakdown-steps" id="breakdownSteps"></div>
+        <div class="adhd-breakdown-actions">
+          <button class="adhd-save-btn" onclick="saveTaskBreakdown()">Save & Start</button>
+          <button class="adhd-regenerate-btn" onclick="regenerateBreakdown()">Try Different Approach</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD MEAL MODAL -->
+  <div class="modal-sheet" id="addMealSheet">
+    <div class="modal-header">
+      <h3>Add Meal</h3>
+      <button class="modal-close" onclick="closeAddMealSheet()">×</button>
+    </div>
+    <div class="modal-content">
+      <input type="hidden" id="mealDayIndex">
+      <input type="hidden" id="mealType">
+
+      <div class="form-field">
+        <label>Meal Name</label>
+        <input type="text" id="mealName" placeholder="e.g., Spaghetti Bolognese">
+      </div>
+
+      <div class="form-field">
+        <label>Ingredients (one per line)</label>
+        <textarea id="mealIngredients" rows="4" placeholder="500g mince&#10;1 onion&#10;2 cans tomatoes&#10;Pasta"></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>Notes</label>
+        <input type="text" id="mealNotes" placeholder="e.g., Kid-friendly, 30 mins">
+      </div>
+
+      <button class="form-submit" onclick="saveMeal()">Save Meal</button>
+    </div>
+  </div>
+
+  <!-- FLOATING ACTION BUTTON -->
+  <!-- UNDO TOAST -->
+  <div class="undo-toast" id="undoToast">
+    <span class="undo-toast-text">Item removed</span>
+    <button class="undo-toast-btn" onclick="undoDelete()">Undo</button>
+  </div>
 
   <!-- FLOATING ACTION BUTTON -->
   <button class="fab" id="fabBtn" onclick="toggleFabMenu()">+</button>
@@ -1213,6 +3108,16 @@
     </div>
     <div class="sheet-content">
       <div class="form-group">
+        <label class="form-label">Profile Picture</label>
+        <div class="profile-pic-upload" onclick="document.getElementById('memberPhoto').click()">
+          <div class="profile-pic-preview" id="memberPhotoPreview">📷</div>
+          <div class="profile-pic-upload-text">
+            <strong>Tap to upload</strong><br>or use emoji below
+          </div>
+          <input type="file" class="profile-pic-input" id="memberPhoto" accept="image/*" onchange="handlePhotoUpload(event)">
+        </div>
+      </div>
+      <div class="form-group">
         <label class="form-label">Name</label>
         <input type="text" class="form-input" id="memberName" placeholder="Enter name">
       </div>
@@ -1225,8 +3130,12 @@
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Icon (emoji)</label>
+        <label class="form-label">Fallback Icon (emoji)</label>
         <input type="text" class="form-input" id="memberIcon" placeholder="👤" maxlength="2">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Birthday (optional)</label>
+        <input type="date" class="form-input" id="memberBirthday">
       </div>
     </div>
     <div class="sheet-actions">
@@ -1242,6 +3151,29 @@
       <h3 class="sheet-title">Settings</h3>
     </div>
     <div class="sheet-content">
+      <div class="settings-section">
+        <div class="settings-section-title">Appearance</div>
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <div class="settings-item-label">Dark Mode</div>
+            <div class="settings-item-desc">Easier on the eyes at night</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="settings-item">
+          <div class="settings-item-info">
+            <div class="settings-item-label">Notifications</div>
+            <div class="settings-item-desc" id="notificationStatus">Remind me before appointments</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="notificationToggle" onchange="toggleNotifications()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
       <div class="settings-section">
         <div class="settings-section-title">Data Management</div>
         <div class="settings-item">
@@ -1336,6 +3268,7 @@
     // --- MENU OPTIONS BY ROLE ---
     const MENU_OPTIONS = {
       adult: [
+        { action: 'profile', label: 'View Profile', icon: '👤' },
         { action: 'appointment', label: 'Add Appointment', icon: '🩺' },
         { action: 'roster', label: 'Add Roster', icon: '📋' },
         { action: 'event', label: 'Add Event', icon: '🎉' },
@@ -1344,6 +3277,7 @@
         { action: 'share', label: 'Share Task', icon: '🤝' }
       ],
       child: [
+        { action: 'profile', label: 'View Profile', icon: '👤' },
         { action: 'appointment', label: 'Add Appointment', icon: '🩺' },
         { action: 'milestone', label: 'Add Milestone', icon: '⭐' },
         { action: 'event', label: 'Add Event', icon: '🎉' },
@@ -1351,6 +3285,7 @@
         { action: 'note', label: 'Add Photo/Note', icon: '📸' }
       ],
       household: [
+        { action: 'profile', label: 'View Details', icon: '🏠' },
         { action: 'note', label: 'Shared Task', icon: '📦' },
         { action: 'event', label: 'Shared Event', icon: '🎉' },
         { action: 'weekly', label: 'Weekly Plan', icon: '📋' }
@@ -1508,6 +3443,167 @@
       alert('Screenshot import is coming soon! For now, please enter your roster details manually below.');
     }
 
+    // Appointment photo handling with AI parsing
+    let appointmentPhotoData = null;
+
+    async function handleAppointmentPhoto(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const preview = document.getElementById('appointmentPhotoPreview');
+      preview.classList.add('has-image');
+      preview.innerHTML = `
+        <img src="${URL.createObjectURL(file)}" alt="Appointment">
+        <div class="ai-status">🤖 Analyzing image...</div>
+      `;
+
+      // Convert to base64 for API
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        appointmentPhotoData = e.target.result;
+
+        // Call AI to parse the image
+        try {
+          const parsed = await parseAppointmentImage(appointmentPhotoData);
+          if (parsed) {
+            // Auto-fill the form
+            if (parsed.title) document.getElementById('formTitle').value = parsed.title;
+            if (parsed.date) document.getElementById('formDate').value = parsed.date;
+            if (parsed.time) document.getElementById('formTime').value = parsed.time;
+            if (parsed.location) document.getElementById('formLocation').value = parsed.location;
+            if (parsed.notes) document.getElementById('formNotes').value = parsed.notes;
+
+            preview.innerHTML = `
+              <img src="${appointmentPhotoData}" alt="Appointment">
+              <div class="ai-status" style="background:#dcfce7;color:#166534;">✓ Details extracted!</div>
+            `;
+          }
+        } catch (err) {
+          console.error('AI parsing failed:', err);
+          preview.innerHTML = `
+            <img src="${appointmentPhotoData}" alt="Appointment">
+            <div class="ai-status" style="background:#fee2e2;color:#991b1b;">Could not extract details. Please fill manually.</div>
+          `;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // AI parsing function - calls the backend API
+    async function parseAppointmentImage(imageBase64) {
+      const idToken = localStorage.getItem('google_id_token');
+
+      if (!idToken) {
+        console.warn('No auth token - user needs to sign in');
+        return null;
+      }
+
+      try {
+        // Remove data URL prefix if present
+        const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, '');
+
+        const response = await fetch('/api/appointments/extract', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`
+          },
+          body: JSON.stringify({
+            imageBase64: base64Data,
+            locale: 'en-AU',
+            tz: 'Australia/Sydney'
+          })
+        });
+
+        if (!response.ok) {
+          console.error('API error:', response.status);
+          return null;
+        }
+
+        const data = await response.json();
+
+        if (data.appointment) {
+          // Map API response to our form fields
+          return {
+            title: data.appointment.title || '',
+            date: data.appointment.date || '',
+            time: data.appointment.time || '',
+            location: data.appointment.venueName || data.appointment.address || '',
+            notes: data.appointment.notes || ''
+          };
+        }
+
+        return null;
+      } catch (err) {
+        console.error('Failed to parse appointment image:', err);
+        return null;
+      }
+    }
+
+    // Location search - opens maps
+    function searchLocation() {
+      const locationInput = document.getElementById('formLocation');
+      const query = locationInput.value.trim();
+
+      if (query) {
+        // Open in Google Maps
+        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+        window.open(mapsUrl, '_blank');
+      } else {
+        // Prompt for location
+        const search = prompt('Enter location to search:');
+        if (search) {
+          locationInput.value = search;
+          const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(search)}`;
+          window.open(mapsUrl, '_blank');
+        }
+      }
+    }
+
+    // Share appointment via SMS or native share
+    function shareAppointment(itemId) {
+      const item = feedItems.find(i => i.id === itemId);
+      if (!item) return;
+
+      const member = getMemberById(item.memberId);
+      const memberName = member?.name || 'Someone';
+
+      // Build share text
+      let shareText = `📅 Appointment: ${item.title}\n`;
+      shareText += `👤 For: ${memberName}\n`;
+      shareText += `📆 Date: ${formatDate(item.date)}\n`;
+      shareText += `🕐 Time: ${formatTime(item.time)}\n`;
+
+      if (item.location) {
+        shareText += `📍 Location: ${item.location}\n`;
+        shareText += `🗺️ Map: https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.location)}\n`;
+      }
+
+      if (item.notes) {
+        shareText += `📝 Notes: ${item.notes}\n`;
+      }
+
+      // Try native share first (works on mobile)
+      if (navigator.share) {
+        navigator.share({
+          title: `Appointment: ${item.title}`,
+          text: shareText
+        }).catch(err => {
+          // Fallback to SMS if share fails
+          openSmsShare(shareText);
+        });
+      } else {
+        // Fallback to SMS on desktop or older browsers
+        openSmsShare(shareText);
+      }
+    }
+
+    function openSmsShare(text) {
+      // sms: link works on iOS and Android
+      const smsUrl = `sms:?body=${encodeURIComponent(text)}`;
+      window.location.href = smsUrl;
+    }
+
     // ========================================
     // BUBBLE RENDERING
     // ========================================
@@ -1521,8 +3617,14 @@
 
         const bubble = document.createElement('div');
         bubble.className = `bubble type-${member.role}`;
-        bubble.innerHTML = member.icon;
         bubble.dataset.id = member.id;
+
+        // Show photo if available, otherwise show emoji
+        if (member.photo) {
+          bubble.innerHTML = `<img src="${member.photo}" alt="${member.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+        } else {
+          bubble.innerHTML = member.icon;
+        }
 
         const label = document.createElement('div');
         label.className = 'bubble-label';
@@ -1566,7 +3668,9 @@
         btn.onclick = (e) => {
           e.stopPropagation();
           closeAllMenus();
-          if (opt.action === 'weekly') {
+          if (opt.action === 'profile') {
+            openProfileSheet(member);
+          } else if (opt.action === 'weekly') {
             generateWeeklyPlan();
           } else if (opt.action === 'share') {
             openShareTaskSheet(member.id);
@@ -1581,48 +3685,17 @@
     }
 
     function attachBubbleInteraction(element, member) {
-      let pressTimer;
-      let isLongPress = false;
-      let startY = 0;
+      // Simple tap to open menu
+      element.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const menu = document.getElementById(`menu-${member.id}`);
+        const isOpen = menu && menu.classList.contains('visible');
 
-      const startPress = (e) => {
-        isLongPress = false;
-        startY = e.touches ? e.touches[0].clientY : e.clientY;
-        element.classList.add('pressing');
+        closeAllMenus();
 
-        pressTimer = setTimeout(() => {
-          isLongPress = true;
-          element.classList.remove('pressing');
+        if (!isOpen) {
           openMenu(member.id);
-          if (navigator.vibrate) navigator.vibrate(30);
-        }, 400);
-      };
-
-      const endPress = (e) => {
-        clearTimeout(pressTimer);
-        element.classList.remove('pressing');
-
-        if (!isLongPress) {
-          openProfileSheet(member);
         }
-      };
-
-      const cancelPress = (e) => {
-        const currentY = e.touches ? e.touches[0].clientY : e.clientY;
-        if (Math.abs(currentY - startY) > 10) {
-          clearTimeout(pressTimer);
-          element.classList.remove('pressing');
-        }
-      };
-
-      element.addEventListener('touchstart', startPress, { passive: true });
-      element.addEventListener('touchend', endPress);
-      element.addEventListener('touchmove', cancelPress, { passive: true });
-      element.addEventListener('mousedown', startPress);
-      element.addEventListener('mouseup', endPress);
-      element.addEventListener('mouseleave', () => {
-        clearTimeout(pressTimer);
-        element.classList.remove('pressing');
       });
     }
 
@@ -1654,7 +3727,7 @@
             </div>
             <div class="feed-empty-hint">
               ${hasMembers
-                ? '💡 Long-press a bubble to quickly add items'
+                ? '💡 Tap a bubble to quickly add items'
                 : '💡 Tap + to add your first family member'}
             </div>
           </div>
@@ -1681,6 +3754,12 @@
 
       let html = '';
 
+      // Today View - show what's happening today
+      const todayCard = renderTodayView();
+      if (todayCard) {
+        html += todayCard;
+      }
+
       if (pinned.length > 0) {
         html += '<div class="feed-section-title">Pinned</div>';
         pinned.forEach(item => html += renderFeedCard(item));
@@ -1692,6 +3771,47 @@
       }
 
       content.innerHTML = html;
+    }
+
+    function renderTodayView() {
+      const today = new Date().toISOString().split('T')[0];
+      const todayItems = feedItems.filter(item => item.date === today && item.type !== 'weekly');
+
+      if (todayItems.length === 0) return '';
+
+      const appointments = todayItems.filter(i => i.type === 'appointment');
+      const rosters = todayItems.filter(i => i.type === 'roster');
+      const events = todayItems.filter(i => i.type === 'event');
+
+      let itemsHtml = '';
+
+      appointments.forEach(a => {
+        const member = getMemberById(a.memberId);
+        itemsHtml += `<div class="today-item">🩺 <strong>${formatTime(a.time)}</strong> - ${a.title} (${member?.name || 'Unknown'})</div>`;
+      });
+
+      rosters.forEach(r => {
+        const member = getMemberById(r.memberId);
+        itemsHtml += `<div class="today-item">📋 <strong>${formatTime(r.startTime)}</strong> - ${member?.name || 'Adult'} working</div>`;
+      });
+
+      events.forEach(e => {
+        const member = getMemberById(e.memberId);
+        itemsHtml += `<div class="today-item">🎉 ${e.time ? `<strong>${formatTime(e.time)}</strong> - ` : ''}${e.title}</div>`;
+      });
+
+      return `
+        <div class="today-view-card">
+          <div class="today-header">
+            <span class="today-icon">📅</span>
+            <span class="today-title">Today</span>
+            <span class="today-date">${new Date().toLocaleDateString('en-AU', { weekday: 'long', day: 'numeric', month: 'short' })}</span>
+          </div>
+          <div class="today-items">
+            ${itemsHtml}
+          </div>
+        </div>
+      `;
     }
 
     function renderFeedCard(item) {
@@ -1710,7 +3830,7 @@
       switch (item.type) {
         case 'appointment':
           body = item.notes || 'No additional details';
-          if (item.location) body = `📍 ${item.location}<br>${body}`;
+          if (item.location) body = `📍 <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.location)}" target="_blank" style="color:inherit;text-decoration:underline;">${item.location}</a><br>${body}`;
           meta = `
             <div class="card-meta">
               <span class="card-meta-item">📅 ${formatDate(item.date)}</span>
@@ -1719,6 +3839,7 @@
           `;
           actions = `
             <div class="card-actions">
+              <button class="card-action-btn" onclick="shareAppointment('${item.id}')">📤 Share</button>
               <button class="card-action-btn success" onclick="markDone('${item.id}')">✓ Done</button>
             </div>
           `;
@@ -1802,6 +3923,20 @@
           body = renderWeeklySummaryContent(item);
           break;
 
+        case 'birthday':
+          body = item.notes || '';
+          meta = item.date ? `
+            <div class="card-meta">
+              <span class="card-meta-item">📅 ${formatDate(item.date)}</span>
+            </div>
+          ` : '';
+          actions = `
+            <div class="card-actions">
+              <button class="card-action-btn secondary" onclick="markDone('${item.id}')">✓ Noted</button>
+            </div>
+          `;
+          break;
+
         default:
           body = item.notes || item.content || '';
       }
@@ -1815,13 +3950,15 @@
         goal: '🎯 Goal',
         note: '📝 Note',
         conflict: '⚠️ Conflict',
-        weekly: '📌 Weekly Plan'
+        weekly: '📌 Weekly Plan',
+        birthday: '🎂 Birthday'
       };
 
       return `
         <div class="${cardClass}" data-id="${item.id}">
           <div class="card-header">
             <span class="card-type-badge">${typeLabels[item.type] || item.type}</span>
+            ${item.recurrence ? `<span class="card-recurrence-badge">🔁 ${item.recurrence}</span>` : ''}
             <span class="card-member-badge">${memberIcon} ${memberName}</span>
           </div>
           <div class="card-title">
@@ -1923,10 +4060,51 @@
     // ========================================
     // FEED ACTIONS
     // ========================================
+    let lastDeletedItem = null;
+    let undoTimeout = null;
+
     function markDone(itemId) {
-      feedItems = feedItems.filter(item => item.id !== itemId);
+      const item = feedItems.find(i => i.id === itemId);
+      if (!item) return;
+
+      // Store for undo
+      lastDeletedItem = { ...item };
+
+      // Remove item
+      feedItems = feedItems.filter(i => i.id !== itemId);
       saveData();
       renderFeed();
+
+      // Show undo toast
+      showUndoToast();
+    }
+
+    function showUndoToast() {
+      const toast = document.getElementById('undoToast');
+      toast.classList.add('visible');
+
+      // Clear any existing timeout
+      if (undoTimeout) clearTimeout(undoTimeout);
+
+      // Auto-hide after 5 seconds
+      undoTimeout = setTimeout(() => {
+        toast.classList.remove('visible');
+        lastDeletedItem = null;
+      }, 5000);
+    }
+
+    function undoDelete() {
+      if (lastDeletedItem) {
+        feedItems.push(lastDeletedItem);
+        saveData();
+        renderFeed();
+        lastDeletedItem = null;
+      }
+
+      // Hide toast
+      const toast = document.getElementById('undoToast');
+      toast.classList.remove('visible');
+      if (undoTimeout) clearTimeout(undoTimeout);
     }
 
     function toggleStep(itemId, stepIdx) {
@@ -1968,6 +4146,16 @@
       switch (type) {
         case 'appointment':
           return `
+            <div class="screenshot-import-placeholder" onclick="document.getElementById('appointmentPhoto').click()">
+              <span class="screenshot-icon">📸</span>
+              <span class="screenshot-text">Scan appointment letter/SMS</span>
+              <span class="screenshot-badge">AI Fill</span>
+              <input type="file" id="appointmentPhoto" accept="image/*" capture="environment" style="display:none" onchange="handleAppointmentPhoto(event)">
+            </div>
+            <div id="appointmentPhotoPreview" class="appointment-photo-preview"></div>
+            <div class="form-divider">
+              <span>or enter manually</span>
+            </div>
             <div class="form-group">
               <label class="form-label">Title *</label>
               <input type="text" class="form-input" id="formTitle" placeholder="e.g., Doctor checkup">
@@ -1984,11 +4172,25 @@
             </div>
             <div class="form-group">
               <label class="form-label">Location</label>
-              <input type="text" class="form-input" id="formLocation" placeholder="e.g., Medical Centre">
+              <div class="location-input-wrapper">
+                <input type="text" class="form-input" id="formLocation" placeholder="e.g., Medical Centre">
+                <button type="button" class="location-search-btn" onclick="searchLocation()">📍</button>
+              </div>
             </div>
             <div class="form-group">
               <label class="form-label">Notes</label>
               <textarea class="form-textarea" id="formNotes" placeholder="Any additional details..."></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Repeat</label>
+              <select class="form-select" id="formRecurrence">
+                <option value="none">Does not repeat</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="fortnightly">Fortnightly</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+              </select>
             </div>
           `;
 
@@ -2110,6 +4312,7 @@
       const locationEl = document.getElementById('formLocation');
       const notesEl = document.getElementById('formNotes');
       const timeframeEl = document.getElementById('formTimeframe');
+      const recurrenceEl = document.getElementById('formRecurrence');
 
       const title = titleEl?.value?.trim();
       const date = dateEl?.value;
@@ -2119,6 +4322,7 @@
       const location = locationEl?.value?.trim();
       const notes = notesEl?.value?.trim();
       const timeframe = timeframeEl?.value?.trim();
+      const recurrence = recurrenceEl?.value || 'none';
 
       // Validation
       if (currentFormType === 'appointment' && (!title || !date || !time)) {
@@ -2159,10 +4363,16 @@
         endTime,
         location,
         notes,
-        timeframe
+        timeframe,
+        recurrence: recurrence !== 'none' ? recurrence : null
       };
 
       feedItems.push(newItem);
+
+      // Generate recurring items if recurrence is set
+      if (recurrence !== 'none' && date) {
+        generateRecurringItems(newItem, recurrence);
+      }
 
       // Auto-create prep card for appointments within 7 days
       if (currentFormType === 'appointment' && date && isWithinDays(date, 7)) {
@@ -2189,6 +4399,75 @@
       saveData();
       closeFormSheet();
       renderFeed();
+    }
+
+    function generateRecurringItems(baseItem, recurrence) {
+      const baseDate = new Date(baseItem.date);
+      const maxItems = 12; // Generate up to 12 future occurrences
+
+      for (let i = 1; i <= maxItems; i++) {
+        const nextDate = new Date(baseDate);
+
+        switch (recurrence) {
+          case 'daily':
+            nextDate.setDate(baseDate.getDate() + i);
+            break;
+          case 'weekly':
+            nextDate.setDate(baseDate.getDate() + (i * 7));
+            break;
+          case 'fortnightly':
+            nextDate.setDate(baseDate.getDate() + (i * 14));
+            break;
+          case 'monthly':
+            nextDate.setMonth(baseDate.getMonth() + i);
+            break;
+          case 'yearly':
+            nextDate.setFullYear(baseDate.getFullYear() + i);
+            break;
+        }
+
+        // Only create items up to 90 days in the future (except yearly)
+        const now = new Date();
+        const daysAhead = (nextDate - now) / (1000 * 60 * 60 * 24);
+        if (recurrence !== 'yearly' && daysAhead > 90) break;
+        if (recurrence === 'yearly' && daysAhead > 400) break;
+
+        const recurringItem = {
+          id: generateId(),
+          memberId: baseItem.memberId,
+          type: baseItem.type,
+          title: baseItem.title,
+          createdAt: new Date().toISOString(),
+          date: nextDate.toISOString().split('T')[0],
+          time: baseItem.time,
+          startTime: baseItem.startTime,
+          endTime: baseItem.endTime,
+          location: baseItem.location,
+          notes: baseItem.notes,
+          recurrence: recurrence,
+          parentId: baseItem.id,
+          isRecurring: true
+        };
+
+        feedItems.push(recurringItem);
+
+        // Also create prep items for recurring appointments
+        if (baseItem.type === 'appointment' && isWithinDays(recurringItem.date, 7)) {
+          const prepItem = {
+            id: generateId(),
+            memberId: baseItem.memberId,
+            type: 'prep',
+            title: `Prep: ${baseItem.title}`,
+            relatedTitle: baseItem.title,
+            relatedId: recurringItem.id,
+            createdAt: new Date().toISOString(),
+            date: recurringItem.date,
+            steps: PREP_STEPS.map(s => ({ ...s, done: false })),
+            questions: [...PREP_QUESTIONS]
+          };
+          feedItems.push(prepItem);
+        }
+      }
     }
 
     function checkRosterConflicts(newRoster) {
@@ -2367,19 +4646,45 @@
     // ========================================
     // MEMBER MANAGEMENT
     // ========================================
+    let memberPhotoData = null;
+
     function openAddMemberModal() {
       closeFabMenu();
       closeAllMenus();
       document.getElementById('memberName').value = '';
       document.getElementById('memberRole').value = 'adult';
       document.getElementById('memberIcon').value = '';
+      document.getElementById('memberBirthday').value = '';
+      document.getElementById('memberPhoto').value = '';
+      document.getElementById('memberPhotoPreview').innerHTML = '📷';
+      memberPhotoData = null;
       openModal('addMemberSheet');
+    }
+
+    function handlePhotoUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // Validate file size (max 500KB to keep localStorage reasonable)
+      if (file.size > 500000) {
+        alert('Image too large. Please use an image under 500KB.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        memberPhotoData = e.target.result;
+        document.getElementById('memberPhotoPreview').innerHTML =
+          `<img src="${memberPhotoData}" alt="Profile">`;
+      };
+      reader.readAsDataURL(file);
     }
 
     function saveMember() {
       const name = document.getElementById('memberName').value.trim();
       const role = document.getElementById('memberRole').value;
       let icon = document.getElementById('memberIcon').value.trim();
+      const birthday = document.getElementById('memberBirthday').value;
 
       if (!name) {
         alert('Please enter a name');
@@ -2394,7 +4699,9 @@
         id: generateId(),
         name,
         role,
-        icon
+        icon,
+        photo: memberPhotoData || null,
+        birthday: birthday || null
       };
 
       // Insert before household
@@ -2424,9 +4731,13 @@
       const milestones = memberItems.filter(i => i.type === 'milestone').length;
       const goals = memberItems.filter(i => i.type === 'goal').length;
 
+      const avatarContent = member.photo
+        ? `<img src="${member.photo}" alt="${member.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+        : member.icon;
+
       let statsHtml = `
         <div class="profile-header">
-          <div class="profile-avatar type-${member.role}">${member.icon}</div>
+          <div class="profile-avatar type-${member.role}">${avatarContent}</div>
           <div class="profile-info">
             <h2>${member.name}</h2>
             <div class="profile-role">${member.role}</div>
@@ -2528,6 +4839,1420 @@
       document.getElementById('settingsSheet').classList.remove('open');
     }
 
+    // Dark Mode Functions
+    function toggleDarkMode() {
+      const isDark = document.getElementById('darkModeToggle').checked;
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      localStorage.setItem('LIFE_DARK_MODE', isDark ? 'true' : 'false');
+    }
+
+    function initDarkMode() {
+      const savedPref = localStorage.getItem('LIFE_DARK_MODE');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark = savedPref === 'true' || (savedPref === null && prefersDark);
+
+      if (isDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.getElementById('darkModeToggle').checked = true;
+      }
+    }
+
+    // Notification Functions
+    let notificationTimers = [];
+
+    async function toggleNotifications() {
+      const toggle = document.getElementById('notificationToggle');
+      const status = document.getElementById('notificationStatus');
+
+      if (toggle.checked) {
+        // Request permission
+        if (!('Notification' in window)) {
+          status.textContent = 'Not supported in this browser';
+          toggle.checked = false;
+          return;
+        }
+
+        const permission = await Notification.requestPermission();
+
+        if (permission === 'granted') {
+          localStorage.setItem('LIFE_NOTIFICATIONS', 'true');
+          status.textContent = 'Notifications enabled ✓';
+          scheduleNotifications();
+        } else {
+          toggle.checked = false;
+          status.textContent = 'Permission denied';
+        }
+      } else {
+        localStorage.setItem('LIFE_NOTIFICATIONS', 'false');
+        status.textContent = 'Remind me before appointments';
+        clearScheduledNotifications();
+      }
+    }
+
+    function initNotifications() {
+      const enabled = localStorage.getItem('LIFE_NOTIFICATIONS') === 'true';
+      const toggle = document.getElementById('notificationToggle');
+      const status = document.getElementById('notificationStatus');
+
+      if (enabled && Notification.permission === 'granted') {
+        toggle.checked = true;
+        status.textContent = 'Notifications enabled ✓';
+        scheduleNotifications();
+      } else if (enabled && Notification.permission !== 'granted') {
+        localStorage.setItem('LIFE_NOTIFICATIONS', 'false');
+      }
+    }
+
+    function scheduleNotifications() {
+      clearScheduledNotifications();
+
+      const now = new Date();
+      const todayStr = now.toISOString().split('T')[0];
+
+      // Find appointments for today and tomorrow
+      const upcomingItems = feedItems.filter(item => {
+        if (item.type !== 'appointment' || !item.date || !item.time) return false;
+        const itemDate = new Date(item.date + 'T' + item.time);
+        const diffMs = itemDate - now;
+        // Within next 24 hours
+        return diffMs > 0 && diffMs < 24 * 60 * 60 * 1000;
+      });
+
+      upcomingItems.forEach(item => {
+        const itemDate = new Date(item.date + 'T' + item.time);
+        const member = getMemberById(item.memberId);
+
+        // Schedule 1 hour before
+        const oneHourBefore = itemDate.getTime() - (60 * 60 * 1000);
+        const msUntilOneHour = oneHourBefore - now.getTime();
+
+        if (msUntilOneHour > 0) {
+          const timer = setTimeout(() => {
+            showNotification(
+              `${item.title} in 1 hour`,
+              `${member?.name || 'Appointment'} at ${formatTime(item.time)}${item.location ? ' - ' + item.location : ''}`
+            );
+          }, msUntilOneHour);
+          notificationTimers.push(timer);
+        }
+
+        // Schedule 15 minutes before
+        const fifteenMinBefore = itemDate.getTime() - (15 * 60 * 1000);
+        const msUntilFifteen = fifteenMinBefore - now.getTime();
+
+        if (msUntilFifteen > 0) {
+          const timer = setTimeout(() => {
+            showNotification(
+              `${item.title} in 15 minutes!`,
+              `Time to go! ${item.location ? '📍 ' + item.location : ''}`
+            );
+          }, msUntilFifteen);
+          notificationTimers.push(timer);
+        }
+      });
+    }
+
+    function clearScheduledNotifications() {
+      notificationTimers.forEach(timer => clearTimeout(timer));
+      notificationTimers = [];
+    }
+
+    function showNotification(title, body) {
+      if (Notification.permission === 'granted') {
+        const notification = new Notification(title, {
+          body: body,
+          icon: '📅',
+          badge: '📅',
+          tag: 'life-reminder',
+          requireInteraction: true
+        });
+
+        notification.onclick = () => {
+          window.focus();
+          notification.close();
+        };
+      }
+    }
+
+    // ========================================
+    // CALENDAR VIEW FUNCTIONS
+    // ========================================
+    let currentCalendarYear = new Date().getFullYear();
+    let currentCalendarMonth = new Date().getMonth();
+    let selectedCalendarDate = null;
+    let calendarVisible = false;
+
+    function toggleCalendarView() {
+      calendarVisible = !calendarVisible;
+      const calendarView = document.getElementById('calendarView');
+      const feedLayer = document.getElementById('feedLayer');
+      const calendarBtn = document.getElementById('calendarToggleBtn');
+
+      if (calendarVisible) {
+        calendarView.classList.add('visible');
+        feedLayer.style.display = 'none';
+        calendarBtn.innerHTML = '📋';
+        calendarBtn.title = 'Show Feed';
+        renderCalendar();
+      } else {
+        calendarView.classList.remove('visible');
+        feedLayer.style.display = 'block';
+        calendarBtn.innerHTML = '📅';
+        calendarBtn.title = 'Calendar View';
+      }
+    }
+
+    function renderCalendar() {
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'];
+
+      // Update title
+      document.getElementById('calendarMonthTitle').textContent =
+        `${monthNames[currentCalendarMonth]} ${currentCalendarYear}`;
+
+      const grid = document.getElementById('calendarGrid');
+      grid.innerHTML = '';
+
+      // Get first day of month and total days
+      const firstDay = new Date(currentCalendarYear, currentCalendarMonth, 1);
+      const lastDay = new Date(currentCalendarYear, currentCalendarMonth + 1, 0);
+      const totalDays = lastDay.getDate();
+
+      // Get day of week for first day (0=Sun, adjust for Mon start)
+      let startDayOfWeek = firstDay.getDay();
+      startDayOfWeek = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1; // Convert to Mon=0
+
+      // Today's date for highlighting
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0];
+
+      // Add empty cells for days before first of month
+      for (let i = 0; i < startDayOfWeek; i++) {
+        const emptyDay = document.createElement('div');
+        emptyDay.className = 'calendar-day empty';
+        grid.appendChild(emptyDay);
+      }
+
+      // Add days of month
+      for (let day = 1; day <= totalDays; day++) {
+        const dateStr = `${currentCalendarYear}-${String(currentCalendarMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayEl = document.createElement('div');
+        dayEl.className = 'calendar-day';
+        dayEl.textContent = day;
+
+        // Check if today
+        if (dateStr === todayStr) {
+          dayEl.classList.add('today');
+        }
+
+        // Check if selected
+        if (dateStr === selectedCalendarDate) {
+          dayEl.classList.add('selected');
+        }
+
+        // Check if has events
+        const events = getEventsForDate(dateStr);
+        if (events.length > 0) {
+          dayEl.classList.add('has-events');
+          // Add event type indicator
+          const hasAppointment = events.some(e => e.type === 'appointment');
+          const hasTask = events.some(e => e.type === 'task' || e.type === 'prep');
+          if (hasAppointment) dayEl.classList.add('has-appointment');
+          if (hasTask) dayEl.classList.add('has-task');
+        }
+
+        dayEl.onclick = () => selectDay(dateStr);
+        grid.appendChild(dayEl);
+      }
+
+      // Clear day detail if no date selected
+      if (!selectedCalendarDate) {
+        document.getElementById('calendarDayDetail').innerHTML = '';
+      }
+    }
+
+    function changeMonth(delta) {
+      currentCalendarMonth += delta;
+      if (currentCalendarMonth > 11) {
+        currentCalendarMonth = 0;
+        currentCalendarYear++;
+      } else if (currentCalendarMonth < 0) {
+        currentCalendarMonth = 11;
+        currentCalendarYear--;
+      }
+      selectedCalendarDate = null;
+      renderCalendar();
+    }
+
+    function selectDay(dateStr) {
+      selectedCalendarDate = dateStr;
+      renderCalendar();
+
+      const events = getEventsForDate(dateStr);
+      const detailEl = document.getElementById('calendarDayDetail');
+
+      // Format date for display
+      const dateObj = new Date(dateStr + 'T00:00:00');
+      const options = { weekday: 'long', month: 'long', day: 'numeric' };
+      const formattedDate = dateObj.toLocaleDateString('en-AU', options);
+
+      if (events.length === 0) {
+        detailEl.innerHTML = `
+          <div class="calendar-detail-header">
+            <h4>${formattedDate}</h4>
+          </div>
+          <div class="calendar-no-events">No events scheduled</div>
+        `;
+      } else {
+        detailEl.innerHTML = `
+          <div class="calendar-detail-header">
+            <h4>${formattedDate}</h4>
+            <span class="calendar-event-count">${events.length} event${events.length > 1 ? 's' : ''}</span>
+          </div>
+          <div class="calendar-events-list">
+            ${events.map(event => {
+              const member = getMemberById(event.memberId);
+              const timeStr = event.time ? formatTime(event.time) : '';
+              const typeIcon = event.type === 'appointment' ? '📅' : event.type === 'prep' ? '📝' : '✓';
+              return `
+                <div class="calendar-event-item ${event.type}">
+                  <div class="calendar-event-icon">${typeIcon}</div>
+                  <div class="calendar-event-content">
+                    <div class="calendar-event-title">${event.title}</div>
+                    <div class="calendar-event-meta">
+                      ${timeStr ? `<span>${timeStr}</span>` : ''}
+                      ${member ? `<span>${member.icon} ${member.name}</span>` : ''}
+                      ${event.location ? `<span>📍 ${event.location}</span>` : ''}
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      }
+    }
+
+    function getEventsForDate(dateStr) {
+      return feedItems.filter(item => {
+        if (!item.date) return false;
+        return item.date === dateStr;
+      }).sort((a, b) => {
+        // Sort by time
+        if (a.time && b.time) return a.time.localeCompare(b.time);
+        if (a.time) return -1;
+        if (b.time) return 1;
+        return 0;
+      });
+    }
+
+    // ========================================
+    // SHOPPING LIST FUNCTIONS
+    // ========================================
+    let shoppingItems = JSON.parse(localStorage.getItem('life_shopping') || '[]');
+    let shoppingVisible = false;
+
+    const categoryInfo = {
+      produce: { icon: '🥬', name: 'Produce' },
+      dairy: { icon: '🧀', name: 'Dairy' },
+      meat: { icon: '🥩', name: 'Meat' },
+      bakery: { icon: '🍞', name: 'Bakery' },
+      pantry: { icon: '🥫', name: 'Pantry' },
+      frozen: { icon: '🧊', name: 'Frozen' },
+      drinks: { icon: '🥤', name: 'Drinks' },
+      household: { icon: '🧹', name: 'Household' },
+      other: { icon: '📦', name: 'Other' }
+    };
+
+    function toggleShoppingView() {
+      // Close other views first
+      if (calendarVisible) toggleCalendarView();
+      if (mealPlannerVisible) toggleMealPlannerView();
+
+      shoppingVisible = !shoppingVisible;
+      const shoppingView = document.getElementById('shoppingView');
+      const feedLayer = document.getElementById('feedLayer');
+      const shoppingBtn = document.getElementById('shoppingToggleBtn');
+
+      if (shoppingVisible) {
+        shoppingView.classList.add('visible');
+        feedLayer.style.display = 'none';
+        shoppingBtn.style.background = 'var(--adult)';
+        shoppingBtn.style.color = 'white';
+        renderShoppingList();
+      } else {
+        shoppingView.classList.remove('visible');
+        feedLayer.style.display = 'block';
+        shoppingBtn.style.background = '';
+        shoppingBtn.style.color = '';
+      }
+    }
+
+    function renderShoppingList() {
+      const container = document.getElementById('shoppingCategories');
+
+      if (shoppingItems.length === 0) {
+        container.innerHTML = `
+          <div class="shopping-empty">
+            <div class="shopping-empty-icon">🛒</div>
+            <div>Your shopping list is empty</div>
+            <div style="font-size: 0.85rem; margin-top: 8px;">Add items above or generate from meal plans</div>
+          </div>
+        `;
+        updateShoppingSummary();
+        return;
+      }
+
+      // Group items by category
+      const grouped = {};
+      shoppingItems.forEach(item => {
+        if (!grouped[item.category]) grouped[item.category] = [];
+        grouped[item.category].push(item);
+      });
+
+      // Render categories in order
+      const categoryOrder = ['produce', 'dairy', 'meat', 'bakery', 'pantry', 'frozen', 'drinks', 'household', 'other'];
+      let html = '';
+
+      categoryOrder.forEach(cat => {
+        if (!grouped[cat] || grouped[cat].length === 0) return;
+
+        const info = categoryInfo[cat];
+        const items = grouped[cat];
+
+        html += `
+          <div class="shopping-category">
+            <div class="shopping-category-header">
+              <span class="shopping-category-icon">${info.icon}</span>
+              <span>${info.name}</span>
+              <span style="color: var(--text-muted); font-weight: normal;">(${items.length})</span>
+            </div>
+            ${items.map(item => `
+              <div class="shopping-item ${item.completed ? 'completed' : ''}" data-id="${item.id}">
+                <div class="shopping-checkbox ${item.completed ? 'checked' : ''}" onclick="toggleShoppingItem('${item.id}')">
+                  ${item.completed ? '✓' : ''}
+                </div>
+                <span class="shopping-item-name">${item.name}</span>
+                <button class="shopping-item-delete" onclick="deleteShoppingItem('${item.id}')">×</button>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      updateShoppingSummary();
+    }
+
+    function updateShoppingSummary() {
+      const total = shoppingItems.length;
+      const completed = shoppingItems.filter(i => i.completed).length;
+      document.querySelector('.shopping-count').textContent = `${total} item${total !== 1 ? 's' : ''}`;
+      document.querySelector('.shopping-completed').textContent = `${completed} completed`;
+    }
+
+    function addShoppingItem() {
+      const input = document.getElementById('shoppingInput');
+      const category = document.getElementById('shoppingCategory').value;
+      const name = input.value.trim();
+
+      if (!name) return;
+
+      const newItem = {
+        id: 'shop_' + Date.now(),
+        name: name,
+        category: category,
+        completed: false,
+        createdAt: new Date().toISOString()
+      };
+
+      shoppingItems.push(newItem);
+      saveShoppingList();
+      renderShoppingList();
+      input.value = '';
+      input.focus();
+    }
+
+    function handleShoppingKeypress(event) {
+      if (event.key === 'Enter') {
+        addShoppingItem();
+      }
+    }
+
+    function toggleShoppingItem(id) {
+      const item = shoppingItems.find(i => i.id === id);
+      if (item) {
+        item.completed = !item.completed;
+        saveShoppingList();
+        renderShoppingList();
+      }
+    }
+
+    function deleteShoppingItem(id) {
+      shoppingItems = shoppingItems.filter(i => i.id !== id);
+      saveShoppingList();
+      renderShoppingList();
+    }
+
+    function clearCompletedItems() {
+      const completed = shoppingItems.filter(i => i.completed).length;
+      if (completed === 0) {
+        alert('No completed items to clear');
+        return;
+      }
+      if (confirm(`Clear ${completed} completed item${completed !== 1 ? 's' : ''}?`)) {
+        shoppingItems = shoppingItems.filter(i => !i.completed);
+        saveShoppingList();
+        renderShoppingList();
+      }
+    }
+
+    function saveShoppingList() {
+      localStorage.setItem('life_shopping', JSON.stringify(shoppingItems));
+    }
+
+    // ========================================
+    // MEAL PLANNER FUNCTIONS
+    // ========================================
+    let mealPlan = JSON.parse(localStorage.getItem('life_meals') || '{}');
+    let mealPlannerVisible = false;
+    let mealWeekOffset = 0;
+
+    function toggleMealPlannerView() {
+      // Close other views first
+      if (calendarVisible) toggleCalendarView();
+      if (shoppingVisible) toggleShoppingView();
+
+      mealPlannerVisible = !mealPlannerVisible;
+      const mealView = document.getElementById('mealPlannerView');
+      const feedLayer = document.getElementById('feedLayer');
+      const mealBtn = document.getElementById('mealToggleBtn');
+
+      if (mealPlannerVisible) {
+        mealView.classList.add('visible');
+        feedLayer.style.display = 'none';
+        mealBtn.style.background = 'var(--adult)';
+        mealBtn.style.color = 'white';
+        renderMealPlanner();
+      } else {
+        mealView.classList.remove('visible');
+        feedLayer.style.display = 'block';
+        mealBtn.style.background = '';
+        mealBtn.style.color = '';
+      }
+    }
+
+    function getWeekDates(offset = 0) {
+      const today = new Date();
+      const currentDay = today.getDay();
+      const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
+
+      const monday = new Date(today);
+      monday.setDate(today.getDate() + mondayOffset + (offset * 7));
+
+      const days = [];
+      const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(monday);
+        date.setDate(monday.getDate() + i);
+        days.push({
+          name: dayNames[i],
+          date: date,
+          dateStr: date.toISOString().split('T')[0],
+          isToday: date.toDateString() === today.toDateString()
+        });
+      }
+
+      return days;
+    }
+
+    function renderMealPlanner() {
+      const days = getWeekDates(mealWeekOffset);
+
+      // Update week title
+      const firstDay = days[0].date;
+      const lastDay = days[6].date;
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+      let title = '';
+      if (mealWeekOffset === 0) {
+        title = 'This Week';
+      } else if (mealWeekOffset === 1) {
+        title = 'Next Week';
+      } else if (mealWeekOffset === -1) {
+        title = 'Last Week';
+      } else {
+        title = `${monthNames[firstDay.getMonth()]} ${firstDay.getDate()} - ${monthNames[lastDay.getMonth()]} ${lastDay.getDate()}`;
+      }
+      document.getElementById('mealWeekTitle').textContent = title;
+
+      // Render days
+      const container = document.getElementById('mealDays');
+      container.innerHTML = days.map((day, index) => {
+        const meals = mealPlan[day.dateStr] || {};
+
+        return `
+          <div class="meal-day">
+            <div class="meal-day-header ${day.isToday ? 'today' : ''}">
+              <span class="meal-day-name">${day.name}</span>
+              <span class="meal-day-date">${day.date.getDate()} ${monthNames[day.date.getMonth()]}</span>
+            </div>
+            <div class="meal-slots">
+              ${renderMealSlot(day.dateStr, 'breakfast', meals.breakfast)}
+              ${renderMealSlot(day.dateStr, 'lunch', meals.lunch)}
+              ${renderMealSlot(day.dateStr, 'dinner', meals.dinner)}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderMealSlot(dateStr, type, meal) {
+      const typeLabels = { breakfast: 'Brekky', lunch: 'Lunch', dinner: 'Dinner' };
+
+      if (!meal) {
+        return `
+          <div class="meal-slot">
+            <span class="meal-slot-type">${typeLabels[type]}</span>
+            <div class="meal-slot-content">
+              <span class="meal-slot-empty" onclick="openAddMealSheet('${dateStr}', '${type}')">+ Add meal</span>
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="meal-slot">
+          <span class="meal-slot-type">${typeLabels[type]}</span>
+          <div class="meal-slot-content">
+            <div class="meal-slot-filled">
+              <div>
+                <div class="meal-slot-name">${meal.name}</div>
+                ${meal.notes ? `<div class="meal-slot-notes">${meal.notes}</div>` : ''}
+              </div>
+              <div class="meal-slot-actions">
+                <button class="meal-slot-btn" onclick="openAddMealSheet('${dateStr}', '${type}')" title="Edit">✏️</button>
+                <button class="meal-slot-btn" onclick="deleteMeal('${dateStr}', '${type}')" title="Remove">×</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function changeMealWeek(delta) {
+      mealWeekOffset += delta;
+      renderMealPlanner();
+    }
+
+    function openAddMealSheet(dateStr, type) {
+      document.getElementById('mealDayIndex').value = dateStr;
+      document.getElementById('mealType').value = type;
+
+      const existingMeal = mealPlan[dateStr]?.[type];
+      if (existingMeal) {
+        document.getElementById('mealName').value = existingMeal.name || '';
+        document.getElementById('mealIngredients').value = (existingMeal.ingredients || []).join('\n');
+        document.getElementById('mealNotes').value = existingMeal.notes || '';
+      } else {
+        document.getElementById('mealName').value = '';
+        document.getElementById('mealIngredients').value = '';
+        document.getElementById('mealNotes').value = '';
+      }
+
+      openModal('addMealSheet');
+    }
+
+    function closeAddMealSheet() {
+      document.getElementById('modalOverlay').classList.remove('open');
+      document.getElementById('addMealSheet').classList.remove('open');
+    }
+
+    function saveMeal() {
+      const dateStr = document.getElementById('mealDayIndex').value;
+      const type = document.getElementById('mealType').value;
+      const name = document.getElementById('mealName').value.trim();
+      const ingredientsText = document.getElementById('mealIngredients').value.trim();
+      const notes = document.getElementById('mealNotes').value.trim();
+
+      if (!name) {
+        alert('Please enter a meal name');
+        return;
+      }
+
+      const ingredients = ingredientsText
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0);
+
+      if (!mealPlan[dateStr]) {
+        mealPlan[dateStr] = {};
+      }
+
+      mealPlan[dateStr][type] = {
+        name,
+        ingredients,
+        notes
+      };
+
+      saveMealPlan();
+      closeAddMealSheet();
+      renderMealPlanner();
+    }
+
+    function deleteMeal(dateStr, type) {
+      if (mealPlan[dateStr] && mealPlan[dateStr][type]) {
+        delete mealPlan[dateStr][type];
+        if (Object.keys(mealPlan[dateStr]).length === 0) {
+          delete mealPlan[dateStr];
+        }
+        saveMealPlan();
+        renderMealPlanner();
+      }
+    }
+
+    function saveMealPlan() {
+      localStorage.setItem('life_meals', JSON.stringify(mealPlan));
+    }
+
+    function generateShoppingFromMeals() {
+      const days = getWeekDates(mealWeekOffset);
+      const ingredients = [];
+
+      days.forEach(day => {
+        const meals = mealPlan[day.dateStr] || {};
+        ['breakfast', 'lunch', 'dinner'].forEach(type => {
+          if (meals[type] && meals[type].ingredients) {
+            meals[type].ingredients.forEach(ing => {
+              if (!ingredients.includes(ing.toLowerCase())) {
+                ingredients.push(ing);
+              }
+            });
+          }
+        });
+      });
+
+      if (ingredients.length === 0) {
+        alert('No ingredients found in meal plan for this week');
+        return;
+      }
+
+      // Add to shopping list (avoid duplicates)
+      const existingNames = shoppingItems.map(i => i.name.toLowerCase());
+      let added = 0;
+
+      ingredients.forEach(ing => {
+        if (!existingNames.includes(ing.toLowerCase())) {
+          shoppingItems.push({
+            id: 'shop_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+            name: ing,
+            category: 'other',
+            completed: false,
+            createdAt: new Date().toISOString()
+          });
+          added++;
+        }
+      });
+
+      saveShoppingList();
+
+      if (added > 0) {
+        alert(`Added ${added} ingredient${added !== 1 ? 's' : ''} to shopping list`);
+        toggleMealPlannerView();
+        toggleShoppingView();
+      } else {
+        alert('All ingredients are already in your shopping list');
+      }
+    }
+
+    function generateListFromMeals() {
+      // Switch to meal planner to generate from there
+      toggleShoppingView();
+      toggleMealPlannerView();
+    }
+
+    // ========================================
+    // ADHD TASK BREAKDOWN FUNCTIONS
+    // ========================================
+    let adhdTasks = JSON.parse(localStorage.getItem('life_adhd_tasks') || '[]');
+    let adhdTaskViewVisible = false;
+    let currentBreakdownTask = null;
+    let clarificationQuestions = [];
+    let clarificationAnswers = {};
+    let currentQuestionIndex = 0;
+    let currentFocusTask = null;
+    let currentStepIndex = 0;
+    let focusTimerInterval = null;
+    let focusTimerSeconds = 300; // 5 minutes
+
+    // Common ambiguous words and their clarification options
+    const ambiguousTerms = {
+      'clean': {
+        question: 'What kind of cleaning do you mean?',
+        options: [
+          { value: 'tidy', label: '🧹 Quick tidy up - put things away' },
+          { value: 'deep', label: '🧼 Deep clean - scrub and sanitize' },
+          { value: 'declutter', label: '📦 Declutter - sort and remove items' },
+          { value: 'organize', label: '🗂️ Organize - create systems' }
+        ]
+      },
+      'organize': {
+        question: 'What does organizing mean for this task?',
+        options: [
+          { value: 'sort', label: '📊 Sort into categories' },
+          { value: 'label', label: '🏷️ Label and store properly' },
+          { value: 'digital', label: '💻 Digital organization (files/apps)' },
+          { value: 'schedule', label: '📅 Plan and schedule things' }
+        ]
+      },
+      'fix': {
+        question: 'What kind of fixing is needed?',
+        options: [
+          { value: 'repair', label: '🔧 Physical repair' },
+          { value: 'resolve', label: '💬 Resolve an issue/conflict' },
+          { value: 'update', label: '🔄 Update or improve' },
+          { value: 'troubleshoot', label: '🔍 Find and fix a problem' }
+        ]
+      },
+      'sort': {
+        question: 'How would you like to sort things?',
+        options: [
+          { value: 'keep_donate', label: '📦 Keep vs donate/trash' },
+          { value: 'categorize', label: '🗂️ By category or type' },
+          { value: 'priority', label: '⭐ By priority/importance' },
+          { value: 'alphabetical', label: '🔤 Alphabetically or by date' }
+        ]
+      },
+      'prepare': {
+        question: 'What kind of preparation?',
+        options: [
+          { value: 'gather', label: '🎒 Gather items/materials' },
+          { value: 'plan', label: '📋 Create a plan' },
+          { value: 'practice', label: '🎯 Practice or rehearse' },
+          { value: 'research', label: '🔍 Research and learn' }
+        ]
+      },
+      'do': {
+        question: 'Can you be more specific about what you need to do?',
+        options: [
+          { value: 'complete', label: '✅ Complete a specific task' },
+          { value: 'start', label: '🚀 Start something new' },
+          { value: 'continue', label: '▶️ Continue something in progress' },
+          { value: 'finish', label: '🏁 Finish something almost done' }
+        ]
+      }
+    };
+
+    function toggleAdhdTaskView() {
+      // Close other views first
+      if (calendarVisible) toggleCalendarView();
+      if (shoppingVisible) toggleShoppingView();
+      if (mealPlannerVisible) toggleMealPlannerView();
+
+      adhdTaskViewVisible = !adhdTaskViewVisible;
+      const adhdView = document.getElementById('adhdTaskView');
+      const feedLayer = document.getElementById('feedLayer');
+      const adhdBtn = document.getElementById('adhdTaskToggleBtn');
+
+      if (adhdTaskViewVisible) {
+        adhdView.classList.add('visible');
+        feedLayer.style.display = 'none';
+        adhdBtn.style.background = 'var(--adult)';
+        adhdBtn.style.color = 'white';
+        showAdhdInputSection();
+        renderAdhdTaskList();
+      } else {
+        adhdView.classList.remove('visible');
+        feedLayer.style.display = 'block';
+        adhdBtn.style.background = '';
+        adhdBtn.style.color = '';
+      }
+    }
+
+    function showAdhdInputSection() {
+      document.getElementById('adhdInputSection').style.display = 'block';
+      document.getElementById('adhdClarifySection').style.display = 'none';
+      document.getElementById('adhdFocusSection').style.display = 'none';
+    }
+
+    function renderAdhdTaskList() {
+      const container = document.getElementById('adhdTaskList');
+      const section = document.getElementById('adhdExistingTasks');
+
+      if (adhdTasks.length === 0) {
+        section.style.display = 'none';
+        return;
+      }
+
+      section.style.display = 'block';
+
+      container.innerHTML = adhdTasks.map(task => {
+        const completedSteps = task.steps.filter(s => s.completed).length;
+        const totalSteps = task.steps.length;
+        const progress = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
+        const isCompleted = progress === 100;
+
+        return `
+          <div class="adhd-task-item ${isCompleted ? 'completed' : ''}" onclick="enterFocusMode('${task.id}')">
+            <div class="adhd-task-progress-ring" style="--progress: ${progress}%">
+              <div class="adhd-task-progress-inner">${progress}%</div>
+            </div>
+            <div class="adhd-task-info">
+              <div class="adhd-task-name">${task.name}</div>
+              <div class="adhd-task-meta">${completedSteps} of ${totalSteps} steps done</div>
+            </div>
+            <div class="adhd-task-actions" onclick="event.stopPropagation()">
+              <button class="adhd-task-action-btn" onclick="deleteAdhdTask('${task.id}')" title="Delete">🗑️</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function startTaskBreakdown() {
+      const input = document.getElementById('adhdTaskInput');
+      const taskText = input.value.trim();
+
+      if (!taskText) {
+        alert('Please enter a task first');
+        return;
+      }
+
+      currentBreakdownTask = taskText;
+      clarificationAnswers = {};
+      clarificationQuestions = [];
+      currentQuestionIndex = 0;
+
+      // Check for ambiguous terms
+      const lowerTask = taskText.toLowerCase();
+      for (const [term, data] of Object.entries(ambiguousTerms)) {
+        if (lowerTask.includes(term)) {
+          clarificationQuestions.push({
+            term,
+            question: data.question,
+            options: data.options
+          });
+        }
+      }
+
+      // If we have clarification questions, show them
+      if (clarificationQuestions.length > 0) {
+        showClarificationQuestion();
+      } else {
+        // No clarification needed, go straight to breakdown
+        generateTaskBreakdown();
+      }
+    }
+
+    function showClarificationQuestion() {
+      document.getElementById('adhdInputSection').style.display = 'none';
+      document.getElementById('adhdClarifySection').style.display = 'block';
+
+      const q = clarificationQuestions[currentQuestionIndex];
+      document.getElementById('clarifyQuestion').textContent = q.question;
+      document.getElementById('clarifyProgress').textContent =
+        `Question ${currentQuestionIndex + 1} of ${clarificationQuestions.length}`;
+
+      const optionsContainer = document.getElementById('clarifyOptions');
+      optionsContainer.innerHTML = q.options.map(opt => `
+        <button class="adhd-clarify-option" onclick="selectClarificationOption('${q.term}', '${opt.value}', this)">
+          ${opt.label}
+        </button>
+      `).join('');
+
+      document.getElementById('clarifyCustomInput').value = '';
+    }
+
+    function selectClarificationOption(term, value, btn) {
+      // Remove selected from siblings
+      document.querySelectorAll('.adhd-clarify-option').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+
+      clarificationAnswers[term] = value;
+
+      // Auto-advance after short delay
+      setTimeout(() => {
+        nextClarificationQuestion();
+      }, 300);
+    }
+
+    function submitCustomClarification() {
+      const input = document.getElementById('clarifyCustomInput');
+      const value = input.value.trim();
+      if (!value) return;
+
+      const q = clarificationQuestions[currentQuestionIndex];
+      clarificationAnswers[q.term] = value;
+      nextClarificationQuestion();
+    }
+
+    function nextClarificationQuestion() {
+      currentQuestionIndex++;
+      if (currentQuestionIndex < clarificationQuestions.length) {
+        showClarificationQuestion();
+      } else {
+        // All questions answered, generate breakdown
+        generateTaskBreakdown();
+      }
+    }
+
+    function cancelClarification() {
+      showAdhdInputSection();
+    }
+
+    async function generateTaskBreakdown() {
+      // Show loading modal
+      openModal('adhdBreakdownSheet');
+      document.getElementById('adhdLoading').style.display = 'block';
+      document.getElementById('adhdBreakdownResult').style.display = 'none';
+
+      // Build context from clarifications
+      let context = currentBreakdownTask;
+      if (Object.keys(clarificationAnswers).length > 0) {
+        context += '\n\nClarifications:';
+        for (const [term, value] of Object.entries(clarificationAnswers)) {
+          context += `\n- "${term}" means: ${value}`;
+        }
+      }
+
+      try {
+        // Try to use AI if available
+        const idToken = localStorage.getItem('google_id_token');
+        let steps = [];
+
+        if (idToken) {
+          // Try API call for AI breakdown
+          try {
+            const response = await fetch('/api/tasks/breakdown', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
+              },
+              body: JSON.stringify({ task: context })
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              steps = data.steps || [];
+            }
+          } catch (e) {
+            console.log('AI breakdown not available, using fallback');
+          }
+        }
+
+        // Fallback: Generate steps locally
+        if (steps.length === 0) {
+          steps = generateLocalBreakdown(currentBreakdownTask, clarificationAnswers);
+        }
+
+        // Show results
+        showBreakdownResult(steps);
+
+      } catch (error) {
+        console.error('Breakdown error:', error);
+        // Use local fallback
+        const steps = generateLocalBreakdown(currentBreakdownTask, clarificationAnswers);
+        showBreakdownResult(steps);
+      }
+    }
+
+    function generateLocalBreakdown(task, clarifications) {
+      // Smart local breakdown based on common patterns
+      const lowerTask = task.toLowerCase();
+      let steps = [];
+
+      // Get clarification context
+      const cleanType = clarifications['clean'] || 'tidy';
+      const organizeType = clarifications['organize'] || 'sort';
+
+      if (lowerTask.includes('clean')) {
+        if (cleanType === 'deep') {
+          steps = [
+            'Gather all cleaning supplies (spray, cloths, mop, etc.)',
+            'Clear the surfaces of clutter first',
+            'Start from top to bottom (dust high shelves first)',
+            'Wipe down all surfaces with cleaner',
+            'Clean any mirrors or glass',
+            'Vacuum or sweep the floors',
+            'Mop hard floors or spot-clean carpet',
+            'Take out any trash',
+            'Put cleaning supplies away'
+          ];
+        } else if (cleanType === 'declutter') {
+          steps = [
+            'Get 3 bags/boxes: Keep, Donate, Trash',
+            'Pick ONE area to start (don\'t try to do everything)',
+            'Go through items one by one - decide in 5 seconds',
+            'If you haven\'t used it in a year, it goes',
+            'Put "Keep" items back neatly',
+            'Take donation bag to your car NOW',
+            'Put trash bag out immediately'
+          ];
+        } else if (cleanType === 'organize') {
+          steps = [
+            'Decide on categories for this space',
+            'Empty everything out (yes, everything)',
+            'Sort items into your categories',
+            'Get containers or labels if needed',
+            'Assign a HOME for each category',
+            'Put everything back in its new home',
+            'Label containers if helpful'
+          ];
+        } else {
+          steps = [
+            'Set a timer for 15 minutes',
+            'Put away anything that\'s out of place',
+            'Wipe down visible surfaces',
+            'Quick vacuum/sweep high-traffic areas',
+            'Fluff pillows and straighten blankets',
+            'Done! Good enough is good enough!'
+          ];
+        }
+      } else if (lowerTask.includes('tax') || lowerTask.includes('paperwork')) {
+        steps = [
+          'Gather all relevant documents in one spot',
+          'Make a checklist of what you need',
+          'Find ONE missing document (just one for now)',
+          'Open the form/website you need',
+          'Fill in just the EASY parts first (name, address)',
+          'Take a 5-minute break',
+          'Fill in the next section',
+          'Review what you\'ve done',
+          'Submit or save progress'
+        ];
+      } else if (lowerTask.includes('email') || lowerTask.includes('inbox')) {
+        steps = [
+          'Open your inbox (that\'s it for now)',
+          'Delete obvious spam/junk (10 at a time)',
+          'Star/flag anything urgent',
+          'Reply to ONE easy email',
+          'Take a breath',
+          'Reply to one more',
+          'Unsubscribe from ONE newsletter you never read',
+          'Archive anything older than a month that you\'ve handled'
+        ];
+      } else if (lowerTask.includes('garage') || lowerTask.includes('shed') || lowerTask.includes('storage')) {
+        steps = [
+          'Take a "before" photo (for motivation later!)',
+          'Clear ONE small section completely',
+          'Sort that section: Keep, Donate, Trash, Relocate',
+          'Put Trash items directly in bin NOW',
+          'Box up Donate items and put in car',
+          'Return Keep items to cleared section, organized',
+          'Move to next small section',
+          'Repeat until done or energy runs out',
+          'Take an "after" photo - you did great!'
+        ];
+      } else if (lowerTask.includes('cook') || lowerTask.includes('dinner') || lowerTask.includes('meal')) {
+        steps = [
+          'Decide what you\'re making (pick something simple)',
+          'Check if you have the ingredients',
+          'Get everything out on the counter',
+          'Preheat oven/stove if needed',
+          'Prep ingredients (chop, measure)',
+          'Start cooking - follow recipe step by step',
+          'Set timer so you don\'t forget',
+          'Clean as you go (or don\'t, it\'s fine)',
+          'Serve and enjoy!'
+        ];
+      } else {
+        // Generic breakdown for unknown tasks
+        steps = [
+          `Open/find what you need for "${task}"`,
+          'Identify the very first small action',
+          'Do that first small action (just that)',
+          'What\'s the next tiny step? Do that.',
+          'Take a quick break if needed',
+          'Continue with the next obvious step',
+          'Check your progress - celebrate small wins!',
+          'Keep going until it\'s done or you\'ve hit your time limit',
+          'If stuck, ask: "What\'s the smallest possible next step?"'
+        ];
+      }
+
+      return steps;
+    }
+
+    function showBreakdownResult(steps) {
+      document.getElementById('adhdLoading').style.display = 'none';
+      document.getElementById('adhdBreakdownResult').style.display = 'block';
+
+      document.getElementById('breakdownSummary').innerHTML = `
+        <h4>📋 ${currentBreakdownTask}</h4>
+        <p>I've broken this into ${steps.length} manageable steps. You've got this!</p>
+      `;
+
+      document.getElementById('breakdownSteps').innerHTML = steps.map((step, i) => `
+        <div class="adhd-breakdown-step">
+          <div class="adhd-breakdown-step-num">${i + 1}</div>
+          <div class="adhd-breakdown-step-text">${step}</div>
+        </div>
+      `).join('');
+
+      // Store for saving
+      currentBreakdownTask = {
+        name: currentBreakdownTask,
+        steps: steps
+      };
+    }
+
+    function saveTaskBreakdown() {
+      const newTask = {
+        id: 'adhd_' + Date.now(),
+        name: typeof currentBreakdownTask === 'string' ? currentBreakdownTask : currentBreakdownTask.name,
+        steps: (typeof currentBreakdownTask === 'object' ? currentBreakdownTask.steps : []).map((text, i) => ({
+          id: i,
+          text: text,
+          completed: false
+        })),
+        createdAt: new Date().toISOString(),
+        clarifications: { ...clarificationAnswers }
+      };
+
+      adhdTasks.unshift(newTask);
+      saveAdhdTasks();
+
+      // Close modal and reset
+      closeAdhdBreakdownSheet();
+      document.getElementById('adhdTaskInput').value = '';
+      showAdhdInputSection();
+      renderAdhdTaskList();
+
+      // Enter focus mode for new task
+      setTimeout(() => {
+        enterFocusMode(newTask.id);
+      }, 300);
+    }
+
+    function regenerateBreakdown() {
+      if (typeof currentBreakdownTask === 'object') {
+        currentBreakdownTask = currentBreakdownTask.name;
+      }
+      generateTaskBreakdown();
+    }
+
+    function closeAdhdBreakdownSheet() {
+      document.getElementById('modalOverlay').classList.remove('open');
+      document.getElementById('adhdBreakdownSheet').classList.remove('open');
+    }
+
+    function deleteAdhdTask(taskId) {
+      if (confirm('Delete this task and all its steps?')) {
+        adhdTasks = adhdTasks.filter(t => t.id !== taskId);
+        saveAdhdTasks();
+        renderAdhdTaskList();
+      }
+    }
+
+    function saveAdhdTasks() {
+      localStorage.setItem('life_adhd_tasks', JSON.stringify(adhdTasks));
+    }
+
+    // ========================================
+    // FOCUS MODE FUNCTIONS
+    // ========================================
+    function enterFocusMode(taskId) {
+      currentFocusTask = adhdTasks.find(t => t.id === taskId);
+      if (!currentFocusTask) return;
+
+      // Find first incomplete step
+      currentStepIndex = currentFocusTask.steps.findIndex(s => !s.completed);
+      if (currentStepIndex === -1) currentStepIndex = 0;
+
+      document.getElementById('adhdInputSection').style.display = 'none';
+      document.getElementById('adhdClarifySection').style.display = 'none';
+      document.getElementById('adhdFocusSection').style.display = 'flex';
+
+      renderFocusMode();
+    }
+
+    function renderFocusMode() {
+      if (!currentFocusTask) return;
+
+      document.getElementById('focusTaskTitle').textContent = currentFocusTask.name;
+
+      const currentStep = currentFocusTask.steps[currentStepIndex];
+      document.getElementById('focusCurrentStep').textContent = currentStep ? currentStep.text : 'All done!';
+
+      // Progress
+      const completed = currentFocusTask.steps.filter(s => s.completed).length;
+      const total = currentFocusTask.steps.length;
+      const percent = Math.round((completed / total) * 100);
+
+      document.getElementById('focusProgressBar').style.width = percent + '%';
+      document.getElementById('focusProgressText').textContent = `Step ${currentStepIndex + 1} of ${total}`;
+
+      // Show/hide timer based on step
+      document.getElementById('focusTimer').style.display = 'block';
+
+      // Render all steps list
+      renderFocusStepsList();
+    }
+
+    function renderFocusStepsList() {
+      const container = document.getElementById('focusStepsList');
+      container.innerHTML = currentFocusTask.steps.map((step, i) => {
+        let className = 'adhd-step-item';
+        if (step.completed) className += ' completed';
+        if (i === currentStepIndex && !step.completed) className += ' current';
+
+        return `
+          <div class="${className}">
+            <div class="adhd-step-number">${step.completed ? '✓' : i + 1}</div>
+            <span>${step.text}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function completeCurrentStep() {
+      if (!currentFocusTask) return;
+
+      const step = currentFocusTask.steps[currentStepIndex];
+      if (step) {
+        step.completed = true;
+        saveAdhdTasks();
+
+        // Check if all done
+        const allDone = currentFocusTask.steps.every(s => s.completed);
+        if (allDone) {
+          showCelebration('🎉', 'Amazing! You completed the whole task!');
+          setTimeout(() => {
+            exitFocusMode();
+          }, 2500);
+        } else {
+          // Mini celebration
+          showCelebration('⭐', getRandomPraise());
+
+          // Move to next step
+          currentStepIndex++;
+          if (currentStepIndex >= currentFocusTask.steps.length) {
+            currentStepIndex = currentFocusTask.steps.findIndex(s => !s.completed);
+          }
+
+          setTimeout(() => {
+            hideCelebration();
+            renderFocusMode();
+          }, 1200);
+        }
+      }
+    }
+
+    function skipCurrentStep() {
+      if (!currentFocusTask) return;
+
+      // Find next incomplete step
+      for (let i = currentStepIndex + 1; i < currentFocusTask.steps.length; i++) {
+        if (!currentFocusTask.steps[i].completed) {
+          currentStepIndex = i;
+          renderFocusMode();
+          return;
+        }
+      }
+
+      // Wrap around to start
+      for (let i = 0; i < currentStepIndex; i++) {
+        if (!currentFocusTask.steps[i].completed) {
+          currentStepIndex = i;
+          renderFocusMode();
+          return;
+        }
+      }
+    }
+
+    function exitFocusMode() {
+      document.getElementById('adhdFocusSection').style.display = 'none';
+      showAdhdInputSection();
+      renderAdhdTaskList();
+      stopFocusTimer();
+    }
+
+    function toggleAllSteps() {
+      const list = document.getElementById('focusStepsList');
+      const icon = document.getElementById('showStepsIcon');
+      const btn = document.querySelector('.adhd-show-steps-btn');
+
+      if (list.style.display === 'none') {
+        list.style.display = 'block';
+        icon.textContent = '▲';
+        btn.innerHTML = '<span id="showStepsIcon">▲</span> Hide all steps';
+      } else {
+        list.style.display = 'none';
+        icon.textContent = '▼';
+        btn.innerHTML = '<span id="showStepsIcon">▼</span> Show all steps';
+      }
+    }
+
+    // Timer functions
+    function toggleFocusTimer() {
+      const btn = document.getElementById('timerBtn');
+      if (focusTimerInterval) {
+        stopFocusTimer();
+        btn.textContent = 'Start Timer';
+      } else {
+        startFocusTimer();
+        btn.textContent = 'Pause';
+      }
+    }
+
+    function startFocusTimer() {
+      focusTimerInterval = setInterval(() => {
+        focusTimerSeconds--;
+        updateTimerDisplay();
+
+        if (focusTimerSeconds <= 0) {
+          stopFocusTimer();
+          showCelebration('🏆', '5 minutes done! Keep going or take a break!');
+          setTimeout(hideCelebration, 2000);
+          focusTimerSeconds = 300; // Reset
+          updateTimerDisplay();
+        }
+      }, 1000);
+    }
+
+    function stopFocusTimer() {
+      if (focusTimerInterval) {
+        clearInterval(focusTimerInterval);
+        focusTimerInterval = null;
+      }
+    }
+
+    function updateTimerDisplay() {
+      const mins = Math.floor(focusTimerSeconds / 60);
+      const secs = focusTimerSeconds % 60;
+      document.getElementById('timerDisplay').textContent =
+        `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    // Celebration functions
+    function showCelebration(emoji, text) {
+      document.getElementById('celebrationEmoji').textContent = emoji;
+      document.getElementById('celebrationText').textContent = text;
+      document.getElementById('adhdCelebration').style.display = 'flex';
+    }
+
+    function hideCelebration() {
+      document.getElementById('adhdCelebration').style.display = 'none';
+    }
+
+    function getRandomPraise() {
+      const praises = [
+        'Yes! One step down!',
+        'You\'re doing great!',
+        'Keep that momentum!',
+        'Look at you go!',
+        'Crushing it!',
+        'One less thing to worry about!',
+        'Progress feels good!',
+        'You\'re on fire!',
+        'That\'s the way!',
+        'Boom! Done!'
+      ];
+      return praises[Math.floor(Math.random() * praises.length)];
+    }
+
     // Share Task Functions
     let shareTaskFromMember = null;
 
@@ -2621,9 +6346,63 @@
     // INITIALIZATION
     // ========================================
     function init() {
+      initDarkMode();
+      initNotifications();
       loadData();
+      checkBirthdays();
       renderBubbles();
       renderFeed();
+    }
+
+    // Check for upcoming birthdays and create reminder cards
+    function checkBirthdays() {
+      const today = new Date();
+      const todayMonth = today.getMonth();
+      const todayDay = today.getDate();
+
+      familyMembers.forEach(member => {
+        if (!member.birthday) return;
+
+        const bday = new Date(member.birthday);
+        const bdayMonth = bday.getMonth();
+        const bdayDay = bday.getDate();
+
+        // Check if birthday is within next 7 days
+        for (let i = 0; i <= 7; i++) {
+          const checkDate = new Date(today);
+          checkDate.setDate(today.getDate() + i);
+
+          if (checkDate.getMonth() === bdayMonth && checkDate.getDate() === bdayDay) {
+            // Check if we already have a birthday card for this member this year
+            const existingCard = feedItems.find(item =>
+              item.type === 'birthday' &&
+              item.memberId === member.id &&
+              item.year === today.getFullYear()
+            );
+
+            if (!existingCard) {
+              const age = today.getFullYear() - bday.getFullYear();
+              const isToday = i === 0;
+
+              feedItems.push({
+                id: generateId(),
+                memberId: member.id,
+                type: 'birthday',
+                title: isToday ? `🎂 Happy Birthday ${member.name}!` : `🎂 ${member.name}'s Birthday Coming Up!`,
+                notes: isToday
+                  ? `${member.name} turns ${age} today!`
+                  : `${member.name} turns ${age} in ${i} day${i > 1 ? 's' : ''}`,
+                date: `${today.getFullYear()}-${String(bdayMonth + 1).padStart(2, '0')}-${String(bdayDay).padStart(2, '0')}`,
+                year: today.getFullYear(),
+                createdAt: new Date().toISOString(),
+                pinned: isToday
+              });
+              saveData();
+            }
+            break;
+          }
+        }
+      });
     }
 
     // Start the app
