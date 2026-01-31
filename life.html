@@ -1397,6 +1397,7 @@
     // --- MENU OPTIONS BY ROLE ---
     const MENU_OPTIONS = {
       adult: [
+        { action: 'profile', label: 'View Profile', icon: '👤' },
         { action: 'appointment', label: 'Add Appointment', icon: '🩺' },
         { action: 'roster', label: 'Add Roster', icon: '📋' },
         { action: 'event', label: 'Add Event', icon: '🎉' },
@@ -1405,6 +1406,7 @@
         { action: 'share', label: 'Share Task', icon: '🤝' }
       ],
       child: [
+        { action: 'profile', label: 'View Profile', icon: '👤' },
         { action: 'appointment', label: 'Add Appointment', icon: '🩺' },
         { action: 'milestone', label: 'Add Milestone', icon: '⭐' },
         { action: 'event', label: 'Add Event', icon: '🎉' },
@@ -1412,6 +1414,7 @@
         { action: 'note', label: 'Add Photo/Note', icon: '📸' }
       ],
       household: [
+        { action: 'profile', label: 'View Details', icon: '🏠' },
         { action: 'note', label: 'Shared Task', icon: '📦' },
         { action: 'event', label: 'Shared Event', icon: '🎉' },
         { action: 'weekly', label: 'Weekly Plan', icon: '📋' }
@@ -1633,7 +1636,9 @@
         btn.onclick = (e) => {
           e.stopPropagation();
           closeAllMenus();
-          if (opt.action === 'weekly') {
+          if (opt.action === 'profile') {
+            openProfileSheet(member);
+          } else if (opt.action === 'weekly') {
             generateWeeklyPlan();
           } else if (opt.action === 'share') {
             openShareTaskSheet(member.id);
@@ -1648,48 +1653,17 @@
     }
 
     function attachBubbleInteraction(element, member) {
-      let pressTimer;
-      let isLongPress = false;
-      let startY = 0;
+      // Simple tap to open menu
+      element.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const menu = document.getElementById(`menu-${member.id}`);
+        const isOpen = menu && menu.classList.contains('visible');
 
-      const startPress = (e) => {
-        isLongPress = false;
-        startY = e.touches ? e.touches[0].clientY : e.clientY;
-        element.classList.add('pressing');
+        closeAllMenus();
 
-        pressTimer = setTimeout(() => {
-          isLongPress = true;
-          element.classList.remove('pressing');
+        if (!isOpen) {
           openMenu(member.id);
-          if (navigator.vibrate) navigator.vibrate(30);
-        }, 400);
-      };
-
-      const endPress = (e) => {
-        clearTimeout(pressTimer);
-        element.classList.remove('pressing');
-
-        if (!isLongPress) {
-          openProfileSheet(member);
         }
-      };
-
-      const cancelPress = (e) => {
-        const currentY = e.touches ? e.touches[0].clientY : e.clientY;
-        if (Math.abs(currentY - startY) > 10) {
-          clearTimeout(pressTimer);
-          element.classList.remove('pressing');
-        }
-      };
-
-      element.addEventListener('touchstart', startPress, { passive: true });
-      element.addEventListener('touchend', endPress);
-      element.addEventListener('touchmove', cancelPress, { passive: true });
-      element.addEventListener('mousedown', startPress);
-      element.addEventListener('mouseup', endPress);
-      element.addEventListener('mouseleave', () => {
-        clearTimeout(pressTimer);
-        element.classList.remove('pressing');
       });
     }
 
