@@ -343,6 +343,85 @@ export default {
       }
     }
 
+    // ============ ADHD TASK BREAKDOWN ============
+    // POST /api/tasks/breakdown
+    if (url.pathname === "/api/tasks/breakdown" && request.method === "POST") {
+      try {
+        var authTaskBreakdown = await verifyUserToken(request, env);
+        if (!authTaskBreakdown.valid) {
+          return jsonResponse({ error: "Authentication required" }, 401, request);
+        }
+
+        var bodyTask = await request.json().catch(function () { return {}; });
+        var taskText = typeof bodyTask.task === "string" ? bodyTask.task : "";
+
+        if (!taskText.trim()) {
+          return jsonResponse({ error: "task is required" }, 400, request);
+        }
+
+        var taskRate = await enforceRateLimit(env, "tasks:breakdown:" + hashEmail(authTaskBreakdown.email), 30, 600);
+        if (!taskRate.allowed) {
+          return jsonResponseWithHeaders(
+            { error: "Rate limit exceeded. Please wait and try again." },
+            429,
+            request,
+            { "Retry-After": String(taskRate.retryAfter) }
+          );
+        }
+
+        var breakdownPrompt = [
+          {
+            role: "system",
+            content: [
+              "You are an ADHD-friendly task breakdown assistant.",
+              "Your job is to break down tasks into small, specific, actionable steps.",
+              "",
+              "Guidelines:",
+              "- Each step should be concrete and achievable in 5-15 minutes",
+              "- Use specific verbs: 'Open', 'Write', 'Call', 'Book', 'Check', etc.",
+              "- Include relevant details from the task (names, places, items)",
+              "- Don't use vague steps like 'Plan the task' or 'Get organized'",
+              "- 8-14 steps is ideal",
+              "- For travel: include visa, passport, flights, accommodation, vaccinations, insurance, packing",
+              "- For events: include guest list, venue, food, decorations, invites, gifts",
+              "- For appointments: include documents needed, questions to ask, travel time",
+              "",
+              "Return ONLY a JSON object with this structure:",
+              '{ "steps": ["Step 1 text", "Step 2 text", ...] }',
+              "",
+              "No markdown, no explanation, just the JSON object."
+            ].join("\n")
+          },
+          {
+            role: "user",
+            content: "Break down this task: " + taskText
+          }
+        ];
+
+        var gptResponse = await handleGPT(breakdownPrompt, env);
+
+        // Parse the JSON response
+        var parsed;
+        try {
+          // Handle potential markdown code blocks
+          var cleanResponse = gptResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+          parsed = JSON.parse(cleanResponse);
+        } catch (parseErr) {
+          // If JSON parsing fails, try to extract steps from text
+          var lines = gptResponse.split('\n').filter(function(line) {
+            return line.trim().match(/^\d+[\.\)]/);
+          }).map(function(line) {
+            return line.replace(/^\d+[\.\)]\s*/, '').trim();
+          });
+          parsed = { steps: lines.length > 0 ? lines : ["Review the task and identify first action", "Complete the first small step", "Continue with next steps"] };
+        }
+
+        return jsonResponse({ steps: parsed.steps || [] }, 200, request);
+      } catch (err) {
+        return jsonResponse({ error: err && err.message ? err.message : "Failed to break down task" }, 500, request);
+      }
+    }
+
     // ============ APPOINTMENT IMAGE SCAN ============
     // POST /api/appointments/scan
     if (url.pathname === "/api/appointments/scan" && request.method === "POST") {
