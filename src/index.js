@@ -343,6 +343,40 @@ export default {
       }
     }
 
+    // POST /api/roster/extract - Extract multiple shifts from roster image
+    if (url.pathname === "/api/roster/extract" && request.method === "POST") {
+      try {
+        var authRoster = await verifyUserToken(request, env);
+        if (!authRoster.valid) {
+          return jsonResponse({ error: "Authentication required" }, 401, request);
+        }
+
+        var bodyRoster = await request.json().catch(function () { return {}; });
+        var rosterImageBase64 = typeof bodyRoster.imageBase64 === "string" ? bodyRoster.imageBase64 : "";
+        var rosterLocale = typeof bodyRoster.locale === "string" ? bodyRoster.locale : "en-AU";
+        var rosterTz = typeof bodyRoster.tz === "string" ? bodyRoster.tz : "Australia/Sydney";
+
+        if (!rosterImageBase64.trim()) {
+          return jsonResponse({ error: "imageBase64 is required" }, 400, request);
+        }
+
+        var rosterRate = await enforceRateLimit(env, "roster:extract:" + hashEmail(authRoster.email), 10, 600);
+        if (!rosterRate.allowed) {
+          return jsonResponseWithHeaders(
+            { error: "Rate limit exceeded. Please wait and try again." },
+            429,
+            request,
+            { "Retry-After": String(rosterRate.retryAfter) }
+          );
+        }
+
+        var shifts = await extractRosterFromImage(rosterImageBase64, { locale: rosterLocale, tz: rosterTz }, env);
+        return jsonResponse({ shifts: shifts }, 200, request);
+      } catch (err) {
+        return jsonResponse({ error: err && err.message ? err.message : "Failed to extract roster" }, 500, request);
+      }
+    }
+
     // ============ ADHD TASK BREAKDOWN ============
     // POST /api/tasks/breakdown
     if (url.pathname === "/api/tasks/breakdown" && request.method === "POST") {
@@ -1485,6 +1519,75 @@ async function extractAppointmentFromImageOpenAI(imageBase64, options, env) {
   if (!content) throw new Error("No valid response from OpenAI vision.");
   var parsed = JSON.parse(stripJsonFences(content));
   return normalizeAppointmentExtract(parsed);
+}
+
+async function extractRosterFromImage(imageBase64, options, env) {
+  var apiKey = env.OPENAI_API_KEY;
+  if (!apiKey) throw new Error("OpenAI API key not configured");
+  var locale = options && options.locale ? options.locale : "en-AU";
+  var tz = options && options.tz ? options.tz : "Australia/Sydney";
+
+  var currentYear = new Date().getFullYear();
+
+  var prompt = [
+    "Extract ALL work shifts/roster entries from this image.",
+    "This could be a monthly roster, weekly schedule, or work timetable.",
+    "Return JSON only with schema:",
+    '{"shifts":[{"date":"YYYY-MM-DD","startTime":"HH:MM","endTime":"HH:MM","location":"","notes":""}]}',
+    "",
+    "IMPORTANT RULES:",
+    "- Extract EVERY shift you can see in the image",
+    "- Use locale " + locale + " and timezone " + tz,
+    "- Current year is " + currentYear + " - use this for any dates without a year",
+    "- Convert all dates to YYYY-MM-DD format",
+    "- Convert all times to 24-hour HH:MM format",
+    "- If you see day names (Mon, Tue, etc), calculate the actual date based on the context",
+    "- If location/department is shown, include it",
+    "- Include break times in notes if shown",
+    "- If a shift spans midnight, split into two entries",
+    "- RDO, OFF, LEAVE days should be included with notes indicating the type",
+    "- Return empty shifts array if no shifts found"
+  ].join("\\n");
+
+  var res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + apiKey
+    },
+    body: JSON.stringify({
+      model: "gpt-4o",
+      temperature: 0.1,
+      max_tokens: 4000,
+      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: "You are a precise assistant that extracts work roster/schedule data. Return JSON only." },
+        {
+          role: "user",
+          content: [
+            { type: "text", text: prompt },
+            { type: "image_url", image_url: { url: "data:image/jpeg;base64," + imageBase64 } }
+          ]
+        }
+      ]
+    })
+  });
+
+  var data = await res.json().catch(function () { return {}; });
+  if (!res.ok) {
+    throw new Error("OpenAI API error: " + JSON.stringify(data));
+  }
+
+  var content =
+    data &&
+    data.choices &&
+    data.choices[0] &&
+    data.choices[0].message &&
+    data.choices[0].message.content;
+  if (!content) throw new Error("No valid response from OpenAI vision.");
+
+  var parsed = JSON.parse(stripJsonFences(content));
+  return parsed.shifts || [];
 }
 
 async function handleGrok(messages, env) {
