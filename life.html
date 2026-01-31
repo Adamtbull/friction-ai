@@ -5032,6 +5032,11 @@
     let calendarVisible = false;
 
     function toggleCalendarView() {
+      // Close other views first
+      if (shoppingVisible) toggleShoppingView();
+      if (mealPlannerVisible) toggleMealPlannerView();
+      if (adhdTaskViewVisible) toggleAdhdTaskView();
+
       calendarVisible = !calendarVisible;
       const calendarView = document.getElementById('calendarView');
       const feedLayer = document.getElementById('feedLayer');
@@ -5040,14 +5045,18 @@
       if (calendarVisible) {
         calendarView.classList.add('visible');
         feedLayer.style.display = 'none';
-        calendarBtn.innerHTML = '📋';
+        calendarBtn.innerHTML = '📅';
         calendarBtn.title = 'Show Feed';
+        calendarBtn.style.background = 'var(--adult)';
+        calendarBtn.style.color = 'white';
         renderCalendar();
       } else {
         calendarView.classList.remove('visible');
         feedLayer.style.display = 'block';
         calendarBtn.innerHTML = '📅';
         calendarBtn.title = 'Calendar View';
+        calendarBtn.style.background = '';
+        calendarBtn.style.color = '';
       }
     }
 
@@ -5217,6 +5226,7 @@
       // Close other views first
       if (calendarVisible) toggleCalendarView();
       if (mealPlannerVisible) toggleMealPlannerView();
+      if (adhdTaskViewVisible) toggleAdhdTaskView();
 
       shoppingVisible = !shoppingVisible;
       const shoppingView = document.getElementById('shoppingView');
@@ -5371,6 +5381,7 @@
       // Close other views first
       if (calendarVisible) toggleCalendarView();
       if (shoppingVisible) toggleShoppingView();
+      if (adhdTaskViewVisible) toggleAdhdTaskView();
 
       mealPlannerVisible = !mealPlannerVisible;
       const mealView = document.getElementById('mealPlannerView');
