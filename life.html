@@ -773,6 +773,17 @@
       border-color: var(--adult);
     }
 
+    .export-option.share-native {
+      background: var(--adult);
+      color: white;
+      border-color: var(--adult);
+      margin-bottom: 16px;
+    }
+
+    .export-option.share-native:hover {
+      background: #2563eb;
+    }
+
     .export-logo {
       width: 40px;
       height: 40px;
@@ -3709,6 +3720,12 @@
     <div class="modal-content">
       <p class="pref-description">Copy your list for delivery apps or store websites:</p>
 
+      <!-- Native Share Button (mobile) -->
+      <div class="export-option share-native" id="nativeShareBtn" onclick="shareNative()" style="display: none;">
+        <div class="export-logo">📤</div>
+        <span>Share to Any App</span>
+      </div>
+
       <div class="export-options">
         <div class="export-option" onclick="openStoreWebsite('woolworths')">
           <div class="store-logo woolworths">W</div>
@@ -3726,17 +3743,9 @@
           <div class="store-logo costco">Co</div>
           <span>Costco</span>
         </div>
-        <div class="export-option" onclick="exportForApp('doordash')">
-          <div class="export-logo">🚗</div>
-          <span>DoorDash</span>
-        </div>
-        <div class="export-option" onclick="exportForApp('ubereats')">
-          <div class="export-logo">🛵</div>
-          <span>Uber Eats</span>
-        </div>
         <div class="export-option" onclick="exportPlainText()">
           <div class="export-logo">📋</div>
-          <span>Plain Text</span>
+          <span>Copy List</span>
         </div>
       </div>
 
@@ -6485,6 +6494,58 @@
       }
       openModal('exportSheet');
       document.getElementById('exportPreview').style.display = 'none';
+
+      // Show native share button if Web Share API is supported
+      const nativeShareBtn = document.getElementById('nativeShareBtn');
+      if (navigator.share) {
+        nativeShareBtn.style.display = 'flex';
+      } else {
+        nativeShareBtn.style.display = 'none';
+      }
+    }
+
+    // Native share to any app (mobile)
+    async function shareNative() {
+      const items = shoppingItems.filter(i => !i.completed);
+      if (items.length === 0) {
+        showToast('No items to share');
+        return;
+      }
+
+      // Build shopping list text
+      const grouped = {};
+      items.forEach(item => {
+        const cat = item.category || 'other';
+        if (!grouped[cat]) grouped[cat] = [];
+        grouped[cat].push(item.name);
+      });
+
+      let text = 'SHOPPING LIST\n';
+      text += '─'.repeat(20) + '\n\n';
+
+      Object.keys(grouped).forEach(cat => {
+        const info = categoryInfo[cat] || { icon: '📦', name: cat };
+        text += `${info.icon} ${info.name.toUpperCase()}\n`;
+        grouped[cat].forEach(item => {
+          text += `  □ ${item}\n`;
+        });
+        text += '\n';
+      });
+
+      text += `\nTotal: ${items.length} items`;
+
+      try {
+        await navigator.share({
+          title: 'Shopping List',
+          text: text
+        });
+        closeExportSheet();
+        showToast('Shared successfully!');
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          showToast('Sharing failed - try copy instead');
+        }
+      }
     }
 
     function closeExportSheet() {
