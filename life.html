@@ -932,6 +932,60 @@
       display: none;
     }
 
+    .appointment-photo-preview {
+      margin-bottom: 12px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: none;
+    }
+
+    .appointment-photo-preview.has-image {
+      display: block;
+    }
+
+    .appointment-photo-preview img {
+      width: 100%;
+      max-height: 150px;
+      object-fit: cover;
+      border-radius: var(--radius-md);
+    }
+
+    .appointment-photo-preview .ai-status {
+      padding: 10px;
+      background: #fef3c7;
+      color: #92400e;
+      font-size: 0.8rem;
+      text-align: center;
+      animation: pulse 1.5s infinite;
+    }
+
+    .location-input-wrapper {
+      display: flex;
+      gap: 8px;
+    }
+
+    .location-input-wrapper .form-input {
+      flex: 1;
+    }
+
+    .location-search-btn {
+      width: 48px;
+      height: 48px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      font-size: 1.25rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+
+    .location-search-btn:hover {
+      background: var(--border);
+    }
+
     .btn {
       padding: 14px 24px;
       border-radius: var(--radius-sm);
@@ -1572,6 +1626,137 @@
       alert('Screenshot import is coming soon! For now, please enter your roster details manually below.');
     }
 
+    // Appointment photo handling with AI parsing
+    let appointmentPhotoData = null;
+
+    async function handleAppointmentPhoto(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const preview = document.getElementById('appointmentPhotoPreview');
+      preview.classList.add('has-image');
+      preview.innerHTML = `
+        <img src="${URL.createObjectURL(file)}" alt="Appointment">
+        <div class="ai-status">🤖 Analyzing image...</div>
+      `;
+
+      // Convert to base64 for API
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        appointmentPhotoData = e.target.result;
+
+        // Call AI to parse the image
+        try {
+          const parsed = await parseAppointmentImage(appointmentPhotoData);
+          if (parsed) {
+            // Auto-fill the form
+            if (parsed.title) document.getElementById('formTitle').value = parsed.title;
+            if (parsed.date) document.getElementById('formDate').value = parsed.date;
+            if (parsed.time) document.getElementById('formTime').value = parsed.time;
+            if (parsed.location) document.getElementById('formLocation').value = parsed.location;
+            if (parsed.notes) document.getElementById('formNotes').value = parsed.notes;
+
+            preview.innerHTML = `
+              <img src="${appointmentPhotoData}" alt="Appointment">
+              <div class="ai-status" style="background:#dcfce7;color:#166534;">✓ Details extracted!</div>
+            `;
+          }
+        } catch (err) {
+          console.error('AI parsing failed:', err);
+          preview.innerHTML = `
+            <img src="${appointmentPhotoData}" alt="Appointment">
+            <div class="ai-status" style="background:#fee2e2;color:#991b1b;">Could not extract details. Please fill manually.</div>
+          `;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // AI parsing function - calls your backend or external API
+    async function parseAppointmentImage(imageBase64) {
+      // TODO: Replace with actual API call to ChatGPT/Perplexity
+      // For now, this is a placeholder that shows the concept
+
+      // Example API call structure:
+      // const response = await fetch('/api/parse-appointment', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ image: imageBase64 })
+      // });
+      // return await response.json();
+
+      // Placeholder - simulate a delay and return null
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Return null to indicate manual entry needed
+      // When API is connected, return: { title, date, time, location, notes }
+      return null;
+    }
+
+    // Location search - opens maps
+    function searchLocation() {
+      const locationInput = document.getElementById('formLocation');
+      const query = locationInput.value.trim();
+
+      if (query) {
+        // Open in Google Maps
+        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+        window.open(mapsUrl, '_blank');
+      } else {
+        // Prompt for location
+        const search = prompt('Enter location to search:');
+        if (search) {
+          locationInput.value = search;
+          const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(search)}`;
+          window.open(mapsUrl, '_blank');
+        }
+      }
+    }
+
+    // Share appointment via SMS or native share
+    function shareAppointment(itemId) {
+      const item = feedItems.find(i => i.id === itemId);
+      if (!item) return;
+
+      const member = getMemberById(item.memberId);
+      const memberName = member?.name || 'Someone';
+
+      // Build share text
+      let shareText = `📅 Appointment: ${item.title}\n`;
+      shareText += `👤 For: ${memberName}\n`;
+      shareText += `📆 Date: ${formatDate(item.date)}\n`;
+      shareText += `🕐 Time: ${formatTime(item.time)}\n`;
+
+      if (item.location) {
+        shareText += `📍 Location: ${item.location}\n`;
+        shareText += `🗺️ Map: https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.location)}\n`;
+      }
+
+      if (item.notes) {
+        shareText += `📝 Notes: ${item.notes}\n`;
+      }
+
+      // Try native share first (works on mobile)
+      if (navigator.share) {
+        navigator.share({
+          title: `Appointment: ${item.title}`,
+          text: shareText
+        }).catch(err => {
+          // Fallback to SMS if share fails
+          openSmsShare(shareText);
+        });
+      } else {
+        // Fallback to SMS on desktop or older browsers
+        openSmsShare(shareText);
+      }
+    }
+
+    function openSmsShare(text) {
+      // sms: link works on iOS and Android
+      const smsUrl = `sms:?body=${encodeURIComponent(text)}`;
+      window.location.href = smsUrl;
+    }
+
     // ========================================
     // BUBBLE RENDERING
     // ========================================
@@ -1695,7 +1880,7 @@
             </div>
             <div class="feed-empty-hint">
               ${hasMembers
-                ? '💡 Long-press a bubble to quickly add items'
+                ? '💡 Tap a bubble to quickly add items'
                 : '💡 Tap + to add your first family member'}
             </div>
           </div>
@@ -1751,7 +1936,7 @@
       switch (item.type) {
         case 'appointment':
           body = item.notes || 'No additional details';
-          if (item.location) body = `📍 ${item.location}<br>${body}`;
+          if (item.location) body = `📍 <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.location)}" target="_blank" style="color:inherit;text-decoration:underline;">${item.location}</a><br>${body}`;
           meta = `
             <div class="card-meta">
               <span class="card-meta-item">📅 ${formatDate(item.date)}</span>
@@ -1760,6 +1945,7 @@
           `;
           actions = `
             <div class="card-actions">
+              <button class="card-action-btn" onclick="shareAppointment('${item.id}')">📤 Share</button>
               <button class="card-action-btn success" onclick="markDone('${item.id}')">✓ Done</button>
             </div>
           `;
@@ -2009,6 +2195,16 @@
       switch (type) {
         case 'appointment':
           return `
+            <div class="screenshot-import-placeholder" onclick="document.getElementById('appointmentPhoto').click()">
+              <span class="screenshot-icon">📸</span>
+              <span class="screenshot-text">Scan appointment letter/SMS</span>
+              <span class="screenshot-badge">AI Fill</span>
+              <input type="file" id="appointmentPhoto" accept="image/*" capture="environment" style="display:none" onchange="handleAppointmentPhoto(event)">
+            </div>
+            <div id="appointmentPhotoPreview" class="appointment-photo-preview"></div>
+            <div class="form-divider">
+              <span>or enter manually</span>
+            </div>
             <div class="form-group">
               <label class="form-label">Title *</label>
               <input type="text" class="form-input" id="formTitle" placeholder="e.g., Doctor checkup">
@@ -2025,7 +2221,10 @@
             </div>
             <div class="form-group">
               <label class="form-label">Location</label>
-              <input type="text" class="form-input" id="formLocation" placeholder="e.g., Medical Centre">
+              <div class="location-input-wrapper">
+                <input type="text" class="form-input" id="formLocation" placeholder="e.g., Medical Centre">
+                <button type="button" class="location-search-btn" onclick="searchLocation()">📍</button>
+              </div>
             </div>
             <div class="form-group">
               <label class="form-label">Notes</label>
