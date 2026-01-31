@@ -422,6 +422,217 @@ export default {
       }
     }
 
+    // ============ MEAL GENERATION ============
+    // POST /api/meals/generate
+    if (url.pathname === "/api/meals/generate" && request.method === "POST") {
+      try {
+        var authMeals = await verifyUserToken(request, env);
+        if (!authMeals.valid) {
+          return jsonResponse({ error: "Authentication required" }, 401, request);
+        }
+
+        var bodyMeals = await request.json().catch(function () { return {}; });
+        var mealType = bodyMeals.mealType || "dinner"; // breakfast, lunch, dinner
+        var dislikes = Array.isArray(bodyMeals.dislikes) ? bodyMeals.dislikes : [];
+        var dietPreferences = Array.isArray(bodyMeals.dietPreferences) ? bodyMeals.dietPreferences : [];
+        var servings = parseInt(bodyMeals.servings, 10) || 4;
+        var maxIngredients = parseInt(bodyMeals.maxIngredients, 10) || 12;
+        var budget = bodyMeals.budget || "standard"; // budget, standard, premium
+        var count = parseInt(bodyMeals.count, 10) || 6;
+        if (count > 12) count = 12;
+        if (count < 1) count = 1;
+
+        var mealsRate = await enforceRateLimit(env, "meals:generate:" + hashEmail(authMeals.email), 20, 600);
+        if (!mealsRate.allowed) {
+          return jsonResponseWithHeaders(
+            { error: "Rate limit exceeded. Please wait and try again." },
+            429,
+            request,
+            { "Retry-After": String(mealsRate.retryAfter) }
+          );
+        }
+
+        var mealPrompt = [
+          {
+            role: "system",
+            content: [
+              "You are an Australian meal planning assistant that generates recipes.",
+              "",
+              "CRITICAL RULES - YOU MUST FOLLOW THESE EXACTLY:",
+              "1. NEVER include ANY ingredient that contains or is related to items in the DISLIKES list",
+              "2. STRICTLY follow the diet preferences provided",
+              "3. All recipes must be practical and achievable for home cooking",
+              "4. Use Australian supermarket brands (Coles, Woolworths, Aldi) for ingredients",
+              "5. Include specific brand names where appropriate (e.g., 'Leggo's pasta sauce', 'San Remo pasta')",
+              "",
+              "QUALITY LEVELS:",
+              "- budget: Use home brand/generic products, cheaper cuts of meat, basic ingredients",
+              "- standard: Use mid-range brands, regular quality ingredients",
+              "- premium: Use premium brands, high-quality ingredients, organic where applicable",
+              "",
+              "Return ONLY a JSON array with this structure:",
+              "[",
+              "  {",
+              '    "name": "Meal Name",',
+              '    "emoji": "🍝",',
+              '    "time": "30 min",',
+              '    "servings": 4,',
+              '    "ingredients": [',
+              '      {"name": "ingredient with brand", "quantity": "500g", "estimatedPrice": 5.50}',
+              "    ],",
+              '    "steps": ["Step 1", "Step 2", "Step 3"]',
+              "  }",
+              "]",
+              "",
+              "No markdown, no explanation, just the JSON array."
+            ].join("\n")
+          },
+          {
+            role: "user",
+            content: [
+              "Generate " + count + " unique " + mealType + " recipes for " + servings + " servings.",
+              "",
+              "DISLIKES (MUST AVOID ALL OF THESE - no exceptions):",
+              dislikes.length > 0 ? dislikes.join(", ") : "None specified",
+              "",
+              "DIET PREFERENCES (MUST FOLLOW):",
+              dietPreferences.length > 0 ? dietPreferences.join(", ") : "No specific diet",
+              "",
+              "Maximum ingredients per recipe: " + maxIngredients,
+              "Quality level: " + budget,
+              "",
+              "Remember: If vegetarian/vegan is specified, absolutely NO meat/fish products.",
+              "If an ingredient is disliked, do NOT include it or any dish that typically contains it."
+            ].join("\n")
+          }
+        ];
+
+        var gptMealResponse = await handleGPT(mealPrompt, env);
+
+        // Parse the JSON response
+        var parsedMeals;
+        try {
+          var cleanMealResponse = gptMealResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+          parsedMeals = JSON.parse(cleanMealResponse);
+        } catch (parseErr) {
+          // If parsing fails, return error
+          return jsonResponse({ error: "Failed to parse meal data", raw: gptMealResponse }, 500, request);
+        }
+
+        // Add unique IDs to each meal
+        var mealsWithIds = parsedMeals.map(function(meal, index) {
+          return Object.assign({}, meal, { id: Date.now() + index });
+        });
+
+        return jsonResponse({ meals: mealsWithIds }, 200, request);
+      } catch (err) {
+        return jsonResponse({ error: err && err.message ? err.message : "Failed to generate meals" }, 500, request);
+      }
+    }
+
+    // ============ PRICE SEARCH (Perplexity) ============
+    // POST /api/prices/search
+    if (url.pathname === "/api/prices/search" && request.method === "POST") {
+      try {
+        var authPrices = await verifyUserToken(request, env);
+        if (!authPrices.valid) {
+          return jsonResponse({ error: "Authentication required" }, 401, request);
+        }
+
+        var bodyPrices = await request.json().catch(function () { return {}; });
+        var ingredients = Array.isArray(bodyPrices.ingredients) ? bodyPrices.ingredients : [];
+        var stores = Array.isArray(bodyPrices.stores) ? bodyPrices.stores : ["woolworths", "coles"];
+        var quality = bodyPrices.quality || "standard";
+
+        if (ingredients.length === 0) {
+          return jsonResponse({ error: "No ingredients provided" }, 400, request);
+        }
+
+        if (ingredients.length > 30) {
+          ingredients = ingredients.slice(0, 30);
+        }
+
+        var pricesRate = await enforceRateLimit(env, "prices:search:" + hashEmail(authPrices.email), 15, 600);
+        if (!pricesRate.allowed) {
+          return jsonResponseWithHeaders(
+            { error: "Rate limit exceeded. Please wait and try again." },
+            429,
+            request,
+            { "Retry-After": String(pricesRate.retryAfter) }
+          );
+        }
+
+        var pricePrompt = [
+          {
+            role: "system",
+            content: [
+              "You are an Australian grocery price comparison assistant.",
+              "Search for current prices of groceries at Australian supermarkets.",
+              "Use real, current prices from Woolworths, Coles, and Aldi.",
+              "",
+              "QUALITY LEVELS affect which products to search for:",
+              "- budget: Search for home brand, generic, or cheapest options",
+              "- standard: Search for regular branded products at normal prices",
+              "- premium: Search for premium brands, organic, or specialty items",
+              "",
+              "Return ONLY a JSON object with this structure:",
+              "{",
+              '  "ingredients": [',
+              "    {",
+              '      "name": "original ingredient name",',
+              '      "product": "exact product name found",',
+              '      "brand": "brand name",',
+              '      "price": 5.50,',
+              '      "store": "woolworths",',
+              '      "quantity": "500g",',
+              '      "pricePerUnit": "$11.00/kg"',
+              "    }",
+              "  ],",
+              '  "totalEstimate": 45.50',
+              "}",
+              "",
+              "No markdown, no explanation, just the JSON."
+            ].join("\n")
+          },
+          {
+            role: "user",
+            content: [
+              "Find current Australian supermarket prices for these ingredients:",
+              ingredients.map(function(ing) {
+                return "- " + (ing.name || ing) + (ing.quantity ? " (" + ing.quantity + ")" : "");
+              }).join("\n"),
+              "",
+              "Preferred stores: " + stores.join(", "),
+              "Quality preference: " + quality,
+              "",
+              "Search for REAL current prices. Return the best value option for each ingredient."
+            ].join("\n")
+          }
+        ];
+
+        var perplexityPriceResponse = await handlePerplexityPriceSearch(pricePrompt, env);
+
+        // Parse the JSON response
+        var parsedPrices;
+        try {
+          var cleanPriceResponse = perplexityPriceResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+          // Try to find JSON object in response
+          var jsonMatch = cleanPriceResponse.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            parsedPrices = JSON.parse(jsonMatch[0]);
+          } else {
+            throw new Error("No JSON found");
+          }
+        } catch (parseErr) {
+          return jsonResponse({ error: "Failed to parse price data", raw: perplexityPriceResponse }, 500, request);
+        }
+
+        return jsonResponse(parsedPrices, 200, request);
+      } catch (err) {
+        return jsonResponse({ error: err && err.message ? err.message : "Failed to search prices" }, 500, request);
+      }
+    }
+
     // ============ APPOINTMENT IMAGE SCAN ============
     // POST /api/appointments/scan
     if (url.pathname === "/api/appointments/scan" && request.method === "POST") {
@@ -1338,6 +1549,39 @@ async function handlePerplexity(messages, env, systemPrompt) {
       out += "\n[" + (j + 1) + "] " + citations[j];
     }
   }
+
+  return out;
+}
+
+async function handlePerplexityPriceSearch(messages, env) {
+  var apiKey = env.PERPLEXITY_API_KEY;
+  if (!apiKey) throw new Error("Perplexity API key not configured");
+
+  var res = await fetch("https://api.perplexity.ai/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + apiKey
+    },
+    body: JSON.stringify({
+      model: "sonar",
+      temperature: 0.2,
+      messages: messages
+    })
+  });
+
+  var data = await res.json().catch(function () { return {}; });
+  if (!res.ok) {
+    throw new Error("Perplexity API error: " + JSON.stringify(data));
+  }
+
+  var out =
+    data &&
+    data.choices &&
+    data.choices[0] &&
+    data.choices[0].message &&
+    data.choices[0].message.content;
+  if (!out) throw new Error("No valid response text from Perplexity.");
 
   return out;
 }
