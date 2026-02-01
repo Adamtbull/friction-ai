@@ -458,6 +458,7 @@ export default {
 
     // ============ MEAL GENERATION ============
     // POST /api/meals/generate
+    // Dual-AI System: Claude generates authentic recipes, GPT audits for authenticity
     if (url.pathname === "/api/meals/generate" && request.method === "POST") {
       try {
         var authMeals = await verifyUserToken(request, env);
@@ -475,8 +476,8 @@ export default {
         var budget = bodyMeals.budget || "standard"; // budget, standard, premium
         var complexity = bodyMeals.complexity || "any"; // quick, intermediate, scratch, any
         var cookingMethod = bodyMeals.cookingMethod || "any"; // stovetop, oven, slowcooker, airfryer, bbq, nocook, any
-        var count = parseInt(bodyMeals.count, 10) || 6;
-        if (count > 20) count = 20;
+        var count = parseInt(bodyMeals.count, 10) || 5; // Default to 5 recipes
+        if (count > 10) count = 10; // Max 10 for quality
         if (count < 1) count = 1;
 
         var mealsRate = await enforceRateLimit(env, "meals:generate:" + hashEmail(authMeals.email), 20, 600);
@@ -519,155 +520,295 @@ export default {
           methodInstructions = "Any cooking method is fine.";
         }
 
-        // Build cuisine instructions - celebrating Australia's multicultural food scene!
+        // Authentic cuisine instructions with traditional dish examples
         var cuisineInstructions = "";
-        var cuisineMap = {
-          "australian": "Aussie Classics (meat pies, snags, pavlova, lamingtons, fish & chips, roast dinner, BBQ)",
-          "italian": "Italian (pasta, risotto, pizza, osso buco, tiramisu, bruschetta, minestrone)",
-          "chinese": "Chinese (stir-fry, dumplings, fried rice, kung pao, mapo tofu, sweet & sour)",
-          "indian": "Indian (curry, biryani, tikka masala, dal, naan, samosas, korma, vindaloo)",
-          "thai": "Thai (pad thai, green curry, tom yum, massaman, larb, satay)",
-          "vietnamese": "Vietnamese (pho, banh mi, spring rolls, bun cha, lemongrass chicken)",
-          "japanese": "Japanese (sushi, ramen, teriyaki, katsu, yakitori, donburi, miso)",
-          "korean": "Korean (bulgogi, bibimbap, kimchi jjigae, Korean fried chicken, japchae)",
-          "mexican": "Mexican (tacos, burritos, enchiladas, quesadillas, fajitas, nachos)",
-          "greek": "Greek (souvlaki, moussaka, gyros, spanakopita, dolmades, tzatziki)",
-          "lebanese": "Lebanese (shawarma, falafel, tabbouleh, hummus, kafta, fattoush)",
-          "middleeastern": "Middle Eastern (kebabs, shakshuka, mezze, kibbeh, baba ganoush)",
-          "turkish": "Turkish (doner, pide, kofte, manti, lahmacun, borek)",
-          "moroccan": "Moroccan (tagine, couscous, harira, b'stilla, chermoula)",
-          "spanish": "Spanish (paella, tapas, tortilla, gazpacho, chorizo dishes)",
-          "french": "French (coq au vin, beef bourguignon, quiche, ratatouille, crepes)",
-          "american": "American (burgers, mac & cheese, BBQ ribs, fried chicken, meatloaf)",
-          "british": "British (shepherd's pie, fish & chips, bangers & mash, Sunday roast)",
-          "filipino": "Filipino (adobo, sinigang, lumpia, kare-kare, lechon, pancit)",
-          "indonesian": "Indonesian (nasi goreng, satay, rendang, gado-gado, mie goreng)",
-          "malaysian": "Malaysian (laksa, nasi lemak, char kway teow, satay, roti canai)",
-          "sri_lankan": "Sri Lankan (hoppers, kottu, lamprais, curry, pol sambol)",
-          "nepalese": "Nepalese (momo dumplings, dal bhat, thukpa noodle soup, sekuwa, sel roti, gundruk)",
-          "ethiopian": "Ethiopian (injera, doro wat, tibs, kitfo, shiro)",
-          "caribbean": "Caribbean (jerk chicken, rice & peas, curry goat, ackee, plantains)",
-          "brazilian": "Brazilian (feijoada, picanha, coxinha, pão de queijo, moqueca)",
-          "german": "German (schnitzel, bratwurst, sauerbraten, spätzle, pretzels)",
-          "polish": "Polish (pierogi, bigos, kotlet schabowy, borscht, golabki)",
-          "portuguese": "Portuguese (piri piri chicken, bacalhau, francesinha, caldo verde)"
+        var authenticCuisineMap = {
+          "australian": {
+            name: "Australian",
+            traditional: "AUTHENTIC AUSSIE: Meat pies with proper flaky pastry and rich gravy, classic lamb roast with mint sauce, barramundi and chips, pavlova with passionfruit, proper snags on bread with caramelised onions, chicken parmigiana, beef and reef"
+          },
+          "italian": {
+            name: "Italian",
+            traditional: "AUTHENTIC ITALIAN: Proper carbonara (guanciale, pecorino, egg yolks - NO cream), bolognese with the traditional soffritto, risotto with proper technique, osso buco alla milanese, saltimbocca, cacio e pepe, authentic Neapolitan pizza"
+          },
+          "chinese": {
+            name: "Chinese",
+            traditional: "AUTHENTIC CHINESE: Mapo tofu with proper doubanjiang and Sichuan peppercorns, kung pao chicken with the traditional numbing heat, xiaolongbao, char siu with proper maltose glaze, dan dan noodles, proper fried rice with wok hei"
+          },
+          "indian": {
+            name: "Indian",
+            traditional: "AUTHENTIC INDIAN: Proper butter chicken with kasuri methi, biryani with dum technique and proper layering, rogan josh with Kashmiri chillies, chole bhature, authentic dal makhani slow-cooked overnight, proper tandoori with yogurt marinade"
+          },
+          "thai": {
+            name: "Thai",
+            traditional: "AUTHENTIC THAI: Proper pad thai with tamarind and palm sugar balance, green curry with fresh paste and Thai eggplant, tom yum with galangal/lemongrass/kaffir lime, som tum with proper pounding technique, massaman with proper spice blend"
+          },
+          "vietnamese": {
+            name: "Vietnamese",
+            traditional: "AUTHENTIC VIETNAMESE: Proper pho with bone broth simmered 8+ hours, banh mi with proper pate and pickled daikon, bun cha with chargrilled pork, fresh spring rolls with nuoc cham, ca kho to clay pot fish"
+          },
+          "japanese": {
+            name: "Japanese",
+            traditional: "AUTHENTIC JAPANESE: Proper tonkotsu ramen with 12-hour broth, katsu with panko and tonkatsu sauce, authentic teriyaki (not sweet), gyudon with proper dashi, okonomiyaki, proper sushi rice with seasoning"
+          },
+          "korean": {
+            name: "Korean",
+            traditional: "AUTHENTIC KOREAN: Proper bulgogi with Asian pear marinade, bibimbap with gochujang and proper banchan, authentic kimchi jjigae, dakgalbi, japchae with proper glass noodles, samgyeopsal"
+          },
+          "mexican": {
+            name: "Mexican",
+            traditional: "AUTHENTIC MEXICAN: Proper carnitas with citrus and lard, al pastor with achiote and pineapple, mole with 20+ ingredients, authentic tacos on corn tortillas, birria with consomé, chiles rellenos"
+          },
+          "greek": {
+            name: "Greek",
+            traditional: "AUTHENTIC GREEK: Proper moussaka with béchamel, souvlaki with proper tzatziki, pastitsio, authentic spanakopita with filo, yemista stuffed vegetables, stifado, kleftiko slow-cooked lamb"
+          },
+          "lebanese": {
+            name: "Lebanese",
+            traditional: "AUTHENTIC LEBANESE: Proper shawarma with traditional spices, kibbeh with bulgur and pine nuts, authentic fattoush, proper hummus with tahini ratio, kafta bil sanieh, musakhan, mansaf"
+          },
+          "middleeastern": {
+            name: "Middle Eastern",
+            traditional: "AUTHENTIC MIDDLE EASTERN: Proper shakshuka, lamb kofta with authentic spice blend, musakhan, fatteh, proper falafel (never from a mix), authentic tahdig rice"
+          },
+          "turkish": {
+            name: "Turkish",
+            traditional: "AUTHENTIC TURKISH: Proper doner with traditional spices, lahmacun, authentic manti with yogurt and garlic, pide, köfte, iskender kebab, imam bayildi"
+          },
+          "moroccan": {
+            name: "Moroccan",
+            traditional: "AUTHENTIC MOROCCAN: Proper tagine with preserved lemons, authentic couscous (hand-rolled), harira soup, b'stilla, chermoula fish, rfissa"
+          },
+          "spanish": {
+            name: "Spanish",
+            traditional: "AUTHENTIC SPANISH: Proper paella valenciana (no chorizo!), authentic tortilla española, gambas al ajillo, pulpo a la gallega, fabada asturiana, proper patatas bravas"
+          },
+          "french": {
+            name: "French",
+            traditional: "AUTHENTIC FRENCH: Proper coq au vin with wine reduction, beef bourguignon, cassoulet, bouillabaisse, duck confit, proper beurre blanc, authentic ratatouille"
+          },
+          "american": {
+            name: "American",
+            traditional: "AUTHENTIC AMERICAN: Proper Texas brisket, Nashville hot chicken, authentic jambalaya, New England clam chowder, proper Southern fried chicken with buttermilk, Memphis-style ribs"
+          },
+          "british": {
+            name: "British",
+            traditional: "AUTHENTIC BRITISH: Proper shepherd's pie (lamb only), fish and chips with mushy peas, authentic Yorkshire pudding, toad in the hole, proper Sunday roast with gravy, Lancashire hotpot"
+          },
+          "filipino": {
+            name: "Filipino",
+            traditional: "AUTHENTIC FILIPINO: Proper adobo with balanced vinegar and soy, sinigang with proper tamarind sourness, kare-kare with tripe and oxtail, sisig, lechon kawali, authentic pancit"
+          },
+          "indonesian": {
+            name: "Indonesian",
+            traditional: "AUTHENTIC INDONESIAN: Proper rendang slow-cooked until dry, nasi goreng with kecap manis, gado-gado with proper peanut sauce, soto ayam, satay with sambal kacang"
+          },
+          "malaysian": {
+            name: "Malaysian",
+            traditional: "AUTHENTIC MALAYSIAN: Proper laksa with sambal and coconut, nasi lemak with sambal ikan bilis, char kway teow with wok hei, roti canai with proper flaky layers, rendang"
+          },
+          "sri_lankan": {
+            name: "Sri Lankan",
+            traditional: "AUTHENTIC SRI LANKAN: Proper egg hoppers with sambol, kottu roti, authentic lamprais, proper pol sambol, ambul thiyal sour fish curry, cashew curry"
+          },
+          "nepalese": {
+            name: "Nepalese",
+            traditional: "AUTHENTIC NEPALESE: Proper momo with jhol achar dipping sauce, dal bhat tarkari (the complete traditional meal), thukpa with hand-pulled noodles, sekuwa (Nepali BBQ), sel roti, gundruk ko achar, choila"
+          },
+          "ethiopian": {
+            name: "Ethiopian",
+            traditional: "AUTHENTIC ETHIOPIAN: Proper doro wat with berbere, injera with proper teff fermentation, tibs, kitfo (Ethiopian tartare), shiro, proper Ethiopian coffee ceremony"
+          },
+          "caribbean": {
+            name: "Caribbean",
+            traditional: "AUTHENTIC CARIBBEAN: Proper jerk chicken with scotch bonnets and pimento, curry goat, rice and peas with coconut milk, ackee and saltfish, oxtail stew, roti"
+          },
+          "brazilian": {
+            name: "Brazilian",
+            traditional: "AUTHENTIC BRAZILIAN: Proper feijoada with all the meats, picanha with proper cut and cooking, moqueca baiana, coxinha, pão de queijo with proper queijo minas"
+          },
+          "german": {
+            name: "German",
+            traditional: "AUTHENTIC GERMAN: Proper schnitzel (pounded thin, proper breading), sauerbraten with proper marination, spätzle, bratwurst, schweinshaxe, rouladen"
+          },
+          "polish": {
+            name: "Polish",
+            traditional: "AUTHENTIC POLISH: Proper pierogi with traditional fillings, bigos hunter's stew, kotlet schabowy, żurek sour rye soup, gołąbki cabbage rolls"
+          },
+          "portuguese": {
+            name: "Portuguese",
+            traditional: "AUTHENTIC PORTUGUESE: Proper piri piri chicken, bacalhau à brás, francesinha, caldo verde, arroz de pato, pastéis de nata"
+          }
         };
 
         if (cuisines.length > 0) {
-          var cuisineNames = cuisines.map(function(c) { return cuisineMap[c] || c; });
-          cuisineInstructions = "CUISINE FOCUS: Generate meals from these cuisines: " + cuisineNames.join(", ") + ". Mix the selected cuisines evenly across the recipes.";
+          var cuisineDetails = cuisines.map(function(c) {
+            var cuisine = authenticCuisineMap[c];
+            return cuisine ? cuisine.traditional : c;
+          });
+          cuisineInstructions = "STRICT AUTHENTICITY REQUIRED - Generate recipes from these cuisines:\n" + cuisineDetails.join("\n\n") + "\n\nEvery recipe MUST be a dish that a local from that culture would recognize and approve of. NO fusion, NO shortcuts, NO western adaptations.";
         } else {
-          cuisineInstructions = "CUISINE VARIETY: Generate a diverse mix of cuisines to celebrate Australia's multicultural food scene - include Italian, Asian, Middle Eastern, Aussie classics, and more!";
+          cuisineInstructions = "Generate a diverse mix of AUTHENTIC cuisines. Each dish must be recognizable and traditional to its origin culture.";
         }
 
-        var mealPrompt = [
-          {
-            role: "system",
-            content: [
-              "You are an Australian meal planning assistant that generates DELICIOUS, EXCITING, COMPLETE recipes.",
-              "",
-              "CRITICAL RULES - YOU MUST FOLLOW THESE EXACTLY:",
-              "1. NEVER include ANY ingredient that contains or is related to items in the DISLIKES list",
-              "2. STRICTLY follow the diet preferences provided",
-              "3. All recipes must be practical and achievable for home cooking",
-              "4. Use Australian supermarket brands (Coles, Woolworths, Aldi) for ingredients",
-              "5. Include specific brand names where appropriate (e.g., 'Leggo's pasta sauce', 'San Remo pasta')",
-              "",
-              "COMPLETE BALANCED MEALS - VERY IMPORTANT:",
-              "- EVERY dinner recipe MUST be a COMPLETE MEAL with protein AND sides",
-              "- Always include: main protein + carb/starch side + vegetable side",
-              "- Examples of complete meals:",
-              "  * 'Honey Garlic Chicken with Garlic Butter Rice and Roasted Broccoli'",
-              "  * 'Beef Stir-Fry with Jasmine Rice and Asian Greens'",
-              "  * 'Herb-Crusted Salmon with Creamy Mashed Potatoes and Honey Glazed Carrots'",
-              "- NEVER just list a protein alone (e.g., NO 'Grilled Chicken' by itself)",
-              "- Include ALL components in the recipe name and ingredients",
-              "",
-              "MAKE IT EXCITING & DELICIOUS:",
-              "- Use BOLD flavors: garlic butter, honey glazes, herbs, spices, marinades",
-              "- Include flavor boosters: lemon zest, fresh herbs, toasted sesame, parmesan",
-              "- Think restaurant-quality dishes people get EXCITED to cook and eat",
-              "- Use descriptive appetizing names (e.g., 'Crispy Honey Soy Chicken' not just 'Chicken')",
-              "- Add finishing touches: fresh herbs, sauce drizzles, garnishes in the steps",
-              "- NO bland, boring meals - every dish should make mouths water!",
-              "",
-              "RECIPE COMPLEXITY:",
-              complexityInstructions,
-              "",
-              "COOKING METHOD:",
-              methodInstructions,
-              "",
-              cuisineInstructions,
-              "",
-              "QUALITY LEVELS:",
-              "- budget: Use home brand/generic products, cheaper cuts of meat, basic ingredients",
-              "- standard: Use mid-range brands, regular quality ingredients",
-              "- premium: Use premium brands, high-quality ingredients, organic where applicable",
-              "",
-              "Return ONLY a JSON array with this structure:",
-              "[",
-              "  {",
-              '    "name": "Exciting Complete Meal Name with Sides",',
-              '    "emoji": "🍝",',
-              '    "description": "One sentence that makes this dish sound irresistible",',
-              '    "time": "30 min",',
-              '    "servings": 4,',
-              '    "cookingMethod": "stovetop",',
-              '    "ingredients": [',
-              '      {"name": "ingredient with brand", "quantity": "500g", "estimatedPrice": 5.50}',
-              "    ],",
-              '    "steps": ["Step 1", "Step 2", "Step 3"]',
-              "  }",
-              "]",
-              "",
-              "No markdown, no explanation, just the JSON array."
-            ].join("\n")
-          },
+        // STEP 1: Claude generates authentic traditional recipes
+        var claudePrompt = [
           {
             role: "user",
             content: [
-              "Generate " + count + " unique, EXCITING " + mealType + " recipes for " + servings + " servings.",
+              "You are a STRICT AUTHENTICITY ENFORCER for traditional recipes. You must generate recipes that would make locals from each cuisine PROUD.",
               "",
-              "DISLIKES (MUST AVOID ALL OF THESE - no exceptions):",
+              "CRITICAL AUTHENTICITY RULES:",
+              "1. Every recipe MUST be a REAL traditional dish from its cuisine - not a western adaptation",
+              "2. Use AUTHENTIC ingredients - if a dish needs a specific ingredient, include it (e.g., doubanjiang for mapo tofu)",
+              "3. Use TRADITIONAL techniques - proper methods matter (e.g., wok hei for fried rice)",
+              "4. Include the REAL names of dishes in their original language where appropriate",
+              "5. NO FUSION - keep each dish true to its cultural origins",
+              "6. A local grandmother from that culture should look at this recipe and say 'Yes, this is how we make it back home'",
+              "",
+              "TEST: Would a person FROM that culture recognize this as an authentic dish they grew up eating? If not, don't include it.",
+              "",
+              "DISLIKES (MUST AVOID):",
               dislikes.length > 0 ? dislikes.join(", ") : "None specified",
               "",
-              "DIET PREFERENCES (MUST FOLLOW):",
+              "DIET PREFERENCES:",
               dietPreferences.length > 0 ? dietPreferences.join(", ") : "No specific diet",
               "",
-              "Maximum ingredients per recipe: " + maxIngredients,
+              "COMPLEXITY: " + complexityInstructions,
+              "COOKING METHOD: " + methodInstructions,
+              "",
+              cuisineInstructions,
+              "",
+              "COMPLETE BALANCED MEALS:",
+              "- Every dinner must be COMPLETE: protein + carb/starch + vegetables",
+              "- Include traditional sides that go with each dish",
+              "- Example: Dal Bhat should include dal, rice, tarkari (vegetable), and achar",
+              "",
+              "Generate " + count + " AUTHENTIC " + mealType + " recipes for " + servings + " servings.",
+              "Maximum " + maxIngredients + " ingredients per recipe.",
               "Quality level: " + budget,
               "",
-              "CUISINES:",
-              cuisines.length > 0 ? "Focus on: " + cuisines.join(", ") : "Mix of diverse cuisines (Italian, Asian, Middle Eastern, Aussie, etc.)",
-              "",
-              "Remember:",
-              "- If vegetarian/vegan is specified, absolutely NO meat/fish products",
-              "- If an ingredient is disliked, do NOT include it or any dish that typically contains it",
-              "- EVERY meal must be COMPLETE with protein + sides + vegetables",
-              "- Make every dish sound and taste AMAZING - bold flavors, proper seasoning, appetizing!",
-              "- Use AUTHENTIC recipes from the specified cuisines - real dishes people would recognize!"
+              "Return ONLY a JSON array:",
+              "[",
+              "  {",
+              '    "name": "Traditional Dish Name (Local Name)",',
+              '    "emoji": "🍛",',
+              '    "cuisine": "Indian",',
+              '    "authenticityNote": "Brief note on why this is authentic",',
+              '    "description": "Appetizing description mentioning authentic elements",',
+              '    "time": "45 min",',
+              '    "servings": ' + servings + ',',
+              '    "cookingMethod": "stovetop",',
+              '    "ingredients": [',
+              '      {"name": "ingredient", "quantity": "500g", "estimatedPrice": 5.50, "authenticNote": "why this ingredient matters"}',
+              "    ],",
+              '    "steps": ["Detailed step with technique tips", "..."],',
+              '    "traditionalTip": "Tip on how locals would serve/eat this"',
+              "  }",
+              "]"
             ].join("\n")
           }
         ];
 
-        var gptMealResponse = await handleGPT(mealPrompt, env);
+        var claudeResponse = await handleClaude(claudePrompt, env);
 
-        // Parse the JSON response
+        // Parse Claude's response
         var parsedMeals;
         try {
-          var cleanMealResponse = gptMealResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-          parsedMeals = JSON.parse(cleanMealResponse);
+          var cleanClaudeResponse = claudeResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+          var jsonMatch = cleanClaudeResponse.match(/\[[\s\S]*\]/);
+          if (jsonMatch) {
+            parsedMeals = JSON.parse(jsonMatch[0]);
+          } else {
+            throw new Error("No JSON array found in Claude response");
+          }
         } catch (parseErr) {
-          // If parsing fails, return error
-          return jsonResponse({ error: "Failed to parse meal data", raw: gptMealResponse }, 500, request);
+          return jsonResponse({ error: "Failed to parse recipe data", raw: claudeResponse }, 500, request);
         }
 
-        // Add unique IDs to each meal
-        var mealsWithIds = parsedMeals.map(function(meal, index) {
-          return Object.assign({}, meal, { id: Date.now() + index });
+        // STEP 2: GPT audits the recipes for authenticity
+        var auditPrompt = [
+          {
+            role: "system",
+            content: [
+              "You are a STRICT CULINARY AUTHENTICITY AUDITOR. Your job is to review recipes and critique them for cultural authenticity.",
+              "",
+              "For each recipe, evaluate:",
+              "1. Is this a REAL traditional dish from the claimed cuisine?",
+              "2. Are the ingredients authentic and correct?",
+              "3. Is the technique/method traditional?",
+              "4. Would a local from that culture recognize and approve of this recipe?",
+              "",
+              "Be STRICT but fair. Award a score from 1-10:",
+              "- 10: Perfect - a grandmother from that culture would be proud",
+              "- 7-9: Good - authentic with minor improvements possible",
+              "- 4-6: Needs work - some western adaptations detected",
+              "- 1-3: Not authentic - this is fusion or incorrect",
+              "",
+              "Return ONLY a JSON array of audits:",
+              "[",
+              "  {",
+              '    "recipeName": "Name of the recipe",',
+              '    "score": 8,',
+              '    "verdict": "Approved" or "Needs Improvement",',
+              '    "positives": ["What\'s authentic about this dish"],',
+              '    "concerns": ["Any authenticity concerns"],',
+              '    "suggestion": "Brief improvement suggestion if needed"',
+              "  }",
+              "]"
+            ].join("\n")
+          },
+          {
+            role: "user",
+            content: "Audit these recipes for authenticity:\n\n" + JSON.stringify(parsedMeals, null, 2)
+          }
+        ];
+
+        var auditResponse;
+        var parsedAudits = [];
+        try {
+          auditResponse = await handleGPT(auditPrompt, env);
+          var cleanAuditResponse = auditResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+          var auditMatch = cleanAuditResponse.match(/\[[\s\S]*\]/);
+          if (auditMatch) {
+            parsedAudits = JSON.parse(auditMatch[0]);
+          }
+        } catch (auditErr) {
+          // If audit fails, continue without it
+          console.log("Audit failed:", auditErr.message);
+        }
+
+        // Merge audit results with meals
+        var mealsWithAudit = parsedMeals.map(function(meal, index) {
+          var audit = parsedAudits.find(function(a) {
+            return a.recipeName && meal.name && a.recipeName.toLowerCase().includes(meal.name.toLowerCase().split('(')[0].trim().substring(0, 15));
+          }) || parsedAudits[index] || null;
+
+          return Object.assign({}, meal, {
+            id: Date.now() + index,
+            audit: audit ? {
+              score: audit.score,
+              verdict: audit.verdict,
+              positives: audit.positives || [],
+              concerns: audit.concerns || [],
+              suggestion: audit.suggestion || ""
+            } : null
+          });
         });
 
-        return jsonResponse({ meals: mealsWithIds }, 200, request);
+        // Calculate average authenticity score
+        var avgScore = 0;
+        var scoredMeals = mealsWithAudit.filter(function(m) { return m.audit && m.audit.score; });
+        if (scoredMeals.length > 0) {
+          avgScore = scoredMeals.reduce(function(sum, m) { return sum + m.audit.score; }, 0) / scoredMeals.length;
+        }
+
+        return jsonResponse({
+          meals: mealsWithAudit,
+          authenticityScore: Math.round(avgScore * 10) / 10,
+          generatedBy: "Claude",
+          auditedBy: "GPT-4"
+        }, 200, request);
       } catch (err) {
         return jsonResponse({ error: err && err.message ? err.message : "Failed to generate meals" }, 500, request);
       }
@@ -780,20 +921,26 @@ export default {
 
     // POST /api/takeaway/deals
     if (url.pathname === "/api/takeaway/deals" && request.method === "POST") {
+      // Auth check first
+      var authDeals;
       try {
-        var authDeals = await verifyToken(request, env);
-        if (!authDeals.valid) {
-          return jsonResponse({ error: "Authentication required" }, 401, request);
-        }
+        authDeals = await verifyToken(request, env);
+      } catch (authErr) {
+        return jsonResponse({ error: "Authentication required" }, 401, request);
+      }
+      if (!authDeals || !authDeals.valid) {
+        return jsonResponse({ error: "Authentication required" }, 401, request);
+      }
 
-        var bodyDeals = await request.json().catch(function () { return {}; });
-        var location = bodyDeals.location || "";
+      var bodyDeals = await request.json().catch(function () { return {}; });
+      var location = bodyDeals.location || "";
 
-        if (!location) {
-          return jsonResponse({ error: "Location is required" }, 400, request);
-        }
+      if (!location) {
+        return jsonResponse({ error: "Location is required" }, 400, request);
+      }
 
-        // Rate limit
+      // Try rate limit, but don't fail if rate limit service has issues
+      try {
         var dealsRate = await enforceRateLimit(env, "takeaway:deals:" + hashEmail(authDeals.email), 10, 300);
         if (!dealsRate.allowed) {
           return jsonResponseWithHeaders(
@@ -803,6 +950,11 @@ export default {
             { "Retry-After": String(dealsRate.retryAfter) }
           );
         }
+      } catch (rateLimitErr) {
+        console.log("Rate limit check failed, continuing:", rateLimitErr.message);
+      }
+
+      try {
 
         // Use Perplexity to search for current takeaway deals
         var dealsPrompt = [
@@ -933,20 +1085,26 @@ export default {
 
     // POST /api/store/specials
     if (url.pathname === "/api/store/specials" && request.method === "POST") {
+      // Auth check first
+      var authSpecials;
       try {
-        var authSpecials = await verifyToken(request, env);
-        if (!authSpecials.valid) {
-          return jsonResponse({ error: "Authentication required" }, 401, request);
-        }
+        authSpecials = await verifyToken(request, env);
+      } catch (authErr) {
+        return jsonResponse({ error: "Authentication required" }, 401, request);
+      }
+      if (!authSpecials || !authSpecials.valid) {
+        return jsonResponse({ error: "Authentication required" }, 401, request);
+      }
 
-        var bodySpecials = await request.json().catch(function () { return {}; });
-        var specLocation = bodySpecials.location || "";
+      var bodySpecials = await request.json().catch(function () { return {}; });
+      var specLocation = bodySpecials.location || "";
 
-        if (!specLocation) {
-          return jsonResponse({ error: "Location is required" }, 400, request);
-        }
+      if (!specLocation) {
+        return jsonResponse({ error: "Location is required" }, 400, request);
+      }
 
-        // Rate limit
+      // Try rate limit, but don't fail if rate limit service has issues
+      try {
         var specialsRate = await enforceRateLimit(env, "store:specials:" + hashEmail(authSpecials.email), 10, 300);
         if (!specialsRate.allowed) {
           return jsonResponseWithHeaders(
@@ -956,6 +1114,11 @@ export default {
             { "Retry-After": String(specialsRate.retryAfter) }
           );
         }
+      } catch (rateLimitErr) {
+        console.log("Rate limit check failed, continuing:", rateLimitErr.message);
+      }
+
+      try {
 
         // Use Perplexity to search for current store specials
         var specialsPrompt = [
