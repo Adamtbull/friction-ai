@@ -1387,31 +1387,44 @@ export default {
         return true;
       }
 
+      var grokWorked = false;
+
       try {
-        // Try Grok with real-time web search first (best for current deals)
+        // Try Grok first
         try {
-          console.log("Trying Grok with real-time search for deals...");
+          console.log("Trying Grok for deals in " + location + "...");
           var grokResponse = await handleGrokSearch(dealsPrompt, env);
-          console.log("Grok raw response:", grokResponse.substring(0, 500));
+          console.log("Grok raw response (first 500 chars):", grokResponse.substring(0, 500));
           var cleanGrokResponse = grokResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
           var grokMatch = cleanGrokResponse.match(/\[[\s\S]*\]/);
           if (grokMatch) {
             var grokDeals = JSON.parse(grokMatch[0]);
             if (Array.isArray(grokDeals) && grokDeals.length > 0) {
-              // Validate and filter deals
               var validDeals = grokDeals.filter(isValidRestaurant);
-              console.log("Grok found " + grokDeals.length + " deals, " + validDeals.length + " valid");
+              console.log("Grok found " + grokDeals.length + " deals, " + validDeals.length + " valid after filtering");
               if (validDeals.length > 0) {
                 parsedDeals = validDeals;
+                grokWorked = true;
+                console.log("SUCCESS: Using Grok results");
+              } else {
+                console.log("Grok returned deals but all were filtered out as invalid");
               }
+            } else {
+              console.log("Grok response had no deals in array");
             }
+          } else {
+            console.log("Could not find JSON array in Grok response");
           }
         } catch (grokErr) {
-          console.log("Grok failed for deals, trying Perplexity:", grokErr.message);
+          console.log("Grok error:", grokErr.message);
+        }
 
-          // Try Perplexity as backup (also has web search)
+        // If Grok didn't work, try Perplexity
+        if (!grokWorked) {
+          console.log("Trying Perplexity as backup...");
           try {
             var dealsResponse = await handlePerplexityPriceSearch(dealsPrompt, env);
+            console.log("Perplexity raw response (first 500 chars):", dealsResponse.substring(0, 500));
             var cleanDealsResponse = dealsResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
             var jsonArrayMatch = cleanDealsResponse.match(/\[[\s\S]*\]/);
             if (jsonArrayMatch) {
@@ -1421,27 +1434,28 @@ export default {
                 console.log("Perplexity found " + realDeals.length + " deals, " + validPerplexityDeals.length + " valid");
                 if (validPerplexityDeals.length > 0) {
                   parsedDeals = validPerplexityDeals;
+                  console.log("SUCCESS: Using Perplexity results");
                 }
               }
             }
           } catch (perplexityErr) {
-            console.log("Perplexity also failed for deals, using fallback:", perplexityErr.message);
+            console.log("Perplexity also failed:", perplexityErr.message);
           }
         }
       } catch (searchErr) {
-        // Log the error but continue with fallback deals
-        console.log("Takeaway deals search failed, using fallback:", searchErr.message);
+        console.log("Takeaway deals search failed:", searchErr.message);
       }
 
       // Check if we're returning real search results or fallback
       var isRealSearch = parsedDeals !== fallbackDeals;
+      console.log("Final result: isRealSearch=" + isRealSearch + ", deals count=" + parsedDeals.length);
 
       // ALWAYS return 200 with deals (real or fallback)
       return jsonResponse({
         deals: parsedDeals,
         location: location,
         isRealSearch: isRealSearch,
-        source: isRealSearch ? "Grok AI Web Search" : "Popular deals (API unavailable)"
+        source: isRealSearch ? "AI Web Search" : "Popular deals (API unavailable)"
       }, 200, request);
     }
 
