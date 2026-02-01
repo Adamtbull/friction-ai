@@ -511,6 +511,116 @@
       background: var(--border);
     }
 
+    .shopping-action-btn.specials-btn {
+      background: linear-gradient(135deg, #e65100, #ff9800);
+      color: white;
+      box-shadow: 0 2px 8px rgba(230, 81, 0, 0.3);
+    }
+
+    .shopping-action-btn.specials-btn:hover {
+      background: linear-gradient(135deg, #bf360c, #e65100);
+    }
+
+    /* Store Specials Styles */
+    .store-specials-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .store-special-card {
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      border: 1px solid var(--border);
+    }
+
+    .store-special-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .store-special-logo {
+      width: 48px;
+      height: 48px;
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .store-special-name {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .store-special-category {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .store-special-items {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .special-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 10px 12px;
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      gap: 12px;
+    }
+
+    .special-item-info {
+      flex: 1;
+    }
+
+    .special-item-name {
+      font-weight: 500;
+      font-size: 0.9rem;
+      margin-bottom: 2px;
+    }
+
+    .special-item-detail {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .special-item-prices {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .special-item-was {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-decoration: line-through;
+    }
+
+    .special-item-now {
+      font-weight: 700;
+      color: #e65100;
+      font-size: 1rem;
+    }
+
+    .special-item-save {
+      font-size: 0.7rem;
+      color: #2e7d32;
+      background: #e8f5e9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-top: 2px;
+      display: inline-block;
+    }
+
     .shopping-add {
       display: flex;
       gap: 8px;
@@ -3932,6 +4042,7 @@
     <div class="shopping-header">
       <h3>Shopping List</h3>
       <div class="shopping-actions">
+        <button class="shopping-action-btn specials-btn" onclick="openStoreSpecials()" title="Store Specials">🏷️</button>
         <button class="shopping-action-btn" onclick="clearCompletedItems()" title="Clear completed">🗑️</button>
         <button class="shopping-action-btn" onclick="generateListFromMeals()" title="Generate from meals">🍽️</button>
       </div>
@@ -4165,6 +4276,21 @@
       <div id="takeawayDealsContent">
         <div class="takeaway-deals-empty">
           <p>Finding deals in your area...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STORE SPECIALS SHEET -->
+  <div class="modal-sheet large" id="storeSpecialsSheet">
+    <div class="modal-header">
+      <h3>🏷️ This Week's Specials</h3>
+      <button class="modal-close" onclick="closeStoreSpecials()">×</button>
+    </div>
+    <div class="modal-content">
+      <div id="storeSpecialsContent">
+        <div class="takeaway-deals-empty">
+          <p>Finding specials...</p>
         </div>
       </div>
     </div>
@@ -8478,6 +8604,135 @@
         </div>
         <p style="margin-top: 16px; font-size: 0.8rem; color: var(--text-muted); text-align: center;">
           Deals may vary. Check with the restaurant for current offers.
+        </p>
+      `;
+    }
+
+    // Store Specials Functions
+    function openStoreSpecials() {
+      const location = mealPreferences.location;
+      const content = document.getElementById('storeSpecialsContent');
+
+      if (!location) {
+        content.innerHTML = `
+          <div class="takeaway-no-location">
+            <div style="font-size: 3rem; margin-bottom: 16px;">📍</div>
+            <h4>Set Your Location First</h4>
+            <p style="color: var(--text-muted); margin-bottom: 16px;">
+              We need your location to find specials at your local stores.
+            </p>
+            <button class="smart-meal-btn primary" onclick="closeStoreSpecials(); openMealPreferences(); switchPrefTab('stores');">
+              Set Location
+            </button>
+          </div>
+        `;
+        openModal('storeSpecialsSheet');
+        return;
+      }
+
+      content.innerHTML = `
+        <div class="takeaway-deals-empty">
+          <div class="ai-loading-spinner"></div>
+          <p>Searching for specials near ${location}...</p>
+        </div>
+      `;
+
+      openModal('storeSpecialsSheet');
+      searchStoreSpecials(location);
+    }
+
+    function closeStoreSpecials() {
+      document.getElementById('storeSpecialsSheet').classList.remove('open');
+      document.getElementById('modalOverlay').classList.remove('open');
+    }
+
+    async function searchStoreSpecials(location) {
+      const content = document.getElementById('storeSpecialsContent');
+
+      try {
+        const token = localStorage.getItem('google_id_token');
+        if (!token) {
+          throw new Error('Please sign in to search for specials');
+        }
+
+        const response = await fetch('/api/store/specials', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ location })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to search for specials');
+        }
+
+        const data = await response.json();
+        renderStoreSpecials(data.specials || []);
+
+      } catch (error) {
+        console.error('Store specials error:', error);
+        content.innerHTML = `
+          <div class="takeaway-deals-empty" style="color: var(--danger);">
+            <div style="font-size: 3rem; margin-bottom: 16px;">😕</div>
+            <p>${error.message}</p>
+            <button class="smart-meal-btn" onclick="searchStoreSpecials('${location}')" style="margin-top: 16px;">
+              Try Again
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    function renderStoreSpecials(specials) {
+      const content = document.getElementById('storeSpecialsContent');
+
+      if (specials.length === 0) {
+        content.innerHTML = `
+          <div class="takeaway-deals-empty">
+            <div style="font-size: 3rem; margin-bottom: 16px;">🔍</div>
+            <p>No current specials found in your area.</p>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Check back later for new deals!</p>
+          </div>
+        `;
+        return;
+      }
+
+      content.innerHTML = `
+        <p style="margin-bottom: 16px; color: var(--text-muted); font-size: 0.9rem;">
+          This week's specials at stores near you:
+        </p>
+        <div class="store-specials-list">
+          ${specials.map(store => `
+            <div class="store-special-card">
+              <div class="store-special-header">
+                <div class="store-special-logo">${store.emoji || '🏪'}</div>
+                <div>
+                  <div class="store-special-name">${store.name}</div>
+                  <div class="store-special-category">${store.category || 'Supermarket'}</div>
+                </div>
+              </div>
+              <div class="store-special-items">
+                ${store.items.map(item => `
+                  <div class="special-item">
+                    <div class="special-item-info">
+                      <div class="special-item-name">${item.name}</div>
+                      ${item.detail ? `<div class="special-item-detail">${item.detail}</div>` : ''}
+                    </div>
+                    <div class="special-item-prices">
+                      ${item.wasPrice ? `<div class="special-item-was">$${item.wasPrice}</div>` : ''}
+                      <div class="special-item-now">$${item.nowPrice}</div>
+                      ${item.save ? `<div class="special-item-save">Save $${item.save}</div>` : ''}
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <p style="margin-top: 16px; font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+          Specials valid this week. Prices may vary by store.
         </p>
       `;
     }

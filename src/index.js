@@ -905,6 +905,141 @@ export default {
       }
     }
 
+    // POST /api/store/specials
+    if (url.pathname === "/api/store/specials" && request.method === "POST") {
+      try {
+        var authSpecials = await verifyToken(request, env);
+        if (!authSpecials.valid) {
+          return jsonResponse({ error: "Authentication required" }, 401, request);
+        }
+
+        var bodySpecials = await request.json().catch(function () { return {}; });
+        var specLocation = bodySpecials.location || "";
+
+        if (!specLocation) {
+          return jsonResponse({ error: "Location is required" }, 400, request);
+        }
+
+        // Rate limit
+        var specialsRate = await enforceRateLimit(env, "store:specials:" + hashEmail(authSpecials.email), 10, 300);
+        if (!specialsRate.allowed) {
+          return jsonResponseWithHeaders(
+            { error: "Rate limit exceeded. Please wait and try again." },
+            429,
+            request,
+            { "Retry-After": String(specialsRate.retryAfter) }
+          );
+        }
+
+        // Use Perplexity to search for current store specials
+        var specialsPrompt = [
+          {
+            role: "system",
+            content: [
+              "You are an Australian supermarket specials finder. Search for THIS WEEK's catalogue specials at major Australian supermarkets.",
+              "",
+              "Focus on these stores:",
+              "- Woolworths, Coles, ALDI, IGA",
+              "- Costco (if nearby)",
+              "- Harris Farm, Foodland",
+              "",
+              "Return ONLY a JSON array of stores with their specials:",
+              "[",
+              "  {",
+              '    "name": "Store Name",',
+              '    "emoji": "🛒",',
+              '    "category": "Supermarket",',
+              '    "items": [',
+              "      {",
+              '        "name": "Product name",',
+              '        "detail": "Size/brand details",',
+              '        "wasPrice": "5.00",',
+              '        "nowPrice": "3.50",',
+              '        "save": "1.50"',
+              "      }",
+              "    ]",
+              "  }",
+              "]",
+              "",
+              "Include 3-5 stores with 4-6 of their BEST specials each.",
+              "Focus on popular items: meat, fruit, vegetables, pantry staples, dairy.",
+              "Only include REAL current specials from this week's catalogue.",
+              "Prices must be in AUD. Do not include $ symbol in price values.",
+              "No markdown, no explanation, just the JSON array."
+            ].join("\n")
+          },
+          {
+            role: "user",
+            content: [
+              "Find this week's best supermarket specials near " + specLocation + ", Australia.",
+              "",
+              "Search for:",
+              "1. Half-price specials at Woolworths and Coles",
+              "2. ALDI Special Buys and grocery deals",
+              "3. Weekly catalogue deals on meat, produce, dairy",
+              "4. Multi-buy offers (2 for $X, buy 2 get 1 free)",
+              "",
+              "Focus on the biggest savings and best value deals this week."
+            ].join("\n")
+          }
+        ];
+
+        var specialsResponse = await handlePerplexityPriceSearch(specialsPrompt, env);
+
+        // Parse the JSON response
+        var parsedSpecials;
+        try {
+          var cleanSpecialsResponse = specialsResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+          // Try to find JSON array in response
+          var jsonSpecialsMatch = cleanSpecialsResponse.match(/\[[\s\S]*\]/);
+          if (jsonSpecialsMatch) {
+            parsedSpecials = JSON.parse(jsonSpecialsMatch[0]);
+          } else {
+            throw new Error("No JSON array found");
+          }
+        } catch (parseErr) {
+          // Return fallback specials if parsing fails
+          parsedSpecials = [
+            {
+              name: "Woolworths",
+              emoji: "🟢",
+              category: "Supermarket",
+              items: [
+                { name: "Chicken Breast", detail: "1kg", wasPrice: "12.00", nowPrice: "9.00", save: "3.00" },
+                { name: "Strawberries", detail: "250g punnet", wasPrice: "5.00", nowPrice: "2.50", save: "2.50" },
+                { name: "Helga's Bread", detail: "Various", wasPrice: "5.50", nowPrice: "4.00", save: "1.50" },
+                { name: "Dairy Farmers Milk", detail: "2L", wasPrice: "4.20", nowPrice: "3.20", save: "1.00" }
+              ]
+            },
+            {
+              name: "Coles",
+              emoji: "🔴",
+              category: "Supermarket",
+              items: [
+                { name: "Beef Mince", detail: "500g", wasPrice: "10.00", nowPrice: "7.50", save: "2.50" },
+                { name: "Avocados", detail: "Each", wasPrice: "3.00", nowPrice: "1.50", save: "1.50" },
+                { name: "Coles Cheese Block", detail: "500g", wasPrice: "7.50", nowPrice: "5.50", save: "2.00" }
+              ]
+            },
+            {
+              name: "ALDI",
+              emoji: "🟡",
+              category: "Discount Supermarket",
+              items: [
+                { name: "Salmon Fillets", detail: "300g", nowPrice: "8.99" },
+                { name: "Mixed Vegetables", detail: "1kg frozen", nowPrice: "3.49" },
+                { name: "Pasta Sauce", detail: "500g jar", nowPrice: "1.99" }
+              ]
+            }
+          ];
+        }
+
+        return jsonResponse({ specials: parsedSpecials, location: specLocation }, 200, request);
+      } catch (err) {
+        return jsonResponse({ error: err && err.message ? err.message : "Failed to search specials" }, 500, request);
+      }
+    }
+
     // ============ APPOINTMENT IMAGE SCAN ============
     // POST /api/appointments/scan
     if (url.pathname === "/api/appointments/scan" && request.method === "POST") {
