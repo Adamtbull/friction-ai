@@ -974,16 +974,18 @@ export default {
         console.log("Rate limit check failed, continuing:", rateLimitErr.message);
       }
 
-      // Fallback deals to use if anything fails
+      // Fallback deals to use if anything fails - comprehensive Australian deals
       var fallbackDeals = [
         {
           name: "McDonald's",
           emoji: "🍟",
           type: "Fast Food",
           offers: [
-            { description: "Check the McDonald's app for daily deals", price: "Varies" },
+            { description: "🔥 Buy 1 Get 1 Free Big Mac (App Exclusive)", price: "FREE" },
+            { description: "25% Off Your Order (App First Order)", price: "25% OFF" },
+            { description: "2 Small McChicken Meals for $12", price: "$12.00" },
             { description: "$6 Small McValue Meal", price: "$6.00" },
-            { description: "McChicken & Small Fries via app", price: "$5.95" }
+            { description: "Free Medium Fries with $15+ Order", price: "FREE" }
           ],
           source: "McDonald's App"
         },
@@ -992,9 +994,11 @@ export default {
           emoji: "🍗",
           type: "Fast Food",
           offers: [
-            { description: "Check KFC app for exclusive deals", price: "Varies" },
+            { description: "🔥 2 for 1 Zinger Burgers (Tuesdays)", price: "2 FOR 1" },
+            { description: "Family Feast: 10pc Chicken + 2 Large Sides", price: "$32.95" },
             { description: "$4.95 Lunch Deals (11am-4pm)", price: "$4.95" },
-            { description: "Zinger Stacker Combo", price: "$12.95" }
+            { description: "8 Wicked Wings for $8 (App Only)", price: "$8.00" },
+            { description: "Zinger Stacker Box Meal", price: "$14.95" }
           ],
           source: "KFC App"
         },
@@ -1003,19 +1007,36 @@ export default {
           emoji: "🍕",
           type: "Pizza",
           offers: [
-            { description: "Value Range Pizzas from $5", price: "From $5" },
-            { description: "Large Traditional Pizza via app", price: "$8.99" },
-            { description: "Check app for weekly coupons", price: "Varies" }
+            { description: "🔥 Buy 1 Traditional Get 1 FREE (Pickup)", price: "2 FOR 1" },
+            { description: "3 Traditional Pizzas Delivered", price: "$33.95" },
+            { description: "Large Value Pizza Pickup", price: "$5.95" },
+            { description: "50% Off Premium & Traditional (App)", price: "50% OFF" },
+            { description: "Family Meal Deal: 3 Pizzas + 2 Sides + Drink", price: "$45.95" }
           ],
           source: "Domino's App"
+        },
+        {
+          name: "Pizza Hut",
+          emoji: "🍕",
+          type: "Pizza",
+          offers: [
+            { description: "🔥 2 Large Pizzas for $25 Pickup", price: "$25.00" },
+            { description: "All You Can Eat Lunch Buffet", price: "$16.95" },
+            { description: "$1 Wings Wednesday (min 10)", price: "$1 each" },
+            { description: "My Box: Pizza + Side + Drink", price: "$12.95" }
+          ],
+          source: "Pizza Hut App"
         },
         {
           name: "Hungry Jack's",
           emoji: "🍔",
           type: "Fast Food",
           offers: [
-            { description: "Whopper Junior via app", price: "$4.00" },
-            { description: "$6 Stunner Meals", price: "$6.00" }
+            { description: "🔥 2 Whopper Jnrs for $7.95", price: "$7.95" },
+            { description: "Shake & Win - Free Food Daily (App)", price: "FREE" },
+            { description: "$6 Stunner Meals", price: "$6.00" },
+            { description: "Family Bundle: 4 Burgers + 4 Chips + Drinks", price: "$29.95" },
+            { description: "2 Bacon Deluxe for $14", price: "$14.00" }
           ],
           source: "Hungry Jack's App"
         },
@@ -1024,101 +1045,147 @@ export default {
           emoji: "🥪",
           type: "Sandwiches",
           offers: [
-            { description: "$6 Footlong subs via app", price: "$6.00" },
-            { description: "Sub of the Day deals", price: "Varies" }
+            { description: "🔥 Buy 1 Footlong Get 1 50% Off", price: "50% OFF" },
+            { description: "Sub of the Day", price: "$8.50" },
+            { description: "Any Footlong for $10 (App)", price: "$10.00" },
+            { description: "2 Footlongs for $18 (App Exclusive)", price: "$18.00" }
           ],
           source: "Subway App"
+        },
+        {
+          name: "Guzman y Gomez",
+          emoji: "🌯",
+          type: "Mexican",
+          offers: [
+            { description: "🔥 Free Burrito with 3 Burrito Order", price: "FREE" },
+            { description: "$2 Taco Tuesdays (Pickup)", price: "$2 each" },
+            { description: "Family Fiesta Pack: 4 Burritos + Nachos", price: "$49.95" }
+          ],
+          source: "GYG App"
+        },
+        {
+          name: "Nando's",
+          emoji: "🍗",
+          type: "Chicken",
+          offers: [
+            { description: "🔥 Buy Any Burger, Get Another FREE (App)", price: "2 FOR 1" },
+            { description: "1/4 Chicken & Regular Side", price: "$12.95" },
+            { description: "Whole Chicken + 2 Large Sides", price: "$32.95" }
+          ],
+          source: "Nando's App"
+        },
+        {
+          name: "Red Rooster",
+          emoji: "🐔",
+          type: "Chicken",
+          offers: [
+            { description: "🔥 $25 Roast Dinner (Whole Chicken + Sides)", price: "$25.00" },
+            { description: "Rippa Roll Combo", price: "$9.95" },
+            { description: "Family Reds Box: Whole Chicken + Chips", price: "$29.95" }
+          ],
+          source: "Red Rooster App"
+        },
+        {
+          name: "Uber Eats",
+          emoji: "🚗",
+          type: "Delivery",
+          offers: [
+            { description: "🔥 $15 Off First Order (New Users)", price: "$15 OFF" },
+            { description: "Free Delivery from Select Restaurants", price: "FREE DELIVERY" },
+            { description: "Buy 1 Get 1 Free - Featured Restaurants", price: "2 FOR 1" }
+          ],
+          source: "Uber Eats App"
         }
       ];
 
       // Try to get real deals, but ALWAYS return something
       var parsedDeals = fallbackDeals;
 
+      // Deals search prompt - used by all AI providers
+      var dealsPrompt = [
+        {
+          role: "system",
+          content: [
+            "You are an Australian takeaway deals finder with REAL-TIME web search.",
+            "Search the web NOW for CURRENT fast food and takeaway specials.",
+            "",
+            "Focus on major chains and popular takeaway options:",
+            "- McDonald's, KFC, Hungry Jack's, Subway, Domino's, Pizza Hut",
+            "- Guzman y Gomez, Nando's, Oporto, Red Rooster, Chicken Treat",
+            "- Uber Eats, DoorDash, Menulog app deals",
+            "- Local fish & chips, Chinese, Thai, Indian takeaway",
+            "",
+            "IMPORTANT: Search for BOGO, 2-for-1, family deals, app exclusives, and discount offers.",
+            "",
+            "Return ONLY a JSON array of deals with this structure:",
+            "[",
+            "  {",
+            '    "name": "Restaurant Name",',
+            '    "emoji": "🍔",',
+            '    "type": "Fast Food",',
+            '    "offers": [',
+            '      { "description": "🔥 Buy 1 Get 1 Free Burger", "price": "2 FOR 1" },',
+            '      { "description": "Family Feast Deal", "price": "$29.95" }',
+            "    ],",
+            '    "source": "Restaurant App / Website"',
+            "  }",
+            "]",
+            "",
+            "Include 8-12 places with their best current deals.",
+            "Prioritize BOGO, 2-for-1, percentage off, and bundle deals.",
+            "Only include REAL current offers from your web search.",
+            "No markdown, no explanation, just the JSON array."
+          ].join("\n")
+        },
+        {
+          role: "user",
+          content: [
+            "Search the web RIGHT NOW for current takeaway and fast food deals near " + location + ", Australia.",
+            "",
+            "I want to see:",
+            "1. Buy One Get One Free (BOGO) deals",
+            "2. 2-for-1 offers (like KFC Tuesday, Domino's pickup)",
+            "3. Current app-exclusive deals with big discounts",
+            "4. Family meal bundles and combos",
+            "5. Delivery app promos (Uber Eats, DoorDash, Menulog)",
+            "6. Any limited time offers or weekly specials",
+            "",
+            "Search now and find the BEST VALUE deals available TODAY."
+          ].join("\n")
+        }
+      ];
+
       try {
-        // Use Perplexity to search for current takeaway deals
-        var dealsPrompt = [
-          {
-            role: "system",
-            content: [
-              "You are an Australian takeaway deals finder. Search for CURRENT fast food and takeaway specials.",
-              "",
-              "Focus on major chains and popular takeaway options:",
-              "- McDonald's, KFC, Hungry Jack's, Subway, Domino's, Pizza Hut",
-              "- Guzman y Gomez, Nando's, Oporto, Red Rooster, Chicken Treat",
-              "- Uber Eats, DoorDash, Menulog app deals",
-              "- Local fish & chips, Chinese, Thai, Indian takeaway",
-              "",
-              "Return ONLY a JSON array of deals with this structure:",
-              "[",
-              "  {",
-              '    "name": "Restaurant Name",',
-              '    "emoji": "🍔",',
-              '    "type": "Fast Food",',
-              '    "offers": [',
-              '      { "description": "Deal description", "price": "$X.XX" }',
-              "    ],",
-              '    "source": "where you found this deal"',
-              "  }",
-              "]",
-              "",
-              "Include 5-10 places with their best current deals.",
-              "Only include REAL current offers you can verify.",
-              "No markdown, no explanation, just the JSON array."
-            ].join("\n")
-          },
-          {
-            role: "user",
-            content: [
-              "Find current takeaway and fast food deals near " + location + ", Australia.",
-              "",
-              "Search for:",
-              "1. Current app-exclusive deals (McDonald's app, KFC app, etc)",
-              "2. Weekly specials at major chains",
-              "3. Delivery app promos (Uber Eats, DoorDash, Menulog)",
-              "4. Any limited time offers",
-              "",
-              "Focus on the best value deals available RIGHT NOW."
-            ].join("\n")
-          }
-        ];
-
-        // Try Perplexity first, then GPT as backup
+        // Try Grok with real-time web search first (best for current deals)
         try {
-          var dealsResponse = await handlePerplexityPriceSearch(dealsPrompt, env);
-          var cleanDealsResponse = dealsResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-          var jsonArrayMatch = cleanDealsResponse.match(/\[[\s\S]*\]/);
-          if (jsonArrayMatch) {
-            var realDeals = JSON.parse(jsonArrayMatch[0]);
-            if (Array.isArray(realDeals) && realDeals.length > 0) {
-              parsedDeals = realDeals;
+          console.log("Trying Grok with real-time search for deals...");
+          var grokResponse = await handleGrokSearch(dealsPrompt, env);
+          var cleanGrokResponse = grokResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+          var grokMatch = cleanGrokResponse.match(/\[[\s\S]*\]/);
+          if (grokMatch) {
+            var grokDeals = JSON.parse(grokMatch[0]);
+            if (Array.isArray(grokDeals) && grokDeals.length > 0) {
+              console.log("Grok found " + grokDeals.length + " deals");
+              parsedDeals = grokDeals;
             }
           }
-        } catch (perplexityErr) {
-          console.log("Perplexity failed for deals, trying GPT:", perplexityErr.message);
+        } catch (grokErr) {
+          console.log("Grok failed for deals, trying Perplexity:", grokErr.message);
 
-          // Try GPT as backup
+          // Try Perplexity as backup (also has web search)
           try {
-            var gptDealsPrompt = [
-              {
-                role: "system",
-                content: "You are an Australian fast food deals expert. Return ONLY a JSON array of current deals. No markdown, no explanation."
-              },
-              {
-                role: "user",
-                content: "List 5 current fast food deals in Australia from McDonald's, KFC, Domino's, Hungry Jack's, and Subway. Format: [{\"name\": \"Restaurant\", \"emoji\": \"🍔\", \"type\": \"Fast Food\", \"offers\": [{\"description\": \"Deal\", \"price\": \"$X\"}], \"source\": \"App\"}]"
-              }
-            ];
-            var gptResponse = await handleGPT(gptDealsPrompt, env);
-            var cleanGptResponse = gptResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-            var gptMatch = cleanGptResponse.match(/\[[\s\S]*\]/);
-            if (gptMatch) {
-              var gptDeals = JSON.parse(gptMatch[0]);
-              if (Array.isArray(gptDeals) && gptDeals.length > 0) {
-                parsedDeals = gptDeals;
+            var dealsResponse = await handlePerplexityPriceSearch(dealsPrompt, env);
+            var cleanDealsResponse = dealsResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+            var jsonArrayMatch = cleanDealsResponse.match(/\[[\s\S]*\]/);
+            if (jsonArrayMatch) {
+              var realDeals = JSON.parse(jsonArrayMatch[0]);
+              if (Array.isArray(realDeals) && realDeals.length > 0) {
+                console.log("Perplexity found " + realDeals.length + " deals");
+                parsedDeals = realDeals;
               }
             }
-          } catch (gptErr) {
-            console.log("GPT also failed for deals, using fallback:", gptErr.message);
+          } catch (perplexityErr) {
+            console.log("Perplexity also failed for deals, using fallback:", perplexityErr.message);
           }
         }
       } catch (searchErr) {
@@ -1215,69 +1282,94 @@ export default {
       // Try to get real specials, but ALWAYS return something
       var parsedSpecials = fallbackSpecials;
 
+      // Store specials prompt - used by all AI providers
+      var specialsPrompt = [
+        {
+          role: "system",
+          content: [
+            "You are an Australian supermarket specials finder with REAL-TIME web search.",
+            "Search the web NOW for THIS WEEK's catalogue specials at major Australian supermarkets.",
+            "",
+            "Focus on these stores:",
+            "- Woolworths, Coles, ALDI, IGA",
+            "- Costco (if nearby)",
+            "- Harris Farm, Foodland",
+            "",
+            "IMPORTANT: Search for half-price, multi-buy, and catalogue specials.",
+            "",
+            "Return ONLY a JSON array of stores with their specials:",
+            "[",
+            "  {",
+            '    "name": "Store Name",',
+            '    "emoji": "🛒",',
+            '    "category": "Supermarket",',
+            '    "items": [',
+            "      {",
+            '        "name": "Product name",',
+            '        "detail": "Size/brand details",',
+            '        "wasPrice": "5.00",',
+            '        "nowPrice": "3.50",',
+            '        "save": "1.50"',
+            "      }",
+            "    ]",
+            "  }",
+            "]",
+            "",
+            "Include 3-5 stores with 5-8 of their BEST specials each.",
+            "Focus on popular items: meat, fruit, vegetables, pantry staples, dairy.",
+            "Only include REAL current specials from this week's catalogue.",
+            "Prices must be in AUD. Do not include $ symbol in price values.",
+            "No markdown, no explanation, just the JSON array."
+          ].join("\n")
+        },
+        {
+          role: "user",
+          content: [
+            "Search the web NOW for this week's best supermarket specials near " + specLocation + ", Australia.",
+            "",
+            "I want to see:",
+            "1. Half-price specials at Woolworths and Coles",
+            "2. ALDI Special Buys and grocery deals",
+            "3. Weekly catalogue deals on meat, produce, dairy",
+            "4. Multi-buy offers (2 for $X, buy 2 get 1 free)",
+            "5. Any bonus points offers or loyalty deals",
+            "",
+            "Search now and find the biggest savings and best value deals THIS WEEK."
+          ].join("\n")
+        }
+      ];
+
       try {
-        // Use Perplexity to search for current store specials
-        var specialsPrompt = [
-          {
-            role: "system",
-            content: [
-              "You are an Australian supermarket specials finder. Search for THIS WEEK's catalogue specials at major Australian supermarkets.",
-              "",
-              "Focus on these stores:",
-              "- Woolworths, Coles, ALDI, IGA",
-              "- Costco (if nearby)",
-              "- Harris Farm, Foodland",
-              "",
-              "Return ONLY a JSON array of stores with their specials:",
-              "[",
-              "  {",
-              '    "name": "Store Name",',
-              '    "emoji": "🛒",',
-              '    "category": "Supermarket",',
-              '    "items": [',
-              "      {",
-              '        "name": "Product name",',
-              '        "detail": "Size/brand details",',
-              '        "wasPrice": "5.00",',
-              '        "nowPrice": "3.50",',
-              '        "save": "1.50"',
-              "      }",
-              "    ]",
-              "  }",
-              "]",
-              "",
-              "Include 3-5 stores with 4-6 of their BEST specials each.",
-              "Focus on popular items: meat, fruit, vegetables, pantry staples, dairy.",
-              "Only include REAL current specials from this week's catalogue.",
-              "Prices must be in AUD. Do not include $ symbol in price values.",
-              "No markdown, no explanation, just the JSON array."
-            ].join("\n")
-          },
-          {
-            role: "user",
-            content: [
-              "Find this week's best supermarket specials near " + specLocation + ", Australia.",
-              "",
-              "Search for:",
-              "1. Half-price specials at Woolworths and Coles",
-              "2. ALDI Special Buys and grocery deals",
-              "3. Weekly catalogue deals on meat, produce, dairy",
-              "4. Multi-buy offers (2 for $X, buy 2 get 1 free)",
-              "",
-              "Focus on the biggest savings and best value deals this week."
-            ].join("\n")
+        // Try Grok with real-time web search first (best for current specials)
+        try {
+          console.log("Trying Grok with real-time search for store specials...");
+          var grokSpecialsResponse = await handleGrokSearch(specialsPrompt, env);
+          var cleanGrokSpecials = grokSpecialsResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+          var grokSpecialsMatch = cleanGrokSpecials.match(/\[[\s\S]*\]/);
+          if (grokSpecialsMatch) {
+            var grokSpecials = JSON.parse(grokSpecialsMatch[0]);
+            if (Array.isArray(grokSpecials) && grokSpecials.length > 0) {
+              console.log("Grok found " + grokSpecials.length + " stores with specials");
+              parsedSpecials = grokSpecials;
+            }
           }
-        ];
+        } catch (grokErr) {
+          console.log("Grok failed for specials, trying Perplexity:", grokErr.message);
 
-        var specialsResponse = await handlePerplexityPriceSearch(specialsPrompt, env);
-
-        // Parse the JSON response
-        var cleanSpecialsResponse = specialsResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-        var jsonSpecialsMatch = cleanSpecialsResponse.match(/\[[\s\S]*\]/);
-        if (jsonSpecialsMatch) {
-          var realSpecials = JSON.parse(jsonSpecialsMatch[0]);
-          if (Array.isArray(realSpecials) && realSpecials.length > 0) {
-            parsedSpecials = realSpecials;
+          // Try Perplexity as backup (also has web search)
+          try {
+            var specialsResponse = await handlePerplexityPriceSearch(specialsPrompt, env);
+            var cleanSpecialsResponse = specialsResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+            var jsonSpecialsMatch = cleanSpecialsResponse.match(/\[[\s\S]*\]/);
+            if (jsonSpecialsMatch) {
+              var realSpecials = JSON.parse(jsonSpecialsMatch[0]);
+              if (Array.isArray(realSpecials) && realSpecials.length > 0) {
+                console.log("Perplexity found " + realSpecials.length + " stores with specials");
+                parsedSpecials = realSpecials;
+              }
+            }
+          } catch (perplexityErr) {
+            console.log("Perplexity also failed for specials, using fallback:", perplexityErr.message);
           }
         }
       } catch (searchErr) {
@@ -2212,6 +2304,42 @@ async function handleGrok(messages, env) {
     data.choices[0].message &&
     data.choices[0].message.content;
   if (!out) throw new Error("No valid response text from Grok.");
+  return out;
+}
+
+// Grok with real-time web search enabled for finding current deals/prices
+async function handleGrokSearch(messages, env) {
+  var apiKey = env.XAI_API_KEY;
+  if (!apiKey) throw new Error("Grok API key not configured");
+
+  var res = await fetch("https://api.x.ai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + apiKey
+    },
+    body: JSON.stringify({
+      model: "grok-3",
+      temperature: 0.3,
+      search_enabled: true,  // Enable real-time web search
+      messages: messages.map(function (m) {
+        return { role: m.role, content: m.content };
+      })
+    })
+  });
+
+  var data = await res.json().catch(function () { return {}; });
+  if (!res.ok) {
+    throw new Error("Grok Search API error: " + JSON.stringify(data));
+  }
+
+  var out =
+    data &&
+    data.choices &&
+    data.choices[0] &&
+    data.choices[0].message &&
+    data.choices[0].message.content;
+  if (!out) throw new Error("No valid response text from Grok Search.");
   return out;
 }
 
