@@ -710,20 +710,40 @@ export default {
           }
         ];
 
-        var claudeResponse = await handleClaude(claudePrompt, env);
+        // Try Claude first, fall back to GPT if Claude fails
+        var aiResponse;
+        var generatedBy = "Claude";
+        try {
+          aiResponse = await handleClaude(claudePrompt, env);
+        } catch (claudeErr) {
+          console.log("Claude failed, falling back to GPT:", claudeErr.message);
+          // Fall back to GPT with the same prompt structure
+          var gptPrompt = [
+            { role: "system", content: "You are a STRICT AUTHENTICITY ENFORCER for traditional recipes. Generate recipes that would make locals from each cuisine PROUD. Return ONLY valid JSON." },
+            { role: "user", content: claudePrompt[0].content }
+          ];
+          try {
+            aiResponse = await handleGPT(gptPrompt, env);
+            generatedBy = "GPT-4";
+          } catch (gptErr) {
+            console.log("GPT also failed:", gptErr.message);
+            return jsonResponse({ error: "AI services unavailable. Please try again later." }, 503, request);
+          }
+        }
 
-        // Parse Claude's response
+        // Parse the AI response
         var parsedMeals;
         try {
-          var cleanClaudeResponse = claudeResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-          var jsonMatch = cleanClaudeResponse.match(/\[[\s\S]*\]/);
+          var cleanResponse = aiResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+          var jsonMatch = cleanResponse.match(/\[[\s\S]*\]/);
           if (jsonMatch) {
             parsedMeals = JSON.parse(jsonMatch[0]);
           } else {
-            throw new Error("No JSON array found in Claude response");
+            throw new Error("No JSON array found in response");
           }
         } catch (parseErr) {
-          return jsonResponse({ error: "Failed to parse recipe data", raw: claudeResponse }, 500, request);
+          console.log("Parse error:", parseErr.message, "Response:", aiResponse.substring(0, 500));
+          return jsonResponse({ error: "Failed to parse recipe data. Please try again." }, 500, request);
         }
 
         // STEP 2: GPT audits the recipes for authenticity
@@ -806,7 +826,7 @@ export default {
         return jsonResponse({
           meals: mealsWithAudit,
           authenticityScore: Math.round(avgScore * 10) / 10,
-          generatedBy: "Claude",
+          generatedBy: generatedBy,
           auditedBy: "GPT-4"
         }, 200, request);
       } catch (err) {
@@ -1685,8 +1705,8 @@ async function handleClaude(messages, env) {
       "anthropic-version": "2023-06-01"
     },
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 2048,
+      model: "claude-3-5-sonnet-20241022",
+      max_tokens: 4096,
       messages: messages.map(function (m) {
         return { role: m.role, content: m.content };
       })
@@ -2252,7 +2272,7 @@ async function handlePerplexityPriceSearch(messages, env) {
       "Authorization": "Bearer " + apiKey
     },
     body: JSON.stringify({
-      model: "sonar",
+      model: "sonar-pro",
       temperature: 0.2,
       messages: messages
     })
