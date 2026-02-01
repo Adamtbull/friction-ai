@@ -974,16 +974,18 @@ export default {
         console.log("Rate limit check failed, continuing:", rateLimitErr.message);
       }
 
-      // Fallback deals to use if anything fails
+      // Fallback deals to use if anything fails - comprehensive Australian deals
       var fallbackDeals = [
         {
           name: "McDonald's",
           emoji: "🍟",
           type: "Fast Food",
           offers: [
-            { description: "Check the McDonald's app for daily deals", price: "Varies" },
+            { description: "🔥 Buy 1 Get 1 Free Big Mac (App Exclusive)", price: "FREE" },
+            { description: "25% Off Your Order (App First Order)", price: "25% OFF" },
+            { description: "2 Small McChicken Meals for $12", price: "$12.00" },
             { description: "$6 Small McValue Meal", price: "$6.00" },
-            { description: "McChicken & Small Fries via app", price: "$5.95" }
+            { description: "Free Medium Fries with $15+ Order", price: "FREE" }
           ],
           source: "McDonald's App"
         },
@@ -992,9 +994,11 @@ export default {
           emoji: "🍗",
           type: "Fast Food",
           offers: [
-            { description: "Check KFC app for exclusive deals", price: "Varies" },
+            { description: "🔥 2 for 1 Zinger Burgers (Tuesdays)", price: "2 FOR 1" },
+            { description: "Family Feast: 10pc Chicken + 2 Large Sides", price: "$32.95" },
             { description: "$4.95 Lunch Deals (11am-4pm)", price: "$4.95" },
-            { description: "Zinger Stacker Combo", price: "$12.95" }
+            { description: "8 Wicked Wings for $8 (App Only)", price: "$8.00" },
+            { description: "Zinger Stacker Box Meal", price: "$14.95" }
           ],
           source: "KFC App"
         },
@@ -1003,19 +1007,36 @@ export default {
           emoji: "🍕",
           type: "Pizza",
           offers: [
-            { description: "Value Range Pizzas from $5", price: "From $5" },
-            { description: "Large Traditional Pizza via app", price: "$8.99" },
-            { description: "Check app for weekly coupons", price: "Varies" }
+            { description: "🔥 Buy 1 Traditional Get 1 FREE (Pickup)", price: "2 FOR 1" },
+            { description: "3 Traditional Pizzas Delivered", price: "$33.95" },
+            { description: "Large Value Pizza Pickup", price: "$5.95" },
+            { description: "50% Off Premium & Traditional (App)", price: "50% OFF" },
+            { description: "Family Meal Deal: 3 Pizzas + 2 Sides + Drink", price: "$45.95" }
           ],
           source: "Domino's App"
+        },
+        {
+          name: "Pizza Hut",
+          emoji: "🍕",
+          type: "Pizza",
+          offers: [
+            { description: "🔥 2 Large Pizzas for $25 Pickup", price: "$25.00" },
+            { description: "All You Can Eat Lunch Buffet", price: "$16.95" },
+            { description: "$1 Wings Wednesday (min 10)", price: "$1 each" },
+            { description: "My Box: Pizza + Side + Drink", price: "$12.95" }
+          ],
+          source: "Pizza Hut App"
         },
         {
           name: "Hungry Jack's",
           emoji: "🍔",
           type: "Fast Food",
           offers: [
-            { description: "Whopper Junior via app", price: "$4.00" },
-            { description: "$6 Stunner Meals", price: "$6.00" }
+            { description: "🔥 2 Whopper Jnrs for $7.95", price: "$7.95" },
+            { description: "Shake & Win - Free Food Daily (App)", price: "FREE" },
+            { description: "$6 Stunner Meals", price: "$6.00" },
+            { description: "Family Bundle: 4 Burgers + 4 Chips + Drinks", price: "$29.95" },
+            { description: "2 Bacon Deluxe for $14", price: "$14.00" }
           ],
           source: "Hungry Jack's App"
         },
@@ -1024,10 +1045,56 @@ export default {
           emoji: "🥪",
           type: "Sandwiches",
           offers: [
-            { description: "$6 Footlong subs via app", price: "$6.00" },
-            { description: "Sub of the Day deals", price: "Varies" }
+            { description: "🔥 Buy 1 Footlong Get 1 50% Off", price: "50% OFF" },
+            { description: "Sub of the Day", price: "$8.50" },
+            { description: "Any Footlong for $10 (App)", price: "$10.00" },
+            { description: "2 Footlongs for $18 (App Exclusive)", price: "$18.00" }
           ],
           source: "Subway App"
+        },
+        {
+          name: "Guzman y Gomez",
+          emoji: "🌯",
+          type: "Mexican",
+          offers: [
+            { description: "🔥 Free Burrito with 3 Burrito Order", price: "FREE" },
+            { description: "$2 Taco Tuesdays (Pickup)", price: "$2 each" },
+            { description: "Family Fiesta Pack: 4 Burritos + Nachos", price: "$49.95" }
+          ],
+          source: "GYG App"
+        },
+        {
+          name: "Nando's",
+          emoji: "🍗",
+          type: "Chicken",
+          offers: [
+            { description: "🔥 Buy Any Burger, Get Another FREE (App)", price: "2 FOR 1" },
+            { description: "1/4 Chicken & Regular Side", price: "$12.95" },
+            { description: "Whole Chicken + 2 Large Sides", price: "$32.95" }
+          ],
+          source: "Nando's App"
+        },
+        {
+          name: "Red Rooster",
+          emoji: "🐔",
+          type: "Chicken",
+          offers: [
+            { description: "🔥 $25 Roast Dinner (Whole Chicken + Sides)", price: "$25.00" },
+            { description: "Rippa Roll Combo", price: "$9.95" },
+            { description: "Family Reds Box: Whole Chicken + Chips", price: "$29.95" }
+          ],
+          source: "Red Rooster App"
+        },
+        {
+          name: "Uber Eats",
+          emoji: "🚗",
+          type: "Delivery",
+          offers: [
+            { description: "🔥 $15 Off First Order (New Users)", price: "$15 OFF" },
+            { description: "Free Delivery from Select Restaurants", price: "FREE DELIVERY" },
+            { description: "Buy 1 Get 1 Free - Featured Restaurants", price: "2 FOR 1" }
+          ],
+          source: "Uber Eats App"
         }
       ];
 
