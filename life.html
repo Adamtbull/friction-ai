@@ -1642,6 +1642,53 @@
       text-align: center;
     }
 
+    /* Location Input */
+    .location-input-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .location-input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      background: var(--bg);
+      color: var(--text-primary);
+    }
+
+    .location-detect-btn {
+      padding: 12px 16px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .location-detect-btn:disabled {
+      background: var(--text-muted);
+      cursor: not-allowed;
+    }
+
+    .location-status {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .location-status.success {
+      color: var(--success);
+    }
+
+    .location-status.error {
+      color: var(--danger);
+    }
+
     .store-options {
       display: flex;
       flex-direction: column;
@@ -4250,7 +4297,16 @@
 
       <!-- Stores Tab -->
       <div class="pref-panel" id="prefStores">
-        <p class="pref-description">Select stores to compare prices:</p>
+        <p class="pref-description">Your location (for local deals & prices):</p>
+        <div class="location-input-group">
+          <input type="text" id="userSuburb" class="location-input" placeholder="Enter suburb or postcode">
+          <button class="location-detect-btn" onclick="detectUserLocation()">
+            📍 Detect
+          </button>
+        </div>
+        <p id="locationStatus" class="location-status"></p>
+
+        <p class="pref-description" style="margin-top: 20px;">Preferred store:</p>
         <div class="store-options" id="storeOptions"></div>
       </div>
 
@@ -7184,6 +7240,8 @@
       dislikes: [],
       diet: 'none',
       cuisines: [],
+      location: '',
+      locationCoords: null,
       budget: 150,
       servings: 4,
       maxIngredients: 7,
@@ -7386,6 +7444,12 @@
       // Update settings values
       document.getElementById('servingsValue').textContent = mealPreferences.servings;
       document.getElementById('maxIngredientsValue').textContent = mealPreferences.maxIngredients;
+
+      // Update location input
+      const locationInput = document.getElementById('userSuburb');
+      if (locationInput && mealPreferences.location) {
+        locationInput.value = mealPreferences.location;
+      }
     }
 
     function switchPrefTab(tabName) {
@@ -7452,11 +7516,91 @@
       document.getElementById(`${setting}Value`).textContent = mealPreferences[setting];
     }
 
+    async function detectUserLocation() {
+      const statusEl = document.getElementById('locationStatus');
+      const inputEl = document.getElementById('userSuburb');
+      const btnEl = document.querySelector('.location-detect-btn');
+
+      if (!navigator.geolocation) {
+        statusEl.textContent = 'Location not supported by your browser';
+        statusEl.className = 'location-status error';
+        return;
+      }
+
+      // Show loading state
+      btnEl.disabled = true;
+      btnEl.textContent = '📍 Detecting...';
+      statusEl.textContent = 'Getting your location...';
+      statusEl.className = 'location-status';
+
+      try {
+        const position = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: false,
+            timeout: 10000,
+            maximumAge: 300000 // 5 min cache
+          });
+        });
+
+        const { latitude, longitude } = position.coords;
+        mealPreferences.locationCoords = { lat: latitude, lng: longitude };
+
+        // Reverse geocode using OpenStreetMap Nominatim (free, no API key needed)
+        statusEl.textContent = 'Finding your suburb...';
+
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`,
+          { headers: { 'Accept-Language': 'en' } }
+        );
+
+        if (!response.ok) throw new Error('Geocoding failed');
+
+        const data = await response.json();
+        const address = data.address || {};
+
+        // Try to get suburb, then city, then town
+        const suburb = address.suburb || address.city_district || address.city ||
+                       address.town || address.municipality || address.county || '';
+        const postcode = address.postcode || '';
+        const state = address.state || '';
+
+        let locationText = suburb;
+        if (postcode) locationText += ` ${postcode}`;
+        if (state && !locationText.includes(state)) locationText += `, ${state}`;
+
+        inputEl.value = locationText.trim();
+        mealPreferences.location = locationText.trim();
+
+        statusEl.textContent = `Found: ${locationText}`;
+        statusEl.className = 'location-status success';
+
+      } catch (error) {
+        console.error('Location error:', error);
+        let errorMsg = 'Could not detect location';
+        if (error.code === 1) errorMsg = 'Location access denied. Please enter manually.';
+        else if (error.code === 2) errorMsg = 'Location unavailable. Please enter manually.';
+        else if (error.code === 3) errorMsg = 'Location timeout. Please enter manually.';
+
+        statusEl.textContent = errorMsg;
+        statusEl.className = 'location-status error';
+      } finally {
+        btnEl.disabled = false;
+        btnEl.textContent = '📍 Detect';
+      }
+    }
+
     function saveMealPreferencesAndClose() {
       mealPreferences.budget = parseInt(document.getElementById('mealBudget').value) || 150;
+
+      // Save location
+      const locationInput = document.getElementById('userSuburb');
+      if (locationInput) {
+        mealPreferences.location = locationInput.value.trim();
+      }
+
       saveMealPreferences();
       closeMealPreferences();
-      alert('Preferences saved!');
+      showToast('Preferences saved!');
     }
 
     // AI Meal Generation
