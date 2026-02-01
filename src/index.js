@@ -476,9 +476,14 @@ export default {
         var budget = bodyMeals.budget || "standard"; // budget, standard, premium
         var complexity = bodyMeals.complexity || "any"; // quick, intermediate, scratch, any
         var cookingMethod = bodyMeals.cookingMethod || "any"; // stovetop, oven, slowcooker, airfryer, bbq, nocook, any
-        var count = parseInt(bodyMeals.count, 10) || 5; // Default to 5 recipes
-        if (count > 10) count = 10; // Max 10 for quality
+        var count = parseInt(bodyMeals.count, 10) || 14; // Default to 14 recipes
+        if (count > 20) count = 20; // Max 20 recipes
         if (count < 1) count = 1;
+
+        // Additional categories to generate
+        var includeSnacks = bodyMeals.includeSnacks !== false; // Default true
+        var includeEntrees = bodyMeals.includeEntrees !== false; // Default true
+        var includeDesserts = bodyMeals.includeDesserts !== false; // Default true
 
         var mealsRate = await enforceRateLimit(env, "meals:generate:" + hashEmail(authMeals.email), 20, 600);
         if (!mealsRate.allowed) {
@@ -823,8 +828,95 @@ export default {
           avgScore = scoredMeals.reduce(function(sum, m) { return sum + m.audit.score; }, 0) / scoredMeals.length;
         }
 
+        // Generate snacks, entrees, and desserts if requested
+        var snacks = [];
+        var entrees = [];
+        var desserts = [];
+
+        if (includeSnacks || includeEntrees || includeDesserts) {
+          var extrasPrompt = [
+            {
+              role: "user",
+              content: [
+                "You are a STRICT AUTHENTICITY ENFORCER for traditional recipes.",
+                "",
+                "Generate AUTHENTIC recipes for the following categories based on the cuisines: " + (cuisines.length > 0 ? cuisines.join(", ") : "diverse mix"),
+                "",
+                "DISLIKES (MUST AVOID): " + (dislikes.length > 0 ? dislikes.join(", ") : "None"),
+                "DIET PREFERENCES: " + (dietPreferences.length > 0 ? dietPreferences.join(", ") : "No specific diet"),
+                "",
+                includeSnacks ? "SNACKS (generate 6 total - 3 sweet, 3 savoury):" : "",
+                includeSnacks ? "- Sweet snacks: traditional sweets, cookies, energy balls, fruit-based treats" : "",
+                includeSnacks ? "- Savoury snacks: dips with crackers/bread, finger foods, mini bites, nuts/seeds" : "",
+                includeSnacks ? "" : "",
+                includeEntrees ? "ENTREES/STARTERS (generate 4):" : "",
+                includeEntrees ? "- Traditional appetizers, soups, salads, small plates that start a meal" : "",
+                includeEntrees ? "" : "",
+                includeDesserts ? "DESSERTS (generate 4):" : "",
+                includeDesserts ? "- Traditional sweets, cakes, puddings, pastries from the selected cuisines" : "",
+                "",
+                "Return ONLY a JSON object with these arrays:",
+                "{",
+                '  "snacks": [',
+                '    {"name": "Name", "emoji": "🍪", "type": "sweet" or "savoury", "cuisine": "Italian", "description": "...", "time": "15 min", "servings": ' + servings + ', "ingredients": [{"name": "...", "quantity": "..."}], "steps": ["..."]}',
+                "  ],",
+                '  "entrees": [',
+                '    {"name": "Name", "emoji": "🥗", "cuisine": "Thai", "description": "...", "time": "20 min", "servings": ' + servings + ', "ingredients": [{"name": "...", "quantity": "..."}], "steps": ["..."]}',
+                "  ],",
+                '  "desserts": [',
+                '    {"name": "Name", "emoji": "🍰", "cuisine": "French", "description": "...", "time": "45 min", "servings": ' + servings + ', "ingredients": [{"name": "...", "quantity": "..."}], "steps": ["..."]}',
+                "  ]",
+                "}",
+                "",
+                "Make each recipe AUTHENTIC to its cuisine. A local should recognize these as traditional dishes."
+              ].filter(function(line) { return line !== ""; }).join("\n")
+            }
+          ];
+
+          try {
+            var extrasResponse;
+            try {
+              extrasResponse = await handleClaude(extrasPrompt, env);
+            } catch (claudeExtrasErr) {
+              console.log("Claude failed for extras, trying GPT:", claudeExtrasErr.message);
+              var gptExtrasPrompt = [
+                { role: "system", content: "Generate authentic snacks, entrees, and desserts. Return ONLY valid JSON." },
+                { role: "user", content: extrasPrompt[0].content }
+              ];
+              extrasResponse = await handleGPT(gptExtrasPrompt, env);
+            }
+
+            var cleanExtrasResponse = extrasResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+            var extrasJsonMatch = cleanExtrasResponse.match(/\{[\s\S]*\}/);
+            if (extrasJsonMatch) {
+              var parsedExtras = JSON.parse(extrasJsonMatch[0]);
+              if (includeSnacks && Array.isArray(parsedExtras.snacks)) {
+                snacks = parsedExtras.snacks.map(function(s, i) {
+                  return Object.assign({}, s, { id: Date.now() + 1000 + i });
+                });
+              }
+              if (includeEntrees && Array.isArray(parsedExtras.entrees)) {
+                entrees = parsedExtras.entrees.map(function(e, i) {
+                  return Object.assign({}, e, { id: Date.now() + 2000 + i });
+                });
+              }
+              if (includeDesserts && Array.isArray(parsedExtras.desserts)) {
+                desserts = parsedExtras.desserts.map(function(d, i) {
+                  return Object.assign({}, d, { id: Date.now() + 3000 + i });
+                });
+              }
+            }
+          } catch (extrasErr) {
+            console.log("Failed to generate extras:", extrasErr.message);
+            // Continue without extras
+          }
+        }
+
         return jsonResponse({
           meals: mealsWithAudit,
+          snacks: snacks,
+          entrees: entrees,
+          desserts: desserts,
           authenticityScore: Math.round(avgScore * 10) / 10,
           generatedBy: generatedBy,
           auditedBy: "GPT-4"
