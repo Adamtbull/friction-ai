@@ -1082,15 +1082,43 @@ export default {
           }
         ];
 
-        var dealsResponse = await handlePerplexityPriceSearch(dealsPrompt, env);
+        // Try Perplexity first, then GPT as backup
+        try {
+          var dealsResponse = await handlePerplexityPriceSearch(dealsPrompt, env);
+          var cleanDealsResponse = dealsResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+          var jsonArrayMatch = cleanDealsResponse.match(/\[[\s\S]*\]/);
+          if (jsonArrayMatch) {
+            var realDeals = JSON.parse(jsonArrayMatch[0]);
+            if (Array.isArray(realDeals) && realDeals.length > 0) {
+              parsedDeals = realDeals;
+            }
+          }
+        } catch (perplexityErr) {
+          console.log("Perplexity failed for deals, trying GPT:", perplexityErr.message);
 
-        // Parse the JSON response
-        var cleanDealsResponse = dealsResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-        var jsonArrayMatch = cleanDealsResponse.match(/\[[\s\S]*\]/);
-        if (jsonArrayMatch) {
-          var realDeals = JSON.parse(jsonArrayMatch[0]);
-          if (Array.isArray(realDeals) && realDeals.length > 0) {
-            parsedDeals = realDeals;
+          // Try GPT as backup
+          try {
+            var gptDealsPrompt = [
+              {
+                role: "system",
+                content: "You are an Australian fast food deals expert. Return ONLY a JSON array of current deals. No markdown, no explanation."
+              },
+              {
+                role: "user",
+                content: "List 5 current fast food deals in Australia from McDonald's, KFC, Domino's, Hungry Jack's, and Subway. Format: [{\"name\": \"Restaurant\", \"emoji\": \"🍔\", \"type\": \"Fast Food\", \"offers\": [{\"description\": \"Deal\", \"price\": \"$X\"}], \"source\": \"App\"}]"
+              }
+            ];
+            var gptResponse = await handleGPT(gptDealsPrompt, env);
+            var cleanGptResponse = gptResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+            var gptMatch = cleanGptResponse.match(/\[[\s\S]*\]/);
+            if (gptMatch) {
+              var gptDeals = JSON.parse(gptMatch[0]);
+              if (Array.isArray(gptDeals) && gptDeals.length > 0) {
+                parsedDeals = gptDeals;
+              }
+            }
+          } catch (gptErr) {
+            console.log("GPT also failed for deals, using fallback:", gptErr.message);
           }
         }
       } catch (searchErr) {
