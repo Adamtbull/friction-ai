@@ -511,6 +511,116 @@
       background: var(--border);
     }
 
+    .shopping-action-btn.specials-btn {
+      background: linear-gradient(135deg, #e65100, #ff9800);
+      color: white;
+      box-shadow: 0 2px 8px rgba(230, 81, 0, 0.3);
+    }
+
+    .shopping-action-btn.specials-btn:hover {
+      background: linear-gradient(135deg, #bf360c, #e65100);
+    }
+
+    /* Store Specials Styles */
+    .store-specials-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .store-special-card {
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      border: 1px solid var(--border);
+    }
+
+    .store-special-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .store-special-logo {
+      width: 48px;
+      height: 48px;
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .store-special-name {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .store-special-category {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .store-special-items {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .special-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 10px 12px;
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      gap: 12px;
+    }
+
+    .special-item-info {
+      flex: 1;
+    }
+
+    .special-item-name {
+      font-weight: 500;
+      font-size: 0.9rem;
+      margin-bottom: 2px;
+    }
+
+    .special-item-detail {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .special-item-prices {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .special-item-was {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-decoration: line-through;
+    }
+
+    .special-item-now {
+      font-weight: 700;
+      color: #e65100;
+      font-size: 1rem;
+    }
+
+    .special-item-save {
+      font-size: 0.7rem;
+      color: #2e7d32;
+      background: #e8f5e9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-top: 2px;
+      display: inline-block;
+    }
+
     .shopping-add {
       display: flex;
       gap: 8px;
@@ -1030,6 +1140,12 @@
 
     .smart-meal-btn.primary {
       background: var(--adult);
+      color: white;
+      border: none;
+    }
+
+    .smart-meal-btn.takeaway-btn {
+      background: #ff6b35;
       color: white;
       border: none;
     }
@@ -1640,6 +1756,53 @@
       font-weight: 600;
       min-width: 40px;
       text-align: center;
+    }
+
+    /* Location Input */
+    .location-input-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .location-input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      background: var(--bg);
+      color: var(--text-primary);
+    }
+
+    .location-detect-btn {
+      padding: 12px 16px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .location-detect-btn:disabled {
+      background: var(--text-muted);
+      cursor: not-allowed;
+    }
+
+    .location-status {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .location-status.success {
+      color: var(--success);
+    }
+
+    .location-status.error {
+      color: var(--danger);
     }
 
     .store-options {
@@ -3137,6 +3300,95 @@
       transform: translateY(0);
     }
 
+    .modal-sheet.large {
+      max-height: 90vh;
+    }
+
+    /* Takeaway Deals Styles */
+    .takeaway-deals-empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+
+    .takeaway-deals-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .takeaway-deal-card {
+      background: var(--bg);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .takeaway-deal-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .takeaway-deal-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-sm);
+      background: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .takeaway-deal-name {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text-primary);
+    }
+
+    .takeaway-deal-type {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .takeaway-deal-offers {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .takeaway-offer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff8e6;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      border-left: 3px solid #ff9800;
+    }
+
+    .takeaway-offer-text {
+      font-size: 0.9rem;
+      color: var(--text-primary);
+    }
+
+    .takeaway-offer-price {
+      font-weight: 700;
+      color: #e65100;
+    }
+
+    .takeaway-no-location {
+      text-align: center;
+      padding: 30px 20px;
+    }
+
+    .takeaway-no-location button {
+      margin-top: 12px;
+    }
+
     .modal-sheet .modal-header {
       display: flex;
       justify-content: space-between;
@@ -3790,6 +4042,7 @@
     <div class="shopping-header">
       <h3>Shopping List</h3>
       <div class="shopping-actions">
+        <button class="shopping-action-btn specials-btn" onclick="openStoreSpecials()" title="Store Specials">🏷️</button>
         <button class="shopping-action-btn" onclick="clearCompletedItems()" title="Clear completed">🗑️</button>
         <button class="shopping-action-btn" onclick="generateListFromMeals()" title="Generate from meals">🍽️</button>
       </div>
@@ -3903,6 +4156,7 @@
       <div class="meal-ideas-header">
         <button class="smart-meal-btn" onclick="openMealPreferences()">⚙️ Preferences</button>
         <button class="smart-meal-btn primary" onclick="generateMealIdeas()">✨ Generate Ideas</button>
+        <button class="smart-meal-btn takeaway-btn" onclick="openTakeawayDeals()">🍔 Takeaway Deals</button>
       </div>
 
       <!-- Meal Ideas Grid -->
@@ -4009,6 +4263,36 @@
       <button class="form-submit" onclick="confirmMealPlanAssignment()">
         ✓ Add to Meal Plan
       </button>
+    </div>
+  </div>
+
+  <!-- TAKEAWAY DEALS SHEET -->
+  <div class="modal-sheet large" id="takeawayDealsSheet">
+    <div class="modal-header">
+      <h3>🍔 Takeaway Deals Near You</h3>
+      <button class="modal-close" onclick="closeTakeawayDeals()">×</button>
+    </div>
+    <div class="modal-content">
+      <div id="takeawayDealsContent">
+        <div class="takeaway-deals-empty">
+          <p>Finding deals in your area...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STORE SPECIALS SHEET -->
+  <div class="modal-sheet large" id="storeSpecialsSheet">
+    <div class="modal-header">
+      <h3>🏷️ This Week's Specials</h3>
+      <button class="modal-close" onclick="closeStoreSpecials()">×</button>
+    </div>
+    <div class="modal-content">
+      <div id="storeSpecialsContent">
+        <div class="takeaway-deals-empty">
+          <p>Finding specials...</p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -4250,7 +4534,16 @@
 
       <!-- Stores Tab -->
       <div class="pref-panel" id="prefStores">
-        <p class="pref-description">Select stores to compare prices:</p>
+        <p class="pref-description">Your location (for local deals & prices):</p>
+        <div class="location-input-group">
+          <input type="text" id="userSuburb" class="location-input" placeholder="Enter suburb or postcode">
+          <button class="location-detect-btn" onclick="detectUserLocation()">
+            📍 Detect
+          </button>
+        </div>
+        <p id="locationStatus" class="location-status"></p>
+
+        <p class="pref-description" style="margin-top: 20px;">Preferred store:</p>
         <div class="store-options" id="storeOptions"></div>
       </div>
 
@@ -7184,6 +7477,8 @@
       dislikes: [],
       diet: 'none',
       cuisines: [],
+      location: '',
+      locationCoords: null,
       budget: 150,
       servings: 4,
       maxIngredients: 7,
@@ -7386,6 +7681,12 @@
       // Update settings values
       document.getElementById('servingsValue').textContent = mealPreferences.servings;
       document.getElementById('maxIngredientsValue').textContent = mealPreferences.maxIngredients;
+
+      // Update location input
+      const locationInput = document.getElementById('userSuburb');
+      if (locationInput && mealPreferences.location) {
+        locationInput.value = mealPreferences.location;
+      }
     }
 
     function switchPrefTab(tabName) {
@@ -7452,11 +7753,91 @@
       document.getElementById(`${setting}Value`).textContent = mealPreferences[setting];
     }
 
+    async function detectUserLocation() {
+      const statusEl = document.getElementById('locationStatus');
+      const inputEl = document.getElementById('userSuburb');
+      const btnEl = document.querySelector('.location-detect-btn');
+
+      if (!navigator.geolocation) {
+        statusEl.textContent = 'Location not supported by your browser';
+        statusEl.className = 'location-status error';
+        return;
+      }
+
+      // Show loading state
+      btnEl.disabled = true;
+      btnEl.textContent = '📍 Detecting...';
+      statusEl.textContent = 'Getting your location...';
+      statusEl.className = 'location-status';
+
+      try {
+        const position = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: false,
+            timeout: 10000,
+            maximumAge: 300000 // 5 min cache
+          });
+        });
+
+        const { latitude, longitude } = position.coords;
+        mealPreferences.locationCoords = { lat: latitude, lng: longitude };
+
+        // Reverse geocode using OpenStreetMap Nominatim (free, no API key needed)
+        statusEl.textContent = 'Finding your suburb...';
+
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`,
+          { headers: { 'Accept-Language': 'en' } }
+        );
+
+        if (!response.ok) throw new Error('Geocoding failed');
+
+        const data = await response.json();
+        const address = data.address || {};
+
+        // Try to get suburb, then city, then town
+        const suburb = address.suburb || address.city_district || address.city ||
+                       address.town || address.municipality || address.county || '';
+        const postcode = address.postcode || '';
+        const state = address.state || '';
+
+        let locationText = suburb;
+        if (postcode) locationText += ` ${postcode}`;
+        if (state && !locationText.includes(state)) locationText += `, ${state}`;
+
+        inputEl.value = locationText.trim();
+        mealPreferences.location = locationText.trim();
+
+        statusEl.textContent = `Found: ${locationText}`;
+        statusEl.className = 'location-status success';
+
+      } catch (error) {
+        console.error('Location error:', error);
+        let errorMsg = 'Could not detect location';
+        if (error.code === 1) errorMsg = 'Location access denied. Please enter manually.';
+        else if (error.code === 2) errorMsg = 'Location unavailable. Please enter manually.';
+        else if (error.code === 3) errorMsg = 'Location timeout. Please enter manually.';
+
+        statusEl.textContent = errorMsg;
+        statusEl.className = 'location-status error';
+      } finally {
+        btnEl.disabled = false;
+        btnEl.textContent = '📍 Detect';
+      }
+    }
+
     function saveMealPreferencesAndClose() {
       mealPreferences.budget = parseInt(document.getElementById('mealBudget').value) || 150;
+
+      // Save location
+      const locationInput = document.getElementById('userSuburb');
+      if (locationInput) {
+        mealPreferences.location = locationInput.value.trim();
+      }
+
       saveMealPreferences();
       closeMealPreferences();
-      alert('Preferences saved!');
+      showToast('Preferences saved!');
     }
 
     // AI Meal Generation
@@ -8102,6 +8483,258 @@
         toast.classList.remove('show');
         btnEl.style.display = '';
       }, 3000);
+    }
+
+    // Takeaway Deals Functions
+    function openTakeawayDeals() {
+      const location = mealPreferences.location;
+      const content = document.getElementById('takeawayDealsContent');
+
+      if (!location) {
+        content.innerHTML = `
+          <div class="takeaway-no-location">
+            <div style="font-size: 3rem; margin-bottom: 16px;">📍</div>
+            <h4>Set Your Location First</h4>
+            <p style="color: var(--text-muted); margin-bottom: 16px;">
+              We need your location to find nearby takeaway deals.
+            </p>
+            <button class="smart-meal-btn primary" onclick="closeTakeawayDeals(); openMealPreferences(); switchPrefTab('stores');">
+              Set Location
+            </button>
+          </div>
+        `;
+        openModal('takeawayDealsSheet');
+        return;
+      }
+
+      content.innerHTML = `
+        <div class="takeaway-deals-empty">
+          <div class="ai-loading-spinner"></div>
+          <p>Searching for deals near ${location}...</p>
+        </div>
+      `;
+
+      openModal('takeawayDealsSheet');
+      searchTakeawayDeals(location);
+    }
+
+    function closeTakeawayDeals() {
+      document.getElementById('takeawayDealsSheet').classList.remove('open');
+      document.getElementById('modalOverlay').classList.remove('open');
+    }
+
+    async function searchTakeawayDeals(location) {
+      const content = document.getElementById('takeawayDealsContent');
+
+      try {
+        const token = localStorage.getItem('google_id_token');
+        if (!token) {
+          throw new Error('Please sign in to search for deals');
+        }
+
+        const response = await fetch('/api/takeaway/deals', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ location })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to search for deals');
+        }
+
+        const data = await response.json();
+        renderTakeawayDeals(data.deals || []);
+
+      } catch (error) {
+        console.error('Takeaway deals error:', error);
+        content.innerHTML = `
+          <div class="takeaway-deals-empty" style="color: var(--danger);">
+            <div style="font-size: 3rem; margin-bottom: 16px;">😕</div>
+            <p>${error.message}</p>
+            <button class="smart-meal-btn" onclick="searchTakeawayDeals('${location}')" style="margin-top: 16px;">
+              Try Again
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    function renderTakeawayDeals(deals) {
+      const content = document.getElementById('takeawayDealsContent');
+
+      if (deals.length === 0) {
+        content.innerHTML = `
+          <div class="takeaway-deals-empty">
+            <div style="font-size: 3rem; margin-bottom: 16px;">🔍</div>
+            <p>No current deals found in your area.</p>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Try again later for new specials!</p>
+          </div>
+        `;
+        return;
+      }
+
+      content.innerHTML = `
+        <p style="margin-bottom: 16px; color: var(--text-muted); font-size: 0.9rem;">
+          Found ${deals.length} places with deals near you:
+        </p>
+        <div class="takeaway-deals-list">
+          ${deals.map(deal => `
+            <div class="takeaway-deal-card">
+              <div class="takeaway-deal-header">
+                <div class="takeaway-deal-logo">${deal.emoji || '🍔'}</div>
+                <div>
+                  <div class="takeaway-deal-name">${deal.name}</div>
+                  <div class="takeaway-deal-type">${deal.type || 'Fast Food'}</div>
+                </div>
+              </div>
+              <div class="takeaway-deal-offers">
+                ${deal.offers.map(offer => `
+                  <div class="takeaway-offer">
+                    <span class="takeaway-offer-text">${offer.description}</span>
+                    ${offer.price ? `<span class="takeaway-offer-price">${offer.price}</span>` : ''}
+                  </div>
+                `).join('')}
+              </div>
+              ${deal.source ? `<p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;">Source: ${deal.source}</p>` : ''}
+            </div>
+          `).join('')}
+        </div>
+        <p style="margin-top: 16px; font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+          Deals may vary. Check with the restaurant for current offers.
+        </p>
+      `;
+    }
+
+    // Store Specials Functions
+    function openStoreSpecials() {
+      const location = mealPreferences.location;
+      const content = document.getElementById('storeSpecialsContent');
+
+      if (!location) {
+        content.innerHTML = `
+          <div class="takeaway-no-location">
+            <div style="font-size: 3rem; margin-bottom: 16px;">📍</div>
+            <h4>Set Your Location First</h4>
+            <p style="color: var(--text-muted); margin-bottom: 16px;">
+              We need your location to find specials at your local stores.
+            </p>
+            <button class="smart-meal-btn primary" onclick="closeStoreSpecials(); openMealPreferences(); switchPrefTab('stores');">
+              Set Location
+            </button>
+          </div>
+        `;
+        openModal('storeSpecialsSheet');
+        return;
+      }
+
+      content.innerHTML = `
+        <div class="takeaway-deals-empty">
+          <div class="ai-loading-spinner"></div>
+          <p>Searching for specials near ${location}...</p>
+        </div>
+      `;
+
+      openModal('storeSpecialsSheet');
+      searchStoreSpecials(location);
+    }
+
+    function closeStoreSpecials() {
+      document.getElementById('storeSpecialsSheet').classList.remove('open');
+      document.getElementById('modalOverlay').classList.remove('open');
+    }
+
+    async function searchStoreSpecials(location) {
+      const content = document.getElementById('storeSpecialsContent');
+
+      try {
+        const token = localStorage.getItem('google_id_token');
+        if (!token) {
+          throw new Error('Please sign in to search for specials');
+        }
+
+        const response = await fetch('/api/store/specials', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ location })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to search for specials');
+        }
+
+        const data = await response.json();
+        renderStoreSpecials(data.specials || []);
+
+      } catch (error) {
+        console.error('Store specials error:', error);
+        content.innerHTML = `
+          <div class="takeaway-deals-empty" style="color: var(--danger);">
+            <div style="font-size: 3rem; margin-bottom: 16px;">😕</div>
+            <p>${error.message}</p>
+            <button class="smart-meal-btn" onclick="searchStoreSpecials('${location}')" style="margin-top: 16px;">
+              Try Again
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    function renderStoreSpecials(specials) {
+      const content = document.getElementById('storeSpecialsContent');
+
+      if (specials.length === 0) {
+        content.innerHTML = `
+          <div class="takeaway-deals-empty">
+            <div style="font-size: 3rem; margin-bottom: 16px;">🔍</div>
+            <p>No current specials found in your area.</p>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Check back later for new deals!</p>
+          </div>
+        `;
+        return;
+      }
+
+      content.innerHTML = `
+        <p style="margin-bottom: 16px; color: var(--text-muted); font-size: 0.9rem;">
+          This week's specials at stores near you:
+        </p>
+        <div class="store-specials-list">
+          ${specials.map(store => `
+            <div class="store-special-card">
+              <div class="store-special-header">
+                <div class="store-special-logo">${store.emoji || '🏪'}</div>
+                <div>
+                  <div class="store-special-name">${store.name}</div>
+                  <div class="store-special-category">${store.category || 'Supermarket'}</div>
+                </div>
+              </div>
+              <div class="store-special-items">
+                ${store.items.map(item => `
+                  <div class="special-item">
+                    <div class="special-item-info">
+                      <div class="special-item-name">${item.name}</div>
+                      ${item.detail ? `<div class="special-item-detail">${item.detail}</div>` : ''}
+                    </div>
+                    <div class="special-item-prices">
+                      ${item.wasPrice ? `<div class="special-item-was">$${item.wasPrice}</div>` : ''}
+                      <div class="special-item-now">$${item.nowPrice}</div>
+                      ${item.save ? `<div class="special-item-save">Save $${item.save}</div>` : ''}
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <p style="margin-top: 16px; font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+          Specials valid this week. Prices may vary by store.
+        </p>
+      `;
     }
 
     async function addIngredientsWithPricing() {
