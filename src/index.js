@@ -1361,31 +1361,29 @@ export default {
 
       // Validation function to filter out generic/invalid restaurant entries
       function isValidRestaurant(deal) {
-        if (!deal || !deal.name) return false;
-
-        // Check for generic names that indicate failed search
-        var genericNames = [
-          'local', 'restaurant', 'takeaway', 'cuisine', 'kitchen', 'food', 'cafe',
-          'pizza place', 'indian restaurant', 'chinese restaurant', 'thai restaurant',
-          'italian restaurant', 'chicken shop', 'kebab shop', 'fish and chips'
-        ];
-        var nameLower = deal.name.toLowerCase();
-
-        // Reject if name is too generic (only contains generic words)
-        var wordCount = deal.name.trim().split(/\s+/).length;
-        if (wordCount <= 2) {
-          for (var i = 0; i < genericNames.length; i++) {
-            if (nameLower === genericNames[i] || nameLower.replace(/[^a-z\s]/g, '').trim() === genericNames[i]) {
-              return false;
-            }
-          }
-        }
-
-        // Require address - must have at least a number and street name
-        if (!deal.address || deal.address.length < 10 || !/\d/.test(deal.address)) {
+        if (!deal || !deal.name) {
+          console.log("Rejected deal: missing name", deal);
           return false;
         }
 
+        // Check for generic names that indicate failed search
+        var genericNames = [
+          'local restaurant', 'local takeaway', 'indian restaurant', 'chinese restaurant',
+          'thai restaurant', 'italian restaurant', 'chicken shop', 'kebab shop',
+          'fish and chips', 'pizza place', 'local pizza', 'local chicken'
+        ];
+        var nameLower = deal.name.toLowerCase().trim();
+
+        // Reject if name exactly matches a generic placeholder
+        for (var i = 0; i < genericNames.length; i++) {
+          if (nameLower === genericNames[i]) {
+            console.log("Rejected deal: generic name", deal.name);
+            return false;
+          }
+        }
+
+        // Accept the deal - address is optional now
+        console.log("Accepted deal:", deal.name);
         return true;
       }
 
@@ -2562,26 +2560,33 @@ async function handleGrokSearch(messages, env) {
   var apiKey = env.XAI_API_KEY;
   if (!apiKey) throw new Error("Grok API key not configured");
 
+  // xAI API - using grok-2 model with web search capability
+  // The model will use its training and any available search based on the prompt
+  var requestBody = {
+    model: "grok-2-1212",  // Specific stable model version
+    temperature: 0.5,
+    max_tokens: 4096,
+    messages: messages.map(function (m) {
+      return { role: m.role, content: m.content };
+    })
+  };
+
+  console.log("Grok request body:", JSON.stringify(requestBody).substring(0, 500));
+
   var res = await fetch("https://api.x.ai/v1/chat/completions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "Authorization": "Bearer " + apiKey
     },
-    body: JSON.stringify({
-      model: "grok-2-latest",
-      temperature: 0.3,
-      search_parameters: {
-        mode: "auto"
-      },
-      messages: messages.map(function (m) {
-        return { role: m.role, content: m.content };
-      })
-    })
+    body: JSON.stringify(requestBody)
   });
 
   var data = await res.json().catch(function () { return {}; });
+  console.log("Grok response status:", res.status, "ok:", res.ok);
+
   if (!res.ok) {
+    console.log("Grok API error response:", JSON.stringify(data));
     throw new Error("Grok Search API error: " + JSON.stringify(data));
   }
 
@@ -2591,7 +2596,13 @@ async function handleGrokSearch(messages, env) {
     data.choices[0] &&
     data.choices[0].message &&
     data.choices[0].message.content;
-  if (!out) throw new Error("No valid response text from Grok Search.");
+
+  if (!out) {
+    console.log("Grok response missing content:", JSON.stringify(data));
+    throw new Error("No valid response text from Grok Search.");
+  }
+
+  console.log("Grok response length:", out.length);
   return out;
 }
 
