@@ -3481,6 +3481,63 @@
       color: var(--text-muted);
     }
 
+    /* Takeaway Filter Styles */
+    .takeaway-filters {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .filter-row {
+      margin-bottom: 12px;
+    }
+
+    .filter-row:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .filter-row label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-chip {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-chip:hover {
+      border-color: var(--primary);
+    }
+
+    .filter-chip.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .cuisine-chips {
+      max-height: 80px;
+      overflow-y: auto;
+    }
+
     .takeaway-deals-list {
       display: flex;
       flex-direction: column;
@@ -3521,6 +3578,55 @@
     .takeaway-deal-type {
       font-size: 0.8rem;
       color: var(--text-muted);
+    }
+
+    .takeaway-deal-address {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .takeaway-deal-card.local-restaurant {
+      border-left: 3px solid #4caf50;
+    }
+
+    .takeaway-deal-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .takeaway-order-btn,
+    .takeaway-phone-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .takeaway-order-btn {
+      background: var(--primary);
+      color: white;
+    }
+
+    .takeaway-order-btn:hover {
+      background: var(--primary-dark, #1565c0);
+    }
+
+    .takeaway-phone-btn {
+      background: var(--surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .takeaway-phone-btn:hover {
+      background: var(--border);
     }
 
     .takeaway-deal-offers {
@@ -4443,9 +4549,45 @@
       <button class="modal-close" onclick="closeTakeawayDeals()">×</button>
     </div>
     <div class="modal-content">
+      <!-- Filter Section -->
+      <div id="takeawayFilters" class="takeaway-filters">
+        <div class="filter-row">
+          <label>Type:</label>
+          <div class="filter-chips">
+            <button class="filter-chip active" data-filter="dealType" data-value="all" onclick="setTakeawayFilter('dealType', 'all', this)">All</button>
+            <button class="filter-chip" data-filter="dealType" data-value="chains" onclick="setTakeawayFilter('dealType', 'chains', this)">🏪 Big Chains</button>
+            <button class="filter-chip" data-filter="dealType" data-value="local" onclick="setTakeawayFilter('dealType', 'local', this)">🏠 Local Only</button>
+          </div>
+        </div>
+        <div class="filter-row">
+          <label>Budget:</label>
+          <div class="filter-chips">
+            <button class="filter-chip active" data-filter="budget" data-value="all" onclick="setTakeawayFilter('budget', 'all', this)">All</button>
+            <button class="filter-chip" data-filter="budget" data-value="budget" onclick="setTakeawayFilter('budget', 'budget', this)">💰 Under $15</button>
+            <button class="filter-chip" data-filter="budget" data-value="mid" onclick="setTakeawayFilter('budget', 'mid', this)">💵 $15-30</button>
+            <button class="filter-chip" data-filter="budget" data-value="family" onclick="setTakeawayFilter('budget', 'family', this)">👨‍👩‍👧‍👦 Family $30+</button>
+          </div>
+        </div>
+        <div class="filter-row">
+          <label>Cuisine:</label>
+          <div class="filter-chips cuisine-chips">
+            <button class="filter-chip cuisine active" data-cuisine="all" onclick="toggleCuisineFilter('all', this)">All</button>
+            <button class="filter-chip cuisine" data-cuisine="chicken" onclick="toggleCuisineFilter('chicken', this)">🍗 Chicken</button>
+            <button class="filter-chip cuisine" data-cuisine="pizza" onclick="toggleCuisineFilter('pizza', this)">🍕 Pizza</button>
+            <button class="filter-chip cuisine" data-cuisine="lebanese" onclick="toggleCuisineFilter('lebanese', this)">🥙 Lebanese</button>
+            <button class="filter-chip cuisine" data-cuisine="indian" onclick="toggleCuisineFilter('indian', this)">🍛 Indian</button>
+            <button class="filter-chip cuisine" data-cuisine="thai" onclick="toggleCuisineFilter('thai', this)">🍜 Thai</button>
+            <button class="filter-chip cuisine" data-cuisine="chinese" onclick="toggleCuisineFilter('chinese', this)">🥡 Chinese</button>
+            <button class="filter-chip cuisine" data-cuisine="burgers" onclick="toggleCuisineFilter('burgers', this)">🍔 Burgers</button>
+          </div>
+        </div>
+        <button class="smart-meal-btn primary" onclick="searchTakeawayWithFilters()" style="width: 100%; margin-top: 12px;">
+          🔍 Search Deals
+        </button>
+      </div>
       <div id="takeawayDealsContent">
         <div class="takeaway-deals-empty">
-          <p>Finding deals in your area...</p>
+          <p>Set your filters and tap "Search Deals"</p>
         </div>
       </div>
     </div>
@@ -8845,11 +8987,20 @@
     }
 
     // Takeaway Deals Functions
+    // Filter state
+    let takeawayFilters = {
+      dealType: 'all',
+      budget: 'all',
+      cuisines: []
+    };
+
     function openTakeawayDeals() {
       const location = mealPreferences.location;
       const content = document.getElementById('takeawayDealsContent');
+      const filters = document.getElementById('takeawayFilters');
 
       if (!location) {
+        filters.style.display = 'none';
         content.innerHTML = `
           <div class="takeaway-no-location">
             <div style="font-size: 3rem; margin-bottom: 16px;">📍</div>
@@ -8866,20 +9017,110 @@
         return;
       }
 
+      // Show filters and reset content
+      filters.style.display = 'block';
       content.innerHTML = `
         <div class="takeaway-deals-empty">
-          <div class="ai-loading-spinner"></div>
-          <p>Searching for deals near ${location}...</p>
+          <div style="font-size: 3rem; margin-bottom: 16px;">🔍</div>
+          <p>Set your filters above and tap "Search Deals"</p>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 8px;">
+            Searching in: <strong>${location}</strong>
+          </p>
         </div>
       `;
 
       openModal('takeawayDealsSheet');
-      searchTakeawayDeals(location);
     }
 
     function closeTakeawayDeals() {
       document.getElementById('takeawayDealsSheet').classList.remove('open');
       document.getElementById('modalOverlay').classList.remove('open');
+    }
+
+    function setTakeawayFilter(filterType, value, btn) {
+      takeawayFilters[filterType] = value;
+
+      // Update active state for this filter group
+      const siblings = btn.parentElement.querySelectorAll('.filter-chip');
+      siblings.forEach(chip => chip.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function toggleCuisineFilter(cuisine, btn) {
+      if (cuisine === 'all') {
+        // Select "All" - clear other selections
+        takeawayFilters.cuisines = [];
+        const allChips = document.querySelectorAll('.filter-chip.cuisine');
+        allChips.forEach(chip => chip.classList.remove('active'));
+        btn.classList.add('active');
+      } else {
+        // Deselect "All" when selecting specific cuisine
+        const allBtn = document.querySelector('.filter-chip.cuisine[data-cuisine="all"]');
+        allBtn.classList.remove('active');
+
+        // Toggle this cuisine
+        const idx = takeawayFilters.cuisines.indexOf(cuisine);
+        if (idx === -1) {
+          takeawayFilters.cuisines.push(cuisine);
+          btn.classList.add('active');
+        } else {
+          takeawayFilters.cuisines.splice(idx, 1);
+          btn.classList.remove('active');
+        }
+
+        // If no cuisines selected, reselect "All"
+        if (takeawayFilters.cuisines.length === 0) {
+          allBtn.classList.add('active');
+        }
+      }
+    }
+
+    async function searchTakeawayWithFilters() {
+      const location = mealPreferences.location;
+      const content = document.getElementById('takeawayDealsContent');
+
+      content.innerHTML = `
+        <div class="takeaway-deals-empty">
+          <div class="ai-loading-spinner"></div>
+          <p>Searching for ${takeawayFilters.dealType === 'local' ? 'local' : takeawayFilters.dealType === 'chains' ? 'chain' : ''} deals near ${location}...</p>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 8px;">Powered by Grok AI with real-time search</p>
+        </div>
+      `;
+
+      try {
+        const token = localStorage.getItem('google_id_token');
+        if (!token) {
+          renderTakeawayDeals(FALLBACK_TAKEAWAY_DEALS, true);
+          return;
+        }
+
+        const response = await fetch('/api/takeaway/deals', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            location: location,
+            dealType: takeawayFilters.dealType,
+            cuisines: takeawayFilters.cuisines,
+            budget: takeawayFilters.budget
+          })
+        });
+
+        if (!response.ok) {
+          console.log('API returned error, showing fallback');
+          renderTakeawayDeals(FALLBACK_TAKEAWAY_DEALS, true);
+          return;
+        }
+
+        const data = await response.json();
+        renderTakeawayDeals(data.deals || FALLBACK_TAKEAWAY_DEALS);
+
+      } catch (error) {
+        console.error('Takeaway deals error:', error);
+        renderTakeawayDeals(FALLBACK_TAKEAWAY_DEALS, true);
+      }
     }
 
     // Fallback deals to show if API fails
@@ -9141,8 +9382,8 @@
         content.innerHTML = `
           <div class="takeaway-deals-empty">
             <div style="font-size: 3rem; margin-bottom: 16px;">🔍</div>
-            <p>No current deals found in your area.</p>
-            <p style="font-size: 0.85rem; color: var(--text-muted);">Try again later for new specials!</p>
+            <p>No current deals found with those filters.</p>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Try different filters or search again!</p>
           </div>
         `;
         return;
@@ -9163,23 +9404,28 @@
         ${headerText}
         <div class="takeaway-deals-list">
           ${deals.map(deal => `
-            <div class="takeaway-deal-card">
+            <div class="takeaway-deal-card ${deal.isChain === false ? 'local-restaurant' : ''}">
               <div class="takeaway-deal-header">
                 <div class="takeaway-deal-logo">${deal.emoji || '🍔'}</div>
-                <div>
+                <div style="flex: 1;">
                   <div class="takeaway-deal-name">${deal.name}</div>
-                  <div class="takeaway-deal-type">${deal.type || 'Fast Food'}</div>
+                  <div class="takeaway-deal-type">${deal.type || 'Fast Food'}${deal.isChain === false ? ' • Local' : ''}</div>
+                  ${deal.address ? `<div class="takeaway-deal-address">📍 ${deal.address}</div>` : ''}
                 </div>
               </div>
               <div class="takeaway-deal-offers">
-                ${deal.offers.map(offer => `
+                ${(deal.offers || []).map(offer => `
                   <div class="takeaway-offer">
                     <span class="takeaway-offer-text">${offer.description}</span>
                     ${offer.price ? `<span class="takeaway-offer-price">${offer.price}</span>` : ''}
                   </div>
                 `).join('')}
               </div>
-              ${deal.source ? `<p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;">Source: ${deal.source}</p>` : ''}
+              <div class="takeaway-deal-actions">
+                ${deal.orderLink ? `<a href="${deal.orderLink}" target="_blank" class="takeaway-order-btn">🛒 Order Now</a>` : ''}
+                ${deal.phone ? `<a href="tel:${deal.phone}" class="takeaway-phone-btn">📞 ${deal.phone}</a>` : ''}
+              </div>
+              ${deal.source ? `<p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 8px;">Source: ${deal.source}</p>` : ''}
             </div>
           `).join('')}
         </div>

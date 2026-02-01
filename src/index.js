@@ -1046,6 +1046,9 @@ export default {
 
       var bodyDeals = await request.json().catch(function () { return {}; });
       var location = bodyDeals.location || "";
+      var dealType = bodyDeals.dealType || "all"; // "chains", "local", "all"
+      var cuisineFilter = Array.isArray(bodyDeals.cuisines) ? bodyDeals.cuisines : []; // ["lebanese", "indian", "thai", etc]
+      var budgetFilter = bodyDeals.budget || "all"; // "budget" (<$15), "mid" ($15-30), "family" ($30+), "all"
 
       if (!location) {
         return jsonResponse({ error: "Location is required" }, 400, request);
@@ -1237,6 +1240,30 @@ export default {
       // Try to get real deals, but ALWAYS return something
       var parsedDeals = fallbackDeals;
 
+      // Build filter instructions based on user preferences
+      var dealTypeInstruction = "";
+      if (dealType === "chains") {
+        dealTypeInstruction = "ONLY search for MAJOR CHAIN restaurants (McDonald's, KFC, Domino's, Pizza Hut, Subway, Hungry Jack's, Nando's, etc). NO local restaurants.";
+      } else if (dealType === "local") {
+        dealTypeInstruction = "ONLY search for LOCAL independent restaurants. NO major chains. Focus on family-owned takeaways, local charcoal chicken, independent pizza shops, ethnic restaurants.";
+      } else {
+        dealTypeInstruction = "Search for BOTH major chains AND local restaurants. Prioritize local gems but include chain deals too.";
+      }
+
+      var cuisineInstruction = "";
+      if (cuisineFilter.length > 0) {
+        cuisineInstruction = "FILTER BY CUISINES: Only show restaurants serving: " + cuisineFilter.join(", ") + ". Ignore other cuisine types.";
+      }
+
+      var budgetInstruction = "";
+      if (budgetFilter === "budget") {
+        budgetInstruction = "BUDGET FILTER: Only show deals UNDER $15. Focus on cheap eats, lunch specials, student deals.";
+      } else if (budgetFilter === "mid") {
+        budgetInstruction = "MID-RANGE FILTER: Show deals between $15-$30. Good value meals for 1-2 people.";
+      } else if (budgetFilter === "family") {
+        budgetInstruction = "FAMILY FILTER: Show deals $30 and above. Focus on family packs, sharing platters, group meals.";
+      }
+
       // Deals search prompt - optimized for Grok's real-time local search
       var dealsPrompt = [
         {
@@ -1245,43 +1272,37 @@ export default {
             "You are an Australian takeaway deals finder with REAL-TIME web search capability.",
             "Search the web NOW for CURRENT takeaway deals and specials in the specified location.",
             "",
-            "IMPORTANT: Find BOTH major chains AND local restaurants:",
+            "FILTER INSTRUCTIONS:",
+            dealTypeInstruction,
+            cuisineInstruction,
+            budgetInstruction,
             "",
-            "MAJOR CHAINS (include if they have deals):",
-            "- McDonald's, KFC, Hungry Jack's, Subway, Domino's, Pizza Hut",
-            "- Guzman y Gomez, Nando's, Oporto, Red Rooster, Crust Pizza",
-            "",
-            "LOCAL RESTAURANTS (PRIORITIZE THESE - search for local gems):",
-            "- Local charcoal chicken shops with family deals",
-            "- Lebanese/Middle Eastern (shawarma, kebabs, platters)",
-            "- Indian restaurants (biryani, curry specials)",
-            "- Thai takeaway with lunch/dinner specials",
-            "- Chinese restaurants with combo meals",
-            "- Afghan/Persian restaurants (kabab, rice dishes)",
-            "- Italian pizza shops (not just chains)",
-            "- Vietnamese, Greek, Turkish restaurants",
-            "- Fish & chips shops",
-            "- Any local takeaway with good deals",
-            "",
-            "INCLUDE STREET ADDRESSES when available (e.g., '226-228 Merrylands Road')",
+            "CRITICAL: For each restaurant, you MUST provide:",
+            "1. EXACT RESTAURANT NAME (not generic like 'Local Chicken Shop')",
+            "2. STREET ADDRESS if you can find it (e.g., '226-228 Merrylands Road')",
+            "3. ORDER LINK if available (website, Uber Eats, DoorDash, Menulog link)",
             "",
             "Return ONLY a JSON array with this structure:",
             "[",
             "  {",
-            '    "name": "Restaurant Name (Address if known)",',
+            '    "name": "La Mono Charcoal Chicken",',
+            '    "address": "106 Burnett Street, Merrylands",',
             '    "emoji": "🍗",',
-            '    "type": "Charcoal Chicken / Lebanese / Indian / etc",',
+            '    "type": "Charcoal Chicken",',
+            '    "isChain": false,',
             '    "offers": [',
-            '      { "description": "Family Deal: Whole chicken + chips + salad + drinks", "price": "$34.95" },',
-            '      { "description": "Student Pack: 2 chickens + chips + sauce + drink", "price": "$14.90" }',
+            '      { "description": "🔥 Student Pack: 2 chickens + chips + sauce + drink", "price": "$14.90" },',
+            '      { "description": "Tradies Pack: 3 chickens + chips + salad + drinks", "price": "$39.90" }',
             "    ],",
-            '    "source": "restaurant website / DoorDash / Uber Eats / Facebook"',
+            '    "orderLink": "https://www.ubereats.com/au/store/la-mono/xxx",',
+            '    "phone": "02 9999 9999",',
+            '    "source": "Uber Eats / restaurant website"',
             "  }",
             "]",
             "",
-            "Include 12-18 places mixing chains AND local restaurants.",
-            "Local restaurants with specific deals are MORE valuable than chains.",
-            "Include family packs, combo deals, lunch specials, student deals.",
+            "Include 10-15 restaurants with REAL names and addresses.",
+            "Every restaurant must have a real name - NO generic names like 'Local Indian Restaurant'.",
+            "Include order links when available (Uber Eats, DoorDash, Menulog, or restaurant website).",
             "Only include REAL offers you find from your web search.",
             "No markdown, no explanation, just the JSON array."
           ].join("\n")
@@ -1289,21 +1310,20 @@ export default {
         {
           role: "user",
           content: [
-            "Search the web RIGHT NOW for takeaway deals and restaurant specials in " + location + ", Australia.",
+            "Search the web RIGHT NOW for takeaway deals in " + location + ", Australia.",
             "",
-            "I want to find:",
-            "1. LOCAL charcoal chicken shops with family deals and combo packs",
-            "2. Lebanese/Middle Eastern restaurants with shawarma, kebab, and platter deals",
-            "3. Indian restaurants with biryani combos and curry specials",
-            "4. Local pizza shops (not just Domino's) with pickup/delivery deals",
-            "5. Thai, Vietnamese, Chinese restaurants with lunch/dinner specials",
-            "6. Afghan, Turkish, Greek restaurants with meal deals",
-            "7. Major chains (KFC, Maccas, etc) with current app deals and BOGOs",
-            "8. Uber Eats, DoorDash deals for restaurants in this area",
+            dealTypeInstruction,
+            cuisineInstruction ? cuisineInstruction : "Include all cuisine types.",
+            budgetInstruction ? budgetInstruction : "Include all price ranges.",
             "",
-            "Find restaurants with SPECIFIC addresses and REAL prices.",
-            "I want local hidden gems, not just big chains!",
-            "Search now and give me the BEST takeaway deals in this suburb."
+            "IMPORTANT REQUIREMENTS:",
+            "1. Use REAL restaurant names (search Google, Uber Eats, DoorDash for actual businesses)",
+            "2. Include STREET ADDRESSES when you find them",
+            "3. Include ORDER LINKS (Uber Eats, DoorDash, Menulog, or restaurant websites)",
+            "4. Include PHONE NUMBERS if available",
+            "5. Only include deals with REAL prices you found",
+            "",
+            "Search thoroughly and give me specific restaurants in " + location + " with their actual details."
           ].join("\n")
         }
       ];
