@@ -1435,8 +1435,16 @@ export default {
         console.log("Takeaway deals search failed, using fallback:", searchErr.message);
       }
 
+      // Check if we're returning real search results or fallback
+      var isRealSearch = parsedDeals !== fallbackDeals;
+
       // ALWAYS return 200 with deals (real or fallback)
-      return jsonResponse({ deals: parsedDeals, location: location }, 200, request);
+      return jsonResponse({
+        deals: parsedDeals,
+        location: location,
+        isRealSearch: isRealSearch,
+        source: isRealSearch ? "Grok AI Web Search" : "Popular deals (API unavailable)"
+      }, 200, request);
     }
 
     // POST /api/store/specials
