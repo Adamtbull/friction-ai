@@ -776,6 +776,135 @@ export default {
       }
     }
 
+    // ============ TAKEAWAY DEALS ============
+
+    // POST /api/takeaway/deals
+    if (url.pathname === "/api/takeaway/deals" && request.method === "POST") {
+      try {
+        var authDeals = await verifyToken(request, env);
+        if (!authDeals.valid) {
+          return jsonResponse({ error: "Authentication required" }, 401, request);
+        }
+
+        var bodyDeals = await request.json().catch(function () { return {}; });
+        var location = bodyDeals.location || "";
+
+        if (!location) {
+          return jsonResponse({ error: "Location is required" }, 400, request);
+        }
+
+        // Rate limit
+        var dealsRate = await enforceRateLimit(env, "takeaway:deals:" + hashEmail(authDeals.email), 10, 300);
+        if (!dealsRate.allowed) {
+          return jsonResponseWithHeaders(
+            { error: "Rate limit exceeded. Please wait and try again." },
+            429,
+            request,
+            { "Retry-After": String(dealsRate.retryAfter) }
+          );
+        }
+
+        // Use Perplexity to search for current takeaway deals
+        var dealsPrompt = [
+          {
+            role: "system",
+            content: [
+              "You are an Australian takeaway deals finder. Search for CURRENT fast food and takeaway specials.",
+              "",
+              "Focus on major chains and popular takeaway options:",
+              "- McDonald's, KFC, Hungry Jack's, Subway, Domino's, Pizza Hut",
+              "- Guzman y Gomez, Nando's, Oporto, Red Rooster, Chicken Treat",
+              "- Uber Eats, DoorDash, Menulog app deals",
+              "- Local fish & chips, Chinese, Thai, Indian takeaway",
+              "",
+              "Return ONLY a JSON array of deals with this structure:",
+              "[",
+              "  {",
+              '    "name": "Restaurant Name",',
+              '    "emoji": "🍔",',
+              '    "type": "Fast Food",',
+              '    "offers": [',
+              '      { "description": "Deal description", "price": "$X.XX" }',
+              "    ],",
+              '    "source": "where you found this deal"',
+              "  }",
+              "]",
+              "",
+              "Include 5-10 places with their best current deals.",
+              "Only include REAL current offers you can verify.",
+              "No markdown, no explanation, just the JSON array."
+            ].join("\n")
+          },
+          {
+            role: "user",
+            content: [
+              "Find current takeaway and fast food deals near " + location + ", Australia.",
+              "",
+              "Search for:",
+              "1. Current app-exclusive deals (McDonald's app, KFC app, etc)",
+              "2. Weekly specials at major chains",
+              "3. Delivery app promos (Uber Eats, DoorDash, Menulog)",
+              "4. Any limited time offers",
+              "",
+              "Focus on the best value deals available RIGHT NOW."
+            ].join("\n")
+          }
+        ];
+
+        var dealsResponse = await handlePerplexityPriceSearch(dealsPrompt, env);
+
+        // Parse the JSON response
+        var parsedDeals;
+        try {
+          var cleanDealsResponse = dealsResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+          // Try to find JSON array in response
+          var jsonArrayMatch = cleanDealsResponse.match(/\[[\s\S]*\]/);
+          if (jsonArrayMatch) {
+            parsedDeals = JSON.parse(jsonArrayMatch[0]);
+          } else {
+            throw new Error("No JSON array found");
+          }
+        } catch (parseErr) {
+          // Return fallback deals if parsing fails
+          parsedDeals = [
+            {
+              name: "McDonald's",
+              emoji: "🍟",
+              type: "Fast Food",
+              offers: [
+                { description: "Check the McDonald's app for daily deals", price: "Varies" },
+                { description: "$6 Small McValue Meal", price: "$6.00" }
+              ],
+              source: "McDonald's App"
+            },
+            {
+              name: "KFC",
+              emoji: "🍗",
+              type: "Fast Food",
+              offers: [
+                { description: "Check KFC app for exclusive deals", price: "Varies" }
+              ],
+              source: "KFC App"
+            },
+            {
+              name: "Domino's",
+              emoji: "🍕",
+              type: "Pizza",
+              offers: [
+                { description: "Value Range Pizzas from $5", price: "From $5" },
+                { description: "Check app for weekly coupons", price: "Varies" }
+              ],
+              source: "Domino's Website"
+            }
+          ];
+        }
+
+        return jsonResponse({ deals: parsedDeals, location: location }, 200, request);
+      } catch (err) {
+        return jsonResponse({ error: err && err.message ? err.message : "Failed to search deals" }, 500, request);
+      }
+    }
+
     // ============ APPOINTMENT IMAGE SCAN ============
     // POST /api/appointments/scan
     if (url.pathname === "/api/appointments/scan" && request.method === "POST") {

@@ -1034,6 +1034,12 @@
       border: none;
     }
 
+    .smart-meal-btn.takeaway-btn {
+      background: #ff6b35;
+      color: white;
+      border: none;
+    }
+
     /* Meal Tabs */
     .meal-tabs {
       display: flex;
@@ -3184,6 +3190,95 @@
       transform: translateY(0);
     }
 
+    .modal-sheet.large {
+      max-height: 90vh;
+    }
+
+    /* Takeaway Deals Styles */
+    .takeaway-deals-empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+
+    .takeaway-deals-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .takeaway-deal-card {
+      background: var(--bg);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .takeaway-deal-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .takeaway-deal-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-sm);
+      background: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .takeaway-deal-name {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text-primary);
+    }
+
+    .takeaway-deal-type {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .takeaway-deal-offers {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .takeaway-offer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff8e6;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      border-left: 3px solid #ff9800;
+    }
+
+    .takeaway-offer-text {
+      font-size: 0.9rem;
+      color: var(--text-primary);
+    }
+
+    .takeaway-offer-price {
+      font-weight: 700;
+      color: #e65100;
+    }
+
+    .takeaway-no-location {
+      text-align: center;
+      padding: 30px 20px;
+    }
+
+    .takeaway-no-location button {
+      margin-top: 12px;
+    }
+
     .modal-sheet .modal-header {
       display: flex;
       justify-content: space-between;
@@ -3950,6 +4045,7 @@
       <div class="meal-ideas-header">
         <button class="smart-meal-btn" onclick="openMealPreferences()">⚙️ Preferences</button>
         <button class="smart-meal-btn primary" onclick="generateMealIdeas()">✨ Generate Ideas</button>
+        <button class="smart-meal-btn takeaway-btn" onclick="openTakeawayDeals()">🍔 Takeaway Deals</button>
       </div>
 
       <!-- Meal Ideas Grid -->
@@ -4056,6 +4152,21 @@
       <button class="form-submit" onclick="confirmMealPlanAssignment()">
         ✓ Add to Meal Plan
       </button>
+    </div>
+  </div>
+
+  <!-- TAKEAWAY DEALS SHEET -->
+  <div class="modal-sheet large" id="takeawayDealsSheet">
+    <div class="modal-header">
+      <h3>🍔 Takeaway Deals Near You</h3>
+      <button class="modal-close" onclick="closeTakeawayDeals()">×</button>
+    </div>
+    <div class="modal-content">
+      <div id="takeawayDealsContent">
+        <div class="takeaway-deals-empty">
+          <p>Finding deals in your area...</p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -8246,6 +8357,129 @@
         toast.classList.remove('show');
         btnEl.style.display = '';
       }, 3000);
+    }
+
+    // Takeaway Deals Functions
+    function openTakeawayDeals() {
+      const location = mealPreferences.location;
+      const content = document.getElementById('takeawayDealsContent');
+
+      if (!location) {
+        content.innerHTML = `
+          <div class="takeaway-no-location">
+            <div style="font-size: 3rem; margin-bottom: 16px;">📍</div>
+            <h4>Set Your Location First</h4>
+            <p style="color: var(--text-muted); margin-bottom: 16px;">
+              We need your location to find nearby takeaway deals.
+            </p>
+            <button class="smart-meal-btn primary" onclick="closeTakeawayDeals(); openMealPreferences(); switchPrefTab('stores');">
+              Set Location
+            </button>
+          </div>
+        `;
+        openModal('takeawayDealsSheet');
+        return;
+      }
+
+      content.innerHTML = `
+        <div class="takeaway-deals-empty">
+          <div class="ai-loading-spinner"></div>
+          <p>Searching for deals near ${location}...</p>
+        </div>
+      `;
+
+      openModal('takeawayDealsSheet');
+      searchTakeawayDeals(location);
+    }
+
+    function closeTakeawayDeals() {
+      document.getElementById('takeawayDealsSheet').classList.remove('open');
+      document.getElementById('modalOverlay').classList.remove('open');
+    }
+
+    async function searchTakeawayDeals(location) {
+      const content = document.getElementById('takeawayDealsContent');
+
+      try {
+        const token = localStorage.getItem('google_id_token');
+        if (!token) {
+          throw new Error('Please sign in to search for deals');
+        }
+
+        const response = await fetch('/api/takeaway/deals', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ location })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to search for deals');
+        }
+
+        const data = await response.json();
+        renderTakeawayDeals(data.deals || []);
+
+      } catch (error) {
+        console.error('Takeaway deals error:', error);
+        content.innerHTML = `
+          <div class="takeaway-deals-empty" style="color: var(--danger);">
+            <div style="font-size: 3rem; margin-bottom: 16px;">😕</div>
+            <p>${error.message}</p>
+            <button class="smart-meal-btn" onclick="searchTakeawayDeals('${location}')" style="margin-top: 16px;">
+              Try Again
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    function renderTakeawayDeals(deals) {
+      const content = document.getElementById('takeawayDealsContent');
+
+      if (deals.length === 0) {
+        content.innerHTML = `
+          <div class="takeaway-deals-empty">
+            <div style="font-size: 3rem; margin-bottom: 16px;">🔍</div>
+            <p>No current deals found in your area.</p>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Try again later for new specials!</p>
+          </div>
+        `;
+        return;
+      }
+
+      content.innerHTML = `
+        <p style="margin-bottom: 16px; color: var(--text-muted); font-size: 0.9rem;">
+          Found ${deals.length} places with deals near you:
+        </p>
+        <div class="takeaway-deals-list">
+          ${deals.map(deal => `
+            <div class="takeaway-deal-card">
+              <div class="takeaway-deal-header">
+                <div class="takeaway-deal-logo">${deal.emoji || '🍔'}</div>
+                <div>
+                  <div class="takeaway-deal-name">${deal.name}</div>
+                  <div class="takeaway-deal-type">${deal.type || 'Fast Food'}</div>
+                </div>
+              </div>
+              <div class="takeaway-deal-offers">
+                ${deal.offers.map(offer => `
+                  <div class="takeaway-offer">
+                    <span class="takeaway-offer-text">${offer.description}</span>
+                    ${offer.price ? `<span class="takeaway-offer-price">${offer.price}</span>` : ''}
+                  </div>
+                `).join('')}
+              </div>
+              ${deal.source ? `<p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;">Source: ${deal.source}</p>` : ''}
+            </div>
+          `).join('')}
+        </div>
+        <p style="margin-top: 16px; font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+          Deals may vary. Check with the restaurant for current offers.
+        </p>
+      `;
     }
 
     async function addIngredientsWithPricing() {
