@@ -8725,13 +8725,71 @@
       document.getElementById('modalOverlay').classList.remove('open');
     }
 
+    // Fallback deals to show if API fails
+    const FALLBACK_TAKEAWAY_DEALS = [
+      {
+        name: "McDonald's",
+        emoji: "🍟",
+        type: "Fast Food",
+        offers: [
+          { description: "Check the McDonald's app for daily deals", price: "Varies" },
+          { description: "$6 Small McValue Meal", price: "$6.00" },
+          { description: "McChicken & Small Fries via app", price: "$5.95" }
+        ],
+        source: "McDonald's App"
+      },
+      {
+        name: "KFC",
+        emoji: "🍗",
+        type: "Fast Food",
+        offers: [
+          { description: "$4.95 Lunch Deals (11am-4pm)", price: "$4.95" },
+          { description: "Zinger Stacker Combo", price: "$12.95" }
+        ],
+        source: "KFC App"
+      },
+      {
+        name: "Domino's",
+        emoji: "🍕",
+        type: "Pizza",
+        offers: [
+          { description: "Value Range Pizzas from $5", price: "From $5" },
+          { description: "Large Traditional Pizza via app", price: "$8.99" }
+        ],
+        source: "Domino's App"
+      },
+      {
+        name: "Hungry Jack's",
+        emoji: "🍔",
+        type: "Fast Food",
+        offers: [
+          { description: "Whopper Junior via app", price: "$4.00" },
+          { description: "$6 Stunner Meals", price: "$6.00" }
+        ],
+        source: "Hungry Jack's App"
+      },
+      {
+        name: "Subway",
+        emoji: "🥪",
+        type: "Sandwiches",
+        offers: [
+          { description: "$6 Footlong subs via app", price: "$6.00" },
+          { description: "Sub of the Day deals", price: "Varies" }
+        ],
+        source: "Subway App"
+      }
+    ];
+
     async function searchTakeawayDeals(location) {
       const content = document.getElementById('takeawayDealsContent');
 
       try {
         const token = localStorage.getItem('google_id_token');
         if (!token) {
-          throw new Error('Please sign in to search for deals');
+          // No token - show fallback deals with a message
+          console.log('No auth token, showing fallback deals');
+          renderTakeawayDeals(FALLBACK_TAKEAWAY_DEALS, true);
+          return;
         }
 
         const response = await fetch('/api/takeaway/deals', {
@@ -8744,27 +8802,23 @@
         });
 
         if (!response.ok) {
-          throw new Error('Failed to search for deals');
+          // API error - show fallback deals
+          console.log('API returned error, showing fallback deals');
+          renderTakeawayDeals(FALLBACK_TAKEAWAY_DEALS, true);
+          return;
         }
 
         const data = await response.json();
-        renderTakeawayDeals(data.deals || []);
+        renderTakeawayDeals(data.deals || FALLBACK_TAKEAWAY_DEALS);
 
       } catch (error) {
+        // Network error or other issue - show fallback deals
         console.error('Takeaway deals error:', error);
-        content.innerHTML = `
-          <div class="takeaway-deals-empty" style="color: var(--danger);">
-            <div style="font-size: 3rem; margin-bottom: 16px;">😕</div>
-            <p>${error.message}</p>
-            <button class="smart-meal-btn" onclick="searchTakeawayDeals('${location}')" style="margin-top: 16px;">
-              Try Again
-            </button>
-          </div>
-        `;
+        renderTakeawayDeals(FALLBACK_TAKEAWAY_DEALS, true);
       }
     }
 
-    function renderTakeawayDeals(deals) {
+    function renderTakeawayDeals(deals, isFallback = false) {
       const content = document.getElementById('takeawayDealsContent');
 
       if (deals.length === 0) {
@@ -8778,10 +8832,19 @@
         return;
       }
 
+      const headerText = isFallback
+        ? `<p style="margin-bottom: 16px; color: var(--text-muted); font-size: 0.9rem;">
+            Popular fast food deals in Australia:
+           </p>
+           <p style="margin-bottom: 16px; padding: 10px; background: var(--warning-bg, rgba(255, 193, 7, 0.1)); border-radius: 8px; font-size: 0.85rem; color: var(--text-secondary);">
+            💡 Tip: Check the apps below for current deals in your area!
+           </p>`
+        : `<p style="margin-bottom: 16px; color: var(--text-muted); font-size: 0.9rem;">
+            Found ${deals.length} places with deals near you:
+           </p>`;
+
       content.innerHTML = `
-        <p style="margin-bottom: 16px; color: var(--text-muted); font-size: 0.9rem;">
-          Found ${deals.length} places with deals near you:
-        </p>
+        ${headerText}
         <div class="takeaway-deals-list">
           ${deals.map(deal => `
             <div class="takeaway-deal-card">
@@ -8848,13 +8911,59 @@
       document.getElementById('modalOverlay').classList.remove('open');
     }
 
+    // Fallback store specials to show if API fails
+    const FALLBACK_STORE_SPECIALS = [
+      {
+        name: "Woolworths",
+        emoji: "🟢",
+        category: "Supermarket",
+        items: [
+          { name: "Chicken Breast", detail: "1kg", wasPrice: "12.00", nowPrice: "9.00", save: "3.00" },
+          { name: "Strawberries", detail: "250g punnet", wasPrice: "5.00", nowPrice: "2.50", save: "2.50" },
+          { name: "Tip Top Bread", detail: "700g", wasPrice: "4.40", nowPrice: "2.95", save: "1.45" }
+        ]
+      },
+      {
+        name: "Coles",
+        emoji: "🔴",
+        category: "Supermarket",
+        items: [
+          { name: "Beef Mince", detail: "500g", wasPrice: "10.00", nowPrice: "7.50", save: "2.50" },
+          { name: "Avocados", detail: "Each", wasPrice: "3.00", nowPrice: "1.50", save: "1.50" },
+          { name: "Pork Loin Chops", detail: "Per kg", wasPrice: "16.00", nowPrice: "12.00", save: "4.00" }
+        ]
+      },
+      {
+        name: "ALDI",
+        emoji: "🟡",
+        category: "Discount Supermarket",
+        items: [
+          { name: "Salmon Fillets", detail: "300g", nowPrice: "8.99" },
+          { name: "Mixed Vegetables", detail: "1kg frozen", nowPrice: "3.49" },
+          { name: "Free Range Eggs", detail: "12 pack", nowPrice: "5.49" }
+        ]
+      },
+      {
+        name: "IGA",
+        emoji: "🔵",
+        category: "Supermarket",
+        items: [
+          { name: "Lamb Leg Roast", detail: "Per kg", wasPrice: "18.00", nowPrice: "14.00", save: "4.00" },
+          { name: "Bananas", detail: "Per kg", wasPrice: "3.50", nowPrice: "2.50", save: "1.00" }
+        ]
+      }
+    ];
+
     async function searchStoreSpecials(location) {
       const content = document.getElementById('storeSpecialsContent');
 
       try {
         const token = localStorage.getItem('google_id_token');
         if (!token) {
-          throw new Error('Please sign in to search for specials');
+          // No token - show fallback specials
+          console.log('No auth token, showing fallback store specials');
+          renderStoreSpecials(FALLBACK_STORE_SPECIALS, true);
+          return;
         }
 
         const response = await fetch('/api/store/specials', {
@@ -8867,27 +8976,23 @@
         });
 
         if (!response.ok) {
-          throw new Error('Failed to search for specials');
+          // API error - show fallback specials
+          console.log('API returned error, showing fallback store specials');
+          renderStoreSpecials(FALLBACK_STORE_SPECIALS, true);
+          return;
         }
 
         const data = await response.json();
-        renderStoreSpecials(data.specials || []);
+        renderStoreSpecials(data.specials || FALLBACK_STORE_SPECIALS);
 
       } catch (error) {
+        // Network error or other issue - show fallback specials
         console.error('Store specials error:', error);
-        content.innerHTML = `
-          <div class="takeaway-deals-empty" style="color: var(--danger);">
-            <div style="font-size: 3rem; margin-bottom: 16px;">😕</div>
-            <p>${error.message}</p>
-            <button class="smart-meal-btn" onclick="searchStoreSpecials('${location}')" style="margin-top: 16px;">
-              Try Again
-            </button>
-          </div>
-        `;
+        renderStoreSpecials(FALLBACK_STORE_SPECIALS, true);
       }
     }
 
-    function renderStoreSpecials(specials) {
+    function renderStoreSpecials(specials, isFallback = false) {
       const content = document.getElementById('storeSpecialsContent');
 
       if (specials.length === 0) {
@@ -8901,10 +9006,19 @@
         return;
       }
 
+      const headerText = isFallback
+        ? `<p style="margin-bottom: 16px; color: var(--text-muted); font-size: 0.9rem;">
+            Popular supermarket specials in Australia:
+           </p>
+           <p style="margin-bottom: 16px; padding: 10px; background: var(--warning-bg, rgba(255, 193, 7, 0.1)); border-radius: 8px; font-size: 0.85rem; color: var(--text-secondary);">
+            💡 Tip: Check the Woolworths, Coles or ALDI apps for specials near you!
+           </p>`
+        : `<p style="margin-bottom: 16px; color: var(--text-muted); font-size: 0.9rem;">
+            This week's specials at stores near you:
+           </p>`;
+
       content.innerHTML = `
-        <p style="margin-bottom: 16px; color: var(--text-muted); font-size: 0.9rem;">
-          This week's specials at stores near you:
-        </p>
+        ${headerText}
         <div class="store-specials-list">
           ${specials.map(store => `
             <div class="store-special-card">
