@@ -1363,6 +1363,60 @@
       color: white;
     }
 
+    /* Meal Section Headers */
+    .meal-section-header {
+      grid-column: 1 / -1;
+      padding: 16px 0 8px 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 8px;
+      margin-top: 16px;
+    }
+
+    .meal-section-header:first-child {
+      margin-top: 0;
+    }
+
+    .meal-section-header h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* Category Tags on Cards */
+    .meal-category-tag {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .meal-category-tag.entree {
+      background: rgba(33, 150, 243, 0.15);
+      color: #1976d2;
+    }
+
+    .meal-category-tag.snack-sweet {
+      background: rgba(233, 30, 99, 0.15);
+      color: #c2185b;
+    }
+
+    .meal-category-tag.snack-savoury,
+    .meal-category-tag.snack {
+      background: rgba(255, 152, 0, 0.15);
+      color: #f57c00;
+    }
+
+    .meal-category-tag.dessert {
+      background: rgba(156, 39, 176, 0.15);
+      color: #7b1fa2;
+    }
+
     .meal-idea-cuisine {
       font-size: 0.7rem;
       color: var(--primary);
@@ -8246,7 +8300,10 @@
             budget: quality,
             complexity: mealPreferences.complexity || 'any',
             cookingMethod: mealPreferences.cookingMethod || 'any',
-            count: 5  // 5 authentic recipes with GPT audit
+            count: 14,  // 14 authentic recipes with GPT audit
+            includeSnacks: true,  // 6 snacks (3 sweet, 3 savoury)
+            includeEntrees: true, // 4 entrees/starters
+            includeDesserts: true // 4 desserts
           })
         });
 
@@ -8272,6 +8329,10 @@
         }
 
         mealIdeas = data.meals || [];
+        // Store snacks, entrees, and desserts
+        window.snackIdeas = data.snacks || [];
+        window.entreeIdeas = data.entrees || [];
+        window.dessertIdeas = data.desserts || [];
         // Store AI attribution info
         window.mealGeneratedBy = data.generatedBy || 'AI';
         window.mealAuditedBy = data.auditedBy || 'GPT-4';
@@ -8283,6 +8344,11 @@
 
         selectedMealIds.clear();
         renderMealIdeasGrid();
+
+        // Log the extras we received
+        console.log('Snacks received:', window.snackIdeas.length);
+        console.log('Entrees received:', window.entreeIdeas.length);
+        console.log('Desserts received:', window.dessertIdeas.length);
       } catch (error) {
         console.error('Meal generation error:', error);
 
@@ -8377,30 +8443,102 @@
         return;
       }
 
-      grid.innerHTML = mealIdeas.map(meal => {
+      // Helper function to render a meal card
+      const renderMealCard = (meal, category = 'meal') => {
         const auditScore = meal.audit?.score;
         const badgeClass = auditScore ? getAuthenticityBadgeClass(auditScore) : '';
 
         return `
         <div class="meal-idea-card ${selectedMealIds.has(meal.id) ? 'selected' : ''}"
              onclick="toggleMealSelection(${meal.id})"
-             ondblclick="expandMealCard(${meal.id})">
+             ondblclick="expandMealCard(${meal.id}, '${category}')">
           <div class="meal-idea-checkbox">${selectedMealIds.has(meal.id) ? '✓' : ''}</div>
           ${auditScore ? `
             <div class="authenticity-badge ${badgeClass}">
               ✓ ${auditScore}/10
             </div>
           ` : ''}
-          <div class="meal-idea-image">${meal.emoji}</div>
+          ${category !== 'meal' ? `<div class="meal-category-tag ${category}">${category}</div>` : ''}
+          <div class="meal-idea-image">${meal.emoji || '🍽️'}</div>
           <div class="meal-idea-content">
             ${meal.cuisine ? `<div class="meal-idea-cuisine">${meal.cuisine}</div>` : ''}
             <div class="meal-idea-name">${meal.name}</div>
             ${meal.description ? `<div class="meal-idea-description">${meal.description}</div>` : ''}
-            <div class="meal-idea-meta">${meal.time} • ${meal.servings} servings</div>
+            <div class="meal-idea-meta">${meal.time || '30 min'} • ${meal.servings || 4} servings</div>
           </div>
         </div>
-      `}).join('');
+      `};
 
+      // Build the grid with all categories
+      let gridHTML = '';
+
+      // Main Meals Section
+      gridHTML += `
+        <div class="meal-section-header">
+          <h3>🍽️ Main Meals (${mealIdeas.length})</h3>
+        </div>
+      `;
+      gridHTML += mealIdeas.map(meal => renderMealCard(meal, 'meal')).join('');
+
+      // Entrees Section
+      const entrees = window.entreeIdeas || [];
+      if (entrees.length > 0) {
+        gridHTML += `
+          <div class="meal-section-header">
+            <h3>🥗 Entrees & Starters (${entrees.length})</h3>
+          </div>
+        `;
+        gridHTML += entrees.map(e => renderMealCard(e, 'entree')).join('');
+      }
+
+      // Snacks Section
+      const snacks = window.snackIdeas || [];
+      if (snacks.length > 0) {
+        const sweetSnacks = snacks.filter(s => s.type === 'sweet');
+        const savourySnacks = snacks.filter(s => s.type === 'savoury' || s.type === 'savory');
+
+        if (sweetSnacks.length > 0) {
+          gridHTML += `
+            <div class="meal-section-header">
+              <h3>🍪 Sweet Snacks (${sweetSnacks.length})</h3>
+            </div>
+          `;
+          gridHTML += sweetSnacks.map(s => renderMealCard(s, 'snack-sweet')).join('');
+        }
+
+        if (savourySnacks.length > 0) {
+          gridHTML += `
+            <div class="meal-section-header">
+              <h3>🧀 Savoury Snacks (${savourySnacks.length})</h3>
+            </div>
+          `;
+          gridHTML += savourySnacks.map(s => renderMealCard(s, 'snack-savoury')).join('');
+        }
+
+        // If snacks don't have type, show them all together
+        const untypedSnacks = snacks.filter(s => !s.type || (s.type !== 'sweet' && s.type !== 'savoury' && s.type !== 'savory'));
+        if (untypedSnacks.length > 0 && sweetSnacks.length === 0 && savourySnacks.length === 0) {
+          gridHTML += `
+            <div class="meal-section-header">
+              <h3>🍿 Snacks (${untypedSnacks.length})</h3>
+            </div>
+          `;
+          gridHTML += untypedSnacks.map(s => renderMealCard(s, 'snack')).join('');
+        }
+      }
+
+      // Desserts Section
+      const desserts = window.dessertIdeas || [];
+      if (desserts.length > 0) {
+        gridHTML += `
+          <div class="meal-section-header">
+            <h3>🍰 Desserts (${desserts.length})</h3>
+          </div>
+        `;
+        gridHTML += desserts.map(d => renderMealCard(d, 'dessert')).join('');
+      }
+
+      grid.innerHTML = gridHTML;
       updateSelectionBar();
     }
 
@@ -8438,8 +8576,27 @@
       return qty ? `${qty} ${name}${price}` : `${name}${price}`;
     }
 
-    function expandMealCard(mealId) {
-      const meal = mealIdeas.find(m => m.id === mealId);
+    function expandMealCard(mealId, category = 'meal') {
+      // Search in the appropriate array based on category
+      let meal;
+      if (category === 'meal') {
+        meal = mealIdeas.find(m => m.id === mealId);
+      } else if (category === 'entree') {
+        meal = (window.entreeIdeas || []).find(m => m.id === mealId);
+      } else if (category === 'snack' || category === 'snack-sweet' || category === 'snack-savoury') {
+        meal = (window.snackIdeas || []).find(m => m.id === mealId);
+      } else if (category === 'dessert') {
+        meal = (window.dessertIdeas || []).find(m => m.id === mealId);
+      }
+
+      // Fallback: search all arrays
+      if (!meal) {
+        meal = mealIdeas.find(m => m.id === mealId) ||
+               (window.entreeIdeas || []).find(m => m.id === mealId) ||
+               (window.snackIdeas || []).find(m => m.id === mealId) ||
+               (window.dessertIdeas || []).find(m => m.id === mealId);
+      }
+
       if (!meal) return;
 
       // Build audit section if available
