@@ -4846,14 +4846,19 @@
 
       <!-- Stores Tab -->
       <div class="pref-panel" id="prefStores">
-        <p class="pref-description">Your location (for local deals & prices):</p>
+        <p class="pref-description">Your location (suburb, postcode, or city):</p>
         <div class="location-input-group">
-          <input type="text" id="userSuburb" class="location-input" placeholder="Enter suburb or postcode">
+          <input type="text" id="userSuburb" class="location-input"
+                 placeholder="e.g. Parramatta, 2150, or Melbourne CBD"
+                 oninput="onLocationInput(this)">
           <button class="location-detect-btn" onclick="detectUserLocation()">
             📍 Detect
           </button>
         </div>
         <p id="locationStatus" class="location-status"></p>
+        <p class="pref-description" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+          Type any Australian suburb, postcode, or area name
+        </p>
 
         <p class="pref-description" style="margin-top: 20px;">Preferred store:</p>
         <div class="store-options" id="storeOptions"></div>
@@ -8135,6 +8140,43 @@
       } finally {
         btnEl.disabled = false;
         btnEl.textContent = '📍 Detect';
+      }
+    }
+
+    // Handle manual location input
+    function onLocationInput(input) {
+      const statusEl = document.getElementById('locationStatus');
+      const value = input.value.trim();
+
+      if (value.length === 0) {
+        statusEl.textContent = '';
+        statusEl.className = 'location-status';
+        return;
+      }
+
+      // Check if it looks like a valid Australian postcode (4 digits)
+      const isPostcode = /^\d{4}$/.test(value);
+      // Check if it's a partial postcode
+      const isPartialPostcode = /^\d{1,3}$/.test(value);
+
+      if (isPostcode) {
+        statusEl.textContent = '✓ Postcode entered - will search in this area';
+        statusEl.className = 'location-status success';
+        // Auto-save when a complete postcode is entered
+        mealPreferences.location = value;
+        saveMealPreferences();
+      } else if (isPartialPostcode) {
+        statusEl.textContent = 'Keep typing postcode...';
+        statusEl.className = 'location-status';
+      } else if (value.length >= 3) {
+        statusEl.textContent = '✓ Location set - will search near ' + value;
+        statusEl.className = 'location-status success';
+        // Auto-save after 3+ characters
+        mealPreferences.location = value;
+        saveMealPreferences();
+      } else {
+        statusEl.textContent = 'Keep typing...';
+        statusEl.className = 'location-status';
       }
     }
 
