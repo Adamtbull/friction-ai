@@ -2560,10 +2560,9 @@ async function handleGrokSearch(messages, env) {
   var apiKey = env.XAI_API_KEY;
   if (!apiKey) throw new Error("Grok API key not configured");
 
-  // xAI API - using grok-2 model with web search capability
-  // The model will use its training and any available search based on the prompt
+  // xAI API - using grok-3 model (same as chat section)
   var requestBody = {
-    model: "grok-2-1212",  // Specific stable model version
+    model: "grok-3",
     temperature: 0.5,
     max_tokens: 4096,
     messages: messages.map(function (m) {
