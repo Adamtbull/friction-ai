@@ -974,8 +974,67 @@ export default {
         console.log("Rate limit check failed, continuing:", rateLimitErr.message);
       }
 
-      try {
+      // Fallback deals to use if anything fails
+      var fallbackDeals = [
+        {
+          name: "McDonald's",
+          emoji: "🍟",
+          type: "Fast Food",
+          offers: [
+            { description: "Check the McDonald's app for daily deals", price: "Varies" },
+            { description: "$6 Small McValue Meal", price: "$6.00" },
+            { description: "McChicken & Small Fries via app", price: "$5.95" }
+          ],
+          source: "McDonald's App"
+        },
+        {
+          name: "KFC",
+          emoji: "🍗",
+          type: "Fast Food",
+          offers: [
+            { description: "Check KFC app for exclusive deals", price: "Varies" },
+            { description: "$4.95 Lunch Deals (11am-4pm)", price: "$4.95" },
+            { description: "Zinger Stacker Combo", price: "$12.95" }
+          ],
+          source: "KFC App"
+        },
+        {
+          name: "Domino's",
+          emoji: "🍕",
+          type: "Pizza",
+          offers: [
+            { description: "Value Range Pizzas from $5", price: "From $5" },
+            { description: "Large Traditional Pizza via app", price: "$8.99" },
+            { description: "Check app for weekly coupons", price: "Varies" }
+          ],
+          source: "Domino's App"
+        },
+        {
+          name: "Hungry Jack's",
+          emoji: "🍔",
+          type: "Fast Food",
+          offers: [
+            { description: "Whopper Junior via app", price: "$4.00" },
+            { description: "$6 Stunner Meals", price: "$6.00" }
+          ],
+          source: "Hungry Jack's App"
+        },
+        {
+          name: "Subway",
+          emoji: "🥪",
+          type: "Sandwiches",
+          offers: [
+            { description: "$6 Footlong subs via app", price: "$6.00" },
+            { description: "Sub of the Day deals", price: "Varies" }
+          ],
+          source: "Subway App"
+        }
+      ];
 
+      // Try to get real deals, but ALWAYS return something
+      var parsedDeals = fallbackDeals;
+
+      try {
         // Use Perplexity to search for current takeaway deals
         var dealsPrompt = [
           {
@@ -1023,84 +1082,24 @@ export default {
           }
         ];
 
-        // Try Perplexity search, fall back to defaults if it fails
-        var parsedDeals;
-        try {
-          var dealsResponse = await handlePerplexityPriceSearch(dealsPrompt, env);
+        var dealsResponse = await handlePerplexityPriceSearch(dealsPrompt, env);
 
-          // Parse the JSON response
-          var cleanDealsResponse = dealsResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-          // Try to find JSON array in response
-          var jsonArrayMatch = cleanDealsResponse.match(/\[[\s\S]*\]/);
-          if (jsonArrayMatch) {
-            parsedDeals = JSON.parse(jsonArrayMatch[0]);
-          } else {
-            throw new Error("No JSON array found");
+        // Parse the JSON response
+        var cleanDealsResponse = dealsResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        var jsonArrayMatch = cleanDealsResponse.match(/\[[\s\S]*\]/);
+        if (jsonArrayMatch) {
+          var realDeals = JSON.parse(jsonArrayMatch[0]);
+          if (Array.isArray(realDeals) && realDeals.length > 0) {
+            parsedDeals = realDeals;
           }
-        } catch (searchErr) {
-          // Return fallback deals if search or parsing fails
-          console.log("Takeaway deals search failed, using fallback:", searchErr.message);
-          parsedDeals = [
-            {
-              name: "McDonald's",
-              emoji: "🍟",
-              type: "Fast Food",
-              offers: [
-                { description: "Check the McDonald's app for daily deals", price: "Varies" },
-                { description: "$6 Small McValue Meal", price: "$6.00" },
-                { description: "McChicken & Small Fries via app", price: "$5.95" }
-              ],
-              source: "McDonald's App"
-            },
-            {
-              name: "KFC",
-              emoji: "🍗",
-              type: "Fast Food",
-              offers: [
-                { description: "Check KFC app for exclusive deals", price: "Varies" },
-                { description: "$4.95 Lunch Deals (11am-4pm)", price: "$4.95" },
-                { description: "Zinger Stacker Combo", price: "$12.95" }
-              ],
-              source: "KFC App"
-            },
-            {
-              name: "Domino's",
-              emoji: "🍕",
-              type: "Pizza",
-              offers: [
-                { description: "Value Range Pizzas from $5", price: "From $5" },
-                { description: "Large Traditional Pizza via app", price: "$8.99" },
-                { description: "Check app for weekly coupons", price: "Varies" }
-              ],
-              source: "Domino's App"
-            },
-            {
-              name: "Hungry Jack's",
-              emoji: "🍔",
-              type: "Fast Food",
-              offers: [
-                { description: "Whopper Junior via app", price: "$4.00" },
-                { description: "$6 Stunner Meals", price: "$6.00" }
-              ],
-              source: "Hungry Jack's App"
-            },
-            {
-              name: "Subway",
-              emoji: "🥪",
-              type: "Sandwiches",
-              offers: [
-                { description: "$6 Footlong subs via app", price: "$6.00" },
-                { description: "Sub of the Day deals", price: "Varies" }
-              ],
-              source: "Subway App"
-            }
-          ];
         }
-
-        return jsonResponse({ deals: parsedDeals, location: location }, 200, request);
-      } catch (err) {
-        return jsonResponse({ error: err && err.message ? err.message : "Failed to search deals" }, 500, request);
+      } catch (searchErr) {
+        // Log the error but continue with fallback deals
+        console.log("Takeaway deals search failed, using fallback:", searchErr.message);
       }
+
+      // ALWAYS return 200 with deals (real or fallback)
+      return jsonResponse({ deals: parsedDeals, location: location }, 200, request);
     }
 
     // POST /api/store/specials
@@ -1138,8 +1137,57 @@ export default {
         console.log("Rate limit check failed, continuing:", rateLimitErr.message);
       }
 
-      try {
+      // Fallback specials to use if anything fails
+      var fallbackSpecials = [
+        {
+          name: "Woolworths",
+          emoji: "🟢",
+          category: "Supermarket",
+          items: [
+            { name: "Chicken Breast", detail: "1kg", wasPrice: "12.00", nowPrice: "9.00", save: "3.00" },
+            { name: "Strawberries", detail: "250g punnet", wasPrice: "5.00", nowPrice: "2.50", save: "2.50" },
+            { name: "Helga's Bread", detail: "Various", wasPrice: "5.50", nowPrice: "4.00", save: "1.50" },
+            { name: "Dairy Farmers Milk", detail: "2L", wasPrice: "4.20", nowPrice: "3.20", save: "1.00" },
+            { name: "Tip Top Bread", detail: "700g", wasPrice: "4.40", nowPrice: "2.95", save: "1.45" }
+          ]
+        },
+        {
+          name: "Coles",
+          emoji: "🔴",
+          category: "Supermarket",
+          items: [
+            { name: "Beef Mince", detail: "500g", wasPrice: "10.00", nowPrice: "7.50", save: "2.50" },
+            { name: "Avocados", detail: "Each", wasPrice: "3.00", nowPrice: "1.50", save: "1.50" },
+            { name: "Coles Cheese Block", detail: "500g", wasPrice: "7.50", nowPrice: "5.50", save: "2.00" },
+            { name: "Pork Loin Chops", detail: "Per kg", wasPrice: "16.00", nowPrice: "12.00", save: "4.00" }
+          ]
+        },
+        {
+          name: "ALDI",
+          emoji: "🟡",
+          category: "Discount Supermarket",
+          items: [
+            { name: "Salmon Fillets", detail: "300g", nowPrice: "8.99" },
+            { name: "Mixed Vegetables", detail: "1kg frozen", nowPrice: "3.49" },
+            { name: "Pasta Sauce", detail: "500g jar", nowPrice: "1.99" },
+            { name: "Free Range Eggs", detail: "12 pack", nowPrice: "5.49" }
+          ]
+        },
+        {
+          name: "IGA",
+          emoji: "🔵",
+          category: "Supermarket",
+          items: [
+            { name: "Lamb Leg Roast", detail: "Per kg", wasPrice: "18.00", nowPrice: "14.00", save: "4.00" },
+            { name: "Bananas", detail: "Per kg", wasPrice: "3.50", nowPrice: "2.50", save: "1.00" }
+          ]
+        }
+      ];
 
+      // Try to get real specials, but ALWAYS return something
+      var parsedSpecials = fallbackSpecials;
+
+      try {
         // Use Perplexity to search for current store specials
         var specialsPrompt = [
           {
@@ -1193,74 +1241,24 @@ export default {
           }
         ];
 
-        // Try Perplexity search, fall back to defaults if it fails
-        var parsedSpecials;
-        try {
-          var specialsResponse = await handlePerplexityPriceSearch(specialsPrompt, env);
+        var specialsResponse = await handlePerplexityPriceSearch(specialsPrompt, env);
 
-          // Parse the JSON response
-          var cleanSpecialsResponse = specialsResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-          // Try to find JSON array in response
-          var jsonSpecialsMatch = cleanSpecialsResponse.match(/\[[\s\S]*\]/);
-          if (jsonSpecialsMatch) {
-            parsedSpecials = JSON.parse(jsonSpecialsMatch[0]);
-          } else {
-            throw new Error("No JSON array found");
+        // Parse the JSON response
+        var cleanSpecialsResponse = specialsResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        var jsonSpecialsMatch = cleanSpecialsResponse.match(/\[[\s\S]*\]/);
+        if (jsonSpecialsMatch) {
+          var realSpecials = JSON.parse(jsonSpecialsMatch[0]);
+          if (Array.isArray(realSpecials) && realSpecials.length > 0) {
+            parsedSpecials = realSpecials;
           }
-        } catch (searchErr) {
-          // Return fallback specials if search or parsing fails
-          console.log("Store specials search failed, using fallback:", searchErr.message);
-          parsedSpecials = [
-            {
-              name: "Woolworths",
-              emoji: "🟢",
-              category: "Supermarket",
-              items: [
-                { name: "Chicken Breast", detail: "1kg", wasPrice: "12.00", nowPrice: "9.00", save: "3.00" },
-                { name: "Strawberries", detail: "250g punnet", wasPrice: "5.00", nowPrice: "2.50", save: "2.50" },
-                { name: "Helga's Bread", detail: "Various", wasPrice: "5.50", nowPrice: "4.00", save: "1.50" },
-                { name: "Dairy Farmers Milk", detail: "2L", wasPrice: "4.20", nowPrice: "3.20", save: "1.00" },
-                { name: "Tip Top Bread", detail: "700g", wasPrice: "4.40", nowPrice: "2.95", save: "1.45" }
-              ]
-            },
-            {
-              name: "Coles",
-              emoji: "🔴",
-              category: "Supermarket",
-              items: [
-                { name: "Beef Mince", detail: "500g", wasPrice: "10.00", nowPrice: "7.50", save: "2.50" },
-                { name: "Avocados", detail: "Each", wasPrice: "3.00", nowPrice: "1.50", save: "1.50" },
-                { name: "Coles Cheese Block", detail: "500g", wasPrice: "7.50", nowPrice: "5.50", save: "2.00" },
-                { name: "Pork Loin Chops", detail: "Per kg", wasPrice: "16.00", nowPrice: "12.00", save: "4.00" }
-              ]
-            },
-            {
-              name: "ALDI",
-              emoji: "🟡",
-              category: "Discount Supermarket",
-              items: [
-                { name: "Salmon Fillets", detail: "300g", nowPrice: "8.99" },
-                { name: "Mixed Vegetables", detail: "1kg frozen", nowPrice: "3.49" },
-                { name: "Pasta Sauce", detail: "500g jar", nowPrice: "1.99" },
-                { name: "Free Range Eggs", detail: "12 pack", nowPrice: "5.49" }
-              ]
-            },
-            {
-              name: "IGA",
-              emoji: "🔵",
-              category: "Supermarket",
-              items: [
-                { name: "Lamb Leg Roast", detail: "Per kg", wasPrice: "18.00", nowPrice: "14.00", save: "4.00" },
-                { name: "Bananas", detail: "Per kg", wasPrice: "3.50", nowPrice: "2.50", save: "1.00" }
-              ]
-            }
-          ];
         }
-
-        return jsonResponse({ specials: parsedSpecials, location: specLocation }, 200, request);
-      } catch (err) {
-        return jsonResponse({ error: err && err.message ? err.message : "Failed to search specials" }, 500, request);
+      } catch (searchErr) {
+        // Log the error but continue with fallback specials
+        console.log("Store specials search failed, using fallback:", searchErr.message);
       }
+
+      // ALWAYS return 200 with specials (real or fallback)
+      return jsonResponse({ specials: parsedSpecials, location: specLocation }, 200, request);
     }
 
     // ============ APPOINTMENT IMAGE SCAN ============
