@@ -1277,69 +1277,135 @@ export default {
             cuisineInstruction,
             budgetInstruction,
             "",
-            "CRITICAL: For each restaurant, you MUST provide:",
-            "1. EXACT RESTAURANT NAME (not generic like 'Local Chicken Shop')",
-            "2. STREET ADDRESS if you can find it (e.g., '226-228 Merrylands Road')",
-            "3. ORDER LINK if available (website, Uber Eats, DoorDash, Menulog link)",
+            "ABSOLUTE REQUIREMENTS - READ CAREFULLY:",
             "",
-            "Return ONLY a JSON array with this structure:",
+            "1. REAL RESTAURANT NAMES ONLY:",
+            "   - GOOD: 'La Mono Charcoal Chicken', 'Mehfil Indian Restaurant', 'Kabul House Afghan Cuisine'",
+            "   - BAD: 'Local Chicken Shop', 'Italian Restaurant', 'Indian Takeaway', 'Chinese Restaurant'",
+            "   - If you cannot find the actual business name, DO NOT include it",
+            "",
+            "2. STREET ADDRESS is MANDATORY for every restaurant:",
+            "   - Format: '123 Main Street, Suburb'",
+            "   - Search Google Maps, Uber Eats, or DoorDash to find the exact address",
+            "",
+            "3. ORDER LINK is REQUIRED:",
+            "   - Search Uber Eats, DoorDash, or Menulog for the restaurant",
+            "   - Include the full URL to order from that restaurant",
+            "   - If no delivery, include the restaurant website",
+            "",
+            "Return ONLY a JSON array with this EXACT structure:",
             "[",
             "  {",
             '    "name": "La Mono Charcoal Chicken",',
-            '    "address": "106 Burnett Street, Merrylands",',
+            '    "address": "106 Burnett Street, Merrylands NSW 2160",',
             '    "emoji": "🍗",',
             '    "type": "Charcoal Chicken",',
             '    "isChain": false,',
             '    "offers": [',
-            '      { "description": "🔥 Student Pack: 2 chickens + chips + sauce + drink", "price": "$14.90" },',
-            '      { "description": "Tradies Pack: 3 chickens + chips + salad + drinks", "price": "$39.90" }',
+            '      { "description": "🔥 Student Pack: 2 chickens + chips + sauce + drink", "price": "$14.90" }',
             "    ],",
-            '    "orderLink": "https://www.ubereats.com/au/store/la-mono/xxx",',
-            '    "phone": "02 9999 9999",',
-            '    "source": "Uber Eats / restaurant website"',
+            '    "orderLink": "https://www.ubereats.com/au/store/la-mono-charcoal-chicken/abc123",',
+            '    "phone": "(02) 9637 1234",',
+            '    "source": "Uber Eats"',
+            "  },",
+            "  {",
+            '    "name": "Mehfil Indian Restaurant",',
+            '    "address": "226 Merrylands Road, Merrylands NSW 2160",',
+            '    "emoji": "🍛",',
+            '    "type": "Indian",',
+            '    "isChain": false,',
+            '    "offers": [',
+            '      { "description": "Butter Chicken with Rice & Naan", "price": "$16.90" }',
+            "    ],",
+            '    "orderLink": "https://www.doordash.com/store/mehfil-indian/xyz789",',
+            '    "phone": "(02) 9682 5678",',
+            '    "source": "DoorDash"',
             "  }",
             "]",
             "",
-            "Include 10-15 restaurants with REAL names and addresses.",
-            "Every restaurant must have a real name - NO generic names like 'Local Indian Restaurant'.",
-            "Include order links when available (Uber Eats, DoorDash, Menulog, or restaurant website).",
-            "Only include REAL offers you find from your web search.",
-            "No markdown, no explanation, just the JSON array."
+            "RULES:",
+            "- Include 10-15 REAL restaurants with ACTUAL business names",
+            "- EVERY restaurant MUST have: name, address, orderLink",
+            "- NO generic names allowed - reject any entry without a specific business name",
+            "- Search Uber Eats, DoorDash, Menulog, and Google Maps for this information",
+            "- Only include REAL current deals and prices you find",
+            "- No markdown formatting, no explanation - pure JSON array only"
           ].join("\n")
         },
         {
           role: "user",
           content: [
-            "Search the web RIGHT NOW for takeaway deals in " + location + ", Australia.",
+            "Search RIGHT NOW for restaurants and takeaway deals in " + location + ", Australia.",
             "",
             dealTypeInstruction,
             cuisineInstruction ? cuisineInstruction : "Include all cuisine types.",
             budgetInstruction ? budgetInstruction : "Include all price ranges.",
             "",
-            "IMPORTANT REQUIREMENTS:",
-            "1. Use REAL restaurant names (search Google, Uber Eats, DoorDash for actual businesses)",
-            "2. Include STREET ADDRESSES when you find them",
-            "3. Include ORDER LINKS (Uber Eats, DoorDash, Menulog, or restaurant websites)",
-            "4. Include PHONE NUMBERS if available",
-            "5. Only include deals with REAL prices you found",
+            "SEARCH THESE SOURCES FOR REAL DATA:",
+            "1. Search Uber Eats for '" + location + " restaurants'",
+            "2. Search DoorDash for '" + location + " food delivery'",
+            "3. Search Menulog for restaurants in " + location,
+            "4. Search Google Maps for 'takeaway near " + location + "'",
             "",
-            "Search thoroughly and give me specific restaurants in " + location + " with their actual details."
+            "FOR EACH RESTAURANT YOU MUST PROVIDE:",
+            "- The EXACT business name as it appears on Uber Eats/DoorDash (e.g. 'Hawa Charcoal Chicken' not 'Chicken Shop')",
+            "- The FULL street address (e.g. '45 Railway Parade, Merrylands NSW 2160')",
+            "- The ORDER LINK from Uber Eats, DoorDash, or Menulog",
+            "- Current deals or popular menu items with prices",
+            "",
+            "DO NOT use generic names like 'Local Pizza', 'Indian Restaurant', 'Thai Takeaway'.",
+            "Only include restaurants where you can find the actual business name and address."
           ].join("\n")
         }
       ];
+
+      // Validation function to filter out generic/invalid restaurant entries
+      function isValidRestaurant(deal) {
+        if (!deal || !deal.name) return false;
+
+        // Check for generic names that indicate failed search
+        var genericNames = [
+          'local', 'restaurant', 'takeaway', 'cuisine', 'kitchen', 'food', 'cafe',
+          'pizza place', 'indian restaurant', 'chinese restaurant', 'thai restaurant',
+          'italian restaurant', 'chicken shop', 'kebab shop', 'fish and chips'
+        ];
+        var nameLower = deal.name.toLowerCase();
+
+        // Reject if name is too generic (only contains generic words)
+        var wordCount = deal.name.trim().split(/\s+/).length;
+        if (wordCount <= 2) {
+          for (var i = 0; i < genericNames.length; i++) {
+            if (nameLower === genericNames[i] || nameLower.replace(/[^a-z\s]/g, '').trim() === genericNames[i]) {
+              return false;
+            }
+          }
+        }
+
+        // Require address - must have at least a number and street name
+        if (!deal.address || deal.address.length < 10 || !/\d/.test(deal.address)) {
+          return false;
+        }
+
+        return true;
+      }
 
       try {
         // Try Grok with real-time web search first (best for current deals)
         try {
           console.log("Trying Grok with real-time search for deals...");
           var grokResponse = await handleGrokSearch(dealsPrompt, env);
+          console.log("Grok raw response:", grokResponse.substring(0, 500));
           var cleanGrokResponse = grokResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
           var grokMatch = cleanGrokResponse.match(/\[[\s\S]*\]/);
           if (grokMatch) {
             var grokDeals = JSON.parse(grokMatch[0]);
             if (Array.isArray(grokDeals) && grokDeals.length > 0) {
-              console.log("Grok found " + grokDeals.length + " deals");
-              parsedDeals = grokDeals;
+              // Validate and filter deals
+              var validDeals = grokDeals.filter(isValidRestaurant);
+              console.log("Grok found " + grokDeals.length + " deals, " + validDeals.length + " valid");
+              if (validDeals.length > 0) {
+                parsedDeals = validDeals;
+              }
             }
           }
         } catch (grokErr) {
@@ -1353,8 +1419,11 @@ export default {
             if (jsonArrayMatch) {
               var realDeals = JSON.parse(jsonArrayMatch[0]);
               if (Array.isArray(realDeals) && realDeals.length > 0) {
-                console.log("Perplexity found " + realDeals.length + " deals");
-                parsedDeals = realDeals;
+                var validPerplexityDeals = realDeals.filter(isValidRestaurant);
+                console.log("Perplexity found " + realDeals.length + " deals, " + validPerplexityDeals.length + " valid");
+                if (validPerplexityDeals.length > 0) {
+                  parsedDeals = validPerplexityDeals;
+                }
               }
             }
           } catch (perplexityErr) {
@@ -2492,9 +2561,11 @@ async function handleGrokSearch(messages, env) {
       "Authorization": "Bearer " + apiKey
     },
     body: JSON.stringify({
-      model: "grok-3",
+      model: "grok-2-latest",
       temperature: 0.3,
-      search_enabled: true,  // Enable real-time web search
+      search_parameters: {
+        mode: "auto"
+      },
       messages: messages.map(function (m) {
         return { role: m.role, content: m.content };
       })
