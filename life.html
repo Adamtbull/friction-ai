@@ -1975,6 +1975,47 @@
       color: var(--danger);
     }
 
+    /* Save Preferences Button */
+    .save-preferences-btn {
+      width: 100%;
+      padding: 16px 24px;
+      margin-top: 24px;
+      border: none;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--adult) 100%);
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .save-preferences-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+    }
+
+    .save-preferences-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    }
+
+    .save-btn-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      font-size: 0.9rem;
+    }
+
     .store-options {
       display: flex;
       flex-direction: column;
@@ -4864,7 +4905,10 @@
         <div class="store-options" id="storeOptions"></div>
       </div>
 
-      <button class="form-submit" onclick="saveMealPreferencesAndClose()">Save Preferences</button>
+      <button class="save-preferences-btn" onclick="saveMealPreferencesAndClose()">
+        <span class="save-btn-icon">✓</span>
+        Save Preferences
+      </button>
     </div>
   </div>
 
