@@ -8181,7 +8181,11 @@
     }
 
     function saveMealPreferencesAndClose() {
-      mealPreferences.budget = parseInt(document.getElementById('mealBudget').value) || 150;
+      // Save budget if element exists
+      const budgetInput = document.getElementById('mealBudget');
+      if (budgetInput) {
+        mealPreferences.budget = parseInt(budgetInput.value) || 150;
+      }
 
       // Save location
       const locationInput = document.getElementById('userSuburb');
