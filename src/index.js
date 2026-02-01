@@ -1095,62 +1095,123 @@ export default {
             { description: "Buy 1 Get 1 Free - Featured Restaurants", price: "2 FOR 1" }
           ],
           source: "Uber Eats App"
+        },
+        {
+          name: "Local Charcoal Chicken",
+          emoji: "🍗",
+          type: "Charcoal Chicken",
+          offers: [
+            { description: "🔥 Family Pack: Whole chicken + large chips + salad", price: "$34.95" },
+            { description: "Student Deal: 1/4 chicken + chips + drink", price: "$12.90" },
+            { description: "Tradies Pack: 3 chickens + 2 large chips + sauces", price: "$59.95" }
+          ],
+          source: "Check local shops"
+        },
+        {
+          name: "Lebanese/Middle Eastern",
+          emoji: "🥙",
+          type: "Lebanese",
+          offers: [
+            { description: "🔥 Mixed Plate: Shawarma + falafel + tabouleh + bread", price: "$18.95" },
+            { description: "Family Platter: Kebabs + rice + salads (feeds 4)", price: "$49.95" },
+            { description: "Lunch Special: Chicken wrap + chips + drink", price: "$14.50" }
+          ],
+          source: "Local Lebanese restaurants"
+        },
+        {
+          name: "Indian Restaurant",
+          emoji: "🍛",
+          type: "Indian",
+          offers: [
+            { description: "🔥 Biryani Combo: Chicken biryani + curry + drink", price: "$22.99" },
+            { description: "Family Feast: 2 curries + rice + naan + sides", price: "$45.00" },
+            { description: "Lunch Thali: Rice + 2 curries + sides", price: "$15.95" }
+          ],
+          source: "Local Indian restaurants"
+        },
+        {
+          name: "Thai Takeaway",
+          emoji: "🍜",
+          type: "Thai",
+          offers: [
+            { description: "🔥 Pad Thai + Spring Rolls combo", price: "$16.95" },
+            { description: "Curry + Rice + Satay deal", price: "$18.50" },
+            { description: "Free delivery on orders over $50", price: "FREE DELIVERY" }
+          ],
+          source: "Local Thai restaurants"
         }
       ];
 
       // Try to get real deals, but ALWAYS return something
       var parsedDeals = fallbackDeals;
 
-      // Deals search prompt - used by all AI providers
+      // Deals search prompt - optimized for Grok's real-time local search
       var dealsPrompt = [
         {
           role: "system",
           content: [
-            "You are an Australian takeaway deals finder with REAL-TIME web search.",
-            "Search the web NOW for CURRENT fast food and takeaway specials.",
+            "You are an Australian takeaway deals finder with REAL-TIME web search capability.",
+            "Search the web NOW for CURRENT takeaway deals and specials in the specified location.",
             "",
-            "Focus on major chains and popular takeaway options:",
+            "IMPORTANT: Find BOTH major chains AND local restaurants:",
+            "",
+            "MAJOR CHAINS (include if they have deals):",
             "- McDonald's, KFC, Hungry Jack's, Subway, Domino's, Pizza Hut",
-            "- Guzman y Gomez, Nando's, Oporto, Red Rooster, Chicken Treat",
-            "- Uber Eats, DoorDash, Menulog app deals",
-            "- Local fish & chips, Chinese, Thai, Indian takeaway",
+            "- Guzman y Gomez, Nando's, Oporto, Red Rooster, Crust Pizza",
             "",
-            "IMPORTANT: Search for BOGO, 2-for-1, family deals, app exclusives, and discount offers.",
+            "LOCAL RESTAURANTS (PRIORITIZE THESE - search for local gems):",
+            "- Local charcoal chicken shops with family deals",
+            "- Lebanese/Middle Eastern (shawarma, kebabs, platters)",
+            "- Indian restaurants (biryani, curry specials)",
+            "- Thai takeaway with lunch/dinner specials",
+            "- Chinese restaurants with combo meals",
+            "- Afghan/Persian restaurants (kabab, rice dishes)",
+            "- Italian pizza shops (not just chains)",
+            "- Vietnamese, Greek, Turkish restaurants",
+            "- Fish & chips shops",
+            "- Any local takeaway with good deals",
             "",
-            "Return ONLY a JSON array of deals with this structure:",
+            "INCLUDE STREET ADDRESSES when available (e.g., '226-228 Merrylands Road')",
+            "",
+            "Return ONLY a JSON array with this structure:",
             "[",
             "  {",
-            '    "name": "Restaurant Name",',
-            '    "emoji": "🍔",',
-            '    "type": "Fast Food",',
+            '    "name": "Restaurant Name (Address if known)",',
+            '    "emoji": "🍗",',
+            '    "type": "Charcoal Chicken / Lebanese / Indian / etc",',
             '    "offers": [',
-            '      { "description": "🔥 Buy 1 Get 1 Free Burger", "price": "2 FOR 1" },',
-            '      { "description": "Family Feast Deal", "price": "$29.95" }',
+            '      { "description": "Family Deal: Whole chicken + chips + salad + drinks", "price": "$34.95" },',
+            '      { "description": "Student Pack: 2 chickens + chips + sauce + drink", "price": "$14.90" }',
             "    ],",
-            '    "source": "Restaurant App / Website"',
+            '    "source": "restaurant website / DoorDash / Uber Eats / Facebook"',
             "  }",
             "]",
             "",
-            "Include 8-12 places with their best current deals.",
-            "Prioritize BOGO, 2-for-1, percentage off, and bundle deals.",
-            "Only include REAL current offers from your web search.",
+            "Include 12-18 places mixing chains AND local restaurants.",
+            "Local restaurants with specific deals are MORE valuable than chains.",
+            "Include family packs, combo deals, lunch specials, student deals.",
+            "Only include REAL offers you find from your web search.",
             "No markdown, no explanation, just the JSON array."
           ].join("\n")
         },
         {
           role: "user",
           content: [
-            "Search the web RIGHT NOW for current takeaway and fast food deals near " + location + ", Australia.",
+            "Search the web RIGHT NOW for takeaway deals and restaurant specials in " + location + ", Australia.",
             "",
-            "I want to see:",
-            "1. Buy One Get One Free (BOGO) deals",
-            "2. 2-for-1 offers (like KFC Tuesday, Domino's pickup)",
-            "3. Current app-exclusive deals with big discounts",
-            "4. Family meal bundles and combos",
-            "5. Delivery app promos (Uber Eats, DoorDash, Menulog)",
-            "6. Any limited time offers or weekly specials",
+            "I want to find:",
+            "1. LOCAL charcoal chicken shops with family deals and combo packs",
+            "2. Lebanese/Middle Eastern restaurants with shawarma, kebab, and platter deals",
+            "3. Indian restaurants with biryani combos and curry specials",
+            "4. Local pizza shops (not just Domino's) with pickup/delivery deals",
+            "5. Thai, Vietnamese, Chinese restaurants with lunch/dinner specials",
+            "6. Afghan, Turkish, Greek restaurants with meal deals",
+            "7. Major chains (KFC, Maccas, etc) with current app deals and BOGOs",
+            "8. Uber Eats, DoorDash deals for restaurants in this area",
             "",
-            "Search now and find the BEST VALUE deals available TODAY."
+            "Find restaurants with SPECIFIC addresses and REAL prices.",
+            "I want local hidden gems, not just big chains!",
+            "Search now and give me the BEST takeaway deals in this suburb."
           ].join("\n")
         }
       ];
