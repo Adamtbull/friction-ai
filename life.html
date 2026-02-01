@@ -1333,6 +1333,122 @@
       color: white;
     }
 
+    /* Authenticity Badge */
+    .authenticity-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      backdrop-filter: blur(8px);
+    }
+
+    .authenticity-badge.score-high {
+      background: rgba(46, 125, 50, 0.9);
+      color: white;
+    }
+
+    .authenticity-badge.score-medium {
+      background: rgba(255, 152, 0, 0.9);
+      color: white;
+    }
+
+    .authenticity-badge.score-low {
+      background: rgba(211, 47, 47, 0.9);
+      color: white;
+    }
+
+    .meal-idea-cuisine {
+      font-size: 0.7rem;
+      color: var(--primary);
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    /* Audit Details in expanded view */
+    .audit-section {
+      background: var(--bg);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      margin-top: 16px;
+    }
+
+    .audit-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .audit-score {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .audit-score.high { color: #2e7d32; }
+    .audit-score.medium { color: #ff9800; }
+    .audit-score.low { color: #d32f2f; }
+
+    .audit-verdict {
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .audit-verdict.approved {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .audit-verdict.needs-improvement {
+      background: #fff3e0;
+      color: #e65100;
+    }
+
+    .audit-list {
+      font-size: 0.85rem;
+      margin: 8px 0;
+    }
+
+    .audit-list li {
+      margin-bottom: 4px;
+    }
+
+    .audit-positives { color: #2e7d32; }
+    .audit-concerns { color: #e65100; }
+
+    .audit-suggestion {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+
+    .ai-attribution {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--border);
+    }
+
+    .ai-attribution span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
     /* Meal Selection Bar */
     .meal-selection-bar {
       position: sticky;
@@ -8130,7 +8246,7 @@
             budget: quality,
             complexity: mealPreferences.complexity || 'any',
             cookingMethod: mealPreferences.cookingMethod || 'any',
-            count: 10  // Reduced from 20 to improve API reliability
+            count: 5  // 5 authentic recipes with GPT audit
           })
         });
 
@@ -8238,6 +8354,12 @@
       showToast('Using offline meals (AI unavailable)', 'info');
     }
 
+    function getAuthenticityBadgeClass(score) {
+      if (score >= 7) return 'score-high';
+      if (score >= 4) return 'score-medium';
+      return 'score-low';
+    }
+
     function renderMealIdeasGrid() {
       const grid = document.getElementById('mealIdeasGrid');
 
@@ -8251,19 +8373,29 @@
         return;
       }
 
-      grid.innerHTML = mealIdeas.map(meal => `
+      grid.innerHTML = mealIdeas.map(meal => {
+        const auditScore = meal.audit?.score;
+        const badgeClass = auditScore ? getAuthenticityBadgeClass(auditScore) : '';
+
+        return `
         <div class="meal-idea-card ${selectedMealIds.has(meal.id) ? 'selected' : ''}"
              onclick="toggleMealSelection(${meal.id})"
              ondblclick="expandMealCard(${meal.id})">
           <div class="meal-idea-checkbox">${selectedMealIds.has(meal.id) ? '✓' : ''}</div>
+          ${auditScore ? `
+            <div class="authenticity-badge ${badgeClass}">
+              ✓ ${auditScore}/10
+            </div>
+          ` : ''}
           <div class="meal-idea-image">${meal.emoji}</div>
           <div class="meal-idea-content">
+            ${meal.cuisine ? `<div class="meal-idea-cuisine">${meal.cuisine}</div>` : ''}
             <div class="meal-idea-name">${meal.name}</div>
             ${meal.description ? `<div class="meal-idea-description">${meal.description}</div>` : ''}
             <div class="meal-idea-meta">${meal.time} • ${meal.servings} servings</div>
           </div>
         </div>
-      `).join('');
+      `}).join('');
 
       updateSelectionBar();
     }
@@ -8306,15 +8438,74 @@
       const meal = mealIdeas.find(m => m.id === mealId);
       if (!meal) return;
 
+      // Build audit section if available
+      let auditHtml = '';
+      if (meal.audit) {
+        const scoreClass = meal.audit.score >= 7 ? 'high' : (meal.audit.score >= 4 ? 'medium' : 'low');
+        const verdictClass = meal.audit.verdict === 'Approved' ? 'approved' : 'needs-improvement';
+
+        auditHtml = `
+          <div class="audit-section">
+            <div class="audit-header">
+              <div>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">Authenticity Score</span>
+                <div class="audit-score ${scoreClass}">${meal.audit.score}/10</div>
+              </div>
+              <span class="audit-verdict ${verdictClass}">${meal.audit.verdict}</span>
+            </div>
+            ${meal.audit.positives?.length ? `
+              <div class="audit-positives">
+                <strong>✓ What's authentic:</strong>
+                <ul class="audit-list">
+                  ${meal.audit.positives.map(p => `<li>${p}</li>`).join('')}
+                </ul>
+              </div>
+            ` : ''}
+            ${meal.audit.concerns?.length ? `
+              <div class="audit-concerns">
+                <strong>⚠ Concerns:</strong>
+                <ul class="audit-list">
+                  ${meal.audit.concerns.map(c => `<li>${c}</li>`).join('')}
+                </ul>
+              </div>
+            ` : ''}
+            ${meal.audit.suggestion ? `
+              <div class="audit-suggestion">
+                💡 ${meal.audit.suggestion}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+
+      // Build traditional tip if available
+      let traditionalTipHtml = '';
+      if (meal.traditionalTip) {
+        traditionalTipHtml = `
+          <div class="expanded-meal-section" style="background: #fff8e1; padding: 12px; border-radius: var(--radius-md); margin-top: 12px;">
+            <h4 style="margin-bottom: 8px;">🍽️ Traditional Serving Tip</h4>
+            <p style="font-size: 0.9rem; margin: 0; color: #5d4037;">${meal.traditionalTip}</p>
+          </div>
+        `;
+      }
+
       document.getElementById('expandedMealTitle').textContent = meal.name;
       document.getElementById('expandedMealContent').innerHTML = `
         <div class="expanded-meal-image">${meal.emoji}</div>
+        ${meal.cuisine ? `<div style="text-align: center; color: var(--primary); font-weight: 600; margin-bottom: 8px;">${meal.cuisine} Cuisine</div>` : ''}
         ${meal.description ? `<div class="expanded-meal-description">${meal.description}</div>` : ''}
+        ${meal.authenticityNote ? `<div style="text-align: center; font-size: 0.8rem; color: var(--text-muted); font-style: italic; margin-bottom: 12px;">✓ ${meal.authenticityNote}</div>` : ''}
+
+        ${auditHtml}
 
         <div class="expanded-meal-section">
           <h4>📋 Ingredients (${meal.ingredients.length})</h4>
           <div class="expanded-ingredient-list">
-            ${meal.ingredients.map(ing => `<span class="expanded-ingredient">${getIngredientDisplay(ing)}</span>`).join('')}
+            ${meal.ingredients.map(ing => {
+              const display = getIngredientDisplay(ing);
+              const note = ing.authenticNote ? ` <span style="font-size: 0.7rem; color: var(--text-muted);">(${ing.authenticNote})</span>` : '';
+              return `<span class="expanded-ingredient">${display}${note}</span>`;
+            }).join('')}
           </div>
         </div>
 
@@ -8328,6 +8519,13 @@
               </div>
             `).join('')}
           </div>
+        </div>
+
+        ${traditionalTipHtml}
+
+        <div class="ai-attribution">
+          <span>🤖 Generated by Claude</span>
+          <span>✓ Audited by GPT-4</span>
         </div>
 
         <div class="expanded-meal-actions">
